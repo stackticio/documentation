@@ -1,0 +1,118 @@
+/* Main container that holds everything */
+.pricingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 50px 0;
+  background: #f4f7fa; /* Soft background */
+}
+
+/* Container for the cards */
+.cardContainer {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap; /* Allows cards to wrap to the next line on smaller screens */
+}
+
+/* Styling for each card */
+.card {
+  border: 1px solid rgba(0, 123, 255, 0.3);
+  background: linear-gradient(145deg, #ffffff, #e6e8eb);
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1),
+              -5px -5px 15px rgba(255, 255, 255, 0.7);
+  border-radius: 20px;
+  padding: 30px;
+  margin: 15px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease-in-out;
+  width: calc(33.333% - 60px); /* Adjusts the width of the cards to fit three in a row */
+}
+
+/* Hover effect for cards */
+.card:hover {
+  transform: translateY(-5px); /* Subtle lift effect */
+}
+
+/* Heading of the card */
+.cardHeading {
+  text-align: center;
+  color: #073b4c; /* Dark cyan */
+  padding: 20px 0;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-size: 1.5em;
+  font-weight: 600;
+}
+
+/* Styling for the customization process section */
+.customizationProcessContainer,
+.customizationProcess {
+  display: flex;
+  justify-content: center;
+  margin-top: 50px;
+  text-align: center;
+}
+
+.customizationProcess {
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 20px;
+  width: 80%;
+  max-width: 600px;
+  margin: 50px auto;
+}
+
+/* Media query for smaller screens to stack cards */
+@media (max-width: 768px) {
+  .cardContainer {
+    flex-direction: column;
+  }
+
+  .card {
+    width: auto; /* Full width on small screens */
+    margin-bottom: 25px;
+  }
+}
+
+/* Styling for the bubbles */
+.bubble {
+  background-color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  margin: 15px 0;
+  padding: 20px;
+  box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.05),
+              inset -2px -2px 5px rgba(255, 255, 255, 0.5);
+}
+
+/* Space between sections inside the card */
+.section:not(:last-child) {
+  margin-bottom: 25px;
+}
+
+/* Styling for the list inside the bubbles */
+.bubble ul {
+  list-style: none;
+  padding-left: 20px;
+}
+
+/* Custom list item bullet */
+.bubble ul li::before {
+  content: '• ';
+  color: #007bff;
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+
+.customizationProcessPricing {
+  max-width: 80%;
+  margin: 50px auto; /* Center and provide top and bottom spacing */
+}
+
+/* You may want to add some top margin if you want more space between this section and the previous one */
+.customizationProcessPricing .bubble {
+  margin-top: 30px;
+}

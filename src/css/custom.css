@@ -1,0 +1,92 @@
+/* Custom.css - Global styles and themes for the Docusaurus documentation */
+:root {
+    --primary-bg-color: #f4f5f7;
+    --primary-text-color: #333333; /* Ensuring text is clearly black */
+    --link-color: #0052cc;
+    --navbar-bg-color: #B7C7CE;
+    --footer-bg-color: #0052cc;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--primary-bg-color); /* Use primary background color */
+  color: var(--primary-text-color); /* Ensure text color is set globally */
+  overflow-x: hidden; /* Prevent horizontal overflow */
+}
+
+body {
+   font-family: 'JetBrains Mono', sans-serif;
+}
+
+/* Navbar styling */
+.navbar__brand {
+  display: flex;
+  align-items: center; /* Vertically center the logo */
+  justify-content: flex-start; /* Align logo to the left */
+  padding-left: 20px; /* Add padding to adjust alignment */
+}
+
+.navbar__brand img {
+  width: auto; 
+  max-width: 350px; /* Set the width you want for the logo */
+  height: 70px; /* Adjust height if needed */
+}
+
+.navbar {
+    background-color: var(--navbar-bg-color);
+    height: 80px; /* Increase the navbar height if needed to fit the logo */
+}
+
+.navbar__link, .navbar__title {
+    color: #ffffff;
+    font: 14px 'JetBrains Mono', sans-serif;
+    font-weight: bold;
+}
+
+.footer {
+    background-color: var(--footer-bg-color);
+    color: #ffffff;
+}
+
+.footer__link {
+    color: #ffffff;
+}
+
+.docSidebar {
+    background-color: var(--primary-bg-color);
+}
+
+.sidebar__link {
+    color: var(--primary-text-color);
+}
+
+.sidebar__link--active {
+    font-weight: bold;
+    color: var(--link-color);
+}
+
+.markdown, .docItemContainer {
+    text-align: left;
+    line-height: 1.3;
+    color: var(--primary-text-color); /* Reinforce text color for markdown and documentation container */
+}
+
+.markdown li, .mdx li, .docItemContainer li {
+    margin-bottom: 0.5em;
+}
+
+/* Adjusting sidebar link colors */
+.sidebar__link {
+    color: var(--primary-text-color); /* Using the primary text color variable */
+}
+
+/* Custom color for headings */
+h1, h2, h3, h4, h5, h6 {
+    color: #333; /* Example: Changing to the link color for consistency or choose a different color */
+}
+
+body, .docMainWrapper, .main-wrapper {
+    background-color: #ffffff; /* Ensuring a white background */
+}
+

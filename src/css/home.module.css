@@ -1,0 +1,341 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+:root {
+  /* Color scheme */
+  --primary-color: #0052cc; /* Primary color for your brand */
+  --text-color: #333; /* Main text color */
+  --background-color: #ffffff; /* Background color */
+  --accent-color: #f0f0f0; /* Light grey for backgrounds to add depth */
+  --button-bg-color: #0052cc; /* Button background color */
+  --button-hover-bg-color: #003d99; /* Button hover background color */
+  --button-text-color: #ffffff; /* Button text color */
+  --font-family: 'Poppins', sans-serif; /* Font family */
+}
+
+/* General Styles */
+.containerHome {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 40px 20px;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: 'Poppins', sans-serif;
+}
+
+.headlineContainerHome {
+  padding: 20px;
+  background-color: #f5f5f5; /* Light grey background */
+  border-radius: 8px; /* Rounded corners */
+  margin-bottom: 20px; /* Space below the container */
+}
+
+/* Intro Section Styles */
+.introSectionHome {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  margin-bottom: 40px;
+  background-color: var(--accent-color); /* Subtle background to distinguish the section */
+  padding: var(--text-box-padding);
+  border-radius: 8px; /* Soften edges */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Subtle shadow for depth */
+}
+
+.introTextHome {
+  flex: 1;
+  max-width: 50%;
+  text-align: left;
+  padding-right: 30px; /* Closer to the image */
+  background-color: var(--text-box-background-color);
+  font-size: var(--font-size-large); /* Larger for readability */
+  border-radius: 8px; /* Rounded corners for modern look */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Subtle shadow for depth */
+}
+
+.introTextHomeLi {
+  font-size: var(--font-size-large); /* Consistent larger size for list items */
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+
+.introImageHome {
+  flex: 1;
+  max-width: 45%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.imageHome {
+  width: 100%;
+  max-width: 550px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Stacktic Designed For Section */
+.stackticDesignedFor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: left;
+  margin: var(--section-margin);
+  max-width: 60%;
+  background-color: var(--text-box-background-color);
+  padding: var(--text-box-padding);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.stackticDesignedFor ul, .stackticDesignedFor li {
+  list-style-type: none; /* Remove default bullets */
+  padding-left: 0; /* Remove default padding which might offset custom bullets */
+  margin-left: 0; /* Ensure list aligns properly without default indentation */
+}
+
+.stackticDesignedForLi {
+  font-size: var(--font-size-standard);
+  margin-bottom: 10px;
+}
+
+/* Centered Image Adjustments */
+.centeredImageHome {
+  max-width: 70%;
+  height: auto;
+  margin: 0 auto;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.imageContainerHome {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 150%;
+}
+
+/* Additional Styling */
+.bottomSpacingLargeHome {
+  margin-bottom: 120px; /* Ensure ample spacing at the bottom */
+}
+
+/* Adjust Bottom Text Size */
+.bottomTextHome li {
+  margin-bottom: 10px; /* Space between list items */
+  line-height: 1.6; /* Line spacing for readability */
+  color: #444; /* Slightly lighter text color for readability */
+}
+
+.bottomTextHome li::before {
+  content: "•"; /* Custom bullet point */
+  color: #007BFF; /* Bullet point color */
+  font-weight: bold; /* Bold bullet points */
+  display: inline-block;
+  width: 1em; /* Space before bullet points */
+  margin-left: -1em; /* Align bullet points outside the text alignment */
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .introSectionHome {
+    flex-direction: column;
+    text-align: center;
+    gap: 20px;
+  }
+
+  .introTextHome, .introImageHome, .stackticDesignedFor {
+    max-width: 100%;
+    padding: var(--text-box-padding);
+    text-align: center;
+  }
+
+  .introTextHome {
+    padding-left: 0; /* Ensuring text alignment and spacing on smaller screens */
+    padding-right: 0;
+  }
+}
+
+
+/* General description style */
+.stackticDescription {
+  text-align: center; /* Ensure text is centered */
+  max-width: 80%; /* Control the width to not span the entire container width */
+  margin: 0 auto 50px; /* Center it horizontally and add bottom margin */
+  padding: 20px; /* Add some padding for spacing */
+  font-size: var(--font-size-large); /* Use a slightly larger font size for emphasis */
+  background-color: var(--text-box-background-color); /* Optional: background color for emphasis */
+  border-radius: 8px; /* Rounded corners for a modern look */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Subtle shadow for depth */
+}
+
+/* Style for lists that need to be centralized */
+.stackticDesignedFor, .stackticDesignedForLi {
+  text-align: center; /* Center text for both the container and list items */
+  max-width: 90%; /* Adjust width as needed to fit content appropriately */
+  margin: 0 auto; /* Center the block horizontally */
+  padding: var(--text-box-padding); /* Consistent padding */
+  list-style-position: inside; /* Ensure list markers are inside to align text properly */
+}
+
+/* Ensuring the entire block is centered within its parent */
+.stackticDesignedFor {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Align children (text, list) to the center */
+  justify-content: center; /* Center content vertically if needed */
+  background-color: var(--text-box-background-color); /* Optional: for emphasis */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Subtle shadow */
+}
+
+/* Centralized Content Section */
+.stackticDesignedFor {
+  display: block; /* Use block layout for simpler alignment */
+  max-width: 60%; /* Limiting width to prevent stretching */
+  margin: 0 auto; /* Center the block horizontally */
+  padding: 20px; /* Add padding for visual spacing */
+  text-align: left; /* Align text to the left for consistency */
+}
+
+.stackticDesignedFor h2 {
+  text-align: center; /* Center the heading */
+  margin-bottom: 20px; /* Space below the heading */
+}
+
+.stackticDesignedForLi {
+  margin-bottom: 10px; /* Space between list items */
+}
+
+/* Adjust the font size for readability */
+.stackticDesignedFor, .stackticDesignedForLi {
+  font-size: 1.1rem; /* Adjust based on preference */
+}
+
+/* Ensure the list is visually distinct and well-presented */
+.stackticDesignedFor ul {
+  list-style-type: none; /* Remove default list styling */
+  padding: 0; /* Remove default padding */
+}
+
+.stackticDesignedFor li::before {
+  content: "•"; /* Custom bullet point */
+  color: #007BFF; /* Bullet point color */
+  font-weight: bold; /* Bold bullet points */
+  display: inline-block;
+  margin-right: 10px; /* Space between the bullet and the text */
+  /* Adjusted to not use negative margin, ensuring it doesn't create double bullets */
+}
+
+.videoContainerHome {
+  text-align: center; /* Center the video horizontally */
+  margin-top: 20px; /* Spacing from the text above */
+}
+
+.videoHome {
+  width: 100%; /* Responsive width */
+  max-width: 900px; /* Maximum size to ensure it's not too large */
+  height: auto; /* Maintain aspect ratio */
+  border-radius: 8px; /* Optional: rounded corners */
+}
+
+
+
+
+/* Homepage Button Container to mimic Solution Page styles */
+.homeButtonContainer {
+  text-align: center;
+  margin: 20px 0;
+}
+
+/* Mimicking Solution Page Button Styles for the Home Page */
+.homeButton {
+  padding: 20px 40px;
+  margin: 0 10px;
+  background-color: #0052cc; /* Blue background */
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: bold;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.homeButton:hover, .homeButton:focus {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  outline: none;
+}
+
+/* Ensuring the layout structure is not ruined */
+.containerHome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+
+/* You might need to adjust the existing styles to ensure consistency */
+/* Button Container */
+.buttonContainerHome {
+  text-align: center;
+  margin: 40px 0; /* Adjust the margin as needed */
+}
+
+/* Buttons */
+.homeButton {
+  padding: 15px 30px; /* Adjust padding to match the size of the solution page buttons */
+  margin: 0 10px; /* Space between buttons */
+  background-color: var(--button-bg-color);
+  color: var(--button-text-color);
+  border: none;
+  border-radius: 5px; /* Adjust for rounded corners */
+  cursor: pointer;
+  font-size: 1rem; /* Adjust font size as needed */
+  font-weight: 600; /* Bold font weight */
+  font-family: var(--font-family);
+  transition: background-color 0.3s, transform 0.2s; /* Smooth transition for hover effects */
+}
+
+.homeButton:hover, .homeButton:focus {
+  background-color: var(--button-hover-bg-color); /* Darker shade on hover/focus */
+  transform: scale(1.05); /* Slightly increase size on hover/focus */
+  outline: none; /* Remove outline to keep the design clean */
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+  .buttonContainerHome {
+    margin: 20px 0; /* Less vertical space on smaller screens */
+  }
+
+  .homeButton {
+    padding: 12px 24px; /* Slightly smaller buttons on smaller screens */
+    font-size: 0.9rem; /* Smaller font size for better fit */
+  }
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+:root {
+  /* Color scheme */
+  --primary-color: #0052cc; /* Primary color for your brand */
+  --text-color: #333; /* Main text color */
+  --background-color: #ffffff; /* Background color */
+  --accent-color: #f0f0f0; /* Light grey for backgrounds to add depth */
+  --button-bg-color: #0052cc; /* Button background color, matching Solutions */
+  --button-hover-bg-color: #003d99; /* Button hover background color, matching Solutions */
+  --button-text-color: #ffffff; /* Button text color, white as per Solutions */
+  --font-family: 'Poppins', sans-serif; /* Font family, Poppins as per Solutions */
+}
+
+/* Ensuring consistency in button container placement and styling */
+.buttonContainerHome, .button-container-solution {
+  text-align: center;
+  margin: 20px 0; /* Adjusted to ensure it's at the top and has space before content starts */
+}

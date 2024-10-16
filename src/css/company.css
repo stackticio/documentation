@@ -1,0 +1,121 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+:root {
+  /* Define a cohesive color scheme */
+  --primary-color: #0052cc;
+  --text-color: #333;
+  --background-color: #ffffff;
+  --accent-color: #f0f0f0; /* Light grey for backgrounds */
+}
+
+/* General Styles */
+.container-company {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: 'Poppins', sans-serif;
+}
+
+.headline-container-company {
+  text-align: center;
+  margin: 50px 0;
+}
+
+/* Intro Section Styles */
+.intro-section-company {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.intro-text-company {
+  flex: 1;
+  max-width: 45%;
+  text-align: left;
+  padding: 0 20px;
+}
+
+.intro-text-company li {
+  font-size: 1.6rem;
+  line-height: 1.6;
+  margin-bottom: 20px; /* More space for readability */
+}
+
+.intro-image-company {
+  flex: 1;
+  max-width: 45%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-company {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Add shadow for depth */
+}
+
+/* Detailed Section Styles */
+.detailed-section-company, .bottom-text-company, .stacktic-description-company, .stacktic-designed-for-company {
+  text-align: center;
+  margin: 40px 0;
+}
+
+.detailed-text-company, .stacktic-description-company p, .stacktic-designed-for-company li {
+  font-size: 1.2rem;
+  max-width: 80%;
+  margin: 0 auto; /* Center content */
+  line-height: 1.6; /* Improve readability */
+  padding: 10px; /* Add padding for better spacing */
+  background-color: var(--accent-color); /* Use accent color for background */
+  border-radius: 8px; /* Soften edges */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Subtle shadow */
+}
+
+/* Improve heading styles for emphasis */
+.headline-container-company h1 {
+  font-size: 2.5rem;
+  color: var(--primary-color); /* Use primary color for headings */
+  margin-bottom: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .intro-section-company {
+    flex-direction: column;
+  }
+
+  .intro-text-company, .intro-image-company {
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .intro-text-company {
+    padding: 0;
+  }
+}
+
+/* Additional Styles for Professional Look */
+.bottom-spacing-large-company {
+  margin-bottom: 120px;
+}
+
+/* Ensure images are centered and responsive */
+.centered-image-company {
+  max-width: 70%;
+  margin: 20px auto; /* Center and add vertical space */
+}
+
+.image-container-company {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+

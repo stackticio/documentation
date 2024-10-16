@@ -68,7 +68,7 @@ The Stacktic system streamlines the application setup process, from initial desi
    - **Description**: Upon saving the design, the logic engine activates. It translates the saved design into a structured database that reflects the specified components and their interactions. This engine processes the metadata, preparing it for further actions.
 
 4. **Data Layer**:
-   - **Description**: The SQL database stores UI components and their relationships in PostgreSQL, including links, components, and attributes. Upon user submission, the system generates the templating metadata (Cookiecutter YAML) from the database. This allows conditions in the template repository to access the metadata, facilitating the creation of templates according to the rules and logic defined within the template.
+   - **Description**: The  database stores UI components and their relationships such as links, components, and attributes. or stacks Upon user submission,  
 
 5. **Stack Generator**:
    - **Description**: Converts the metadata configuration into the customer's GitHub repository. This process involves stripping all conditions from our templates and pushing the refined code directly into the repository.

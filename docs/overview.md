@@ -5,15 +5,18 @@ hide_table_of_contents: true
 
 # What is Stacktic?
 
-Stacktic is a **stack generator platform** engineered to simplify the development and operation of modern applications. Utilizing metadata and a logic engine, Stacktic automates the generation of configurations for a diverse array of open-source frameworks and tools. This automation facilitates the creation of a GitHub repository tailored to your project's needs, encompassing everything from build processes and APIs to infrastructure and security considerations.
+Stacktic is a developer platform for generating full-stack, sovereign applications.
+But it's more than just a platform—it defines a new standard for building and operating full-stack apps by automating common patterns from Day 0 to Day 2.
 
-Beyond being merely a design tool, Stacktic provides a robust suite of features for "Day 2" operations, including versioning and comprehensive management capabilities. At the heart of Stacktic's philosophy is a commitment to **zero vendor lock-in**, with a foundation built entirely on open-source technologies. These technologies are not only selected and integrated for their stability and reliability but are also customizable by users, enhancing flexibility through logical parameters.
+It starts with a simple process:
+You design your app’s topology, properties, and configuration → push build → and Stacktic generates a production-ready full-stack skeleton directly into your repository.
 
-The platform empowers users with a self-service engine, enabling the addition, customization, and seamless control of their tooling. This flexibility ensures Stacktic's integration with virtually any desired tool or technology.
+From there, Stacktic becomes your operation layer—letting you version, modify, secure your stack, and even receive smart notifications with recommendations for improvement.
 
-In essence, Stacktic offers an end-to-end (E2E) solution for the design, operation, and security of advanced applications on Kubernetes. This comprehensive approach is designed to maximize efficiency, results, and quality with minimal effort. Stacktic ensures that users can not only deploy but also effectively manage and secure their applications, establishing it as a comprehensive platform for the development of modern applications.
+Stacktic automates topology, operations, and security—including data flows, policies, microservices, and more...
+The result is a fully customized, production-ready repository—generated for you.
 
-The goal of Stacktic is to transform months of development work into results achievable in seconds, all while maintaining as much generality and flexibility as possible.
+We automate the hard work so engineers can focus on customization, with full control and ownership of their stack.
 
 ![img_20.png](img_20.png)
 

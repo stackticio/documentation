@@ -26,4 +26,8 @@ This helps Stacktic forecast performance and scaling needs.
 
 ### 📦 Example: Initial App Topology
 
-[![Watch the video](https://img.youtube.com/vi/VIDEO_ID/maxresdefault.jpg)](https://video.wixstatic.com/video/06ddae_156895725d83421bae1cc5e90362b682/1080p/mp4/file.mp4)
+## Demo Video
+
+Click the image below to watch the demo:
+
+[![Demo Video](https://via.placeholder.com/640x480.png?text=Click+to+Play+Video)](https://video.wixstatic.com/video/06ddae_156895725d83421bae1cc5e90362b682/1080p/mp4/file.mp4)

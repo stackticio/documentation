@@ -16,8 +16,10 @@ The workflow is always the same: **design → import → tune → validate**.
 
 | Scenario | How to onboard it |
 |----------|------------------|
-| **Source code in Git** | Add an **`external-code`** component that points to the repo and its Dockerfile. Stakctic will clone, build, scan, and deploy the image, injecting ENV vars and configs automatically. |
-| **Pre‑built container image** | Use an **`image-base`** service. Stakctic simply pulls the image that your CI has already published. |
+| **Source code in Git** | Add an **`external_source_code`** component that points to the repo and its Dockerfile. Stakctic will clone, build, scan, and deploy the image, injecting ENV vars and configs automatically. |
+| **Pre‑built container image** | Use an **`image_base`** service. Stakctic simply pulls the image that your CI has already published. |
+
+<img width="474" height="423" alt="image" src="https://github.com/user-attachments/assets/3643398e-06c2-42f8-a829-3f5f05ce27cc" />
 
 ---
 
@@ -27,12 +29,16 @@ The workflow is always the same: **design → import → tune → validate**.
 2. Declare relationships so the app receives connection strings and credentials via secrets.  
 3. (Optional) Connect the app to an **API Gateway** for ingress and routing.
 
+<img width="328" height="366" alt="image" src="https://github.com/user-attachments/assets/8158e633-0464-4382-8809-c3df89fc9d5c" />
+
 ---
 
 ### 4&nbsp;· Load existing data
 
 - **Manual import** – run your own migration job.  
 - **Bucket automation** – point Stakctic at an object‑storage bucket; it will generate a Kubernetes Job to load the dump into the linked database.
+
+<img width="594" height="334" alt="image" src="https://github.com/user-attachments/assets/05efa951-b323-48b7-aa44-8fd01679935a" />
 
 ---
 
@@ -43,8 +49,7 @@ The workflow is always the same: **design → import → tune → validate**.
 
 ---
 
-### 6&nbsp;· Layer on additional components (optional)
-
+### 6&nbsp;· Layer on additional components 
 Need more complexity? Add:
 
 - **Airflow** for ETL pipelines.  
@@ -52,6 +57,8 @@ Need more complexity? Add:
 - Any other micro‑services or data‑flow tooling.
 
 Re‑validate after each addition.
+
+<img width="768" height="612" alt="image" src="https://github.com/user-attachments/assets/d2bef256-4462-4675-96b1-59af9b651af6" />
 
 ---
 
@@ -65,6 +72,8 @@ Once the stack is stable, enable operational add‑ons:
 - **Security policies & RBAC**.
 
 Run Stakctic’s readiness checks to make sure the cluster is production‑ready.
+
+<img width="1471" height="721" alt="image" src="https://github.com/user-attachments/assets/217a3a8e-5519-4cca-a191-2257865bc00e" />
 
 ---
 

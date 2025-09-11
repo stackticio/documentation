@@ -175,4 +175,27 @@ This structure provides **flexibility and precision** while maintaining a clear 
 
 <img width="471" height="392" alt="image" src="https://github.com/user-attachments/assets/b63b0da4-ef2d-4a14-8697-4880e69dc0e7" />
 
+## 🏢 Stacktic SaaS Considerations
+
+Stacktic’s **public SaaS** is built on **multi-tenant principles** and **best security practices**.  
+- We **do not store personal application data** or run directly in your production environment.  
+- For customers with stricter security or compliance requirements, we offer the following options:
+
+### 🔒 Flexible Deployment Options
+1. **Private Public SaaS**  
+   - We can host and manage Stacktic as a **dedicated SaaS instance** for your organization.  
+   - Supports private data and backend management.  
+   - We can restrict access with **firewall rules** to your IP ranges or apply **specific custom configurations** to meet your security requirements.
+
+2. **Private SaaS for Highly Regulated Customers**  
+   - Deploy Stacktic **within your own clusters**, **compliant data centers**, or **air-gapped environments**.  
+   - We only require secure access to **push updates remotely** to the Stacktic host, ensuring you maintain full control of sensitive environments.
+
+---
+
+## 🔐 Security and Openness
+
+Stacktic is an **open platform**, meaning:  
+- If you deploy Stacktic as **private SaaS** or use our **health-check agent**, **you retain the option and responsibility** to modify or add your own security measures to our services.  
+- This flexibility allows organizations to **align Stacktic with their internal security policies** without vendor lock-in or restricted controls.
 

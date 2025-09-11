@@ -110,7 +110,7 @@ stacktic is a metdata based logic which can udnerstand by single link from one s
 when you connect for example backend to database there always one good pattenrs which include secrets, depencies , api , configmap exchange ENV and doecumantion explaining the configraiton ..
 the only elements htat could impact is the versions which can impact depencdencies ,knolwedge shraing and more.. stacktic automate the good pattern while understing the depcncies of the versions 
 
-
+<img width="1016" height="517" alt="image" src="https://github.com/user-attachments/assets/4f64e6d1-2e75-465a-a2d7-61783f5b3d67" />
 
 
 ### Metadata Structure Overview

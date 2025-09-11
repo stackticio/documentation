@@ -9,13 +9,11 @@ The architecture and approach of Stacktic reflect a deep commitment to security,
 
 ## Security and Data Concerns
 
-Stacktic operates as a stack generator, not as an operator or agent within your infrastructure. This means it requires only basic credentials to initialize an empty repository and registry, without storing any personal information or code. The platform provides the application's skeleton, allowing you to write or migrate your code without concern for underlying complexities.
+Stacktic operates as a stack generator, not as an operator or deployemnt agent within your infrastructure. This means it requires only credentials for git repo to push and merge and registry to pull and build images to initialize an empty repository and registry, without storing any personal information or code. The platform provides the application's skeleton, allowing you to write or migrate your code without concern for underlying complexities.
 
-## Relation with the Repository
-
-Stacktic actively manages and updates versions, dependencies, connections, and services to ensure your stack remains current. It accomplishes this by creating new branches for these updates, giving you the option to merge these changes or ignore them if upgrades are not desired at the moment.
-
-This example highlights the overall workflow. The user begins by entering initial information, such as registry details and Git credentials for a dedicated project repository. They then specify a branch for Stacktic updates, utilizing "main" for their code. The user integrates all initial design code in the first merge, followed by subsequent merges for changes, updates, and modifications on day two.
+## stacktic autoamtion overview
+Stacktic autoamte any layer and step on the way for full stack applciations from day0 architedcturr to day1 despcloemnt to day2 operation. the platform understand metdata based on the UI toplogiy and its autoamtign all these layers unclduging the security and human tasks configiraiton involved...    it does not have anthing to do wioth the code itself of the logic or the datbases.. its create all the sekelton till code inclduign the infra,apis,connecores ,decpencies and more but the code is compeltly yours .   in other words its autoamting every beyond the code so yoyu just focus on the code. 
+stacktic will generate the atuoamtion into git repo that ccan installed on single command or components like argocd directly to k8s 
 
 ![img_23.png](img_23.png)
 
@@ -23,62 +21,90 @@ This example highlights the overall workflow. The user begins by entering initia
 
 The repository structure maintained by Stacktic follows a consistent format, leveraging the strengths of both Helm charts and Kustomize for maximum flexibility and maintainability:
 
-- **Helm Chart Templating**: Used for creating YAML files, offering dynamic configuration capabilities.
-- **Kustomize Control**: Provides overlays to manage different environments or configurations, enhancing Helm's templating.
-- **Deployment and Build Directories**: Located under `k8s/deploy` for deployment configurations and `k8s/build` for build processes, respectively.
+- **Helm Chart Templating**: Hlem is being Used for creating the deplyoemnt YAML ready for kustomize but we bypass managing helm charts itslef overhead..  instead we created full kustomze setup on the helm results 
+- **Kustomize Control**: the stack sturcutre is defined by kustomize where each components autoamtcly configured at the base with pre-defined overlays, you can deploy your stack from single commands on any k8s cloud. 
+- **Deployment and Build Directories**: kustomize do both builkd and deploy, Located under `k8s/deploy` for deployment configurations and `k8s/build` for build processes, respectively.  the build is being trigered by kaniko
+```
+  cat k8s/deploy/overlays/dev/kustomization.yaml
+resources:
+  - fastapi
+  - stack-agent
+  - prod
+  - dev
+  - stage
+  - cert-manager
+  - minio
+  - apisix
+  - cnpg
+  - rabbitmq
+  - keycloak-operator.........
+ 
+tree -d k8s/deploy/base/
+
+k8s/deploy/base/
+├── apisix
+│   ├── crd
+│   ├── patch
+│   └── secret
+├── cert-manager
+│   └── issuer
+├── cnpg
+│   ├── backup
+│   ├── jobs
+│   ├── patch
+│   └── secret
+├── dev
+│   ├── config
+│   ├── files
+│   ├── jobs
+│   ├── patch
+│   └── secret
+│       └── cosign
+├── fastapi
+│   ├── files
+│   ├── patch
+│   └── secret
+├── keycloak-operator
+│   ├── crds
+│   ├── jobs
+│   ├── patch
+│   └── secret
+├── minio.............
+
+```
 - **Documentation and Source Code**: Placed at the root level for easy access and modification.
 
-## Templating Structure
-
-Stacktic uses Cookiecutter for templating, dynamically injecting variables and logic based on UI inputs into the configuration files:
-
-- **Cookiecutter Structure**: Consists of `cookiecutter.json` for defining variables, hooks for pre and post-generation operations, and templates for the actual files and configurations.
-- **Example Structure**: The provided example demonstrates how a typical Stacktic template (e.g., for MinIO) is organized, including documentation, Helm chart for YAML generation, Kubernetes deployment configurations with base and overlays, and validation scripts.
-
-This architecture ensures that Stacktic is not only flexible and powerful but also secure and easy to integrate into your CI/CD workflows. By combining the best features of Helm and Kustomize with the dynamic templating capabilities of Cookiecutter, Stacktic delivers a robust foundation for deploying and managing Kubernetes applications with ease.
-
-### Example Repository Structure
-
-```plaintext
-├── doc/
-|   ├── stacktic
-|   |   └── README.md
-|   └── component-1
-|   |   └── README.md
-|   └── ...
-└── k8s/
-|   ├── build/
-|   |   └── base/
-|   |   |   └── stacktic
-|   |   |   └── component-1
-|   |   |   └── ...
-|   |   └── overlays/
-|   |   |   └── dev/
-|   |   |   |   └── stacktic
-|   |   |   |   └── component-1
-|   |   |   |   └── ...
-|   ├── deploy/
-|   |   └── base/
-|   |   |   └── stacktic
-|   |   |   └── component-1
-|   |   |   └── ...
-|   |   └── overlays/
-|   |   |   └── dev/
-|   |   |   |   └── stacktic
-|   |   |   |   └── component-1
-|   |   |   |   └── ...
-├── scripts/
-|   └── stacktic/
-|   |   └── validate-all.sh
-|   |   └── ...
-|   └── component-1/
-|   |   └── validate.sh
-|   └── ...
-├── component-1
-|   └── ...
-└── ...
 ```
+ tree -d doc             
+doc
+├── apisix
+├── cert-manager
+├── cnpg
+├── dev
+├── fastapi
+│   └── images
+├── minio
+├── prod
+├── rabbitmq
+├── stack-agent
+├── stacktic
+│   └── known-issues
+└── stage
 
+14 directories
+tree -d fastapi 
+fastapi
+├── day2
+├── dev_tools
+├── src
+│   ├── rabbitmq_module
+│   └── stack_agent_api_module
+└── tests
+    └── integration
+
+8 directories
+
+```
 
 ## Metadata and Logic
 

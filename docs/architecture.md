@@ -37,13 +37,23 @@ The generated automation is committed to your **Git repository** and can be:
 
 
 
-## Repository Structure
+## 📁 Repository Structure
 
-The repository structure maintained by Stacktic follows a consistent format, leveraging the strengths of both Helm charts and Kustomize for maximum flexibility and maintainability:
+The repository structure maintained by **Stacktic** follows a consistent format, combining **Helm** and **Kustomize** for maximum flexibility and maintainability:
 
-- **Helm Chart Templating**: Hlem is being Used for creating the deplyoemnt YAML ready for kustomize but we bypass managing helm charts itslef overhead..  instead we created full kustomze setup on the helm results 
-- **Kustomize Control**: the stack sturcutre is defined by kustomize where each components autoamtcly configured at the base with pre-defined overlays, you can deploy your stack from single commands on any k8s cloud. 
-- **Deployment and Build Directories**: kustomize do both builkd and deploy, Located under `k8s/deploy` for deployment configurations and `k8s/build` for build processes, respectively.  the build is being trigered by kaniko
+- **Helm Chart Templating**  
+  Helm is used to generate the deployment YAML files that feed into Kustomize.  
+  We avoid the overhead of managing Helm charts directly—instead, we create a full Kustomize setup from the Helm output.
+
+- **Kustomize Control**  
+  The stack structure is defined by **Kustomize**, where each component is automatically configured at the base level with pre-defined overlays.  
+  This allows you to deploy your stack with a **single command** on any Kubernetes cloud.
+
+- **Deployment and Build Directories**  
+  Kustomize handles both **build** and **deploy** processes:  
+  - Deployment configurations are located under `k8s/deploy`.  
+  - Build processes are located under `k8s/build`, with builds triggered by **Kaniko**.
+
 ```
   cat k8s/deploy/overlays/dev/kustomization.yaml
 resources:

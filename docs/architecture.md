@@ -15,7 +15,6 @@ Stacktic operates as a stack generator, not as an operator or deployemnt agent w
 Stacktic autoamte any layer and step on the way for full stack applciations from day0 architedcturr to day1 despcloemnt to day2 operation. the platform understand metdata based on the UI toplogiy and its autoamtign all these layers unclduging the security and human tasks configiraiton involved...    it does not have anthing to do wioth the code itself of the logic or the datbases.. its create all the sekelton till code inclduign the infra,apis,connecores ,decpencies and more but the code is compeltly yours .   in other words its autoamting every beyond the code so yoyu just focus on the code. 
 stacktic will generate the atuoamtion into git repo that ccan installed on single command or components like argocd directly to k8s 
 
-![img_23.png](img_23.png)
 
 ## Repository Structure
 
@@ -107,8 +106,12 @@ fastapi
 ```
 
 ## Metadata and Logic
+stacktic is a metdata based logic which can udnerstand by single link from one serivce to another what need to happen, 
+when you connect for example backend to database there always one good pattenrs which include secrets, depencies , api , configmap exchange ENV and doecumantion explaining the configraiton ..
+the only elements htat could impact is the versions which can impact depencdencies ,knolwedge shraing and more.. stacktic automate the good pattern while understing the depcncies of the versions 
 
-Understanding the metadata structure and its use within Stacktic involves analyzing how services are defined, interconnected, and how their characteristics dictate their deployment and interaction within a Kubernetes environment. This detailed explanation aims to clarify the underlying mechanisms of Stacktic's metadata-driven architecture, focusing on service categorization, connectors, and the management of configurations and policies.
+
+
 
 ### Metadata Structure Overview
 

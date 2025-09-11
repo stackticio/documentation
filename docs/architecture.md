@@ -7,13 +7,34 @@ hide_table_of_contents: true
 
 The architecture and approach of Stacktic reflect a deep commitment to security, data privacy, and operational efficiency. Here's a breakdown of its key architectural components and methodologies:
 
-## Security and Data Concerns
+## 🔒 Security and Data Concerns
 
-Stacktic operates as a stack generator, not as an operator or deployemnt agent within your infrastructure. This means it requires only credentials for git repo to push and merge and registry to pull and build images to initialize an empty repository and registry, without storing any personal information or code. The platform provides the application's skeleton, allowing you to write or migrate your code without concern for underlying complexities.
+Stacktic is a **stack generator**, **not** an operator or deployment agent within your infrastructure.  
+- It only requires credentials for your Git repository (to push and merge) and your container registry (to pull and build images).  
+- These credentials are used **only to initialize** an empty repository and registry—Stacktic **does not store** your personal information or application code.  
+- The platform provides the **application skeleton**, so you can write or migrate your own code without worrying about underlying infrastructure complexity.  
 
-## stacktic autoamtion overview
-Stacktic autoamte any layer and step on the way for full stack applciations from day0 architedcturr to day1 despcloemnt to day2 operation. the platform understand metdata based on the UI toplogiy and its autoamtign all these layers unclduging the security and human tasks configiraiton involved...    it does not have anthing to do wioth the code itself of the logic or the datbases.. its create all the sekelton till code inclduign the infra,apis,connecores ,decpencies and more but the code is compeltly yours .   in other words its autoamting every beyond the code so yoyu just focus on the code. 
-stacktic will generate the atuoamtion into git repo that ccan installed on single command or components like argocd directly to k8s 
+Optionally, Stacktic can use a lightweight **agent inside your cluster** that communicates with the backend via API to share **health** and **stack layer information**. This is used **only for health checks, security, and scaling purposes**.
+
+<img width="1119" height="641" alt="Stacktic Diagram" src="https://github.com/user-attachments/assets/56dc189a-c452-4ea0-a4e2-4412d8e39ccf" />
+
+---
+
+## ⚙️ Stacktic Automation Overview
+
+Stacktic automates **every layer and step** involved in delivering full-stack applications:  
+- **Day 0 – Architecture:** Defines your application topology and dependencies.  
+- **Day 1 – Deployment:** Generates and deploys the required stack components.  
+- **Day 2 – Operations:** Automates scaling, security checks, and operational tasks.  
+
+The platform understands **metadata from your UI topology** and automates **infrastructure, APIs, connectors, dependencies, security settings, and human task configurations**—but **it never touches your application logic or databases**.  
+
+In other words, **Stacktic automates everything beyond your code**, so you can focus entirely on building features.  
+
+The generated automation is committed to your **Git repository** and can be:  
+- Installed with a **single command**, or  
+- Deployed through existing tools (e.g., **ArgoCD**) directly to Kubernetes.
+
 
 
 ## Repository Structure

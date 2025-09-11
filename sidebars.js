@@ -50,6 +50,16 @@ module.exports = {
       id: 'services',
       label: 'Services',
     },
+    {
+      type: 'doc',
+      id: 'stack_liveview',
+      label: 'Stack LiveView',
+    },
+    {
+      type: 'doc',
+      id: 'common_use_cases',
+      label: 'Common Use Cases',
+    },
     // Add other documents as needed
   ],
 };

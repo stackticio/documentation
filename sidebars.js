@@ -7,6 +7,11 @@ module.exports = {
     },
     {
       type: 'doc',
+      id: 'quick_introduction',
+      label: 'Qucik introduction',
+    },
+    {
+      type: 'doc',
       id: 'Core_Concepts',
       label: 'Core Concepts',
     },

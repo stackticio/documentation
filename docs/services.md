@@ -214,6 +214,24 @@ Validate the configuration by testing the FastAPI endpoints and viewing generate
 
 <img src={require('./image-41.png').default} alt="alt text" width="500" />
 
+### sub_component for custom API
+
+Stacktic acts as **version control for your stack**.  
+You can:  
+- Create your own API on the existing **FastAPI** service in the `main` branch.  
+- Modify an existing API.  
+- Or use **sub-components** to define APIs.
+
+When you add a **sub-component**, Stacktic **automatically generates the API code** inside the existing structure.  
+You don’t need to manually touch `main`—just add the **route** and **basic service definition**.
+
+### ✅ Advantages of Using Sub-Component APIs
+- Saved as part of **Stacktic’s version control**, making it easy to track changes.
+- Minimizes direct code editing—no need to manage dependencies or modify `main`; simply provide the API definition.  
+- Gives Stacktic additional **metadata about your logic**, enabling smarter automation and insights.  
+
+<img src={require('./image-44.png').default} alt="alt text" width="500" />
+
 ### Security Best Practices
 
 > 🔒 **Security Recommendation:**  

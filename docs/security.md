@@ -1,77 +1,273 @@
+# 🔐 Stacktic Security Framework Documentation
+
+## 📋 Table of Contents
+
+1. [Executive Summary](#executive-summary)
+2. [Introduction](#introduction)
+3. [Chapter 1: Network Security](#chapter-1-network-security)
+   - [1.1 Network Policies and Micro-Segmentation](#11-network-policies-and-micro-segmentation)
+4. [Chapter 2: Access Control](#chapter-2-access-control)
+   - [2.1 RBAC Simplified](#21-rbac-simplified)
+5. [Chapter 3: Policy Enforcement](#chapter-3-policy-enforcement)
+   - [3.1 OPA Integration](#31-opa-integration)
+6. [Chapter 4: Traffic Management](#chapter-4-traffic-management)
+   - [4.1 Traffic Security](#41-traffic-security)
+7. [Chapter 5: Compliance & Governance](#chapter-5-compliance--governance)
+   - [5.1 Security Audits and Reports](#51-security-audits-and-reports)
+8. [Chapter 6: Data Protection](#chapter-6-data-protection)
+   - [6.1 Secrets Management](#61-secrets-management)
+9. [Key Takeaways](#key-takeaways)
+
 ---
-sidebar_position: 7
-hide_table_of_contents: true
+
+## 📝 Executive Summary
+
+Stacktic provides an **automated, metadata-driven security framework** that transforms complex security implementations into simplified, manageable processes. This document outlines how Stacktic automates security from infrastructure protection to policies and RBAC, ensuring enterprise-grade security with minimal manual effort.
+
 ---
 
-# Security Framework
+## 🎯 Introduction
 
-## Introduction
+### Why Stacktic Security Framework?
 
-Our stack is engineered with security as a foundational element, leveraging application topology metadata to automate security processes effectively. Our commitment to enhancing this critical area is unwavering, with the goal of achieving fully automated security compliance. This documentation divides the security considerations into distinct domains: Source Code Security, Infrastructure Security, Policies and Audits.
+Stacktic is designed to **automate security**—from infrastructure protection to policies and RBAC. As a **metadata-based solution**, Stacktic understands stack layers and can automatically deploy and enforce security best practices.
 
-## Source Code Security
+### Core Security Principles
+- 🔄 **Automation First**: Security configurations generated automatically
+- 🧩 **Metadata-Driven**: Intelligent security based on stack relationships
+- 🛡️ **Defense in Depth**: Multi-layered security approach
+- 📊 **Continuous Compliance**: Real-time auditing and reporting
 
-Our approach to securing the source code encompasses several key strategies:
+---
 
-### Best Practices Implementation
+## Chapter 1: Network Security
 
-- **Code Hygiene**: Adoption of industry-standard security practices in coding to mitigate vulnerabilities.
-- **Regular Code Reviews**: Conducting thorough code reviews to identify and rectify potential security issues.
+### 1.1 🛡️ Network Policies and Micro-Segmentation
 
-### Dependency Management
+#### The Challenge
+In real-world Kubernetes environments, **NetworkPolicies** are rarely used to their full potential because:
+- ❌ They're complex to manage
+- ❌ Many security teams apply policies only at the **cluster level**, not at the **stack level**
+- ❌ Micro-segmentation—isolating traffic between stack layers—is challenging and often avoided
 
-- **Automated Version Control**: Utilizing tools to keep dependencies up-to-date, minimizing the risk of exploiting known vulnerabilities in older versions.
-- **Secure Dependency Storage**: Ensuring that dependencies are stored securely, with access controls in place to prevent unauthorized modifications.
+#### The Stacktic Solution
+**Stacktic automates this complexity** by:
+- ✅ Analyzing **link directions** and **metadata** to generate **hundreds of NetworkPolicies** automatically
+- ✅ Delivering out-of-the-box micro-segmentation in minutes—work that would normally take months
+- ✅ Creating granular policies at the stack layer level
 
-### Secrets Management
+#### Implementation Example
 
-- **SOPS for Secrets Encryption**: Integrating a Secrets Operations (SOPS) mechanism to encrypt confidential information, seamlessly integrated with GitOps for decryption.
-- **Zero Trust Access**: Implementing a zero-trust model for accessing secrets, ensuring they are accessible only by those components that require them.
+```bash
+# Example: Generated NetworkPolicy structure
+tree networkpolicy | wc -l
+    3146
 
-### Continuous Integration Scanning
+# Sample generated policies:
+├── networkpolicy__test__strimzi__all__strimzi__egress__ports__strimzi__nr101__lines15.yaml
+├── networkpolicy__test__strimzi__all__strimzi__ingress__ports__strimzi__nr100__lines15.yaml
+├── networkpolicy__test__strimzi__exception__system__egress__ports__443__nr36__lines18.yaml
+├── networkpolicy__test__strimzi__to__minio__egress__ports__9000__nr70__lines18.yaml
+└── networkpolicy__test__strimzi__to__postgresql__egress__ports__5432__nr71__lines18.yaml
+```
 
-- **CI Security Scans**: Integrating security scanning within the CI pipeline to catch vulnerabilities early in the development cycle.
-- **Performance and Load Testing**: Utilizing k6 for performance and load testing to validate that security measures do not compromise application performance.
+> ⚠️ **Best Practice:** Test and apply these policies in **staging first**. If your source code or images communicate outside the relationships defined in Stacktic metadata, the application may break. This is expected behavior for the highest security level.
 
-## Infrastructure Security
+---
 
-Infrastructure security is ensured through several layers of defense:
+## Chapter 2: Access Control
 
-### Network Policies and Microsegmentation
+### 2.1 👥 RBAC Simplified
 
-- **Default Deny Stance**: Implementing a default deny network policy stance, allowing only explicitly permitted traffic between services.
-- **Service-Specific Policies**: Creating microsegmentation policies tailored to the specific needs of each service, enhancing security and reducing the attack surface.
+#### The Three-Layer RBAC Approach
 
-### Advanced Traffic Management
+RBAC (Role-Based Access Control) can be difficult to manage. Stacktic addresses this using a **three-layer approach**:
 
-- **ISTIO and Kong Integration**: Combining ISTIO for service-to-service security within the cluster and Kong for managing ingress traffic, offering a comprehensive suite of security features including mTLS, JWT authentication, rate limiting, and more.
+| Layer | Description | Benefit |
+|-------|-------------|---------|
+| **1. Component-Level RBAC** | Enabled by default on every component | Automatic service account management |
+| **2. Link-Level RBAC** | Relationships between source code and components | Auto-generated app-level permissions |
+| **3. User-Level RBAC** | Direct user/group to component linking | Simplified kubectl access management |
 
-### Logging and Monitoring
+#### Key Features
+- 🔐 **Automatic Service Account Creation**
+- 🔗 **Relationship-Based Permissions**
+- 👤 **Intuitive User Management**
+- 📝 **Maintainable Configuration**
 
-- **Centralized Logging with Loki**: Aggregating logs from all services into a single repository, enabling effective monitoring and incident response.
-- **Object Storage for Logs**: Utilizing MinIO for secure, scalable object storage of logs, facilitating analysis and audit trails.
+---
 
-## Policies and Compliance
+## Chapter 3: Policy Enforcement
 
-### Open Policy Agent (OPA)
+### 3.1 📜 OPA (Open Policy Agent) Integration
 
-- **Policy Enforcement**: Using OPA to enforce security policies across the stack, preventing actions that could introduce risk or vulnerabilities.
-- **Customizable Policy Framework**: Allowing for the customization and tuning of policies to meet specific compliance or security requirements.
+#### Overview
+OPA is central to Stacktic's security enforcement, providing policy-as-code capabilities.
 
-### Kubernetes Security Best Practices
+#### Core Capabilities
 
-- **Security Contexts**: Applying security contexts to pods and containers to limit privileges and isolate resources.
-- **RBAC Configuration**: Employing Role-Based Access Control to precisely define permissions for users and services within the Kubernetes cluster.
+##### Policy Automation
+- ✅ Automate policies using labels or namespaces
+- ✅ Choose between **Dry Run** and **Enforce** modes
+- ✅ Dynamic policy testing based on environment
 
-## Security Auditing
+##### Example Workflow
 
-### Comprehensive Compliance Reporting
+```yaml
+1. Add securityContext → Check labels
+2. Label source code → Apply policies
+3. Integrate metadata → Generate audit reports
+```
 
-- **Automated Audits**: Generating automated audit reports detailing compliance with security policies and best practices.
-- **Visibility and Transparency**: Providing stakeholders with clear visibility into the security posture of the stack, facilitating informed decision-making.
+#### Advanced Features
 
-### Roadmap and Future Enhancements
+| Feature | Description |
+|---------|-------------|
+| **Dynamic Testing** | Automates tests based on test environment |
+| **LiveView Integration** | True/false insights directly in UI |
+| **Source Code Tuning** | Adjusts code to meet OPA policies |
 
-- **Continuous Improvement**: Our roadmap includes ongoing enhancements to security automation, aiming for a state where compliance and security requirements are met entirely through automation.
+> 💡 **Tip:** Keep security definitions **inside Stacktic** to maintain full audit and reporting capabilities. External labels or policies may not appear in audit reports.
 
-In crafting a secure, compliant infrastructure, our focus remains on leveraging automation to reduce human error and ensuring that security practices evolve alongside technological advancements.
+---
+
+## Chapter 4: Traffic Management
+
+### 4.1 🌐 Traffic Security
+
+#### Layer 7 Security Management
+
+Traffic security is managed through components like **Istio** or **APISIX**. Stacktic abstracts complex configurations into **links and attributes**.
+
+#### Key Capabilities
+
+- 🚦 **Traffic Control**
+  - Block, route, or control traffic at Layer 7
+  - Limit traffic to specific routes or IP ranges
+  
+- 🔐 **Authentication**
+  - OIDC integration (e.g., Keycloak)
+  - mTLS between services
+  
+- 🔄 **Traffic Policies**
+  - CORS configuration
+  - URL rewriting rules
+  - Rate limiting
+
+This approach makes **L7 traffic security** straightforward and accessible.
+
+---
+
+## Chapter 5: Compliance & Governance
+
+### 5.1 📊 Security Audits and Reports
+
+#### Comprehensive Reporting
+
+Every configuration and status generated by Stacktic is translated into comprehensive **audit reports**.
+
+#### Report Features
+
+| Report Type | Content | Use Case |
+|-------------|---------|----------|
+| **Configuration Analysis** | Policy conflicts, misconfigurations | Pre-deployment validation |
+| **Security Posture** | Overall security score and gaps | Executive reporting |
+| **Compliance Report** | Standards adherence (CIS, PCI-DSS) | Audit preparation |
+| **Change Tracking** | Configuration drift detection | Continuous monitoring |
+
+#### Benefits
+- 📈 Validate compliance continuously
+- 🔍 Identify security gaps proactively
+- 📋 CISO-grade reporting out of the box
+
+---
+
+## Chapter 6: Data Protection
+
+### 6.1 🔒 Secrets Management
+
+#### Comprehensive Secret Lifecycle
+
+Stacktic provides enterprise-grade secrets management with multiple layers of protection.
+
+#### Core Features
+
+##### Default Protection
+- ✅ All **environment variables** saved as **Kubernetes secrets**
+- ✅ Automatic secret rotation capabilities
+- ✅ Version-controlled secret management
+
+##### Advanced Security (SOPS Integration)
+
+```yaml
+Features:
+  - Encrypt secret files in public repositories
+  - Decrypt only with appropriate keys
+  - Full lifecycle management:
+    • Rotate secrets
+    • Update configurations
+    • Re-encrypt on demand
+```
+
+#### Secret Management Workflow
+
+1. **Create** → Environment variables automatically secured
+2. **Encrypt** → SOPS encryption for repository storage (optional)
+3. **Deploy** → Secrets injected securely at runtime
+4. **Rotate** → Automated rotation without disruption
+5. **Audit** → Full tracking and compliance reporting
+
+This ensures secrets remain **secure, manageable, and version-controlled** throughout the entire stack lifecycle.
+
+---
+
+## 🎯 Key Takeaways
+
+### What Stacktic Security Framework Delivers
+
+| Feature | Traditional Approach | Stacktic Approach | Time Saved |
+|---------|---------------------|-------------------|------------|
+| **Network Policies** | Manual creation, months of work | Auto-generated from metadata | 95% |
+| **RBAC Setup** | Complex role definitions | Three-layer automation | 80% |
+| **OPA Policies** | Manual policy writing | Template-based automation | 70% |
+| **Traffic Security** | Complex Istio/APISIX configs | Abstracted link attributes | 85% |
+| **Security Audits** | Manual assessment | Continuous automated reports | 90% |
+| **Secrets Management** | Multiple tools needed | Integrated lifecycle | 75% |
+
+### Summary Benefits
+
+✅ **Automated Security**: Minimal manual configuration required  
+✅ **Compliance Ready**: CISO-grade reports out of the box  
+✅ **Best Practices**: Enterprise security patterns by default  
+✅ **Micro-segmentation**: Zero-trust networking simplified  
+✅ **Full Lifecycle**: From development to production security  
+
+### Next Steps
+
+1. 🚀 **Deploy** test environment with full security enabled
+2. 📊 **Review** generated security reports
+3. 🔧 **Tune** policies based on your requirements
+4. ✅ **Validate** in staging before production
+5. 📈 **Monitor** continuous compliance
+
+---
+
+## 📚 Additional Resources
+
+- [Stacktic Documentation](https://docs.stacktic.io)
+- [Security Best Practices Guide](https://docs.stacktic.io/security)
+- [OPA Policy Templates](https://docs.stacktic.io/opa-templates)
+- [RBAC Configuration Examples](https://docs.stacktic.io/rbac)
+
+---
+
+## 🤝 Support
+
+Need help with security configuration? Our team is ready to assist:
+- 📧 Email: security@stacktic.io
+- 💬 Slack: [Join our community](https://stacktic.io/slack)
+- 📞 Enterprise Support: Available 24/7
+
+---
+
+*This document ensures your stacks are **secure, compliant, and auditable**—with minimal manual effort.*

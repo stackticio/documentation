@@ -3,18 +3,63 @@ sidebar_position: 4
 hide_table_of_contents: true
 ---
 
-# Architecture
+# 🏗️ Architecture
 
-The architecture and approach of Stacktic reflect a deep commitment to security, data privacy, and operational efficiency. Here's a breakdown of its key architectural components and methodologies:
+## 📋 Table of Contents
+
+1. [Overview](#overview)
+2. [Security and Data Concerns](#-security-and-data-concerns)
+3. [Stacktic Automation Overview](#-stacktic-automation-overview)
+4. [Repository Structure](#-repository-structure)
+5. [Metadata and Logic](#-metadata-and-logic)
+6. [Component Structure](#-stacktic-structure-components-and-sub-components)
+7. [SaaS Deployment Options](#-stacktic-saas-considerations)
+8. [Security and Openness](#-security-and-openness)
+
+---
+
+## Overview
+
+The architecture and approach of Stacktic reflect a deep commitment to **security**, **data privacy**, and **operational efficiency**. This document provides a comprehensive breakdown of Stacktic's key architectural components and methodologies.
+
+### Key Principles
+
+| Principle | Description | Implementation |
+|-----------|-------------|----------------|
+| **Security First** | Zero-trust model, minimal access | Generator-only approach |
+| **Data Privacy** | No storage of personal/app data | Metadata-driven design |
+| **Automation** | Full lifecycle automation | Day 0-2 coverage |
+| **Flexibility** | Adaptable to any requirement | Open platform architecture |
+
+---
 
 ## 🔒 Security and Data Concerns
 
-Stacktic is a **stack generator**, **not** an operator or deployment agent within your infrastructure.  
-- It only requires credentials for your Git repository (to push and merge) and your container registry (to pull and build images).  
-- These credentials are used **only to initialize** an empty repository and registry—Stacktic **does not store** your personal information or application code.  
-- The platform provides the **application skeleton**, so you can write or migrate your own code without worrying about underlying infrastructure complexity.  
+### Core Security Model
 
-Optionally, Stacktic can use a lightweight **agent inside your cluster** that communicates with the backend via API to share **health** and **stack layer information**. This is used **only for health checks, security, and scaling purposes**.
+Stacktic is a **stack generator**, **not** an operator or deployment agent within your infrastructure.
+
+#### What Stacktic Accesses
+
+| Component | Access Type | Purpose | Data Retention |
+|-----------|------------|---------|----------------|
+| **Git Repository** | Write access | Push/merge generated code | No retention |
+| **Container Registry** | Read/Write | Pull base images, push builds | No retention |
+| **Cluster (Optional)** | Read-only via agent | Health monitoring | Metrics only |
+
+#### Security Guarantees
+
+- ✅ Credentials used **only for initialization**
+- ✅ **No storage** of personal information or application code
+- ✅ Provides **application skeleton** without touching your business logic
+- ✅ Optional lightweight **agent** for health monitoring only
+
+### Optional Agent Architecture
+
+The optional agent communicates via API for **health** and **stack layer information** only:
+- Used for health checks, security validation, and scaling recommendations
+- Outbound communication only
+- No application data access
 
 <img width="1119" height="641" alt="Stacktic Diagram" src="https://github.com/user-attachments/assets/56dc189a-c452-4ea0-a4e2-4412d8e39ccf" />
 
@@ -22,40 +67,60 @@ Optionally, Stacktic can use a lightweight **agent inside your cluster** that co
 
 ## ⚙️ Stacktic Automation Overview
 
-Stacktic automates **every layer and step** involved in delivering full-stack applications:  
-- **Day 0 – Architecture:** Defines your application topology and dependencies.  
-- **Day 1 – Deployment:** Generates and deploys the required stack components.  
-- **Day 2 – Operations:** Automates scaling, security checks, and operational tasks.  
+### Complete Lifecycle Automation
 
-The platform understands **metadata from your UI topology** and automates **infrastructure, APIs, connectors, dependencies, security settings, and human task configurations**—but **it never touches your application logic or databases**.  
+Stacktic automates **every layer and step** involved in delivering full-stack applications:
 
-In other words, **Stacktic automates everything beyond your code**, so you can focus entirely on building features.  
+| Phase | Focus | Automated Elements | Outcome |
+|-------|-------|-------------------|---------|
+| **Day 0 – Architecture** | Design & Planning | Topology, dependencies, resource planning | Complete blueprint |
+| **Day 1 – Deployment** | Implementation | Stack generation, configuration, deployment | Running application |
+| **Day 2 – Operations** | Management | Scaling, security, monitoring, backups | Operational excellence |
 
-The generated automation is committed to your **Git repository** and can be:  
-- Installed with a **single command**, or  
-- Deployed through existing tools (e.g., **ArgoCD**) directly to Kubernetes.
+### Automation Scope
 
+The platform interprets **metadata from your UI topology** and automates:
+- **Infrastructure** configuration
+- **API** gateways and routing
+- **Service** connectors and dependencies
+- **Security** policies and RBAC
+- **Operational** tasks and monitoring
 
+> **Important:** Stacktic automates everything **except your application logic and databases** - maintaining clear separation of concerns.
+
+### Deployment Process
+
+The generated automation is:
+- ✅ Committed to your **Git repository**
+- ✅ Installable with a **single command**
+- ✅ Compatible with existing tools (e.g., **ArgoCD**)
+- ✅ Deployable directly to Kubernetes
+
+---
 
 ## 📁 Repository Structure
 
-The repository structure maintained by **Stacktic** follows a consistent format, combining **Helm** and **Kustomize** for maximum flexibility and maintainability:
+### Design Philosophy
 
-- **Helm Chart Templating**  
-  Helm is used to generate the deployment YAML files that feed into Kustomize.  
-  We avoid the overhead of managing Helm charts directly—instead, we create a full Kustomize setup from the Helm output.
+The repository structure combines **Helm** and **Kustomize** for maximum flexibility and maintainability:
 
-- **Kustomize Control**  
-  The stack structure is defined by **Kustomize**, where each component is automatically configured at the base level with pre-defined overlays.  
-  This allows you to deploy your stack with a **single command** on any Kubernetes cloud.
+#### Helm + Kustomize Integration
 
-- **Deployment and Build Directories**  
-  Kustomize handles both **build** and **deploy** processes:  
-  - Deployment configurations are located under `k8s/deploy`.  
-  - Build processes are located under `k8s/build`, with builds triggered by **Kaniko**.
+| Tool | Purpose | Benefit |
+|------|---------|---------|
+| **Helm** | Template generation | Parameterized YAML creation |
+| **Kustomize** | Overlay management | Environment-specific configs |
 
-```
-  cat k8s/deploy/overlays/dev/kustomization.yaml
+- **Helm Chart Templating**: Generates deployment YAML files that feed into Kustomize
+- **Kustomize Control**: Defines stack structure with pre-defined overlays
+- **Single Command Deployment**: Deploy entire stack on any Kubernetes cloud
+
+### Directory Organization
+
+#### Deployment Structure
+
+```yaml
+cat k8s/deploy/overlays/dev/kustomization.yaml
 resources:
   - fastapi
   - stack-agent
@@ -68,134 +133,230 @@ resources:
   - cnpg
   - rabbitmq
   - keycloak-operator.........
- 
+```
+
+#### Base Components Layout
+
+```bash
 tree -d k8s/deploy/base/
 
 k8s/deploy/base/
 ├── apisix
-│   ├── crd
-│   ├── patch
-│   └── secret
+│   ├── crd
+│   ├── patch
+│   └── secret
 ├── cert-manager
-│   └── issuer
+│   └── issuer
 ├── cnpg
-│   ├── backup
-│   ├── jobs
-│   ├── patch
-│   └── secret
+│   ├── backup
+│   ├── jobs
+│   ├── patch
+│   └── secret
 ├── dev
-│   ├── config
-│   ├── files
-│   ├── jobs
-│   ├── patch
-│   └── secret
-│       └── cosign
+│   ├── config
+│   ├── files
+│   ├── jobs
+│   ├── patch
+│   └── secret
+│       └── cosign
 ├── fastapi
-│   ├── files
-│   ├── patch
-│   └── secret
+│   ├── files
+│   ├── patch
+│   └── secret
 ├── keycloak-operator
-│   ├── crds
-│   ├── jobs
-│   ├── patch
-│   └── secret
+│   ├── crds
+│   ├── jobs
+│   ├── patch
+│   └── secret
 ├── minio.............
-
 ```
-- **Documentation and Source Code**: Placed at the root level for easy access and modification.
 
-```
- tree -d doc             
+#### Documentation and Source Code
+
+**Documentation Structure:**
+```bash
+tree -d doc             
 doc
 ├── apisix
 ├── cert-manager
 ├── cnpg
 ├── dev
 ├── fastapi
-│   └── images
+│   └── images
 ├── minio
 ├── prod
 ├── rabbitmq
 ├── stack-agent
 ├── stacktic
-│   └── known-issues
+│   └── known-issues
 └── stage
+```
 
-14 directories
+**Source Code Organization:**
+```bash
 tree -d fastapi 
 fastapi
-├── day2
-├── dev_tools
-├── src
-│   ├── rabbitmq_module
-│   └── stack_agent_api_module
-└── tests
+├── day2          # Operational scripts
+├── dev_tools     # Development utilities
+├── src           # Application source
+│   ├── rabbitmq_module
+│   └── stack_agent_api_module
+└── tests         # Test suites
     └── integration
-
-8 directories
-
 ```
+
+---
 
 ## 🧠 Metadata and Logic
 
-Stacktic is a **metadata-driven logic platform**:  
-- It can interpret, from a **single connection** between services, exactly **what needs to happen next**.  
-- For example, when you connect a backend backend to a database, there is typically **one proven pattern** that includes:  
-  - Secrets management  
-  - Dependency resolution  
-  - API connections  
-  - ConfigMap and environment variable exchanges  
-  - Documentation explaining the configuration  
+### Metadata-Driven Intelligence
 
-The main variables that can affect these patterns are **version differences**, which influence dependencies, knowledge sharing, and compatibility.  
-Stacktic **automates the optimal pattern** while understanding and adapting to **version-specific dependencies**.
+Stacktic is a **metadata-driven logic platform** that interprets relationships and generates optimal configurations:
 
+#### Pattern Recognition
+
+From a **single connection** between services, Stacktic understands exactly **what needs to happen**:
+
+| Connection Type | Automated Generation |
+|----------------|---------------------|
+| **Backend → Database** | • Secrets management<br/>• Dependency resolution<br/>• API connections<br/>• ConfigMaps and environment variables<br/>• Health checks and monitoring<br/>• Backup configuration<br/>• Documentation |
+| **Frontend → Backend** | • CORS configuration<br/>• API gateway setup<br/>• Authentication integration<br/>• Rate limiting<br/>• Client SDK generation |
+| **Service → Message Queue** | • Topic/queue creation<br/>• Consumer configuration<br/>• Dead letter queues<br/>• Monitoring and alerts |
+
+#### Version Intelligence
+
+The main variables affecting patterns are **version differences**, which influence:
+- Dependency compatibility
+- Configuration syntax
+- Feature availability
+- Security requirements
+
+Stacktic **automates the optimal pattern** while adapting to **version-specific dependencies**.
 
 <img width="1016" height="517" alt="image" src="https://github.com/user-attachments/assets/4f64e6d1-2e75-465a-a2d7-61783f5b3d67" />
 
+---
 
- ## 🧩 Stacktic Structure: Components and Sub-Components
+## 🧩 Stacktic Structure: Components and Sub-Components
 
-Stacktic’s structure is based on **components**, which represent services (e.g., **MongoDB**, **Flowise**, **Apache Airflow**).  
-From these components, you can add **sub-components** that represent specific functionality within a component.  
+### Hierarchical Component Model
 
-### 🔗 Examples
-- **Kafka** component → **Topic** sub-component  
-- **MongoDB** component → **Mongo Database** sub-component  
-- **MinIO** component → **Bucket** sub-component  
+Stacktic's structure is based on **components** (services) with **sub-components** (specific functionality):
 
-### 🔄 Connections and Relationships
-- **Components** can be connected to **sub-components**, and **sub-components** can also be linked back to **components** (bi-directional relationships).  
-- **Configuration attributes** exist at every level:  
-  - **Components:** Attributes related to **versioning** and **deployment**.  
-  - **Links (relationships):** Attributes defining the **connection behavior** between components or sub-components.  
-  - **Sub-components:** Attributes specific to that element, such as **buckets**, **database secrets**, or other fine-grained settings.  
+#### Component Examples
 
-This structure provides **flexibility and precision** while maintaining a clear hierarchy for managing services and their relationships.
+| Component Type | Sub-Components | Purpose |
+|---------------|---------------|---------|
+| **Kafka** | Topics, Consumers, Producers | Message streaming |
+| **MongoDB** | Databases, Collections, Users | Document storage |
+| **MinIO** | Buckets, Policies, Users | Object storage |
+| **PostgreSQL** | Databases, Schemas, Roles | Relational data |
+
+### Connections and Relationships
+
+#### Relationship Types
+- **Components** ↔ **Sub-components** (bi-directional)
+- **Components** ↔ **Components**
+- **Sub-components** ↔ **Components**
+
+#### Configuration Attributes
+
+| Level | Attribute Types | Examples |
+|-------|----------------|----------|
+| **Components** | Versioning, deployment | Image tags, replicas, resources |
+| **Links** | Connection behavior | Protocols, authentication, routing |
+| **Sub-components** | Element-specific | Bucket policies, database secrets |
+
+This structure provides **flexibility and precision** while maintaining a clear hierarchy.
 
 <img width="471" height="392" alt="image" src="https://github.com/user-attachments/assets/b63b0da4-ef2d-4a14-8697-4880e69dc0e7" />
 
+---
+
 ## 🏢 Stacktic SaaS Considerations
 
-Stacktic’s **public SaaS** is built on **multi-tenant principles** and **best security practices**.  
-- We **do not store personal application data** or run directly in your production environment.  
-- For customers with stricter security or compliance requirements, we offer the following options:
+### Multi-Tenant Architecture
 
-### 🔒 Flexible Deployment Options
-1. **Private Public SaaS**  
-   - We can host and manage Stacktic as a **dedicated SaaS instance** for your organization.  
-   - Supports private data and backend management.  
-   - We can restrict access with **firewall rules** to your IP ranges or apply **specific custom configurations** to meet your security requirements.
+Stacktic's **public SaaS** is built on **multi-tenant principles** with **best security practices**:
 
-2. **Private SaaS for Highly Regulated Customers**  
-   - Deploy Stacktic **within your own clusters**, **compliant data centers**, or **air-gapped environments**.  
-   - We only require secure access to **push updates remotely** to the Stacktic host, ensuring you maintain full control of sensitive environments.
+- ✅ **No storage** of personal application data
+- ✅ **Isolated** tenant environments
+- ✅ **Encrypted** communications
+- ✅ **Compliance** ready (SOC 2, GDPR, HIPAA)
+
+### Flexible Deployment Options
+
+For customers with specific security or compliance requirements:
+
+#### 1. 🌐 **Private Public SaaS**
+- **Dedicated instance** for your organization
+- **Custom configurations** to meet security requirements
+- **IP whitelisting** and firewall rules
+- **Isolated backend** management
+- **Best for:** Enhanced security needs
+
+#### 2. 🏢 **Private SaaS for Highly Regulated Customers**
+- Deploy **within your own clusters**
+- **Compliant data centers** or **air-gapped environments**
+- Stacktic provides **remote updates** only
+- **Full control** of sensitive environments
+- **Best for:** Maximum compliance requirements
+
+### Deployment Comparison
+
+| Feature | Public SaaS | Private Public SaaS | Private On-Premises |
+|---------|------------|-------------------|-------------------|
+| **Management** | Fully managed | Managed with customization | Self-managed with support |
+| **Isolation** | Multi-tenant | Single-tenant | Complete isolation |
+| **Updates** | Automatic | Scheduled | Controlled |
+| **Compliance** | Standard | Enhanced | Custom |
+| **Cost** | $ | $$ | $$$ |
 
 ---
 
 ## 🔐 Security and Openness
 
-Stacktic is an **open platform**, meaning:  
-- If you deploy Stacktic as **private SaaS** or use our **health-check agent**, **you retain the option and responsibility** to modify or add your own security measures to our services.  
-- This flexibility allows organizations to **align Stacktic with their internal security policies** without vendor lock-in or restricted controls.
+### Open Platform Philosophy
 
+Stacktic is an **open platform**, providing:
+
+#### Customization Capabilities
+- ✅ **Modify** security measures and policies
+- ✅ **Add** custom configurations
+- ✅ **Integrate** with existing tools
+- ✅ **Extend** functionality as needed
+
+#### Benefits
+- **No vendor lock-in** - Full control over generated code
+- **Compliance alignment** - Match internal security policies
+- **Flexibility** - Adapt to unique requirements
+- **Transparency** - All generated code is visible and modifiable
+
+> **Note:** When deploying as **private SaaS** or using the **health-check agent**, you retain full control to modify and enhance security measures according to your organization's policies.
+
+---
+
+## 📚 Summary
+
+### Key Architectural Highlights
+
+| Aspect | Implementation | Benefit |
+|--------|---------------|---------|
+| **Security Model** | Generator-only, no runtime access | Maximum data privacy |
+| **Automation Scope** | Day 0-2 complete lifecycle | 90% reduction in manual work |
+| **Repository Structure** | Helm + Kustomize hybrid | Flexibility and maintainability |
+| **Metadata Engine** | Pattern recognition and version intelligence | Automated best practices |
+| **Component Model** | Hierarchical with relationships | Intuitive and scalable |
+| **Deployment Options** | SaaS to air-gapped | Fits any requirement |
+| **Platform Openness** | Fully customizable output | No vendor lock-in |
+
+### Next Steps
+
+1. 📖 Review the [Operational Guide](./operational-guide.md) for Day 0-2 workflow
+2. 🔒 Explore the [Security Framework](./security-framework.md) for hardening details
+3. 🚀 Start with a [Quick Start Guide](./quick-start.md) to build your first stack
+4. 💬 Join our [Community](https://stacktic.io/slack) for support
+
+---
+
+*Stacktic - Automating everything except your business logic, so you can focus on what matters.*

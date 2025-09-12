@@ -27,6 +27,11 @@ module.exports = {
     },
     {
       type: 'doc',
+      id: 'adoption',
+      label: 'Adoption and Customization',
+    },
+    {
+      type: 'doc',
       id: 'operational_guide',
       label: 'Operational Guide',
     },
@@ -34,11 +39,6 @@ module.exports = {
       type: 'doc',
       id: 'migration',
       label: 'Migration',
-    },
-    {
-      type: 'doc',
-      id: 'customization',
-      label: 'Customization',
     },
     {
       type: 'doc',

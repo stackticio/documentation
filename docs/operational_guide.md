@@ -1,113 +1,216 @@
-Here is your revised and polished `README.md` with improved **English**, **structure**, and **clarity**, while preserving your voice and technical intent:
 
----
+# 📘 Stacktic Operational Guide: Day 0–2 Workflow
 
-# Stacktic Operational Guide: Day 0–2 Workflow
+**Stacktic** takes you from an **idea** to a **production-ready full stack** in minutes.  
+This guide walks you through the workflow across:
 
-**Stacktic** takes you from idea to production-ready full stack in minutes.
-This guide walks you through a sample workflow from:
-
-* **Day 0 – Architecture & Topology**
-* **Day 1 – Deployment**
-* **Day 2 – Operations & Security**
+- **Day 0 – Architecture & Topology**  
+- **Day 1 – Deployment**  
+- **Day 2 – Operations & Security**
 
 ---
 
 ## 📅 Day 0 – Architecture & Topology
 
-Start by designing your app’s topology using standard components:
+### 🧩 Design Your Application Topology
+Begin by designing your application using standard components:
 
-* ✅ Define your **databases**, **backend**, and **frontend** services.
-* ➕ Click the **“+”** icon on each service to explore **available links** to other components (e.g., connect backend to database).
+- ✅ Define **databases**, **backend**, and **frontend** services.  
+- ➕ Use the **“+”** icon on each service to explore available links to other components (e.g., connecting a backend to a database).
 
-for example:
+### 🔗 Import Options
+Choose how to bring your application code or images into Stacktic:
 
-create base stack 
+- **Import code from a repository** (`external_source_code` component):  
 
-![alt text](image-15.png)
+![alt text](image-21.png)
 
-extend the stack to more functionlatiy like api end points and messaging
+- **Import an image** (`image_base` component):  
 
-![alt text](image-16.png)
+![alt text](image-20.png)
 
-create and stage and prod enviroment 
-
-![alt text](image-17.png)
-
+> **Tip:** After importing, adjust settings such as container ports, UID numbers, enabling PVCs, or updating configurations based on your image or Dockerfile.
 
 ---
 
-### 📦 Example: Initial App Topology Demo
+### 🏗 Build a Base Stack
+Create the base stack for your app, including backend services, data relationships, API gateway endpoints, and supporting services like authentication.  
 
-Click below to watch the demo:
+![alt text](image-15.png)
 
+Extend functionality—for example, add **API endpoints** or **messaging services**:  
+
+![alt text](image-16.png)
+
+---
+
+### 📦 Demo: Initial App Topology
+Click below to watch the demo:  
 [![Demo Video](https://via.placeholder.com/640x480.png?text=Click+to+Play+Video)](https://video.wixstatic.com/video/06ddae_156895725d83421bae1cc5e90362b682/1080p/mp4/file.mp4)
 
 ---
 
 ### 🔧 Optional: Add Scale Forecast Inputs
+Provide forecast values on components or links (e.g., from API gateways like Apisix) to get **scaling cost recommendations** during design:
 
-You can optionally input forecast values on components or links (e.g., from API Gateway like Apisix) to get **scaling cost recommendations** even at the design stage.
+- `rps` – Requests per second  
+- `io` – Storage I/O estimates  
 
-* `rps` – Requests per second
-* `io` – Storage I/O estimates
-
-This helps Stacktic simulate performance requirements and cost.
+These inputs help Stacktic **simulate performance requirements** and **predict costs**.  
 
 <img width="897" alt="image" src="https://github.com/user-attachments/assets/73c7644a-355b-4476-923f-cf0f724235de" />
 
-After building, you can check the **scale cost report** to support your production planning:
+After building, review the **scale cost report** for production planning:  
 
 <img width="1442" alt="image" src="https://github.com/user-attachments/assets/f112ff77-92f1-4c2f-9043-cd7665873511" />
 
 ---
 
-## 📅 Day 1 – Deployment & Day 2 Operations Setup
+Don’t forget: **Stacktic creates empty databases**. You’ll need to import your dump into the Kubernetes cluster.  
+We can automate this via bucket jobs (explained later in the migration chapter), but to keep it simple, you can find import scripts in the `data` components’ Day 0 folder:
 
-Now that the base skeleton is ready, it’s time to make the app **production-capable** by:
+```
 
-* Creating environments (e.g., **dev**, **staging**, **prod**)
-* Adding security and backup layers
-* Deploying **Day 2 operational components**
+tree mongodb/day0
+mongodb/day0
+├── README.md
+├── backup-all-db.sh
+├── backup.sh
+└── restore.sh
 
----
-
-### 🏗️ Example: Base App View
-
-This is our starting point:
-
-<img width="675" alt="image" src="https://github.com/user-attachments/assets/79967fa9-cc37-4f0c-bd99-3e10883cc3ed" />
+```
 
 ---
 
-### 🌐 Set Up Development Environment
+## 📅 Day 1 – Deployment & Day 2 – Operations
 
-Create a dedicated environment for development:
+### 🛠 Prepare for Production
+With your base skeleton ready, make the app production-ready by:
 
-<img width="644" alt="image" src="https://github.com/user-attachments/assets/fd168590-98bc-4a4f-b1f9-83d1ad104d92" />
+- Creating environments (**dev**, **staging**, **prod**)  
+- Adding **security** and **backup** layers  
+- Deploying **Day 2 operational components**
+
+> **Tip:** Use `external_source_code` for importing your code and `image_base` for production images.  
+> For dev or staging, you can also use `image_base` if you want to handle your own CI pipeline.
+
+![alt text](image-17.png)
 
 ---
 
 ### ➕ Add Operational Components
+Extend your stack with key operational tools:
 
-Here are a few core components to extend functionality:
+- **Velero (Backup):** Generates backup and restore pipelines under the `day2` folder.  
+- **ArgoCD:** Automates deployment (via `kind` or cluster-specific apps) for each service.  
+- **Prometheus + Grafana:**  
+  - Linking **Prometheus** creates monitoring metrics.  
+  - Linking **Prometheus** as a **Grafana** data source generates preconfigured dashboards.
 
-* **Velero (Backup):** Automatically generates backup and restore pipelines under the `day2` folder via links.
-* **ArgoCD:** Automates deployment (via `kind` or cluster-specific apps) for each service in the stack.
-* **Prometheus + Grafana:**
-
-  * Linking from Prometheus creates monitoring metrics.
-  * Linking Prometheus as a Grafana data source generates preconfigured dashboards for all linked components.
+![alt text](image-22.png)
 
 ---
 
 ## 🔐 Security Hardening
 
-Once the operational base is in place, proceed to security:
+Once the operational base is ready, secure your stack:
 
-* **OPA Policies:** Add Open Policy Agent policies according to your desired security level.
-* **RBAC Configuration:** Include RBAC components; link users/groups to services as needed.
-* **Source Code Security:** Stacktic automatically tunes the security level of service source code. You can manually adjust security settings per service if needed.
+- **OPA Policies:** Add Open Policy Agent rules to meet your security standards.  
+- **RBAC Configuration:**  
+  - Include RBAC components.  
+  - Link users or groups to services (e.g., associate data users/groups with MongoDB, or Ops groups with backend services).  
+- **Source Code Security:**  
+  - Stacktic automatically adjusts security settings for your services.  
+  - Manually review and refine settings (e.g., folder write permissions, probes).  
+  - Be careful—overly strict settings may disrupt your code.
+
+**OPA and RBAC:**  
+
+![alt text](image-23.png)
+
+**Hardening Source Code:**  
+
+![alt text](image-24.png)
+
+Stacktic also generates a **CISO Audit Report** inside the repository.  
+This report provides a **real-time assessment** of your security level based on stack metadata, including recommendations.  
+You can make changes directly in the design page until the audit report confirms compliance.
+
+![alt text](image-32.png)
 
 ---
 
+At this point, you’ve evaluated your stack from **architecture** to **operations** and **security**.  
+Use **stack version control** for each phase:  
+- Save multiple versions of your stack for different teams or environments.  
+- Make radical changes by branching into a new version (e.g., V-x) without dealing with complicated manual versioning.
+
+![alt text](image-25.png)
+
+---
+
+## 📅 Day 2 – Operations in Action
+
+Assume your stack is running with separate **prod**, **stage**, and **dev** versions, with Ops and security in place. Let’s look at Day 2 operations:
+
+- On any component, you can change its **version**—either a specific Helm or image version, or a new Stacktic component version—jumping to a new release range.  
+
+![alt text](image-26.png)
+
+- You’ll receive **notifications** for new versions and changes:  
+
+![alt text](image-27.png)
+
+Stacktic maintains your automation even as versions change.  
+However, it’s recommended to test upgrades in **staging** first, since new versions could affect your code or data even if automation remains consistent.  
+
+Use the **Sections** area to manage versions, secrets, and resources:
+
+![alt text](image-28.png)
+
+![alt text](image-29.png)
+
+You can also create custom sections—for example, grouping specific attributes from multiple components:
+
+![alt text](image-30.png)
+
+---
+
+### 🗂 Day-2 Readiness
+Make sure to review your Ops configuration and understand operational behavior.  
+
+For example, linking **Velero** will automatically create backup, restore, and schedule configurations in the `day2` folder:
+
+![alt text](image-31.png)
+
+```
+
+tree velero/day2
+velero/day2
+├── README.md
+├── backup
+│   ├── mongodb-backup.yaml
+│   └── opensearch-backup.yaml
+├── restore
+│   ├── mongodb-restore.yaml
+│   └── opensearch-restore.yaml
+└── schedule
+├── mongodb-schedule.yaml
+└── opensearch-schedule.yaml
+
+```
+
+The `day2` folder exists for many services to support ongoing operations.
+
+Stacktic also provides **out-of-the-box dashboards** for SRE, which are maintained and updated with new versions.  
+Beyond Grafana and Loki-style dashboards, Stacktic includes a **Live View**:  
+
+- The Live View agent validates stack layers and updates the UI.  
+- It checks **API health**, **data component health**, **route scanning**, **SSL health**, and performs **security validation tests**.  
+- This gives you deep, relationship-aware insight into your stack’s health and readiness.
+
+see liveview chapter for more information
+
+![alt text](image-33.png)
+
+![alt text](image-34.png)

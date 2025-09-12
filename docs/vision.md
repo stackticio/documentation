@@ -1,3 +1,7 @@
+---
+sidebar_position: 1
+hide_table_of_contents: true
+---
 # 🚀 Introduction to Stacktic
 
 Stacktic is a **new concept**, so we’ll begin with a short introduction explaining the **problems** in today’s ecosystem and the **idea behind Stacktic** as a solution.

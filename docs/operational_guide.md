@@ -1,3 +1,7 @@
+---
+sidebar_position: 7
+hide_table_of_contents: true
+---
 # 📘 Stacktic Operational Guide: Complete Day 0–2 Workflow
 
 ## 📋 Table of Contents

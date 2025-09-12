@@ -100,6 +100,18 @@ RBAC (Role-Based Access Control) can be difficult to manage. Stacktic addresses 
 - 👤 **Intuitive User Management**
 - 📝 **Maintainable Configuration**
 
+
+USER LEVEL RBAC
+
+<img src={require('./image-54.png').default} alt="alt text" width="500" />
+
+
+APP RELATION LEVEL RBAC
+
+
+<img src={require('./image-55.png').default} alt="alt text" width="500" />
+
+
 ---
 
 ## Chapter 3: Policy Enforcement

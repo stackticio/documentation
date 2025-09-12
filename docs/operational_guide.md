@@ -20,10 +20,20 @@ Start by designing your app’s topology using standard components:
 * ✅ Define your **databases**, **backend**, and **frontend** services.
 * ➕ Click the **“+”** icon on each service to explore **available links** to other components (e.g., connect backend to database).
 
-<img width="1164" alt="image" src="https://github.com/user-attachments/assets/e5b48f0f-51f1-40e1-a2c6-b0b6c987541e" />
+for example:
 
-* 🧱 For a first draft, skip advanced services like **KEDA**, **OPA**, etc.
-* ⚙️ Default configurations work out of the box—no need to modify settings for the initial architecture.
+create base stack 
+
+![alt text](image-15.png)
+
+extend the stack to more functionlatiy like api end points and messaging
+
+![alt text](image-16.png)
+
+create and stage and prod enviroment 
+
+![alt text](image-17.png)
+
 
 ---
 

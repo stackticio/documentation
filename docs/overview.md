@@ -61,6 +61,8 @@ The user interface (UI) facilitates a drag-and-drop approach to application desi
 
 The Stacktic system streamlines the application setup process, from initial design to deployment, ensuring efficiency and flexibility. Here’s a high-level overview of the flow:
 
+![alt text](image-4.png)
+
 1. **Our Templates**:
    - **Description**: Start with our predefined templates designed for various application types and configurations. These templates offer a broad starting point tailored to meet diverse development needs.
 
@@ -85,4 +87,3 @@ The Stacktic system streamlines the application setup process, from initial desi
 8. **Customize UI DB**:
    - **Description**: Users can define their own UI elements, including components, connectors, properties, and logic. These elements can be linked to their personal templates, enabling a fully customized platform tailored to specific project requirements.
 
-![alt text](image-4.png)

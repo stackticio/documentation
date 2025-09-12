@@ -36,12 +36,6 @@ This section explains how Stacktic integrates with your existing tools and proce
 
 Stacktic is designed to **coexist peacefully with your existing environment**.
 
-#### What Stacktic DOESN'T Do
-- ❌ **Doesn't force** replacement of current tools
-- ❌ **Doesn't break** existing workflows
-- ❌ **Doesn't lock** you into proprietary systems
-- ❌ **Doesn't override** your customizations
-
 #### What Stacktic DOES Enable
 - ✅ Continue using your **existing CI/CD pipeline** OR handle CI directly in Stacktic
 - ✅ Use your own **Backstage** OR automate from Stacktic
@@ -77,7 +71,7 @@ Stacktic keeps your code **open and under your control** with multiple approache
 - Perfect for third-party services
 - Stacktic manages deployment configuration
 
-#### Option 3: Use Stacktic Repository
+#### Option 3: Use Stacktic Sourc Code
 - Write code directly on `main` branch
 - Stacktic merges configuration changes separately
 - **Never touches** your source code or libraries

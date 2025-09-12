@@ -68,8 +68,7 @@ LiveView Agent → API Gateway → Stack Components
          Relationship-Aware Insights
 ```
 #### Step 3: Add your own customized tests
-Create your own health, error detection and relation related to your stack..
-API structure guide will be generated under the stack agent documentations 
+Create your own health, error detection and relation related to your stack (API structure guide will be generated under the stack agent documentations).
 
 
 ![alt text](image-53.png)

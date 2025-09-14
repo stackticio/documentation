@@ -5,9 +5,19 @@ hide_table_of_contents: true
 
 # 🚀 Introduction to Stacktic
 
-**Stacktic** is a new concept in full-stack management - a logic framework that understands and automates relationships across your entire technology stack.
 
 ---
+
+> **Note**  
+> This guide does **not** represent the full set of capabilities or guidelines for each service.  
+> Detailed information is generated directly within the **application stack repository**, which contains the complete, up-to-date reference.  
+> The purpose of this guide is to **explain key concepts** and provide **examples** of our framework, automation, and solutions.  
+> For comprehensive details on every feature and service, please refer to the **stack documentation**.
+
+___
+
+**Stacktic** is a new concept in full-stack management - a logic framework that understands and automates relationships across your entire technology stack.
+
 
 ## ❗ The Problem
 
@@ -30,11 +40,18 @@ Companies are trapped between bad options:
 
 ### Hard Decisions Companies Face Daily
 
-- Private container-based LLaMA vs fast-moving AI services (OpenAI, Gemini, Claude)?
+- Private container-based LLaMA vs fast-moving AI services (OpenAI, Gemini, Claude)?   
 - Stay with managed services or migrate to containers/Kubernetes?
-- How to transition from VMs or Cloud Foundry to pure Kubernetes?
+- How to transition from VMs or Cloud Foundry to pure modrern app Kubernetes?
+
+#### The impact of each choice is not only about saving millions in infa or Ops,it’s about meeting future demands for privacy, ensuring flexibility, and maintaining the ability to adapt and change.
+
+
+![alt text](image-63.png)
 
 ### The Root Cause
+
+## Relationships
 
 **It's all about relationships:**
 - Between services and databases

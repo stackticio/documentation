@@ -24,10 +24,10 @@ Stacktic converts application topology into a fully versioned Git repository—c
 
 ## High‑Level Workflow
 
-1. **Design topology** – Drag components and connect them.
-2. **Extend with logic (optional)** – Add custom automation rules.
+1. **initilze configuration** – configure Repo and Regsitry tokens
+2. **Design topology** – Drag components and connect them.
 3. **Generate your stack** – Build to create the Git skeleton (`k8s/`, `scripts/`, dashboards, secrets).
-4. **Source‑of‑truth Ops** – Stacktic tracks versions, handles merges, and promotes safe rollbacks.
+4. **Deploy Your Stack** – Kustomize your full stack on K8s Cluster
 
 ---
 
@@ -56,6 +56,16 @@ Stacktic converts application topology into a fully versioned Git repository—c
 
 ## Quick Start
 
+
+#### before we start, here is a 3 min video example 
+
+
+<video controls width="100%">
+  <source src={require('@site/static/videos/import-source-code-4.mp4').default} type="video/mp4" />
+</video>
+
+---
+
 ```shell
 # 1. Sign in
 https://staging.app.stacktic.io/
@@ -63,15 +73,25 @@ https://staging.app.stacktic.io/
 # 2. Create or select a Stack
 https://staging.app.stacktic.io/systems
 
-<img width="1135" height="658" alt="image" src="https://github.com/user-attachments/assets/5830a1ec-e581-48ca-84ac-c999ab32ff4b" />
-
 # 3. Configure system (tokens > passwords!) and domain
 ```
-<img width="1228" height="1003" alt="image" src="https://github.com/user-attachments/assets/a60053d2-7d23-4991-bb2d-c2c641b07c8f" />
+
+1. **initilze configuration** – configure Regsitry token
 
 
-> **SOPS support** – Enable encryption by adding your Age public key (optional only)
-<img width="1712" height="742" alt="image" src="https://github.com/user-attachments/assets/a9aa76c5-9965-4ff1-addb-dc80c2cba707" />
+<img src={require('./image-65.png').default} alt="alt text" width="500" />
+
+
+2. **initilze configuration** – configure Repo token
+
+
+<img src={require('./image-66.png').default} alt="alt text" width="500" />
+
+
+3. **SOPS support (optional)** – Enable encryption by adding your Age public key (optional only)
+
+
+<img src={require('./image-67.png').default} alt="alt text" width="500" />
 
 ---
 

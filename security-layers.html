@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Architecture Layers</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #ffffff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 18px;
+            color: #0969da;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .security-layers {
+            display: grid;
+            gap: 15px;
+        }
+
+        .layer {
+            background: #ffffff;
+            border: 2px solid #d0d7de;
+            border-radius: 6px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 80px 1fr 2fr;
+            gap: 20px;
+            align-items: start;
+            transition: all 0.2s ease;
+        }
+
+        .layer:hover {
+            border-color: #0969da;
+            box-shadow: 0 4px 12px rgba(9, 105, 218, 0.15);
+        }
+
+        .layer-number {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #f6f8fa;
+            border: 2px solid #d0d7de;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #24292f;
+        }
+
+        .layer-title {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .layer-title h2 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #24292f;
+            margin-bottom: 4px;
+        }
+
+        .layer-title .category {
+            font-size: 10px;
+            color: #57606a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .layer-features {
+            background: #f6f8fa;
+            border-radius: 4px;
+            padding: 12px;
+        }
+
+        .layer-features ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .layer-features li {
+            font-size: 11px;
+            color: #57606a;
+            padding-left: 14px;
+            position: relative;
+            line-height: 1.4;
+        }
+
+        .layer-features li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #0969da;
+            font-weight: 700;
+        }
+
+        /* Summary section */
+        .summary {
+            margin-top: 20px;
+            background: #f6f8fa;
+            border: 2px solid #0969da;
+            border-radius: 6px;
+            padding: 20px;
+        }
+
+        .summary h2 {
+            font-size: 14px;
+            color: #0969da;
+            margin-bottom: 15px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .summary-item {
+            background: #ffffff;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #d0d7de;
+            text-align: center;
+        }
+
+        .summary-item strong {
+            display: block;
+            font-size: 12px;
+            color: #24292f;
+            margin-bottom: 6px;
+        }
+
+        .summary-item span {
+            font-size: 10px;
+            color: #57606a;
+            line-height: 1.3;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .layer {
+                grid-template-columns: 80px 1fr;
+            }
+
+            .layer-features {
+                grid-column: 1 / -1;
+            }
+
+            .layer-features ul {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Security Architecture Layers</h1>
+
+        <div class="security-layers">
+            <!-- Layer 1 -->
+            <div class="layer">
+                <div class="layer-number">1</div>
+                <div class="layer-title">
+                    <h2>Network Policies</h2>
+                    <span class="category">Micro-segmentation</span>
+                </div>
+                <div class="layer-features">
+                    <ul>
+                        <li>Auto-generated NetworkPolicy per service</li>
+                        <li>Ingress/Egress rules enforcement</li>
+                        <li>Pod-to-Pod communication control</li>
+                        <li>Zero-trust network isolation</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Layer 2 -->
+            <div class="layer">
+                <div class="layer-number">2</div>
+                <div class="layer-title">
+                    <h2>RBAC & Access Control</h2>
+                    <span class="category">3-Layer Permissions</span>
+                </div>
+                <div class="layer-features">
+                    <ul>
+                        <li>Component-level service accounts</li>
+                        <li>Link-level relationship permissions</li>
+                        <li>User/group access control</li>
+                        <li>Namespace isolation with quotas</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Layer 3 -->
+            <div class="layer">
+                <div class="layer-number">3</div>
+                <div class="layer-title">
+                    <h2>OPA Gatekeeper</h2>
+                    <span class="category">Policy Enforcement</span>
+                </div>
+                <div class="layer-features">
+                    <ul>
+                        <li>Admission control policies</li>
+                        <li>Security context validation</li>
+                        <li>Resource quota enforcement</li>
+                        <li>Compliance validation (CIS, PCI-DSS)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Layer 4 -->
+            <div class="layer">
+                <div class="layer-number">4</div>
+                <div class="layer-title">
+                    <h2>Secrets Management</h2>
+                    <span class="category">Encryption & Lifecycle</span>
+                </div>
+                <div class="layer-features">
+                    <ul>
+                        <li>SOPS encryption (Age/GPG)</li>
+                        <li>Automated secret injection</li>
+                        <li>Connection string generation</li>
+                        <li>Secret rotation support</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Layer 5 -->
+            <div class="layer">
+                <div class="layer-number">5</div>
+                <div class="layer-title">
+                    <h2>API Gateway & Service Mesh</h2>
+                    <span class="category">L7 Traffic Security</span>
+                </div>
+                <div class="layer-features">
+                    <ul>
+                        <li>OIDC/OAuth authentication</li>
+                        <li>Rate limiting & throttling</li>
+                        <li>mTLS service encryption</li>
+                        <li>CORS and security headers</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Layer 6 -->
+            <div class="layer">
+                <div class="layer-number">6</div>
+                <div class="layer-title">
+                    <h2>CVE & SBOM</h2>
+                    <span class="category">Vulnerability Management</span>
+                </div>
+                <div class="layer-features">
+                    <ul>
+                        <li>Offline CVE reports per component</li>
+                        <li>Version-specific vulnerability analysis</li>
+                        <li>Full SBOM XML generation</li>
+                        <li>Dependency tree tracking</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Layer 7 -->
+            <div class="layer">
+                <div class="layer-number">7</div>
+                <div class="layer-title">
+                    <h2>LiveView Agent</h2>
+                    <span class="category">Real-time Monitoring</span>
+                </div>
+                <div class="layer-features">
+                    <ul>
+                        <li>Live RBAC compliance validation</li>
+                        <li>Policy enforcement status</li>
+                        <li>Secrets strength monitoring</li>
+                        <li>Security breach detection</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Layer 8 -->
+            <div class="layer">
+                <div class="layer-number">8</div>
+                <div class="layer-title">
+                    <h2>Source Code Security</h2>
+                    <span class="category">Container Hardening</span>
+                </div>
+                <div class="layer-features">
+                    <ul>
+                        <li>Security context configuration</li>
+                        <li>Read-only root filesystem</li>
+                        <li>Non-root user enforcement</li>
+                        <li>OPA validation integration</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Layer 9 -->
+            <div class="layer">
+                <div class="layer-number">9</div>
+                <div class="layer-title">
+                    <h2>Multi-tenancy Isolation</h2>
+                    <span class="category">Namespace Segmentation</span>
+                </div>
+                <div class="layer-features">
+                    <ul>
+                        <li>Complete namespace isolation</li>
+                        <li>Resource quota enforcement</li>
+                        <li>Separate audit boundaries</li>
+                        <li>Cost tracking per tenant</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Layer 10 -->
+            <div class="layer">
+                <div class="layer-number">10</div>
+                <div class="layer-title">
+                    <h2>Audit & Compliance</h2>
+                    <span class="category">Reports & Validation</span>
+                </div>
+                <div class="layer-features">
+                    <ul>
+                        <li>Security posture reports</li>
+                        <li>Configuration analysis</li>
+                        <li>Compliance validation (SOC2, HIPAA)</li>
+                        <li>Change tracking & drift detection</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary">
+            <h2>Security Framework Summary</h2>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <strong>Defense in Depth</strong>
+                    <span>10 layers of automated security controls</span>
+                </div>
+                <div class="summary-item">
+                    <strong>Zero-Trust Model</strong>
+                    <span>Every connection authenticated & authorized</span>
+                </div>
+                <div class="summary-item">
+                    <strong>Automated Enforcement</strong>
+                    <span>Policies generated from metadata</span>
+                </div>
+                <div class="summary-item">
+                    <strong>Compliance Ready</strong>
+                    <span>SOC2, HIPAA, PCI-DSS validation</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

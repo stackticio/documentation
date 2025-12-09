@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VM to Kubernetes Migration Process</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #ffffff;
+            color: #24292f;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #0969da;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #57606a;
+            letter-spacing: 1px;
+        }
+
+        /* Migration Flow */
+        .migration-flow {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 60px 0;
+            padding: 40px 0;
+        }
+
+        /* Connecting Line */
+        .flow-line {
+            position: absolute;
+            top: 50%;
+            left: 5%;
+            right: 5%;
+            height: 3px;
+            background: linear-gradient(90deg, #f85149 0%, #f97316 25%, #3fb950 75%, #58a6ff 100%);
+            transform: translateY(-50%);
+            z-index: 0;
+            box-shadow: 0 0 20px rgba(88, 166, 255, 0.3);
+        }
+
+        .phase-container {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 10px;
+        }
+
+        /* Phase Circle */
+        .phase-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: #f6f8fa;
+            border: 4px solid;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .phase-circle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(9, 105, 218, 0.3);
+        }
+
+        .phase1 .phase-circle { border-color: #f85149; }
+        .phase2 .phase-circle { border-color: #f97316; }
+        .phase3 .phase-circle { border-color: #3fb950; }
+        .phase4 .phase-circle { border-color: #58a6ff; }
+
+        .phase-icon {
+            font-size: 50px;
+            filter: drop-shadow(0 0 10px currentColor);
+        }
+
+        .phase-number {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 3px solid;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .phase1 .phase-number {
+            border-color: #f85149;
+            color: #f85149;
+        }
+        .phase2 .phase-number {
+            border-color: #f97316;
+            color: #f97316;
+        }
+        .phase3 .phase-number {
+            border-color: #3fb950;
+            color: #3fb950;
+        }
+        .phase4 .phase-number {
+            border-color: #58a6ff;
+            color: #58a6ff;
+        }
+
+        /* Phase Content */
+        .phase-content {
+            text-align: center;
+            max-width: 300px;
+        }
+
+        .phase-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .phase1 .phase-title { color: #f85149; }
+        .phase2 .phase-title { color: #f97316; }
+        .phase3 .phase-title { color: #3fb950; }
+        .phase4 .phase-title { color: #58a6ff; }
+
+        .phase-details {
+            background: #f6f8fa;
+            border: 1px solid #d0d7de;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+            font-size: 13px;
+            line-height: 1.7;
+            color: #57606a;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .phase-details ul {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0 0 0;
+            text-align: left;
+        }
+
+        .phase-details li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .phase-details li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #0969da;
+            font-weight: 700;
+        }
+
+        .phase-duration {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 6px 15px;
+            background: #ffffff;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border: 1px solid;
+        }
+
+        .phase1 .phase-duration {
+            border-color: #f85149;
+            color: #f85149;
+        }
+        .phase2 .phase-duration {
+            border-color: #f97316;
+            color: #f97316;
+        }
+        .phase3 .phase-duration {
+            border-color: #3fb950;
+            color: #3fb950;
+        }
+        .phase4 .phase-duration {
+            border-color: #58a6ff;
+            color: #58a6ff;
+        }
+
+        /* Arrow between phases */
+        .phase-arrow {
+            position: relative;
+            flex: 0 0 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .arrow-svg {
+            width: 80px;
+            height: 80px;
+            filter: drop-shadow(0 0 10px rgba(88, 166, 255, 0.5));
+        }
+
+        /* Summary Box */
+        .summary-box {
+            background: #f6f8fa;
+            border: 2px solid #0969da;
+            border-radius: 10px;
+            padding: 30px;
+            margin-top: 60px;
+            box-shadow: 0 10px 40px rgba(9, 105, 218, 0.1);
+        }
+
+        .summary-box h2 {
+            font-size: 22px;
+            color: #0969da;
+            margin-bottom: 20px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .summary-item {
+            background: #ffffff;
+            border: 1px solid #d0d7de;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .summary-item:hover {
+            border-color: #0969da;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(9, 105, 218, 0.2);
+        }
+
+        .summary-label {
+            font-size: 11px;
+            color: #57606a;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .summary-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a7f37;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .migration-flow {
+                flex-direction: column;
+                padding: 20px 0;
+            }
+
+            .flow-line {
+                top: 0;
+                bottom: 0;
+                left: 50%;
+                right: auto;
+                width: 3px;
+                height: auto;
+                background: linear-gradient(180deg, #f85149 0%, #f97316 25%, #3fb950 75%, #58a6ff 100%);
+                transform: translateX(-50%);
+            }
+
+            .phase-container {
+                margin: 30px 0;
+            }
+
+            .phase-arrow {
+                transform: rotate(90deg);
+                margin: 20px 0;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>VM TO KUBERNETES MIGRATION</h1>
+            <p class="subtitle">Automated 4-Phase Process with Stacktic</p>
+        </div>
+
+        <!-- Migration Flow Diagram -->
+        <div class="migration-flow">
+            <!-- Connecting Line -->
+            <div class="flow-line"></div>
+
+            <!-- Phase 1: Inventory & Analysis -->
+            <div class="phase-container phase1">
+                <div class="phase-circle">
+                    <div class="phase-icon">📋</div>
+                    <div class="phase-number">1</div>
+                </div>
+                <div class="phase-content">
+                    <div class="phase-title">INVENTORY & ANALYSIS</div>
+                    <div class="phase-details">
+                        <ul>
+                            <li>Indicate special requirements</li>
+                            <li>Get versions for dependencies</li>
+                            <li>Export database dumps</li>
+                            <li>Indicate special security</li>
+                        </ul>
+                        <div class="phase-duration">1-2 days</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Arrow 1 -->
+            <div class="phase-arrow">
+                <svg class="arrow-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="arrowGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#f85149;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#f97316;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M 10 50 L 70 50 L 60 40 M 70 50 L 60 60" stroke="url(#arrowGrad1)" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+
+            <!-- Phase 2: Design & Generation -->
+            <div class="phase-container phase2">
+                <div class="phase-circle">
+                    <div class="phase-icon">🎯</div>
+                    <div class="phase-number">2</div>
+                </div>
+                <div class="phase-content">
+                    <div class="phase-title">DESIGN & GENERATION</div>
+                    <div class="phase-details">
+                        <ul>
+                            <li>Model in Stacktic UI</li>
+                            <li>Define relationships</li>
+                            <li>Configure resources</li>
+                            <li>Generate manifests</li>
+                        </ul>
+                        <div class="phase-duration">4-8 hours</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Arrow 2 -->
+            <div class="phase-arrow">
+                <svg class="arrow-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="arrowGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#f97316;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#3fb950;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M 10 50 L 70 50 L 60 40 M 70 50 L 60 60" stroke="url(#arrowGrad2)" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+
+            <!-- Phase 3: Containerization -->
+            <div class="phase-container phase3">
+                <div class="phase-circle">
+                    <div class="phase-icon">🐳</div>
+                    <div class="phase-number">3</div>
+                </div>
+                <div class="phase-content">
+                    <div class="phase-title">CONTAINERIZATION</div>
+                    <div class="phase-details">
+                        <ul>
+                            <li>Manual Dockerfile OR</li>
+                            <li>AI VM conversion (VMDK/OVA)</li>
+                            <li>CVE scan & harden</li>
+                            <li>Push to registry</li>
+                        </ul>
+                        <div class="phase-duration">1-3 days</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Arrow 3 -->
+            <div class="phase-arrow">
+                <svg class="arrow-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="arrowGrad3" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#3fb950;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#58a6ff;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M 10 50 L 70 50 L 60 40 M 70 50 L 60 60" stroke="url(#arrowGrad3)" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+
+            <!-- Phase 4: Deployment -->
+            <div class="phase-container phase4">
+                <div class="phase-circle">
+                    <div class="phase-icon">🚀</div>
+                    <div class="phase-number">4</div>
+                </div>
+                <div class="phase-content">
+                    <div class="phase-title">DEPLOYMENT</div>
+                    <div class="phase-details">
+                        <ul>
+                            <li>Restore data dumps</li>
+                            <li>Deploy to staging</li>
+                            <li>Run integration tests</li>
+                            <li>Deploy to production</li>
+                        </ul>
+                        <div class="phase-duration">1 day</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary-box">
+            <h2>MIGRATION SUMMARY</h2>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-label">Total Duration</div>
+                    <div class="summary-value">3-7 days</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Automation Level</div>
+                    <div class="summary-value">85-90%</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Team Size</div>
+                    <div class="summary-value">2-3 Engineers</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Downtime</div>
+                    <div class="summary-value">0-2 hours</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

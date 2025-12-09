@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stacktic Workflow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #ffffff;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            color: #333;
+            font-weight: 400;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+
+        svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>STACKTIC WORKFLOW</h1>
+        
+        <svg viewBox="0 0 1300 600" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <marker id="arrowhead" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M 0 0 L 10 5 L 0 10" fill="none" stroke="#666" stroke-width="1"/>
+                </marker>
+                <marker id="arrowheadGreen" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M 0 0 L 10 5 L 0 10" fill="none" stroke="#4caf50" stroke-width="1"/>
+                </marker>
+                
+                <!-- Gradient for Stacktic UI -->
+                <linearGradient id="stackticGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#667eea;stop-opacity:0.05" />
+                    <stop offset="100%" style="stop-color:#764ba2;stop-opacity:0.05" />
+                </linearGradient>
+                
+                <!-- Shadow filter -->
+                <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.1"/>
+                </filter>
+            </defs>
+
+            <!-- Step 1: Inputs -->
+            <g transform="translate(50, 50)">
+                <text x="60" y="-10" font-size="12" fill="#666" text-anchor="middle">INPUTS</text>
+                
+                <!-- GitHub -->
+                <rect x="0" y="10" width="50" height="50" rx="5" fill="#f5f5f5" stroke="#333" stroke-width="1"/>
+                <circle cx="25" cy="35" r="12" fill="none" stroke="#333" stroke-width="1.5"/>
+                <circle cx="20" cy="35" r="3" fill="#333"/>
+                <circle cx="30" cy="35" r="3" fill="#333"/>
+                <path d="M 20 35 L 30 35" stroke="#333" stroke-width="1.5"/>
+                <text x="25" y="75" font-size="9" fill="#666" text-anchor="middle">Code</text>
+                
+                <!-- Docker -->
+                <rect x="70" y="10" width="50" height="50" rx="5" fill="#f5f5f5" stroke="#333" stroke-width="1"/>
+                <rect x="85" y="25" width="20" height="20" fill="#0db7ed"/>
+                <rect x="87" y="27" width="3" height="3" fill="#fff"/>
+                <rect x="92" y="27" width="3" height="3" fill="#fff"/>
+                <rect x="97" y="27" width="3" height="3" fill="#fff"/>
+                <rect x="102" y="27" width="3" height="3" fill="#fff"/>
+                <text x="95" y="75" font-size="9" fill="#666" text-anchor="middle">Image</text>
+            </g>
+
+            <!-- Import Arrow -->
+            <path d="M 170 85 L 220 150" stroke="#999" stroke-width="1" fill="none" marker-end="url(#arrowhead)"/>
+            <text x="195" y="115" font-size="9" fill="#999">Import</text>
+
+            <!-- Step 2: Improved Stacktic UI -->
+            <g transform="translate(220, 120)">
+                <text x="200" y="-10" font-size="12" fill="#666" text-anchor="middle">STACKTIC DESIGNER</text>
+                
+                <!-- Main Container with gradient background -->
+                <rect x="0" y="0" width="400" height="300" rx="8" fill="url(#stackticGrad)" stroke="#667eea" stroke-width="1.5" filter="url(#shadow)"/>
+                
+                <!-- Header Bar -->
+                <rect x="0" y="0" width="400" height="35" rx="8 8 0 0" fill="#667eea" opacity="0.1"/>
+                <text x="15" y="23" font-size="10" fill="#667eea" font-weight="600">STACKTIC</text>
+                
+                <!-- Top Menu Icons -->
+                <circle cx="350" cy="17" r="4" fill="#4caf50"/>
+                <circle cx="365" cy="17" r="4" fill="#ffc107"/>
+                <circle cx="380" cy="17" r="4" fill="#f44336"/>
+                
+                <!-- Left Panel - Components -->
+                <rect x="10" y="45" width="100" height="245" fill="#fff" stroke="#e0e0e0" stroke-width="1" rx="5"/>
+                <rect x="10" y="45" width="100" height="25" fill="#f5f5f5" rx="5 5 0 0"/>
+                <text x="60" y="61" font-size="9" fill="#333" text-anchor="middle" font-weight="600">Components</text>
+                
+                <!-- Component Categories -->
+                <text x="15" y="85" font-size="7" fill="#999">BACKEND</text>
+                <rect x="15" y="90" width="38" height="18" rx="3" fill="#e3f2fd" stroke="#2196f3" stroke-width="1"/>
+                <text x="34" y="102" font-size="7" text-anchor="middle">FastAPI</text>
+                
+                <rect x="57" y="90" width="38" height="18" rx="3" fill="#e8f5e9" stroke="#4caf50" stroke-width="1"/>
+                <text x="76" y="102" font-size="7" text-anchor="middle">Spring</text>
+                
+                <text x="15" y="125" font-size="7" fill="#999">MESSAGE</text>
+                <rect x="15" y="130" width="38" height="18" rx="3" fill="#fff3e0" stroke="#ff9800" stroke-width="1"/>
+                <text x="34" y="142" font-size="7" text-anchor="middle">Kafka</text>
+                
+                <rect x="57" y="130" width="38" height="18" rx="3" fill="#f3e5f5" stroke="#9c27b0" stroke-width="1"/>
+                <text x="76" y="142" font-size="7" text-anchor="middle">RabbitMQ</text>
+                
+                <text x="15" y="165" font-size="7" fill="#999">DATABASE</text>
+                <rect x="15" y="170" width="38" height="18" rx="3" fill="#e8eaf6" stroke="#3f51b5" stroke-width="1"/>
+                <text x="34" y="182" font-size="7" text-anchor="middle">Postgres</text>
+                
+                <rect x="57" y="170" width="38" height="18" rx="3" fill="#e8f5e9" stroke="#4caf50" stroke-width="1"/>
+                <text x="76" y="182" font-size="7" text-anchor="middle">MongoDB</text>
+                
+                <text x="15" y="205" font-size="7" fill="#999">CACHE/AI</text>
+                <rect x="15" y="210" width="38" height="18" rx="3" fill="#fce4ec" stroke="#e91e63" stroke-width="1"/>
+                <text x="34" y="222" font-size="7" text-anchor="middle">Redis</text>
+                
+                <rect x="57" y="210" width="38" height="18" rx="3" fill="#fff8e1" stroke="#ffc107" stroke-width="1"/>
+                <text x="76" y="222" font-size="7" text-anchor="middle">LLama</text>
+                
+                <rect x="15" y="235" width="38" height="18" rx="3" fill="#e0f2f1" stroke="#009688" stroke-width="1"/>
+                <text x="34" y="247" font-size="7" text-anchor="middle">Elastic</text>
+                
+                <!-- Canvas - Visual Topology -->
+                <rect x="120" y="45" width="200" height="245" fill="#fafafa" stroke="#e0e0e0" stroke-width="1" rx="5"/>
+                <rect x="120" y="45" width="200" height="25" fill="#f5f5f5" rx="5 5 0 0"/>
+                <text x="220" y="61" font-size="9" fill="#333" text-anchor="middle" font-weight="600">Visual Topology</text>
+                
+                <!-- Grid background -->
+                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#f0f0f0" stroke-width="0.5"/>
+                </pattern>
+                <rect x="120" y="70" width="200" height="220" fill="url(#grid)"/>
+                
+                <!-- Topology Nodes with better design -->
+                <circle cx="170" cy="110" r="20" fill="#fff" stroke="#2196f3" stroke-width="2" filter="url(#shadow)"/>
+                <text x="170" y="114" font-size="8" text-anchor="middle" font-weight="500">API</text>
+                
+                <circle cx="140" cy="160" r="20" fill="#fff" stroke="#4caf50" stroke-width="2" filter="url(#shadow)"/>
+                <text x="140" y="164" font-size="8" text-anchor="middle" font-weight="500">Service</text>
+                
+                <circle cx="200" cy="160" r="20" fill="#fff" stroke="#ff9800" stroke-width="2" filter="url(#shadow)"/>
+                <text x="200" y="164" font-size="8" text-anchor="middle" font-weight="500">Kafka</text>
+                
+                <circle cx="260" cy="160" r="20" fill="#fff" stroke="#ffc107" stroke-width="2" filter="url(#shadow)"/>
+                <text x="260" y="164" font-size="8" text-anchor="middle" font-weight="500">LLama</text>
+                
+                <circle cx="140" cy="210" r="20" fill="#fff" stroke="#3f51b5" stroke-width="2" filter="url(#shadow)"/>
+                <text x="140" y="214" font-size="8" text-anchor="middle" font-weight="500">Postgres</text>
+                
+                <circle cx="200" cy="210" r="20" fill="#fff" stroke="#e91e63" stroke-width="2" filter="url(#shadow)"/>
+                <text x="200" y="214" font-size="8" text-anchor="middle" font-weight="500">Redis</text>
+                
+                <circle cx="170" cy="260" r="20" fill="#fff" stroke="#9c27b0" stroke-width="2" filter="url(#shadow)"/>
+                <text x="170" y="264" font-size="8" text-anchor="middle" font-weight="500">Monitor</text>
+                
+                <!-- Connection lines with arrows -->
+                <path d="M 170 130 L 140 140" stroke="#2196f3" stroke-width="1.5" opacity="0.5"/>
+                <path d="M 170 130 L 200 140" stroke="#2196f3" stroke-width="1.5" opacity="0.5"/>
+                <path d="M 140 180 L 140 190" stroke="#4caf50" stroke-width="1.5" opacity="0.5"/>
+                <path d="M 200 180 L 200 190" stroke="#ff9800" stroke-width="1.5" opacity="0.5"/>
+                <path d="M 220 160 L 240 160" stroke="#ff9800" stroke-width="1.5" opacity="0.5"/>
+                <path d="M 170 230 L 170 240" stroke="#9c27b0" stroke-width="1.5" opacity="0.5"/>
+                
+                <!-- Right Panel - Config -->
+                <rect x="330" y="45" width="60" height="245" fill="#fff" stroke="#e0e0e0" stroke-width="1" rx="5"/>
+                <rect x="330" y="45" width="60" height="25" fill="#f5f5f5" rx="5 5 0 0"/>
+                <text x="360" y="61" font-size="9" fill="#333" text-anchor="middle" font-weight="600">Config</text>
+                
+                <text x="335" y="90" font-size="7" fill="#666">Stack Name</text>
+                <rect x="335" y="95" width="50" height="18" rx="3" fill="#f5f5f5" stroke="#ddd" stroke-width="1"/>
+                <text x="360" y="106" font-size="7" text-anchor="middle">prod</text>
+                
+                <text x="335" y="130" font-size="7" fill="#666">Replicas</text>
+                <rect x="335" y="135" width="50" height="18" rx="3" fill="#f5f5f5" stroke="#ddd" stroke-width="1"/>
+                <text x="360" y="146" font-size="7" text-anchor="middle">3</text>
+                
+                <text x="335" y="170" font-size="7" fill="#666">Auto-scale</text>
+                <rect x="335" y="175" width="50" height="18" rx="3" fill="#e8f5e9" stroke="#4caf50" stroke-width="1"/>
+                <text x="360" y="186" font-size="7" text-anchor="middle">✓ ON</text>
+                
+                <text x="335" y="210" font-size="7" fill="#666">TLS/SSL</text>
+                <rect x="335" y="215" width="50" height="18" rx="3" fill="#e8f5e9" stroke="#4caf50" stroke-width="1"/>
+                <text x="360" y="226" font-size="7" text-anchor="middle">✓ ON</text>
+            </g>
+
+            <!-- Arrow to Build -->
+            <path d="M 620 270 L 650 270" stroke="#999" stroke-width="1" fill="none" marker-end="url(#arrowhead)"/>
+
+            <!-- Build Stack Layers -->
+            <g transform="translate(650, 120)">
+                <text x="90" y="-10" font-size="12" fill="#666" text-anchor="middle">AUTO-GENERATED</text>
+                <text x="90" y="5" font-size="9" fill="#4caf50">Stack Code DAY0-2 READY</text>
+                
+                <rect x="0" y="15" width="180" height="285" rx="8" fill="#e8f5e9" stroke="#4caf50" stroke-width="1.5"/>
+                
+                <text x="10" y="40" font-size="9" fill="#4caf50">✓ K8s Manifests</text>
+                <text x="15" y="55" font-size="8" fill="#666">Deployments, Services</text>
+                
+                <text x="10" y="80" font-size="9" fill="#4caf50">✓ Component Relations</text>
+                <text x="15" y="95" font-size="8" fill="#666">Dependencies, APIs</text>
+                
+                <text x="10" y="120" font-size="9" fill="#4caf50">✓ DataOps Pipeline</text>
+                <text x="15" y="135" font-size="8" fill="#666">ETL, Streaming, Batch</text>
+                
+                <text x="10" y="160" font-size="9" fill="#4caf50">✓ AI RAG System</text>
+                <text x="15" y="175" font-size="8" fill="#666">Vector DB, Embeddings</text>
+                
+                <text x="10" y="200" font-size="9" fill="#4caf50">✓ Operations</text>
+                <text x="15" y="215" font-size="8" fill="#666">Monitoring, Logging</text>
+                
+                <text x="10" y="240" font-size="9" fill="#4caf50">✓ Security</text>
+                <text x="15" y="255" font-size="8" fill="#666">RBAC, Network Policies</text>
+                
+                <text x="10" y="280" font-size="9" fill="#4caf50">✓ CI/CD Pipeline</text>
+                <text x="15" y="295" font-size="8" fill="#666">GitOps, Helm charts</text>
+            </g>
+
+            <!-- Arrow to Git -->
+            <path d="M 830 270 L 880 270" stroke="#999" stroke-width="1" fill="none" marker-end="url(#arrowhead)"/>
+
+            <!-- Git Repository -->
+            <g transform="translate(880, 120)">
+                <text x="120" y="-10" font-size="12" fill="#666" text-anchor="middle">GIT REPOSITORY</text>
+                
+                <rect x="0" y="0" width="240" height="300" rx="8" fill="#f8f9fa" stroke="#333" stroke-width="1.5"/>
+                
+                <!-- Stacktic Branch -->
+                <rect x="10" y="20" width="105" height="120" rx="5" fill="#fff" stroke="#ff9800" stroke-width="1"/>
+                <circle cx="25" cy="35" r="4" fill="#ff9800"/>
+                <text x="35" y="38" font-size="9" fill="#ff9800">stacktic branch</text>
+                <text x="15" y="55" font-size="8" fill="#666">Auto-generated:</text>
+                <text x="15" y="70" font-size="7" fill="#999">• k8s/</text>
+                <text x="15" y="85" font-size="7" fill="#999">• helm/</text>
+                <text x="15" y="100" font-size="7" fill="#999">• config/</text>
+                <text x="15" y="115" font-size="7" fill="#999">• monitoring/</text>
+                <text x="15" y="130" font-size="7" fill="#999">• dataops/</text>
+                
+                <!-- Main Branch -->
+                <rect x="125" y="20" width="105" height="120" rx="5" fill="#fff" stroke="#4caf50" stroke-width="1"/>
+                <circle cx="140" cy="35" r="4" fill="#4caf50"/>
+                <text x="150" y="38" font-size="9" fill="#4caf50">main branch</text>
+                <text x="130" y="55" font-size="8" fill="#666">Production:</text>
+                <text x="130" y="70" font-size="7" fill="#999">• Custom code</text>
+                <text x="130" y="85" font-size="7" fill="#999">• Overrides</text>
+                <text x="130" y="100" font-size="7" fill="#999">• Configs</text>
+                <text x="130" y="115" font-size="7" fill="#999">• Customizations</text>
+                <text x="130" y="130" font-size="7" fill="#4caf50">✓ Ready</text>
+                
+                <!-- Merge Arrow -->
+                <path d="M 115 80 L 125 80" stroke="#ff9800" stroke-width="1.5" fill="none" marker-end="url(#arrowhead)"/>
+                
+                <!-- Customization Note -->
+                <rect x="10" y="160" width="220" height="40" rx="5" fill="#fffbf0" stroke="#ffc107" stroke-width="1"/>
+                <text x="120" y="175" font-size="9" fill="#f57c00" text-anchor="middle">💡 Open for Customization</text>
+                <text x="120" y="190" font-size="8" fill="#666" text-anchor="middle">Modify any configs before deploying</text>
+                
+                <!-- Deploy Button -->
+                <rect x="40" y="220" width="160" height="40" rx="20" fill="#e8f5e9" stroke="#4caf50" stroke-width="1.5"/>
+                <text x="120" y="245" font-size="11" fill="#4caf50" text-anchor="middle" font-weight="600">DEPLOY TO K8S</text>
+            </g>
+
+            <!-- Deploy Arrow - FROM BOTTOM OF GIT REPOSITORY BOX -->
+            <path d="M 1000 420 L 1000 440 L 650 440 L 650 470" stroke="#4caf50" stroke-width="1.5" fill="none" marker-end="url(#arrowheadGreen)"/>
+
+            <!-- K8s Cluster -->
+            <g transform="translate(400, 470)">
+                <rect x="0" y="0" width="500" height="100" rx="8" fill="none" stroke="#2196f3" stroke-width="1.5" stroke-dasharray="5,3"/>
+                <text x="250" y="25" font-size="12" fill="#2196f3" text-anchor="middle">KUBERNETES CLUSTER</text>
+                
+                <!-- Pods -->
+                <rect x="50" y="40" width="25" height="25" rx="3" fill="#4caf50" opacity="0.6"/>
+                <rect x="85" y="40" width="25" height="25" rx="3" fill="#2196f3" opacity="0.6"/>
+                <rect x="120" y="40" width="25" height="25" rx="3" fill="#ff9800" opacity="0.6"/>
+                <rect x="155" y="40" width="25" height="25" rx="3" fill="#e91e63" opacity="0.6"/>
+                <rect x="190" y="40" width="25" height="25" rx="3" fill="#9c27b0" opacity="0.6"/>
+                <rect x="225" y="40" width="25" height="25" rx="3" fill="#ffc107" opacity="0.6"/>
+                <rect x="260" y="40" width="25" height="25" rx="3" fill="#009688" opacity="0.6"/>
+                <rect x="295" y="40" width="25" height="25" rx="3" fill="#3f51b5" opacity="0.6"/>
+                <rect x="330" y="40" width="25" height="25" rx="3" fill="#4caf50" opacity="0.6"/>
+                <rect x="365" y="40" width="25" height="25" rx="3" fill="#2196f3" opacity="0.6"/>
+                <rect x="400" y="40" width="25" height="25" rx="3" fill="#ff9800" opacity="0.6"/>
+                <rect x="435" y="40" width="25" height="25" rx="3" fill="#e91e63" opacity="0.6"/>
+                
+                <text x="250" y="85" font-size="10" fill="#4caf50" text-anchor="middle">✓ Stack Running in Production</text>
+            </g>
+
+            <!-- Validation & LiveView Feedback Arrow -->
+            <path d="M 400 520 L 300 520 L 300 420" stroke="#999" stroke-width="1" stroke-dasharray="3,3" fill="none" marker-end="url(#arrowhead)"/>
+            <text x="320" y="535" font-size="8" fill="#999">Validation &amp; LiveView</text>
+
+        </svg>
+    </div>
+</body>
+</html>

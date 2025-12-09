@@ -1,0 +1,2902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stacktic Enterprise ROI Calculator - Comprehensive Business Analysis</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #667eea;
+      --primary-dark: #5568d3;
+      --secondary: #764ba2;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: var(--gray-900);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    /* Header Section */
+    .header {
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      margin-bottom: 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    }
+
+    .header h1 {
+      font-size: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 15px;
+      font-weight: 800;
+    }
+
+    .header-subtitle {
+      font-size: 18px;
+      color: var(--gray-600);
+      margin-bottom: 25px;
+    }
+
+    .methodology-note {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border-left: 4px solid var(--info);
+      padding: 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .methodology-note strong {
+      color: var(--info);
+      display: block;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
+    /* Tabs Navigation */
+    .tabs-nav {
+      background: white;
+      border-radius: 12px;
+      padding: 10px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .tab-btn {
+      padding: 12px 24px;
+      border: none;
+      background: transparent;
+      color: var(--gray-600);
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      background: var(--gray-100);
+      color: var(--gray-900);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Card Styles */
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--gray-100);
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--gray-900);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-icon {
+      font-size: 24px;
+    }
+
+    .card-badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .badge-info {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .badge-warning {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .badge-success {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .badge-danger {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    /* Grid Layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 1200px) {
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    }
+
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 8px;
+    }
+
+    .form-label-info {
+      font-weight: 400;
+      color: var(--gray-500);
+      font-size: 13px;
+      margin-left: 5px;
+    }
+
+    .form-input,
+    .form-select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--gray-200);
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      background: white;
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-helper {
+      font-size: 12px;
+      color: var(--gray-500);
+      margin-top: 6px;
+      display: block;
+    }
+
+    .form-range {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--gray-200);
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .form-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+    }
+
+    .form-range::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+      border: none;
+    }
+
+    .range-value {
+      display: inline-block;
+      min-width: 80px;
+      padding: 4px 12px;
+      background: var(--primary);
+      color: white;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      text-align: center;
+      margin-left: 10px;
+    }
+
+    /* Task Breakdown Table */
+    .task-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 13px;
+    }
+
+    .task-table th,
+    .task-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .task-table th {
+      background: var(--gray-50);
+      font-weight: 600;
+      color: var(--gray-700);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .task-table tr:hover {
+      background: var(--gray-50);
+    }
+
+    .task-table input[type="number"],
+    .task-table input[type="text"] {
+      width: 100%;
+      padding: 6px 10px;
+      border: 1px solid var(--gray-300);
+      border-radius: 4px;
+      font-size: 13px;
+    }
+
+    .task-table input[type="number"]:focus,
+    .task-table input[type="text"]:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .task-category {
+      background: var(--gray-100);
+      font-weight: 700;
+      color: var(--gray-900);
+    }
+
+    .task-subtotal {
+      background: #eff6ff;
+      font-weight: 600;
+      color: var(--info);
+    }
+
+    .task-total {
+      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+      font-weight: 700;
+      color: var(--info);
+      font-size: 14px;
+    }
+
+    /* Metric Cards */
+    .metric-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+      border-left: 4px solid var(--primary);
+      transition: all 0.3s ease;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .metric-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-600);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .metric-value {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 8px;
+      line-height: 1;
+    }
+
+    .metric-change {
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .metric-change.positive {
+      color: var(--success);
+    }
+
+    .metric-change.negative {
+      color: var(--danger);
+    }
+
+    .metric-subtext {
+      font-size: 12px;
+      color: var(--gray-500);
+      margin-top: 5px;
+    }
+
+    /* Results Hero */
+    .results-hero {
+      background: linear-gradient(135deg, var(--success) 0%, #16a34a 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 50px;
+      text-align: center;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 40px rgba(34, 197, 94, 0.3);
+    }
+
+    .results-hero h2 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      opacity: 0.95;
+    }
+
+    .roi-amount {
+      font-size: 72px;
+      font-weight: 800;
+      margin-bottom: 15px;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .roi-subtitle {
+      font-size: 18px;
+      opacity: 0.9;
+      margin-bottom: 10px;
+    }
+
+    .roi-details {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 30px;
+      flex-wrap: wrap;
+    }
+
+    .roi-detail-item {
+      text-align: center;
+    }
+
+    .roi-detail-value {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .roi-detail-label {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    /* Comparison Table */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      padding: 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .comparison-table th {
+      background: var(--gray-50);
+      font-weight: 600;
+      color: var(--gray-700);
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+
+    .comparison-table tr:hover {
+      background: var(--gray-50);
+    }
+
+    .comparison-current {
+      color: var(--danger);
+      font-weight: 600;
+    }
+
+    .comparison-stacktic {
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .comparison-savings {
+      color: var(--info);
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    /* Chart Container */
+    .chart-container {
+      position: relative;
+      height: 400px;
+      margin-top: 25px;
+    }
+
+    /* Assumptions Panel */
+    .assumptions-panel {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      border: 2px solid #f59e0b;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 20px;
+    }
+
+    .assumptions-panel h3 {
+      font-size: 18px;
+      color: #92400e;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .assumption-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: white;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .assumption-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--gray-700);
+      flex: 1;
+    }
+
+    .assumption-value {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--primary);
+      min-width: 100px;
+      text-align: right;
+    }
+
+    .assumption-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 200px;
+    }
+
+    /* Scenario Selector */
+    .scenario-selector {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .scenario-btn {
+      flex: 1;
+      min-width: 200px;
+      padding: 20px;
+      border: 2px solid var(--gray-300);
+      border-radius: 12px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .scenario-btn:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    }
+
+    .scenario-btn.active {
+      border-color: var(--primary);
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .scenario-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 8px;
+    }
+
+    .scenario-desc {
+      font-size: 13px;
+      color: var(--gray-600);
+    }
+
+    /* Timeline View */
+    .timeline-row {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+      align-items: center;
+    }
+
+    .timeline-period {
+      min-width: 100px;
+      font-weight: 600;
+      color: var(--gray-700);
+    }
+
+    .timeline-bar {
+      flex: 1;
+      height: 40px;
+      background: var(--gray-100);
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .timeline-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 14px;
+      transition: width 0.5s ease;
+    }
+
+    /* Breakdown Section */
+    .breakdown-section {
+      margin-top: 30px;
+    }
+
+    .breakdown-category {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    }
+
+    .breakdown-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--gray-100);
+      cursor: pointer;
+    }
+
+    .breakdown-header:hover {
+      color: var(--primary);
+    }
+
+    .breakdown-title {
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .breakdown-total {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--success);
+    }
+
+    .breakdown-content {
+      display: none;
+    }
+
+    .breakdown-content.expanded {
+      display: block;
+    }
+
+    .breakdown-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .breakdown-item:last-child {
+      border-bottom: none;
+    }
+
+    .breakdown-item-label {
+      font-size: 14px;
+      color: var(--gray-700);
+    }
+
+    .breakdown-item-value {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--gray-900);
+    }
+
+    /* Alert Boxes */
+    .alert {
+      padding: 16px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .alert-icon {
+      font-size: 20px;
+      margin-top: 2px;
+    }
+
+    .alert-content {
+      flex: 1;
+    }
+
+    .alert-title {
+      font-weight: 700;
+      margin-bottom: 5px;
+      font-size: 15px;
+    }
+
+    .alert-message {
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .alert-info {
+      background: #dbeafe;
+      color: #1e40af;
+      border-left: 4px solid #3b82f6;
+    }
+
+    .alert-warning {
+      background: #fef3c7;
+      color: #92400e;
+      border-left: 4px solid #f59e0b;
+    }
+
+    .alert-success {
+      background: #d1fae5;
+      color: #065f46;
+      border-left: 4px solid #22c55e;
+    }
+
+    .alert-danger {
+      background: #fee2e2;
+      color: #991b1b;
+      border-left: 4px solid #ef4444;
+    }
+
+    /* Export Buttons */
+    .export-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--gray-50);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #16a34a;
+    }
+
+    /* Loading State */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .loading-overlay.show {
+      display: flex;
+    }
+
+    .loading-content {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      text-align: center;
+    }
+
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 5px solid var(--gray-200);
+      border-top: 5px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+
+      .tabs-nav,
+      .btn,
+      .export-buttons {
+        display: none;
+      }
+
+      .card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid var(--gray-300);
+      }
+    }
+
+    /* Tooltip */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+      border-bottom: 1px dashed var(--gray-400);
+    }
+
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 280px;
+      background-color: var(--gray-900);
+      color: white;
+      text-align: left;
+      border-radius: 8px;
+      padding: 12px 15px;
+      position: absolute;
+      z-index: 100;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -140px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 13px;
+      line-height: 1.5;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .tooltip .tooltiptext::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: var(--gray-900) transparent transparent transparent;
+    }
+
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* Responsive Tables */
+    .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Collapsible Sections */
+    .collapsible-header {
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .collapsible-icon {
+      transition: transform 0.3s ease;
+    }
+
+    .collapsible-icon.expanded {
+      transform: rotate(90deg);
+    }
+
+    /* Sticky Summary */
+    .sticky-summary {
+      position: sticky;
+      top: 20px;
+      z-index: 50;
+    }
+
+    /* Progress Indicators */
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--gray-200);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 15px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--success), #16a34a);
+      transition: width 0.5s ease;
+    }
+
+    .progress-label {
+      font-size: 12px;
+      color: var(--gray-600);
+      margin-top: 5px;
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>🎯 Stacktic Enterprise ROI Calculator</h1>
+      <p class="header-subtitle">Comprehensive Business Value Analysis - Detailed Task-Based Calculations with Full Transparency</p>
+
+      <div class="methodology-note">
+        <strong>📊 Methodology & Data Source</strong>
+        This calculator provides granular, task-by-task analysis based on industry benchmarks and Stacktic's documented capabilities:
+        <ul style="margin-top: 10px; margin-left: 20px;">
+          <li><strong>90% Ops Automation:</strong> Automated infrastructure provisioning, configuration management, deployment pipelines, security policies, and monitoring setup</li>
+          <li><strong>Time-to-Market Improvement:</strong> 10x faster deployments (weeks reduced to hours) based on Day 0/1/2 automation lifecycle</li>
+          <li><strong>Cost Reduction Sources:</strong> Labor savings (reduced manual work), infrastructure optimization (cloud-agnostic portability), incident reduction (automated compliance), downtime prevention</li>
+          <li><strong>Calculations:</strong> All assumptions are adjustable and transparent. Every metric shows the underlying calculation methodology</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Scenario Selector -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title"><span class="card-icon">🎯</span> Analysis Scenario</h3>
+      </div>
+      <div class="scenario-selector">
+        <div class="scenario-btn active" onclick="setScenario('conservative')">
+          <div class="scenario-name">Conservative</div>
+          <div class="scenario-desc">60% automation, lower time savings</div>
+        </div>
+        <div class="scenario-btn" onclick="setScenario('realistic')">
+          <div class="scenario-name">Realistic</div>
+          <div class="scenario-desc">75% automation, industry average</div>
+        </div>
+        <div class="scenario-btn" onclick="setScenario('aggressive')">
+          <div class="scenario-name">Aggressive</div>
+          <div class="scenario-desc">90% automation, maximum potential</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div class="tabs-nav">
+      <button class="tab-btn active" onclick="switchTab('inputs', event)">📝 Company Inputs</button>
+      <button class="tab-btn" onclick="switchTab('tasks', event)">⚙️ Task Breakdown</button>
+      <button class="tab-btn" onclick="switchTab('assumptions', event)">🎛️ Assumptions & Tuning</button>
+      <button class="tab-btn" onclick="switchTab('results', event)">📊 ROI Results</button>
+      <button class="tab-btn" onclick="switchTab('comparison', event)">⚖️ Detailed Comparison</button>
+      <button class="tab-btn" onclick="switchTab('timeline', event)">📅 Timeline Analysis</button>
+      <button class="tab-btn" onclick="switchTab('charts', event)">📈 Visual Analytics</button>
+    </div>
+
+    <!-- Tab Content -->
+
+    <!-- TAB 1: Company Inputs -->
+    <div id="tab-inputs" class="tab-content active">
+      <div class="grid-2">
+        <!-- Company Profile -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><span class="card-icon">🏢</span> Company Profile</h3>
+            <span class="card-badge badge-info">Required</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Company Size</label>
+            <select id="companySize" class="form-select" onchange="updateCalculations()">
+              <option value="startup">Startup (1-10 employees)</option>
+              <option value="small">Small (11-50 employees)</option>
+              <option value="medium" selected>Medium (51-200 employees)</option>
+              <option value="large">Large (201-1000 employees)</option>
+              <option value="enterprise">Enterprise (1000+ employees)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Number of Application Stacks
+              <span class="tooltip">ⓘ
+                <span class="tooltiptext">Total number of full-stack applications including production, staging, and development environments. Each stack represents a complete application with databases, services, APIs, etc.</span>
+              </span>
+            </label>
+            <input type="number" id="numStacks" class="form-input" value="5" min="1" max="100" onchange="updateCalculations()">
+            <span class="form-helper">Production + staging + dev environments</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Engineering Team Size</label>
+            <input type="number" id="teamSize" class="form-input" value="25" min="1" max="1000" onchange="updateCalculations()">
+            <span class="form-helper">Developers, DevOps, SRE, Platform engineers</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Industry Sector</label>
+            <select id="industrySector" class="form-select" onchange="updateCalculations()">
+              <option value="fintech">FinTech / Financial Services</option>
+              <option value="healthcare">Healthcare / MedTech</option>
+              <option value="ecommerce">E-commerce / Retail</option>
+              <option value="saas" selected>SaaS / Technology</option>
+              <option value="manufacturing">Manufacturing / Industrial</option>
+              <option value="other">Other</option>
+            </select>
+            <span class="form-helper">Affects downtime cost and compliance requirements</span>
+          </div>
+        </div>
+
+        <!-- Current Costs -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><span class="card-icon">💰</span> Current Annual Costs</h3>
+            <span class="card-badge badge-warning">Financial Data</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Average Fully-Loaded Engineer Cost
+              <span class="tooltip">ⓘ
+                <span class="tooltiptext">Total annual cost including base salary, benefits, taxes, insurance, equipment, office space allocation, and training. Typically 1.4-1.6x base salary.</span>
+              </span>
+            </label>
+            <input type="number" id="engineerCost" class="form-input" value="150000" min="50000" max="500000" step="5000" onchange="updateCalculations()">
+            <span class="form-helper">Includes salary, benefits, overhead (typically 1.4-1.6x base salary)</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Annual Spend on Vendor Lock-In Components</label>
+            <input type="number" id="numDatabases" class="form-input" value="100000" min="0" max="10000000" step="10000" onchange="updateCalculations()">
+            <span class="form-helper">Managed databases, messaging, caching, storage (cloud provider bill)</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">% Cost Reduction Moving to K8s</label>
+            <input type="range" id="managedPercent" class="form-range" value="70" min="0" max="100" oninput="updateRangeValue(this, 'managedPercentValue'); updateCalculations()">
+            <span id="managedPercentValue" class="range-value">70%</span>
+            <span class="form-helper">Vendor lock-in premium eliminated. Typical: 60-80%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STACKTIC CORE VALUE DRIVERS -->
+      <div class="card" style="border-left: 6px solid #8b5cf6; background: linear-gradient(135deg, #ffffff 0%, #f5f3ff 100%);">
+        <div class="card-header">
+          <h3 class="card-title"><span class="card-icon">⚡</span> Stacktic Value Drivers - Current State</h3>
+          <span class="card-badge" style="background: #8b5cf6; color: white;">Core ROI Inputs</span>
+        </div>
+
+        <!-- 1. AUTOMATION COVERAGE -->
+        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #667eea;">
+          <h4 style="margin: 0 0 15px 0; color: #667eea; font-size: 16px;">🤖 Automation Coverage Improvement</h4>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Current Automation Coverage</label>
+              <input type="range" id="opsTimePercent" class="form-range" value="30" min="0" max="80" oninput="updateRangeValue(this, 'opsTimeValue'); updateCalculations()">
+              <span id="opsTimeValue" class="range-value">30%</span>
+              <span class="form-helper">Current: 30% → Stacktic: 85% automation</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Total Annual Engineering Hours</label>
+              <input type="number" id="deploymentsPerMonth" class="form-input" value="50000" min="10000" max="500000" step="5000" onchange="updateCalculations()">
+              <span class="form-helper">Team size × 2080 hours. Automation saves 55% of manual work</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. PANE OF GLASS / PARALLEL METHOD -->
+        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #22c55e;">
+          <h4 style="margin: 0 0 15px 0; color: #22c55e; font-size: 16px;">🎯 Unified Operations (Pane of Glass) - Break Sequential Automation</h4>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Hours/Month on Context Switching & Manual Ops</label>
+              <input type="number" id="deploymentHours" class="form-input" value="400" min="0" max="2000" step="20" onchange="updateCalculations()">
+              <span class="form-helper">Fragmented tools, manual coordination → Unified: 70% reduction</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Incidents/Year from Human Error</label>
+              <input type="number" id="securityIncidents" class="form-input" value="36" min="0" max="200" onchange="updateCalculations()">
+              <span class="form-helper">Manual mistakes in operations. Parallel automation: 85% reduction</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. AUTOMATED SECURITY -->
+        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #ef4444;">
+          <h4 style="margin: 0 0 15px 0; color: #ef4444; font-size: 16px;">🔒 Automated Security - Remove Approval Bottlenecks</h4>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Hours/Month Waiting on Security Approvals</label>
+              <input type="number" id="downtimeHours" class="form-input" value="120" min="0" max="1000" step="10" onchange="updateCalculations()">
+              <span class="form-helper">Manual security reviews, approvals → Automated: 90% faster</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Average Days for Security Approval</label>
+              <input type="range" id="failedDeployments" class="form-range" value="7" min="1" max="30" oninput="updateRangeValue(this, 'failedDeploymentsValue'); updateCalculations()">
+              <span id="failedDeploymentsValue" class="range-value">7</span>
+              <span class="form-helper">Time to market delay. Stacktic: < 1 day with automated policies</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. CLOUD AGNOSTIC & VENDOR LOCK-IN -->
+        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #f59e0b;">
+          <h4 style="margin: 0 0 15px 0; color: #f59e0b; font-size: 16px;">🌐 Cloud Agnostic - Immediate Migration Capability</h4>
+          <div class="alert" style="background: #fef3c7; border-left: 4px solid #f59e0b; margin-bottom: 15px; padding: 12px;">
+            <strong>Vendor Lock-In Cost:</strong> Covered above in "AWS Managed Services" cost savings
+          </div>
+          <div class="form-group">
+            <label class="form-label">Cost of Migration Inability (yearly risk premium)</label>
+            <input type="number" id="cloudAgnosticRisk" class="form-input" value="200000" min="0" max="5000000" step="50000" onchange="updateCalculations()">
+            <span class="form-helper">Unable to switch providers = pricing premium + risk. Stacktic: migrate in days</span>
+          </div>
+        </div>
+
+        <!-- 5. ROLLBACK / LEGACY REMOVAL -->
+        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #8b5cf6;">
+          <h4 style="margin: 0 0 15px 0; color: #8b5cf6; font-size: 16px;">🔄 Rollback, Migrate, Adopt - Remove Legacy Burden</h4>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Hours/Month Maintaining Legacy Systems</label>
+              <input type="number" id="legacyHours" class="form-input" value="200" min="0" max="1000" step="10" onchange="updateCalculations()">
+              <span class="form-helper">Can't rollback/change → stuck with legacy. Stacktic: 80% reduction</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Failed Migration/Rollback Attempts per Year</label>
+              <input type="number" id="failedMigrations" class="form-input" value="4" min="0" max="50" onchange="updateCalculations()">
+              <span class="form-helper">Inability to safely change. Stacktic: GitOps rollback in minutes</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="export-buttons">
+        <button class="btn btn-primary" onclick="updateCalculations()">🔄 Calculate ROI</button>
+        <button class="btn btn-secondary" onclick="resetToDefaults()">↺ Reset to Defaults</button>
+        <button class="btn btn-secondary" onclick="switchTab('results', null)">View Results →</button>
+      </div>
+    </div>
+
+    <!-- TAB 2: Task Breakdown -->
+    <div id="tab-tasks" class="tab-content">
+      <div class="alert alert-info">
+        <span class="alert-icon">ℹ️</span>
+        <div class="alert-content">
+          <div class="alert-title">Task-Based Calculation Methodology</div>
+          <div class="alert-message">
+            This section breaks down ALL operational tasks into granular activities with time estimates.
+            Adjust frequency and hours to match your organization's actual processes.
+            These values feed directly into the ROI calculation, providing full transparency.
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title"><span class="card-icon">⚙️</span> Detailed Task Breakdown</h3>
+          <span class="card-badge badge-success">Editable</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="task-table" id="taskTable">
+            <thead>
+              <tr>
+                <th style="width: 40%;">Task / Activity</th>
+                <th style="width: 10%;">Frequency</th>
+                <th style="width: 10%;">Hours/Task</th>
+                <th style="width: 10%;">Annual Hours</th>
+                <th style="width: 15%;">Stacktic Automation</th>
+                <th style="width: 15%;">Hours Saved</th>
+              </tr>
+            </thead>
+            <tbody id="taskTableBody">
+              <!-- Populated by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="export-buttons">
+        <button class="btn btn-primary" onclick="updateCalculations()">💾 Save & Recalculate</button>
+        <button class="btn btn-secondary" onclick="exportTasksToCSV()">📥 Export to CSV</button>
+      </div>
+    </div>
+
+    <!-- TAB 3: Assumptions & Tuning -->
+    <div id="tab-assumptions" class="tab-content">
+      <div class="assumptions-panel">
+        <h3>🎛️ Adjust Stacktic Impact Assumptions</h3>
+        <p style="margin-bottom: 20px; font-size: 14px;">
+          Fine-tune the automation percentages and impact factors based on your confidence level and organizational readiness.
+          These directly affect all ROI calculations.
+        </p>
+
+        <div class="grid-2" id="assumptionsGrid">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title"><span class="card-icon">💵</span> Stacktic Pricing Model</h3>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Pricing Model</label>
+            <select id="pricingModel" class="form-select" onchange="updateCalculations()">
+              <option value="per-stack">Per Application Stack</option>
+              <option value="per-user" selected>Per User (Team-based)</option>
+              <option value="enterprise">Enterprise License</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Stacktic Annual Cost Override</label>
+            <input type="number" id="stackticCostOverride" class="form-input" value="0" min="0" max="1000000" step="5000" onchange="updateCalculations()">
+            <span class="form-helper">Leave at 0 for automatic calculation, or enter custom amount</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Implementation Cost (one-time)</label>
+            <input type="number" id="implementationCost" class="form-input" value="0" min="0" max="500000" step="5000" onchange="updateCalculations()">
+            <span class="form-helper">Professional services, migration, training</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Annual Support & Maintenance (%)</label>
+            <input type="range" id="supportPercent" class="form-range" value="15" min="0" max="30" oninput="updateRangeValue(this, 'supportPercentValue'); updateCalculations()">
+            <span id="supportPercentValue" class="range-value">15%</span>
+            <span class="form-helper">Percentage of platform cost for support</span>
+          </div>
+        </div>
+
+        <div class="alert alert-warning">
+          <span class="alert-icon">⚠️</span>
+          <div class="alert-content">
+            <div class="alert-title">Transparent Pricing Calculation</div>
+            <div class="alert-message" id="pricingBreakdown">
+              <!-- Populated by JavaScript -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="export-buttons">
+        <button class="btn btn-primary" onclick="updateCalculations()">🔄 Apply Changes</button>
+        <button class="btn btn-secondary" onclick="resetAssumptions()">↺ Reset Assumptions</button>
+      </div>
+    </div>
+
+    <!-- TAB 4: ROI Results -->
+    <div id="tab-results" class="tab-content">
+      <!-- Results Hero -->
+      <div class="results-hero">
+        <h2>3-Year Total Return on Investment</h2>
+        <div class="roi-amount" id="totalROI">$0</div>
+        <div class="roi-subtitle" id="roiSubtitle">Loading...</div>
+
+        <div class="roi-details">
+          <div class="roi-detail-item">
+            <div class="roi-detail-value" id="paybackMonths">0</div>
+            <div class="roi-detail-label">Months to Payback</div>
+          </div>
+          <div class="roi-detail-item">
+            <div class="roi-detail-value" id="roiPercentage">0%</div>
+            <div class="roi-detail-label">ROI Percentage</div>
+          </div>
+          <div class="roi-detail-item">
+            <div class="roi-detail-value" id="annualSavings">$0</div>
+            <div class="roi-detail-label">Year 1 Net Savings</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Key Metrics Grid -->
+      <div class="grid-4">
+        <div class="metric-card" style="border-left: 4px solid #8b5cf6; background: linear-gradient(135deg, #f5f3ff 0%, #ffffff 100%);">
+          <div class="metric-label" style="color: #8b5cf6;">🎯 Enterprise Centralization Value</div>
+          <div class="metric-value" id="enterpriseCentralizationMetric" style="color: #8b5cf6;">$0</div>
+          <div class="metric-change positive">
+            <span>🚀</span>
+            <span>vs fragmented approach</span>
+          </div>
+          <div class="metric-subtext">Observability, Security, Multi-Cloud, AI, Portal</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-label">Total Cost Savings (3yr)</div>
+          <div class="metric-value" id="totalSavings">$0</div>
+          <div class="metric-change positive">
+            <span>↓</span>
+            <span id="savingsPercent">0%</span>
+          </div>
+          <div class="metric-subtext">vs. current state</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-label">Engineering Hours Reclaimed</div>
+          <div class="metric-value" id="hoursReclaimed">0</div>
+          <div class="metric-change positive">
+            <span>→</span>
+            <span id="fte">0 FTE</span>
+          </div>
+          <div class="metric-subtext">redirected to features</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-label">Deployment Speed Improvement</div>
+          <div class="metric-value" id="speedImprovement">0x</div>
+          <div class="metric-change positive">
+            <span>⚡</span>
+            <span id="timeToMarket">0%</span>
+          </div>
+          <div class="metric-subtext">faster time-to-market</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-label">Risk Reduction Value</div>
+          <div class="metric-value" id="riskValue">$0</div>
+          <div class="metric-change positive">
+            <span>🛡️</span>
+            <span id="incidentReduction">0%</span>
+          </div>
+          <div class="metric-subtext">incident reduction</div>
+        </div>
+      </div>
+
+      <!-- Detailed Breakdown by Category -->
+      <div class="breakdown-section">
+        <h3 style="margin-bottom: 20px; font-size: 22px; font-weight: 700;">💡 Value Breakdown by Category</h3>
+
+        <div class="breakdown-category">
+          <div class="breakdown-header" onclick="toggleBreakdown(this)">
+            <div class="breakdown-title">
+              <span class="collapsible-icon">▶</span>
+              <span>💼 Labor Cost Savings</span>
+            </div>
+            <div class="breakdown-total" id="laborSavingsTotal">$0</div>
+          </div>
+          <div class="breakdown-content">
+            <div class="breakdown-item">
+              <span class="breakdown-item-label">DevOps/SRE Automation</span>
+              <span class="breakdown-item-value" id="devopsSavings">$0</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-item-label">Deployment Time Reduction</span>
+              <span class="breakdown-item-value" id="deploymentSavings">$0</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-item-label">Incident Response Reduction</span>
+              <span class="breakdown-item-value" id="incidentResponseSavings">$0</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-item-label">Manual Testing Reduction</span>
+              <span class="breakdown-item-value" id="testingSavings">$0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="breakdown-category">
+          <div class="breakdown-header" onclick="toggleBreakdown(this)">
+            <div class="breakdown-title">
+              <span class="collapsible-icon">▶</span>
+              <span>🏗️ Infrastructure Cost Savings</span>
+            </div>
+            <div class="breakdown-total" id="infraSavingsTotal">$0</div>
+          </div>
+          <div class="breakdown-content">
+            <div class="breakdown-item">
+              <span class="breakdown-item-label">Cloud Cost Optimization</span>
+              <span class="breakdown-item-value" id="cloudSavings">$0</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-item-label">Vendor Lock-in Avoidance</span>
+              <span class="breakdown-item-value" id="vendorLockSavings">$0</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-item-label">License Consolidation</span>
+              <span class="breakdown-item-value" id="licenseSavings">$0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="breakdown-category">
+          <div class="breakdown-header" onclick="toggleBreakdown(this)">
+            <div class="breakdown-title">
+              <span class="collapsible-icon">▶</span>
+              <span>🛡️ Risk Mitigation Value</span>
+            </div>
+            <div class="breakdown-total" id="riskSavingsTotal">$0</div>
+          </div>
+          <div class="breakdown-content">
+            <div class="breakdown-item">
+              <span class="breakdown-item-label">Downtime Reduction</span>
+              <span class="breakdown-item-value" id="downtimeSavings">$0</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-item-label">Security Incident Reduction</span>
+              <span class="breakdown-item-value" id="securitySavings">$0</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-item-label">Compliance Automation</span>
+              <span class="breakdown-item-value" id="complianceSavings">$0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="breakdown-category" style="border: 3px solid #8b5cf6; background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);">
+          <div class="breakdown-header" onclick="toggleBreakdown(this)">
+            <div class="breakdown-title">
+              <span class="collapsible-icon">▶</span>
+              <span>🎯 ENTERPRISE CENTRALIZATION VALUE</span>
+            </div>
+            <div class="breakdown-total" id="enterpriseCentralizationTotal" style="color: #8b5cf6;">$0</div>
+          </div>
+          <div class="breakdown-content">
+            <div class="breakdown-item">
+              <span class="breakdown-item-label">📊 Centralized Observability (vs per-app Grafana/Prometheus)</span>
+              <span class="breakdown-item-value" id="centralizedObservabilitySavings">$0</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-item-label">🔒 Centralized Security & Compliance (vs fragmented)</span>
+              <span class="breakdown-item-value" id="centralizedSecuritySavings">$0</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-item-label">🌐 Cloud-Agnostic/Multi-Cloud (avoiding vendor lock-in)</span>
+              <span class="breakdown-item-value" id="cloudAgnosticSavings">$0</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-item-label">🎭 Developer Portal (Backstage - onboarding, docs, standards)</span>
+              <span class="breakdown-item-value" id="developerPortalSavings">$0</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-item-label">🔄 Cross-Stack Automation (vs manual coordination)</span>
+              <span class="breakdown-item-value" id="crossStackSavings">$0</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-item-label">🤖 Centralized AI/RAG Platform (vs per-team AI spend)</span>
+              <span class="breakdown-item-value" id="centralizedAISavings">$0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="breakdown-category">
+          <div class="breakdown-header" onclick="toggleBreakdown(this)">
+            <div class="breakdown-title">
+              <span class="collapsible-icon">▶</span>
+              <span>💰 Stacktic Total Cost of Ownership</span>
+            </div>
+            <div class="breakdown-total" id="stackticTCOTotal" style="color: var(--danger);">$0</div>
+          </div>
+          <div class="breakdown-content">
+            <div class="breakdown-item">
+              <span class="breakdown-item-label">Platform License (Annual)</span>
+              <span class="breakdown-item-value" id="platformCost">$0</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-item-label">Implementation (One-time)</span>
+              <span class="breakdown-item-value" id="implCost">$0</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-item-label">Support & Maintenance (Annual)</span>
+              <span class="breakdown-item-value" id="supportCost">$0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export Options -->
+      <div class="export-buttons">
+        <button class="btn btn-primary" onclick="generatePDF()">📄 Export to PDF</button>
+        <button class="btn btn-secondary" onclick="generateExcel()">📊 Export to Excel</button>
+        <button class="btn btn-secondary" onclick="emailReport()">📧 Email Report</button>
+        <button class="btn btn-success" onclick="window.print()">🖨️ Print Report</button>
+      </div>
+    </div>
+
+    <!-- TAB 5: Detailed Comparison -->
+    <div id="tab-comparison" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title"><span class="card-icon">⚖️</span> Current State vs. With Stacktic</h3>
+        </div>
+
+        <div class="table-responsive">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Cost Category</th>
+                <th>Current Annual Cost</th>
+                <th>With Stacktic</th>
+                <th>Annual Savings</th>
+                <th>3-Year Savings</th>
+              </tr>
+            </thead>
+            <tbody id="comparisonTableBody">
+              <!-- Populated by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><span class="card-icon">👥</span> Team Productivity Analysis</h3>
+          </div>
+          <div id="productivityAnalysis">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><span class="card-icon">⚡</span> Deployment Efficiency</h3>
+          </div>
+          <div id="deploymentAnalysis">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: Timeline Analysis -->
+    <div id="tab-timeline" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title"><span class="card-icon">📅</span> Month-by-Month ROI Progression</h3>
+        </div>
+
+        <div id="timelineView">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><span class="card-icon">📊</span> Quarterly Summary</h3>
+          </div>
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Quarter</th>
+                <th>Costs</th>
+                <th>Savings</th>
+                <th>Net Impact</th>
+                <th>Cumulative</th>
+              </tr>
+            </thead>
+            <tbody id="quarterlyTableBody">
+              <!-- Populated by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><span class="card-icon">📈</span> Year-over-Year Comparison</h3>
+          </div>
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Year</th>
+                <th>Total Savings</th>
+                <th>Total Costs</th>
+                <th>Net Benefit</th>
+                <th>ROI %</th>
+              </tr>
+            </thead>
+            <tbody id="yearlyTableBody">
+              <!-- Populated by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 7: Visual Analytics -->
+    <div id="tab-charts" class="tab-content">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><span class="card-icon">📊</span> Cost Comparison (3-Year)</h3>
+          </div>
+          <div class="chart-container">
+            <canvas id="costComparisonChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><span class="card-icon">📈</span> Cumulative ROI Over Time</h3>
+          </div>
+          <div class="chart-container">
+            <canvas id="roiTimelineChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title"><span class="card-icon">🥧</span> Savings Breakdown by Category</h3>
+        </div>
+        <div class="chart-container">
+          <canvas id="savingsBreakdownChart"></canvas>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><span class="card-icon">⏱️</span> Time Savings Distribution</h3>
+          </div>
+          <div class="chart-container">
+            <canvas id="timeSavingsChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><span class="card-icon">📉</span> Risk Reduction Impact</h3>
+          </div>
+          <div class="chart-container">
+            <canvas id="riskReductionChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+      <div class="spinner"></div>
+      <div style="font-size: 18px; font-weight: 600; color: var(--gray-900);">Calculating ROI...</div>
+      <div style="font-size: 14px; color: var(--gray-600); margin-top: 10px;">Analyzing task breakdowns and generating projections</div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // GLOBAL STATE
+    // ==========================================
+    let currentScenario = 'conservative';
+    let charts = {};
+
+    // Scenario presets
+    const SCENARIOS = {
+      conservative: {
+        automationPercent: 0.60,
+        deploymentSpeedUp: 5,
+        incidentReduction: 0.60,
+        downtimeReduction: 0.50,
+        timeToMarketImprovement: 0.50
+      },
+      realistic: {
+        automationPercent: 0.75,
+        deploymentSpeedUp: 8,
+        incidentReduction: 0.75,
+        downtimeReduction: 0.65,
+        timeToMarketImprovement: 0.70
+      },
+      aggressive: {
+        automationPercent: 0.90,
+        deploymentSpeedUp: 12,
+        incidentReduction: 0.85,
+        downtimeReduction: 0.80,
+        timeToMarketImprovement: 0.85
+      }
+    };
+
+    // Task categories with detailed breakdown
+    const TASK_CATEGORIES = {
+      'Infrastructure Setup': [
+        { name: 'Kubernetes cluster setup and configuration', freq: 12, hours: 16, automation: 0.95 },
+        { name: 'Network configuration and security groups', freq: 24, hours: 8, automation: 0.90 },
+        { name: 'Load balancer and ingress setup', freq: 20, hours: 6, automation: 0.95 },
+        { name: 'Storage provisioning and configuration', freq: 36, hours: 4, automation: 0.85 },
+        { name: 'Service mesh installation (Istio/Linkerd)', freq: 4, hours: 24, automation: 0.90 },
+        { name: 'Certificate management setup', freq: 12, hours: 8, automation: 0.95 }
+      ],
+      'Database Management': [
+        { name: 'Database deployment and configuration', freq: 30, hours: 12, automation: 0.90 },
+        { name: 'Database backup automation setup', freq: 15, hours: 8, automation: 0.95 },
+        { name: 'Database user and permission management', freq: 48, hours: 4, automation: 0.90 },
+        { name: 'Database migration scripts', freq: 40, hours: 6, automation: 0.70 },
+        { name: 'Database monitoring and alerting', freq: 12, hours: 10, automation: 0.90 },
+        { name: 'Database performance tuning', freq: 24, hours: 12, automation: 0.60 }
+      ],
+      'Application Deployment': [
+        { name: 'CI/CD pipeline configuration', freq: 20, hours: 16, automation: 0.90 },
+        { name: 'Deployment manifest creation and updates', freq: 120, hours: 3, automation: 0.95 },
+        { name: 'Environment-specific configuration', freq: 60, hours: 4, automation: 0.95 },
+        { name: 'Blue-green deployment setup', freq: 15, hours: 12, automation: 0.85 },
+        { name: 'Canary deployment configuration', freq: 12, hours: 14, automation: 0.85 },
+        { name: 'Rollback procedures and testing', freq: 24, hours: 6, automation: 0.80 }
+      ],
+      'Security & Compliance': [
+        { name: 'RBAC setup and configuration', freq: 36, hours: 8, automation: 0.90 },
+        { name: 'Network policy creation', freq: 48, hours: 6, automation: 0.95 },
+        { name: 'Secret management implementation', freq: 40, hours: 8, automation: 0.95 },
+        { name: 'Security scanning integration', freq: 12, hours: 10, automation: 0.85 },
+        { name: 'Compliance audit preparation', freq: 4, hours: 40, automation: 0.80 },
+        { name: 'Vulnerability remediation', freq: 52, hours: 6, automation: 0.70 },
+        { name: 'OPA policy creation and enforcement', freq: 24, hours: 10, automation: 0.90 }
+      ],
+      'Monitoring & Observability': [
+        { name: 'Prometheus/Grafana setup', freq: 8, hours: 16, automation: 0.95 },
+        { name: 'Dashboard creation and customization', freq: 48, hours: 4, automation: 0.85 },
+        { name: 'Alert rule configuration', freq: 60, hours: 3, automation: 0.90 },
+        { name: 'Log aggregation setup', freq: 12, hours: 12, automation: 0.90 },
+        { name: 'Distributed tracing implementation', freq: 8, hours: 20, automation: 0.85 },
+        { name: 'SLO/SLI definition and monitoring', freq: 24, hours: 8, automation: 0.80 }
+      ],
+      'Day-2 Operations': [
+        { name: 'Incident response and troubleshooting', freq: 120, hours: 4, automation: 0.60 },
+        { name: 'Performance optimization', freq: 24, hours: 12, automation: 0.50 },
+        { name: 'Capacity planning and scaling', freq: 12, hours: 16, automation: 0.75 },
+        { name: 'Version upgrades and patching', freq: 48, hours: 6, automation: 0.80 },
+        { name: 'Configuration drift detection and remediation', freq: 36, hours: 4, automation: 0.90 },
+        { name: 'Cost optimization reviews', freq: 12, hours: 12, automation: 0.70 }
+      ],
+      'API & Service Management': [
+        { name: 'API gateway configuration', freq: 20, hours: 10, automation: 0.90 },
+        { name: 'Rate limiting and throttling setup', freq: 24, hours: 6, automation: 0.90 },
+        { name: 'CORS and security headers configuration', freq: 40, hours: 2, automation: 0.95 },
+        { name: 'Service-to-service authentication', freq: 30, hours: 8, automation: 0.85 },
+        { name: 'API versioning management', freq: 36, hours: 4, automation: 0.80 }
+      ],
+      'Data & Messaging': [
+        { name: 'Message queue setup (Kafka/RabbitMQ)', freq: 12, hours: 16, automation: 0.90 },
+        { name: 'Topic/queue configuration', freq: 48, hours: 4, automation: 0.90 },
+        { name: 'Consumer group management', freq: 40, hours: 3, automation: 0.85 },
+        { name: 'Data pipeline orchestration', freq: 20, hours: 12, automation: 0.75 },
+        { name: 'ETL job configuration', freq: 30, hours: 8, automation: 0.70 }
+      ],
+      'Documentation & Knowledge': [
+        { name: 'Architecture documentation', freq: 24, hours: 8, automation: 0.80 },
+        { name: 'Runbook creation', freq: 36, hours: 6, automation: 0.75 },
+        { name: 'API documentation generation', freq: 48, hours: 4, automation: 0.85 },
+        { name: 'Onboarding materials update', freq: 12, hours: 10, automation: 0.70 }
+      ],
+      '🎯 ENTERPRISE CENTRALIZATION': [
+        { name: '📊 Centralized Observability (vs per-app monitoring)', freq: 52, hours: 12, automation: 0.95 },
+        { name: '🔒 Centralized Security & Policies (vs split policies)', freq: 48, hours: 16, automation: 0.92 },
+        { name: '🌐 Multi-Cloud/Cloud-Agnostic Setup (vs vendor lock-in)', freq: 12, hours: 80, automation: 0.90 },
+        { name: '🎭 Developer Portal/Backstage Implementation', freq: 4, hours: 120, automation: 0.88 },
+        { name: '🔄 Cross-Stack Automation & Orchestration', freq: 36, hours: 24, automation: 0.93 },
+        { name: '🤖 Centralized AI/RAG Platform Setup', freq: 4, hours: 160, automation: 0.85 },
+        { name: '📈 Unified CISO/Audit Reporting (vs manual)', freq: 24, hours: 20, automation: 0.95 },
+        { name: '🔗 Cross-Stack Service Discovery & Routing', freq: 40, hours: 8, automation: 0.90 }
+      ]
+    };
+
+    // ==========================================
+    // INITIALIZATION
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeTasks();
+      initializeAssumptions();
+      updateCalculations();
+    });
+
+    // ==========================================
+    // TAB MANAGEMENT
+    // ==========================================
+    function switchTab(tabName, event) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+
+      // Remove active class from all buttons
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      // Show selected tab
+      document.getElementById('tab-' + tabName).classList.add('active');
+
+      // Highlight active button
+      if (event && event.target) {
+        event.target.classList.add('active');
+      } else {
+        // Find button by tab name and activate it
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach((btn, index) => {
+          const tabs = ['inputs', 'tasks', 'assumptions', 'results', 'comparison', 'timeline', 'charts'];
+          if (tabs[index] === tabName) {
+            btn.classList.add('active');
+          }
+        });
+      }
+
+      // If switching to charts, update them
+      if (tabName === 'charts') {
+        setTimeout(updateCharts, 100);
+      }
+    }
+
+    // ==========================================
+    // SCENARIO MANAGEMENT
+    // ==========================================
+    function setScenario(scenario) {
+      currentScenario = scenario;
+
+      // Update button states
+      document.querySelectorAll('.scenario-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.closest('.scenario-btn').classList.add('active');
+
+      // Apply scenario assumptions
+      const assumptions = SCENARIOS[scenario];
+      Object.keys(assumptions).forEach(key => {
+        const elem = document.getElementById('assumption_' + key);
+        if (elem) {
+          elem.value = assumptions[key] * 100;
+          updateRangeValue(elem, 'value_' + key);
+        }
+      });
+
+      updateCalculations();
+    }
+
+    // ==========================================
+    // TASK BREAKDOWN
+    // ==========================================
+    function initializeTasks() {
+      const tbody = document.getElementById('taskTableBody');
+      let html = '';
+
+      Object.keys(TASK_CATEGORIES).forEach(category => {
+        html += `
+          <tr class="task-category">
+            <td colspan="6"><strong>${category}</strong></td>
+          </tr>
+        `;
+
+        const tasks = TASK_CATEGORIES[category];
+        tasks.forEach((task, index) => {
+          const taskId = category.replace(/\s+/g, '_') + '_' + index;
+          const annualHours = task.freq * task.hours;
+          const automation = Math.round(task.automation * 100);
+          const hoursSaved = Math.round(annualHours * task.automation);
+
+          html += `
+            <tr data-task-id="${taskId}">
+              <td>${task.name}</td>
+              <td><input type="number" class="task-freq" value="${task.freq}" min="0" max="500" style="width: 70px;" onchange="recalculateTask(this)"></td>
+              <td><input type="number" class="task-hours" value="${task.hours}" min="0" max="200" step="0.5" style="width: 70px;" onchange="recalculateTask(this)"></td>
+              <td class="task-annual">${annualHours}</td>
+              <td><input type="range" class="task-automation" value="${automation}" min="0" max="100" onchange="recalculateTask(this)" style="width: 100px;"> <span class="automation-percent">${automation}%</span></td>
+              <td class="task-saved" style="font-weight: 600; color: var(--success);">${hoursSaved}</td>
+            </tr>
+          `;
+        });
+
+        // Category subtotal
+        const categoryTotal = tasks.reduce((sum, t) => sum + (t.freq * t.hours), 0);
+        const categorySaved = tasks.reduce((sum, t) => sum + (t.freq * t.hours * t.automation), 0);
+
+        html += `
+          <tr class="task-subtotal">
+            <td><strong>${category} - Subtotal</strong></td>
+            <td></td>
+            <td></td>
+            <td><strong class="category-total">${Math.round(categoryTotal)}</strong></td>
+            <td></td>
+            <td><strong class="category-saved">${Math.round(categorySaved)}</strong></td>
+          </tr>
+        `;
+      });
+
+      // Grand total
+      const grandTotal = Object.values(TASK_CATEGORIES).flat().reduce((sum, t) => sum + (t.freq * t.hours), 0);
+      const grandSaved = Object.values(TASK_CATEGORIES).flat().reduce((sum, t) => sum + (t.freq * t.hours * t.automation), 0);
+
+      html += `
+        <tr class="task-total">
+          <td><strong>TOTAL ANNUAL HOURS</strong></td>
+          <td></td>
+          <td></td>
+          <td><strong id="grandTotalHours">${Math.round(grandTotal)}</strong></td>
+          <td></td>
+          <td><strong id="grandSavedHours">${Math.round(grandSaved)}</strong></td>
+        </tr>
+      `;
+
+      tbody.innerHTML = html;
+    }
+
+    function recalculateTask(elem) {
+      const row = elem.closest('tr');
+      const freq = parseFloat(row.querySelector('.task-freq').value) || 0;
+      const hours = parseFloat(row.querySelector('.task-hours').value) || 0;
+      const automation = parseFloat(row.querySelector('.task-automation').value) / 100;
+
+      const annual = freq * hours;
+      const saved = Math.round(annual * automation);
+
+      row.querySelector('.task-annual').textContent = Math.round(annual);
+      row.querySelector('.task-saved').textContent = saved;
+      row.querySelector('.automation-percent').textContent = Math.round(automation * 100) + '%';
+
+      updateTaskTotals();
+      updateCalculations();
+    }
+
+    function updateTaskTotals() {
+      let grandTotal = 0;
+      let grandSaved = 0;
+
+      document.querySelectorAll('#taskTableBody tr[data-task-id]').forEach(row => {
+        const annual = parseFloat(row.querySelector('.task-annual').textContent) || 0;
+        const saved = parseFloat(row.querySelector('.task-saved').textContent) || 0;
+        grandTotal += annual;
+        grandSaved += saved;
+      });
+
+      document.getElementById('grandTotalHours').textContent = Math.round(grandTotal);
+      document.getElementById('grandSavedHours').textContent = Math.round(grandSaved);
+    }
+
+    // ==========================================
+    // ASSUMPTIONS PANEL
+    // ==========================================
+    function initializeAssumptions() {
+      const container = document.getElementById('assumptionsGrid');
+      const assumptions = SCENARIOS[currentScenario];
+
+      const labels = {
+        automationPercent: 'Ops Automation Percentage',
+        deploymentSpeedUp: 'Deployment Speed Multiplier',
+        incidentReduction: 'Incident Reduction %',
+        downtimeReduction: 'Downtime Reduction %',
+        timeToMarketImprovement: 'Time-to-Market Improvement %'
+      };
+
+      let html = '';
+      Object.keys(assumptions).forEach(key => {
+        const value = assumptions[key];
+        const isPercent = key !== 'deploymentSpeedUp';
+        const displayValue = isPercent ? Math.round(value * 100) : value;
+        const maxValue = isPercent ? 100 : 20;
+
+        html += `
+          <div class="assumption-item">
+            <div class="assumption-label">${labels[key]}</div>
+            <div class="assumption-control">
+              <input type="range" id="assumption_${key}" class="form-range" value="${displayValue}" min="0" max="${maxValue}"
+                oninput="updateRangeValue(this, 'value_${key}'); updateCalculations()" style="flex: 1;">
+              <span id="value_${key}" class="range-value">${displayValue}${isPercent ? '%' : 'x'}</span>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function resetAssumptions() {
+      setScenario(currentScenario);
+    }
+
+    // ==========================================
+    // MAIN CALCULATION ENGINE
+    // ==========================================
+    function updateCalculations() {
+      showLoading();
+
+      setTimeout(() => {
+        try {
+          console.log('Starting calculations...');
+
+          // Get all inputs
+          const inputs = getInputValues();
+          console.log('Inputs:', inputs);
+
+          // Calculate current state costs
+          const currentCosts = calculateCurrentCosts(inputs);
+          console.log('Current costs:', currentCosts);
+
+          // Calculate Stacktic costs
+          const stackticCosts = calculateStackticCosts(inputs);
+          console.log('Stacktic costs:', stackticCosts);
+
+          // Calculate savings
+          const savings = calculateSavings(currentCosts, stackticCosts, inputs);
+          console.log('Savings:', savings);
+
+          // Calculate ROI
+          const roi = calculateROI(savings, stackticCosts);
+          console.log('ROI:', roi);
+
+          // Update all displays
+          updateResultsDisplay(roi, savings, currentCosts, stackticCosts);
+          updateComparisonTable(currentCosts, stackticCosts, savings);
+          updateTimeline(roi, savings, stackticCosts);
+
+          console.log('Calculations complete!');
+          hideLoading();
+
+        } catch (error) {
+          console.error('Error in updateCalculations:', error);
+          alert('Calculation error: ' + error.message + '\n\nCheck browser console for details.');
+          hideLoading();
+        }
+      }, 500);
+    }
+
+    function getInputValues() {
+      const companySize = document.getElementById('companySize').value;
+
+      // Auto-calculate downtime and incident costs based on company size (industry benchmarks)
+      const downtimeCostMap = { startup: 1000, small: 5000, medium: 15000, large: 50000, enterprise: 100000 };
+      const incidentCostMap = { startup: 10000, small: 25000, medium: 50000, large: 150000, enterprise: 300000 };
+
+      return {
+        companySize: companySize,
+        numStacks: parseInt(document.getElementById('numStacks').value),
+        teamSize: parseInt(document.getElementById('teamSize').value),
+        engineerCost: parseInt(document.getElementById('engineerCost').value),
+        numDatabases: parseInt(document.getElementById('numDatabases')?.value) || 0,
+        managedPercent: (parseInt(document.getElementById('managedPercent')?.value) || 100) / 100,
+        downtimeCost: downtimeCostMap[companySize] || 15000,
+        incidentCost: incidentCostMap[companySize] || 50000,
+        opsTimePercent: parseInt(document.getElementById('opsTimePercent').value) / 100,
+        deploymentsPerMonth: parseInt(document.getElementById('deploymentsPerMonth').value),
+        deploymentHours: parseInt(document.getElementById('deploymentHours').value),
+        securityIncidents: parseInt(document.getElementById('securityIncidents').value),
+        downtimeHours: parseInt(document.getElementById('downtimeHours').value),
+        failedDeployments: parseInt(document.getElementById('failedDeployments').value),
+        cloudAgnosticRisk: parseInt(document.getElementById('cloudAgnosticRisk')?.value) || 200000,
+        legacyHours: parseInt(document.getElementById('legacyHours')?.value) || 200,
+        failedMigrations: parseInt(document.getElementById('failedMigrations')?.value) || 4,
+
+        // Assumptions
+        automationPercent: (parseFloat(document.getElementById('assumption_automationPercent')?.value) || 60) / 100,
+        deploymentSpeedUp: parseFloat(document.getElementById('assumption_deploymentSpeedUp')?.value) || 5,
+        incidentReduction: (parseFloat(document.getElementById('assumption_incidentReduction')?.value) || 60) / 100,
+        downtimeReduction: (parseFloat(document.getElementById('assumption_downtimeReduction')?.value) || 50) / 100,
+        timeToMarketImprovement: (parseFloat(document.getElementById('assumption_timeToMarketImprovement')?.value) || 50) / 100
+      };
+    }
+
+    function calculateCurrentCosts(inputs) {
+      const hourlyRate = inputs.engineerCost / 2080;
+
+      // Labor costs
+      const opsLaborCost = inputs.teamSize * inputs.engineerCost * inputs.opsTimePercent;
+      const deploymentLaborCost = inputs.deploymentsPerMonth * 12 * inputs.deploymentHours * hourlyRate;
+      const incidentResponseCost = inputs.securityIncidents * 40 * hourlyRate; // 40 hours avg per incident
+
+      // Managed Services Cost (AWS bill: RDS, MSK, ElastiCache, etc.)
+      const databaseCost = inputs.numDatabases; // Direct annual spend from user
+
+      // Risk costs
+      const downtimeBusinessCost = inputs.downtimeHours * inputs.downtimeCost;
+      const securityIncidentCost = inputs.securityIncidents * inputs.incidentCost;
+
+      const totalAnnual = opsLaborCost + deploymentLaborCost + incidentResponseCost + databaseCost + downtimeBusinessCost + securityIncidentCost;
+
+      return {
+        opsLaborCost,
+        deploymentLaborCost,
+        incidentResponseCost,
+        databaseCost,
+        downtimeBusinessCost,
+        securityIncidentCost,
+        totalAnnual
+      };
+    }
+
+    function calculateStackticCosts(inputs) {
+      const override = parseInt(document.getElementById('stackticCostOverride')?.value) || 0;
+
+      if (override > 0) {
+        const support = override * (parseInt(document.getElementById('supportPercent')?.value) || 15) / 100;
+        const impl = parseInt(document.getElementById('implementationCost')?.value) || 0;
+        return {
+          platformCost: override,
+          supportCost: support,
+          implementationCost: impl,
+          annualCost: override + support,
+          total3Year: (override + support) * 3 + impl
+        };
+      }
+
+      // Calculate based on model
+      const pricingModel = document.getElementById('pricingModel')?.value || 'per-user';
+      let platformCost = 0;
+
+      if (pricingModel === 'per-stack') {
+        const pricePerStack = inputs.companySize === 'enterprise' ? 5000 :
+                             inputs.companySize === 'large' ? 4000 :
+                             inputs.companySize === 'medium' ? 3000 : 2500;
+        platformCost = inputs.numStacks * pricePerStack;
+
+        // Volume discount
+        if (inputs.numStacks >= 20) platformCost *= 0.70;
+        else if (inputs.numStacks >= 10) platformCost *= 0.80;
+        else if (inputs.numStacks >= 5) platformCost *= 0.90;
+
+      } else if (pricingModel === 'per-user') {
+        const pricePerUser = inputs.companySize === 'enterprise' ? 150 :
+                            inputs.companySize === 'large' ? 120 :
+                            inputs.companySize === 'medium' ? 100 : 80;
+        platformCost = inputs.teamSize * pricePerUser * 12;
+
+      } else { // enterprise
+        platformCost = inputs.companySize === 'enterprise' ? 200000 :
+                      inputs.companySize === 'large' ? 150000 :
+                      inputs.companySize === 'medium' ? 100000 : 75000;
+      }
+
+      const supportPercent = (parseInt(document.getElementById('supportPercent')?.value) || 15) / 100;
+      const supportCost = platformCost * supportPercent;
+      const implCost = parseInt(document.getElementById('implementationCost')?.value) || (platformCost * 0.3);
+
+      return {
+        platformCost: Math.round(platformCost),
+        supportCost: Math.round(supportCost),
+        implementationCost: Math.round(implCost),
+        annualCost: Math.round(platformCost + supportCost),
+        total3Year: Math.round((platformCost + supportCost) * 3 + implCost)
+      };
+    }
+
+    function calculateSavings(currentCosts, stackticCosts, inputs) {
+      // Labor savings
+      const opsLaborSavings = currentCosts.opsLaborCost * inputs.automationPercent;
+      const deploymentSavings = currentCosts.deploymentLaborCost * (1 - 1/inputs.deploymentSpeedUp);
+      const incidentResponseSavings = currentCosts.incidentResponseCost * inputs.incidentReduction;
+
+      // Managed Services savings (user-defined % reduction moving to K8s)
+      const databaseSavings = currentCosts.databaseCost * inputs.managedPercent;
+
+      // Risk mitigation
+      const downtimeSavings = currentCosts.downtimeBusinessCost * inputs.downtimeReduction;
+      const securitySavings = currentCosts.securityIncidentCost * inputs.incidentReduction;
+
+      const totalAnnualSavings = opsLaborSavings + deploymentSavings + incidentResponseSavings +
+                                 databaseSavings + downtimeSavings + securitySavings;
+
+      return {
+        opsLaborSavings,
+        deploymentSavings,
+        incidentResponseSavings,
+        databaseSavings,
+        downtimeSavings,
+        securitySavings,
+        totalAnnualSavings
+      };
+    }
+
+    function calculateROI(savings, stackticCosts) {
+      const year1NetSavings = savings.totalAnnualSavings - stackticCosts.annualCost - stackticCosts.implementationCost;
+      const year2NetSavings = savings.totalAnnualSavings - stackticCosts.annualCost;
+      const year3NetSavings = savings.totalAnnualSavings - stackticCosts.annualCost;
+
+      const total3YearROI = year1NetSavings + year2NetSavings + year3NetSavings;
+
+      const monthlyNetSavings = (savings.totalAnnualSavings - stackticCosts.annualCost) / 12;
+      const paybackMonths = monthlyNetSavings > 0 ?
+        Math.ceil((stackticCosts.annualCost + stackticCosts.implementationCost) / monthlyNetSavings) : 999;
+
+      const roiPercentage = stackticCosts.total3Year > 0 ?
+        Math.round((total3YearROI / stackticCosts.total3Year) * 100) : 0;
+
+      return {
+        year1NetSavings,
+        year2NetSavings,
+        year3NetSavings,
+        total3YearROI,
+        paybackMonths,
+        roiPercentage
+      };
+    }
+
+    // ==========================================
+    // UI UPDATES
+    // ==========================================
+    function safeUpdate(id, value) {
+      const elem = document.getElementById(id);
+      if (elem) {
+        elem.textContent = value;
+      } else {
+        console.warn('Element not found:', id);
+      }
+    }
+
+    function updateResultsDisplay(roi, savings, currentCosts, stackticCosts) {
+      // Hero section
+      safeUpdate('totalROI', formatCurrency(roi.total3YearROI));
+      safeUpdate('roiSubtitle', `${roi.roiPercentage}% return over 3 years`);
+      safeUpdate('paybackMonths', roi.paybackMonths);
+      safeUpdate('roiPercentage', roi.roiPercentage + '%');
+      safeUpdate('annualSavings', formatCurrency(roi.year1NetSavings));
+
+      // Metrics
+      safeUpdate('totalSavings', formatCurrency(savings.totalAnnualSavings * 3));
+      const savingsPercent = Math.round((savings.totalAnnualSavings / currentCosts.totalAnnual) * 100);
+      safeUpdate('savingsPercent', savingsPercent + '%');
+
+      const totalHoursSaved = parseInt(document.getElementById('grandSavedHours')?.textContent) || 0;
+      safeUpdate('hoursReclaimed', formatNumber(totalHoursSaved));
+      const fte = (totalHoursSaved / 2080).toFixed(1);
+      safeUpdate('fte', fte + ' FTE');
+
+      const inputs = getInputValues();
+      safeUpdate('speedImprovement', inputs.deploymentSpeedUp + 'x');
+      safeUpdate('timeToMarket', Math.round(inputs.timeToMarketImprovement * 100) + '%');
+
+      const riskValue = savings.downtimeSavings + savings.securitySavings;
+      safeUpdate('riskValue', formatCurrency(riskValue));
+      safeUpdate('incidentReduction', Math.round(inputs.incidentReduction * 100) + '%');
+
+      // Breakdown totals
+      safeUpdate('laborSavingsTotal', formatCurrency(
+        savings.opsLaborSavings + savings.deploymentSavings + savings.incidentResponseSavings
+      ));
+      safeUpdate('devopsSavings', formatCurrency(savings.opsLaborSavings));
+      safeUpdate('deploymentSavings', formatCurrency(savings.deploymentSavings));
+      safeUpdate('incidentResponseSavings', formatCurrency(savings.incidentResponseSavings));
+      safeUpdate('testingSavings', formatCurrency(0));
+
+      safeUpdate('infraSavingsTotal', formatCurrency(savings.databaseSavings));
+      safeUpdate('cloudSavings', formatCurrency(savings.databaseSavings * 0.7));
+      safeUpdate('vendorLockSavings', formatCurrency(savings.databaseSavings * 0.2));
+      safeUpdate('licenseSavings', formatCurrency(savings.databaseSavings * 0.1));
+
+      safeUpdate('riskSavingsTotal', formatCurrency(riskValue));
+      safeUpdate('downtimeSavings', formatCurrency(savings.downtimeSavings));
+      safeUpdate('securitySavings', formatCurrency(savings.securitySavings));
+      safeUpdate('complianceSavings', formatCurrency(0));
+
+      safeUpdate('stackticTCOTotal', '-' + formatCurrency(stackticCosts.annualCost));
+      safeUpdate('platformCost', formatCurrency(stackticCosts.platformCost));
+      safeUpdate('implCost', formatCurrency(stackticCosts.implementationCost));
+      safeUpdate('supportCost', formatCurrency(stackticCosts.supportCost));
+
+      // Insights
+      safeUpdate('productivityHours', formatNumber(totalHoursSaved));
+
+      // ENTERPRISE CENTRALIZATION VALUE
+      const numStacks = inputs.numStacks || 5;
+
+      // Centralized Observability: Save 80% vs per-app monitoring setup
+      // Each app needs Grafana/Prometheus setup: ~$15K/year per app in tools + labor
+      const perAppMonitoringCost = 15000;
+      const centralizedObservabilitySavings = (numStacks * perAppMonitoringCost) * 0.80;
+
+      // Centralized Security: Save 70% vs fragmented policies
+      // Security overhead per app: ~$20K/year (compliance, audits, policy management)
+      const perAppSecurityCost = 20000;
+      const centralizedSecuritySavings = (numStacks * perAppSecurityCost) * 0.70;
+
+      // Cloud-Agnostic/Multi-Cloud: Avoid vendor lock-in premium
+      // Moving databases from managed services to K8s enables cloud portability
+      // 30% of current managed database costs represents the flexibility value
+      const cloudAgnosticSavings = currentCosts.databaseCost * 0.30;
+
+      // Developer Portal (Backstage): Save onboarding time & knowledge sharing
+      // Average onboarding cost: 3 months * $12K/month = $36K per engineer
+      // Portal reduces by 60%
+      const avgOnboardingPerYear = (inputs.teamSize * 0.15) * 36000; // 15% turnover
+      const developerPortalSavings = avgOnboardingPerYear * 0.60;
+
+      // Cross-Stack Automation: Manual coordination overhead
+      // Enterprise coordination tax: ~10% of engineering time
+      const crossStackSavings = (inputs.teamSize * inputs.engineerCost) * 0.10;
+
+      // Centralized AI/RAG: vs per-team AI subscriptions
+      // Per-team AI spend: $500/dev/month for ChatGPT/Copilot/etc.
+      // Centralized saves 50%
+      const perTeamAISpend = inputs.teamSize * 500 * 12;
+      const centralizedAISavings = perTeamAISpend * 0.50;
+
+      const totalEnterpriseCentralization = centralizedObservabilitySavings +
+                                           centralizedSecuritySavings +
+                                           cloudAgnosticSavings +
+                                           developerPortalSavings +
+                                           crossStackSavings +
+                                           centralizedAISavings;
+
+      safeUpdate('enterpriseCentralizationTotal', formatCurrency(totalEnterpriseCentralization));
+      safeUpdate('enterpriseCentralizationMetric', formatCurrency(totalEnterpriseCentralization));
+      safeUpdate('centralizedObservabilitySavings', formatCurrency(centralizedObservabilitySavings));
+      safeUpdate('centralizedSecuritySavings', formatCurrency(centralizedSecuritySavings));
+      safeUpdate('cloudAgnosticSavings', formatCurrency(cloudAgnosticSavings));
+      safeUpdate('developerPortalSavings', formatCurrency(developerPortalSavings));
+      safeUpdate('crossStackSavings', formatCurrency(crossStackSavings));
+      safeUpdate('centralizedAISavings', formatCurrency(centralizedAISavings));
+    }
+
+    function updateComparisonTable(currentCosts, stackticCosts, savings) {
+      const tbody = document.getElementById('comparisonTableBody');
+      if (!tbody) {
+        console.warn('comparisonTableBody not found');
+        return;
+      }
+
+      const categories = [
+        {
+          name: 'Ops/DevOps/SRE Labor',
+          current: currentCosts.opsLaborCost,
+          withStacktic: currentCosts.opsLaborCost - savings.opsLaborSavings,
+          savings: savings.opsLaborSavings
+        },
+        {
+          name: 'Deployment Operations',
+          current: currentCosts.deploymentLaborCost,
+          withStacktic: currentCosts.deploymentLaborCost - savings.deploymentSavings,
+          savings: savings.deploymentSavings
+        },
+        {
+          name: 'Incident Response',
+          current: currentCosts.incidentResponseCost,
+          withStacktic: currentCosts.incidentResponseCost - savings.incidentResponseSavings,
+          savings: savings.incidentResponseSavings
+        },
+        {
+          name: 'Database Infrastructure (Managed Services → K8s)',
+          current: currentCosts.databaseCost,
+          withStacktic: currentCosts.databaseCost - savings.databaseSavings,
+          savings: savings.databaseSavings
+        },
+        {
+          name: 'Downtime Costs',
+          current: currentCosts.downtimeBusinessCost,
+          withStacktic: currentCosts.downtimeBusinessCost - savings.downtimeSavings,
+          savings: savings.downtimeSavings
+        },
+        {
+          name: 'Security Incidents',
+          current: currentCosts.securityIncidentCost,
+          withStacktic: currentCosts.securityIncidentCost - savings.securitySavings,
+          savings: savings.securitySavings
+        },
+        {
+          name: 'Stacktic Platform & Support',
+          current: 0,
+          withStacktic: stackticCosts.annualCost,
+          savings: -stackticCosts.annualCost
+        }
+      ];
+
+      let html = '';
+      categories.forEach(cat => {
+        const savings3yr = cat.savings * 3;
+        html += `
+          <tr>
+            <td><strong>${cat.name}</strong></td>
+            <td class="comparison-current">${formatCurrency(cat.current)}</td>
+            <td class="comparison-stacktic">${formatCurrency(cat.withStacktic)}</td>
+            <td class="comparison-savings">${formatCurrency(cat.savings)}</td>
+            <td class="comparison-savings">${formatCurrency(savings3yr)}</td>
+          </tr>
+        `;
+      });
+
+      // Total row
+      const currentTotal = currentCosts.totalAnnual;
+      const stackticTotal = currentTotal - savings.totalAnnualSavings + stackticCosts.annualCost;
+      const annualSavings = currentTotal - stackticTotal;
+      const savings3yr = annualSavings * 3;
+
+      html += `
+        <tr style="border-top: 3px solid var(--gray-300); font-weight: 700; background: var(--gray-50);">
+          <td><strong>TOTAL</strong></td>
+          <td class="comparison-current">${formatCurrency(currentTotal)}</td>
+          <td class="comparison-stacktic">${formatCurrency(stackticTotal)}</td>
+          <td class="comparison-savings">${formatCurrency(annualSavings)}</td>
+          <td class="comparison-savings">${formatCurrency(savings3yr)}</td>
+        </tr>
+      `;
+
+      tbody.innerHTML = html;
+    }
+
+    function updateTimeline(roi, savings, stackticCosts) {
+      // Monthly timeline view
+      const timelineView = document.getElementById('timelineView');
+      if (!timelineView) {
+        console.warn('timelineView not found');
+        return;
+      }
+      let html = '<div style="padding: 20px;">';
+
+      const monthlySavings = savings.totalAnnualSavings / 12;
+      const monthlyCost = stackticCosts.annualCost / 12;
+      const monthlyNet = monthlySavings - monthlyCost;
+
+      let cumulative = -stackticCosts.implementationCost;
+
+      for (let month = 1; month <= 36; month++) {
+        cumulative += monthlyNet;
+        const progress = Math.max(0, Math.min(100, (cumulative / roi.total3YearROI) * 100));
+        const isPositive = cumulative >= 0;
+
+        html += `
+          <div class="timeline-row">
+            <div class="timeline-period">Month ${month}</div>
+            <div class="timeline-bar">
+              <div class="timeline-fill" style="width: ${progress}%; background: ${isPositive ? 'linear-gradient(90deg, var(--success), #16a34a)' : 'linear-gradient(90deg, var(--danger), #dc2626)'};">
+                ${formatCurrency(cumulative)}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      html += '</div>';
+      timelineView.innerHTML = html;
+
+      // Quarterly table
+      const quarterlyBody = document.getElementById('quarterlyTableBody');
+      if (!quarterlyBody) {
+        console.warn('quarterlyTableBody not found');
+        return;
+      }
+      let qHtml = '';
+      let qCumulative = -stackticCosts.implementationCost;
+
+      for (let q = 1; q <= 12; q++) {
+        const qSavings = (savings.totalAnnualSavings / 4);
+        const qCost = (stackticCosts.annualCost / 4) + (q === 1 ? stackticCosts.implementationCost : 0);
+        const qNet = qSavings - qCost;
+        qCumulative += qNet;
+
+        qHtml += `
+          <tr>
+            <td><strong>Q${q}</strong></td>
+            <td class="comparison-current">${formatCurrency(qCost)}</td>
+            <td class="comparison-savings">${formatCurrency(qSavings)}</td>
+            <td class="${qNet >= 0 ? 'comparison-savings' : 'comparison-current'}">${formatCurrency(qNet)}</td>
+            <td class="${qCumulative >= 0 ? 'comparison-savings' : 'comparison-current'}">${formatCurrency(qCumulative)}</td>
+          </tr>
+        `;
+      }
+      quarterlyBody.innerHTML = qHtml;
+
+      // Yearly table
+      const yearlyBody = document.getElementById('yearlyTableBody');
+      if (!yearlyBody) {
+        console.warn('yearlyTableBody not found');
+        return;
+      }
+      let yHtml = '';
+
+      const years = [
+        { savings: savings.totalAnnualSavings, cost: stackticCosts.annualCost + stackticCosts.implementationCost, net: roi.year1NetSavings },
+        { savings: savings.totalAnnualSavings, cost: stackticCosts.annualCost, net: roi.year2NetSavings },
+        { savings: savings.totalAnnualSavings, cost: stackticCosts.annualCost, net: roi.year3NetSavings }
+      ];
+
+      years.forEach((year, i) => {
+        const roiPct = year.cost > 0 ? Math.round((year.net / year.cost) * 100) : 0;
+        yHtml += `
+          <tr>
+            <td><strong>Year ${i + 1}</strong></td>
+            <td class="comparison-savings">${formatCurrency(year.savings)}</td>
+            <td class="comparison-current">${formatCurrency(year.cost)}</td>
+            <td class="comparison-savings">${formatCurrency(year.net)}</td>
+            <td><strong>${roiPct}%</strong></td>
+          </tr>
+        `;
+      });
+
+      yearlyBody.innerHTML = yHtml;
+    }
+
+    function updateCharts() {
+      // Destroy existing charts
+      Object.values(charts).forEach(chart => {
+        if (chart) chart.destroy();
+      });
+
+      const inputs = getInputValues();
+      const currentCosts = calculateCurrentCosts(inputs);
+      const stackticCosts = calculateStackticCosts(inputs);
+      const savings = calculateSavings(currentCosts, stackticCosts, inputs);
+      const roi = calculateROI(savings, stackticCosts);
+
+      // Cost Comparison Chart
+      const costCtx = document.getElementById('costComparisonChart')?.getContext('2d');
+      if (costCtx) {
+        charts.costComparison = new Chart(costCtx, {
+          type: 'bar',
+          data: {
+            labels: ['Year 1', 'Year 2', 'Year 3'],
+            datasets: [
+              {
+                label: 'Current State',
+                data: [currentCosts.totalAnnual, currentCosts.totalAnnual, currentCosts.totalAnnual],
+                backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                borderColor: 'rgb(239, 68, 68)',
+                borderWidth: 2
+              },
+              {
+                label: 'With Stacktic',
+                data: [
+                  currentCosts.totalAnnual - savings.totalAnnualSavings + stackticCosts.annualCost + stackticCosts.implementationCost,
+                  currentCosts.totalAnnual - savings.totalAnnualSavings + stackticCosts.annualCost,
+                  currentCosts.totalAnnual - savings.totalAnnualSavings + stackticCosts.annualCost
+                ],
+                backgroundColor: 'rgba(34, 197, 94, 0.7)',
+                borderColor: 'rgb(34, 197, 94)',
+                borderWidth: 2
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'top' },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return context.dataset.label + ': ' + formatCurrency(context.parsed.y);
+                  }
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  callback: function(value) {
+                    return formatCurrency(value);
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // ROI Timeline Chart
+      const roiCtx = document.getElementById('roiTimelineChart')?.getContext('2d');
+      if (roiCtx) {
+        charts.roiTimeline = new Chart(roiCtx, {
+          type: 'line',
+          data: {
+            labels: ['Start', 'Year 1', 'Year 2', 'Year 3'],
+            datasets: [{
+              label: 'Cumulative ROI',
+              data: [
+                -stackticCosts.implementationCost,
+                roi.year1NetSavings,
+                roi.year1NetSavings + roi.year2NetSavings,
+                roi.total3YearROI
+              ],
+              borderColor: 'rgb(102, 126, 234)',
+              backgroundColor: 'rgba(102, 126, 234, 0.1)',
+              tension: 0.4,
+              fill: true,
+              borderWidth: 3
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return 'Cumulative ROI: ' + formatCurrency(context.parsed.y);
+                  }
+                }
+              }
+            },
+            scales: {
+              y: {
+                ticks: {
+                  callback: function(value) {
+                    return formatCurrency(value);
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // Savings Breakdown Chart
+      const savingsCtx = document.getElementById('savingsBreakdownChart')?.getContext('2d');
+      if (savingsCtx) {
+        charts.savingsBreakdown = new Chart(savingsCtx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Ops Labor', 'Deployment', 'Incident Response', 'Database (Managed→K8s)', 'Downtime', 'Security'],
+            datasets: [{
+              data: [
+                savings.opsLaborSavings,
+                savings.deploymentSavings,
+                savings.incidentResponseSavings,
+                savings.databaseSavings,
+                savings.downtimeSavings,
+                savings.securitySavings
+              ],
+              backgroundColor: [
+                'rgba(102, 126, 234, 0.8)',
+                'rgba(34, 197, 94, 0.8)',
+                'rgba(245, 158, 11, 0.8)',
+                'rgba(139, 92, 246, 0.8)',
+                'rgba(236, 72, 153, 0.8)',
+                'rgba(59, 130, 246, 0.8)'
+              ],
+              borderWidth: 2,
+              borderColor: 'white'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'right' },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return context.label + ': ' + formatCurrency(context.parsed);
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // Time Savings Chart
+      const timeCtx = document.getElementById('timeSavingsChart')?.getContext('2d');
+      if (timeCtx) {
+        const totalHours = parseInt(document.getElementById('grandTotalHours')?.textContent) || 0;
+        const savedHours = parseInt(document.getElementById('grandSavedHours')?.textContent) || 0;
+
+        charts.timeSavings = new Chart(timeCtx, {
+          type: 'bar',
+          data: {
+            labels: ['Infrastructure', 'Database', 'Deployment', 'Security', 'Monitoring', 'Day-2 Ops', 'API', 'Data', 'Docs'],
+            datasets: [{
+              label: 'Hours Saved',
+              data: [1200, 900, 1800, 1500, 800, 1100, 600, 700, 400], // TODO: calculate from tasks
+              backgroundColor: 'rgba(34, 197, 94, 0.7)',
+              borderColor: 'rgb(34, 197, 94)',
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  callback: function(value) {
+                    return value + ' hrs';
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // Risk Reduction Chart
+      const riskCtx = document.getElementById('riskReductionChart')?.getContext('2d');
+      if (riskCtx) {
+        charts.riskReduction = new Chart(riskCtx, {
+          type: 'radar',
+          data: {
+            labels: ['Downtime', 'Security Incidents', 'Deployment Failures', 'Compliance Violations', 'Configuration Drift'],
+            datasets: [
+              {
+                label: 'Current Risk',
+                data: [100, 100, 100, 100, 100],
+                borderColor: 'rgb(239, 68, 68)',
+                backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                borderWidth: 2
+              },
+              {
+                label: 'With Stacktic',
+                data: [
+                  (1 - inputs.downtimeReduction) * 100,
+                  (1 - inputs.incidentReduction) * 100,
+                  15,
+                  10,
+                  5
+                ],
+                borderColor: 'rgb(34, 197, 94)',
+                backgroundColor: 'rgba(34, 197, 94, 0.2)',
+                borderWidth: 2
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              r: {
+                beginAtZero: true,
+                max: 100,
+                ticks: {
+                  callback: function(value) {
+                    return value + '%';
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    // ==========================================
+    // UTILITY FUNCTIONS
+    // ==========================================
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(amount);
+    }
+
+    function formatNumber(num) {
+      return new Intl.NumberFormat('en-US').format(num);
+    }
+
+    function updateRangeValue(elem, targetId) {
+      const value = elem.value;
+      const target = document.getElementById(targetId);
+      if (target) {
+        const suffix = elem.parentElement.querySelector('.range-value')?.textContent.includes('%') ? '%' :
+                      elem.parentElement.querySelector('.range-value')?.textContent.includes('x') ? 'x' : '';
+        target.textContent = value + suffix;
+      }
+    }
+
+    function toggleBreakdown(header) {
+      const content = header.nextElementSibling;
+      const icon = header.querySelector('.collapsible-icon');
+
+      content.classList.toggle('expanded');
+      icon.classList.toggle('expanded');
+    }
+
+    function showLoading() {
+      document.getElementById('loadingOverlay').classList.add('show');
+    }
+
+    function hideLoading() {
+      document.getElementById('loadingOverlay').classList.remove('show');
+    }
+
+    function resetToDefaults() {
+      if (confirm('Reset all inputs to default values?')) {
+        document.getElementById('companySize').value = 'medium';
+        document.getElementById('numStacks').value = '5';
+        document.getElementById('teamSize').value = '25';
+        document.getElementById('engineerCost').value = '150000';
+        document.getElementById('numDatabases').value = '100000';
+        document.getElementById('managedPercent').value = '70';
+        document.getElementById('downtimeCost').value = '25000';
+        document.getElementById('incidentCost').value = '50000';
+        document.getElementById('opsTimePercent').value = '60';
+        document.getElementById('deploymentsPerMonth').value = '20';
+        document.getElementById('deploymentHours').value = '160';
+        document.getElementById('securityIncidents').value = '12';
+        document.getElementById('downtimeHours').value = '24';
+        document.getElementById('failedDeployments').value = '15';
+
+        updateRangeValue(document.getElementById('opsTimePercent'), 'opsTimeValue');
+        updateRangeValue(document.getElementById('failedDeployments'), 'failedDeploymentsValue');
+        updateRangeValue(document.getElementById('managedPercent'), 'managedPercentValue');
+
+        setScenario('conservative');
+        updateCalculations();
+      }
+    }
+
+    // Export functions (placeholders)
+    function exportTasksToCSV() {
+      alert('CSV export functionality coming soon');
+    }
+
+    function generatePDF() {
+      window.print();
+    }
+
+    function generateExcel() {
+      alert('Excel export functionality coming soon');
+    }
+
+    function emailReport() {
+      alert('Email functionality coming soon');
+    }
+  </script>
+</body>
+</html>

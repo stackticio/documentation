@@ -1,0 +1,2044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Architecture: Detailed Problem Visualization</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+            overflow-x: hidden;
+            transition: background 2s ease;
+        }
+
+        body.iframe-embed {
+            overflow: hidden;
+            padding: 5px;
+        }
+
+        .page {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+            transition: background 2s ease;
+        }
+
+        body.iframe-embed .page {
+            transform: scale(0.48);
+            transform-origin: top center;
+        }
+
+        body:not(.iframe-embed) .page {
+            transform: scale(1);
+        }
+
+        /* Year Display Overlay */
+        .year-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 200px;
+            font-weight: 900;
+            font-family: 'JetBrains Mono', monospace;
+            color: rgba(239, 68, 68, 0.05);
+            pointer-events: none;
+            z-index: 1;
+            transition: all 0.5s ease;
+        }
+
+        /* === HEADER === */
+        .header {
+            display: grid;
+            grid-template-columns: 190px 1fr 190px;
+            margin-bottom: 20px;
+            align-items: end;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header-label {
+            font-size: 13px;
+            font-weight: 800;
+            color: #333;
+            letter-spacing: 0.5px;
+        }
+
+        .header-label.right { text-align: right; }
+
+        .human-factors {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .factor {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            padding: 14px 22px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 160px;
+            border: 1px solid #ddd;
+            transition: all 0.5s ease;
+        }
+
+        .factor h2 {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #2c3e50;
+        }
+
+        .factor p {
+            font-size: 9px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        /* === MAIN === */
+        .main {
+            display: grid;
+            grid-template-columns: 190px 1fr 190px;
+            gap: 18px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* === OPS BLOCKERS === */
+        .ops-blockers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .blocker {
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
+            padding: 14px;
+            border-radius: 10px;
+            border-left: 4px solid #e53935;
+            transition: all 0.5s ease;
+        }
+
+        .blocker h3 {
+            font-size: 13px;
+            font-weight: 700;
+            color: #c62828;
+            margin-bottom: 6px;
+        }
+
+        .blocker p {
+            font-size: 8px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        /* === ROADMAP === */
+        .roadmap {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .roadmap-item {
+            background: linear-gradient(135deg, #f0f7ff 0%, #e3f0ff 100%);
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            border-right: 4px solid #1976d2;
+            transition: all 0.5s ease;
+        }
+
+        .roadmap-item h3 {
+            font-size: 10px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1565c0;
+        }
+
+        .roadmap-icons {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .roadmap-icon {
+            width: 44px;
+            height: 44px;
+            background: #fff;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-direction: column;
+        }
+
+        .roadmap-icon .label {
+            font-size: 6px;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .roadmap-arrow {
+            font-size: 16px;
+            color: #1976d2;
+        }
+
+        /* === WORKLOAD AREA === */
+        .workload-area {
+            background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+            border: 2px solid #e0e0e0;
+            border-radius: 14px;
+            padding: 18px;
+            transition: all 0.5s ease;
+            position: relative;
+        }
+
+        /* Top bar */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 11px;
+            color: #555;
+            margin-bottom: 12px;
+            padding: 8px;
+            background: #fff;
+            border-radius: 8px;
+            border: 1px dashed #bbb;
+        }
+
+        .top-bar .arrow-text {
+            color: #888;
+            letter-spacing: 2px;
+        }
+
+        /* Deprecated notice */
+        .deprecated-notice {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .deprecated-notice span {
+            display: inline-block;
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border: 2px solid #ffa000;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #e65100;
+        }
+
+        /* === ZONES GRID === */
+        .zones-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        /* Zone base */
+        .zone {
+            background: #fff;
+            border-radius: 12px;
+            padding: 14px;
+            border: 2px solid;
+            position: relative;
+            transition: all 0.5s ease;
+        }
+
+        .zone-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid;
+        }
+
+        .zone-icon {
+            font-size: 20px;
+        }
+
+        .zone-title {
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .zone-subtitle {
+            font-size: 8px;
+            color: #666;
+            margin-left: auto;
+            background: rgba(0,0,0,0.05);
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        .zone-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        /* Zone colors */
+        .zone-config {
+            border-color: #9c27b0;
+            background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 100%);
+        }
+        .zone-config .zone-header { border-color: #9c27b0; }
+        .zone-config .zone-title { color: #7b1fa2; }
+
+        .zone-k8s {
+            border-color: #326ce5;
+            background: linear-gradient(135deg, #e3f2fd 0%, #e8eaf6 100%);
+        }
+        .zone-k8s .zone-header { border-color: #326ce5; }
+        .zone-k8s .zone-title { color: #1565c0; }
+
+        .zone-vm {
+            border-color: #8d6e63;
+            background: linear-gradient(135deg, #efebe9 0%, #d7ccc8 100%);
+        }
+        .zone-vm .zone-header { border-color: #8d6e63; }
+        .zone-vm .zone-title { color: #5d4037; }
+
+        .zone-aws {
+            border-color: #ff9800;
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+        }
+        .zone-aws .zone-header { border-color: #ff9800; }
+        .zone-aws .zone-title { color: #e65100; }
+
+        .zone-external {
+            border-color: #00897b;
+            background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+        }
+        .zone-external .zone-header { border-color: #00897b; }
+        .zone-external .zone-title { color: #00695c; }
+
+        /* === ICONS === */
+        .icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-size: 18px;
+            font-weight: 600;
+            border: 2px solid rgba(255,255,255,0.3);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+            transition: transform 0.2s;
+            position: relative;
+        }
+
+        .icon:hover { transform: translateY(-2px); }
+
+        .icon .label {
+            font-size: 7px;
+            font-weight: 600;
+            margin-top: 2px;
+            text-transform: uppercase;
+        }
+
+        /* AI icons - larger */
+        .icon.ai {
+            width: 56px;
+            height: 56px;
+        }
+
+        /* Icon colors */
+        .yaml { background: linear-gradient(135deg, #d32f2f, #b71c1c); color: #fff; }
+        .json { background: linear-gradient(135deg, #fdd835, #f9a825); color: #000; }
+        .py { background: linear-gradient(135deg, #3776ab, #2c5f86); color: #fff; }
+        .api { background: linear-gradient(135deg, #00897b, #00695c); color: #fff; }
+
+        .chatgpt { background: linear-gradient(135deg, #10a37f, #0d8a6a); color: #fff; }
+        .claude { background: linear-gradient(135deg, #d97706, #b45309); color: #fff; }
+        .copilot { background: linear-gradient(135deg, #333, #111); color: #fff; }
+        .gemini { background: linear-gradient(135deg, #4285f4, #1a73e8); color: #fff; }
+
+        .k8s { background: linear-gradient(135deg, #326ce5, #2857b6); color: #fff; }
+        .docker { background: linear-gradient(135deg, #2496ed, #1a7cc7); color: #fff; }
+        .django { background: linear-gradient(135deg, #092e20, #0c4a33); color: #fff; }
+        .node { background: linear-gradient(135deg, #339933, #2d7d2d); color: #fff; }
+        .nginx { background: linear-gradient(135deg, #009639, #007a2e); color: #fff; }
+        .react { background: linear-gradient(135deg, #61dafb, #21a1c4); color: #000; }
+        .go { background: linear-gradient(135deg, #00add8, #0095ba); color: #fff; }
+        .argocd { background: linear-gradient(135deg, #ef7b4d, #e55a2b); color: #fff; }
+        .helm { background: linear-gradient(135deg, #0f1689, #0a0f5c); color: #fff; }
+        .java { background: linear-gradient(135deg, #ed8b00, #cc7700); color: #fff; }
+
+        .vm { background: linear-gradient(135deg, #795548, #5d4037); color: #fff; }
+        .elastic { background: linear-gradient(135deg, #fed10a, #f7c600); color: #000; }
+        .oracle { background: linear-gradient(135deg, #f80000, #cc0000); color: #fff; }
+        .sqlserver { background: linear-gradient(135deg, #cc2927, #a31f1d); color: #fff; }
+        .postgres { background: linear-gradient(135deg, #336791, #285578); color: #fff; }
+        .mongo { background: linear-gradient(135deg, #47a248, #3a863b); color: #fff; }
+
+        .rds { background: linear-gradient(135deg, #527fff, #3d66cc); color: #fff; }
+        .s3 { background: linear-gradient(135deg, #569a31, #458027); color: #fff; }
+        .documentdb { background: linear-gradient(135deg, #3b48cc, #2e39a3); color: #fff; }
+        .elasticache { background: linear-gradient(135deg, #c925d1, #a31ea9); color: #fff; }
+        .aurora { background: linear-gradient(135deg, #ff9900, #e68a00); color: #fff; }
+        .lambda { background: linear-gradient(135deg, #ff9900, #e68a00); color: #fff; }
+
+        .entra { background: linear-gradient(135deg, #0078d4, #005fa3); color: #fff; }
+        .vault { background: linear-gradient(135deg, #000, #333); color: #fff; }
+        .okta { background: linear-gradient(135deg, #007dc1, #00649a); color: #fff; }
+        .ldap { background: linear-gradient(135deg, #607d8b, #4b636e); color: #fff; }
+        .datadog { background: linear-gradient(135deg, #632ca6, #4e2282); color: #fff; }
+        .pagerduty { background: linear-gradient(135deg, #06ac38, #058a2d); color: #fff; }
+
+        /* Roadmap specific */
+        .keda { background: linear-gradient(135deg, #326ce5, #2857b6); color: #fff; }
+        .istio { background: linear-gradient(135deg, #466bb0, #37558c); color: #fff; }
+        .linkerd { background: linear-gradient(135deg, #2beda7, #20c98e); color: #000; }
+        .opensearch { background: linear-gradient(135deg, #005eb8, #004a91); color: #fff; }
+        .ingress { background: linear-gradient(135deg, #326ce5, #2857b6); color: #fff; }
+        .gateway { background: linear-gradient(135deg, #7c4dff, #651fff); color: #fff; }
+
+        /* Person & code */
+        .person { font-size: 24px; }
+
+        .code-tag {
+            background: linear-gradient(135deg, #fce4ec, #f8bbd9);
+            color: #c2185b;
+            font-family: 'Consolas', monospace;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #f48fb1;
+        }
+
+        /* Badges */
+        .badge {
+            font-size: 7px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge.eol {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+
+        .badge.deprecated {
+            background: #fff3e0;
+            color: #e65100;
+            border: 1px solid #ffcc80;
+        }
+
+        .badge.managed {
+            background: #e3f2fd;
+            color: #1565c0;
+            border: 1px solid #90caf9;
+        }
+
+        .badge.lockin {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+
+        /* === PROBLEM INDICATORS === */
+        .problem-indicator {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            background: #ef4444;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
+            animation: pulse 2s ease-in-out infinite;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
+            }
+            50% {
+                transform: scale(1.15);
+                box-shadow: 0 0 30px rgba(239, 68, 68, 1);
+            }
+        }
+
+        .problem-indicator.security { background: #f97316; }
+        .problem-indicator.migration { background: #eab308; }
+        .problem-indicator.lockin { background: #ec4899; }
+        .problem-indicator.legacy { background: #8b5cf6; }
+        .problem-indicator.cost { background: #14b8a6; }
+
+        /* Problem propagation lines */
+        .problem-line {
+            position: absolute;
+            height: 3px;
+            background: linear-gradient(90deg, #ef4444, transparent);
+            transform-origin: left center;
+            pointer-events: none;
+            z-index: 5;
+            animation: propagate 2s ease-in-out infinite;
+        }
+
+        @keyframes propagate {
+            0%, 100% {
+                opacity: 0.3;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        /* Zone problem overlay */
+        .zone-problem-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .zone-problem-overlay.active {
+            opacity: 1;
+            animation: problemPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes problemPulse {
+            0%, 100% {
+                background: rgba(239, 68, 68, 0.05);
+            }
+            50% {
+                background: rgba(239, 68, 68, 0.15);
+            }
+        }
+
+        /* Icon degradation */
+        .icon.degraded {
+            filter: grayscale(0.3);
+            opacity: 0.7;
+            border-color: #ef4444 !important;
+        }
+
+        .icon.critical {
+            filter: grayscale(0.6);
+            opacity: 0.5;
+            border-color: #dc2626 !important;
+            animation: shake 0.5s ease-in-out infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
+
+        /* === CROSS PLATFORM SECTION === */
+        .cross-section {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            border: 3px solid #e53935;
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.5s ease;
+            position: relative;
+        }
+
+        .cross-title {
+            text-align: center;
+            font-size: 13px;
+            font-weight: 800;
+            color: #c62828;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .cross-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .cross-item {
+            background: #fff;
+            border: 2px solid #ef5350;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            transition: all 0.5s ease;
+            position: relative;
+        }
+
+        .cross-item .from-to {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .cross-item .zone-badge {
+            background: #f5f5f5;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 9px;
+            font-weight: 600;
+        }
+
+        .cross-item .arrows {
+            font-size: 16px;
+            color: #e53935;
+        }
+
+        .cross-item .breaks {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .cross-item .break-tag {
+            background: #ffcdd2;
+            color: #b71c1c;
+            font-size: 8px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        /* === IAC SECTION === */
+        .iac-section {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .iac-box {
+            background: #fff;
+            border: 2px dashed #7b1fa2;
+            border-radius: 12px;
+            padding: 14px;
+            transition: all 0.5s ease;
+            position: relative;
+        }
+
+        .iac-box h4 {
+            font-size: 13px;
+            font-weight: 700;
+            color: #7b1fa2;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .iac-box .content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .iac-box .terraform {
+            background: linear-gradient(135deg, #7b42bc, #5e329a);
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .iac-box .warn {
+            background: #ffebee;
+            border: 1px solid #ef9a9a;
+            color: #c62828;
+            font-size: 9px;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .iac-box .status {
+            background: #e8f5e9;
+            color: #2e7d32;
+            font-size: 8px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid #a5d6a7;
+        }
+
+        /* === PROBLEMS BOX === */
+        .problems-box {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #fff 0%, #fafafa 100%);
+            border: 2px solid #d32f2f;
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.5s ease;
+        }
+
+        .problems-box h4 {
+            font-size: 12px;
+            font-weight: 800;
+            color: #c62828;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .problems-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .problem-tag {
+            background: linear-gradient(135deg, #ffebee, #ffcdd2);
+            border: 1px solid #ef9a9a;
+            color: #b71c1c;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 9px;
+            font-weight: 600;
+        }
+
+        /* Full width zone */
+        .zone-full { grid-column: 1 / -1; }
+
+        /* Divider */
+        .plus-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: #7b1fa2;
+            margin: 0 8px;
+        }
+
+        .arrow-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #7b1fa2;
+            margin: 0 8px;
+        }
+
+        /* === SCENARIO OVERLAY === */
+        .scenario-overlay {
+            position: fixed;
+            top: 120px;
+            left: 20px;
+            width: 400px;
+            max-height: 70vh;
+            overflow-y: auto;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(239, 68, 68, 0.4);
+            border-radius: 16px;
+            padding: 20px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.5s ease;
+            pointer-events: none;
+        }
+
+        .scenario-overlay.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .scenario-overlay-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #ef4444;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .scenario-item {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.8));
+            border-left: 4px solid var(--scenario-color);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: slideUp 0.4s ease forwards;
+        }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .scenario-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .scenario-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .scenario-category {
+            font-size: 9px;
+            padding: 3px 6px;
+            border-radius: 4px;
+            background: var(--scenario-bg);
+            color: var(--scenario-color);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .scenario-desc {
+            font-size: 11px;
+            color: #94a3b8;
+            line-height: 1.5;
+            margin-bottom: 6px;
+        }
+
+        .scenario-impact {
+            font-size: 10px;
+            color: var(--scenario-color);
+            font-weight: 600;
+        }
+
+        .scenario-affected {
+            font-size: 9px;
+            color: #cbd5e1;
+            margin-top: 6px;
+            padding: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+
+        /* === IMPACT SUMMARY === */
+        .impact-summary {
+            position: fixed;
+            top: 120px;
+            right: 20px;
+            width: 280px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(99, 102, 241, 0.4);
+            border-radius: 16px;
+            padding: 20px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateX(20px);
+            transition: all 0.5s ease;
+            pointer-events: none;
+        }
+
+        .impact-summary.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .impact-summary-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #6366f1;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .impact-item {
+            margin-bottom: 15px;
+        }
+
+        .impact-label {
+            font-size: 10px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .impact-number {
+            font-size: 28px;
+            font-weight: 900;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--impact-color);
+            margin-bottom: 4px;
+        }
+
+        .impact-detail {
+            font-size: 9px;
+            color: #94a3b8;
+        }
+
+        /* Timeline Control */
+        .timeline-control {
+            position: fixed;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            border-radius: 16px;
+            padding: 15px 30px;
+            z-index: 1000;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            min-width: 650px;
+        }
+
+        .timeline-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            position: relative;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .timeline-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e, #eab308, #f97316, #ef4444, #dc2626);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .timeline-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+
+        .timeline-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .control-btn {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .control-btn.pause { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .control-btn.reset { background: linear-gradient(135deg, #ef4444, #dc2626); }
+
+        /* Fullscreen button */
+        .fullscreen-btn {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            z-index: 1001;
+            transition: all 0.3s ease;
+        }
+
+        .fullscreen-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Degradation effects */
+        .degraded-1 {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%) !important;
+            border-color: #f59e0b !important;
+        }
+
+        .degraded-2 {
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%) !important;
+            border-color: #f97316 !important;
+        }
+
+        .degraded-3 {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%) !important;
+            border-color: #ef4444 !important;
+        }
+
+        .degraded-4 {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%) !important;
+            border-color: #dc2626 !important;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(30, 41, 59, 0.6); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.6); border-radius: 10px; }
+
+        /* Problem detail tooltip */
+        .problem-tooltip {
+            position: absolute;
+            background: rgba(15, 23, 42, 0.98);
+            color: white;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 10px;
+            z-index: 100;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            max-width: 200px;
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        .problem-tooltip.visible {
+            opacity: 1;
+        }
+
+        .problem-tooltip-title {
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #ef4444;
+        }
+
+        .problem-tooltip-desc {
+            font-size: 9px;
+            line-height: 1.4;
+            color: #cbd5e1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Fullscreen Button -->
+    <button class="fullscreen-btn" onclick="window.open(window.location.href, '_blank')">⛶ View Full Screen</button>
+
+    <script>
+        if (window.self !== window.top) {
+            document.body.classList.add('iframe-embed');
+        }
+    </script>
+
+    <!-- Year Overlay -->
+    <div class="year-overlay" id="yearOverlay">2020</div>
+
+    <!-- Scenario Overlay -->
+    <div class="scenario-overlay" id="scenarioOverlay">
+        <div class="scenario-overlay-title">⏱ PROBLEM TIMELINE</div>
+        <div id="scenarioList"></div>
+    </div>
+
+    <!-- Impact Summary -->
+    <div class="impact-summary" id="impactSummary">
+        <div class="impact-summary-title">IMPACT METRICS</div>
+
+        <div class="impact-item">
+            <div class="impact-label">Automation Conflicts</div>
+            <div class="impact-number" style="--impact-color: #ef4444;" id="conflictsCount">0</div>
+            <div class="impact-detail" id="conflictsDetail">No conflicts yet</div>
+        </div>
+
+        <div class="impact-item">
+            <div class="impact-label">Security Gaps</div>
+            <div class="impact-number" style="--impact-color: #f97316;" id="securityCount">0</div>
+            <div class="impact-detail" id="securityDetail">Unified security</div>
+        </div>
+
+        <div class="impact-item">
+            <div class="impact-label">Failed Migrations</div>
+            <div class="impact-number" style="--impact-color: #eab308;" id="migrationsCount">0</div>
+            <div class="impact-detail" id="migrationsDetail">No failures yet</div>
+        </div>
+
+        <div class="impact-item">
+            <div class="impact-label">Vendor Lock-In</div>
+            <div class="impact-number" style="--impact-color: #a855f7;" id="lockinSeverity">LOW</div>
+            <div class="impact-detail" id="lockinDetail">Cloud-agnostic design</div>
+        </div>
+    </div>
+
+    <div class="page" id="mainPage">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="header-label">OPS BLOCKERS</div>
+            <div class="human-factors">
+                <div class="factor">
+                    <h2>PROCESS</h2>
+                    <p>Human Approvals &<br>validation process</p>
+                </div>
+                <div class="factor">
+                    <h2>CONTROL</h2>
+                    <p>Organization Hierarchy<br>permission and control</p>
+                </div>
+                <div class="factor">
+                    <h2>STRATEGY</h2>
+                    <p>Resistance to changes &<br>avoiding improvements</p>
+                </div>
+                <div class="factor">
+                    <h2>TEAMS</h2>
+                    <p>Onboarding, knowledge<br>sharing, collaboration</p>
+                </div>
+            </div>
+            <div class="header-label right">2030 ROADMAP</div>
+        </div>
+
+        <!-- MAIN -->
+        <div class="main">
+            <!-- OPS BLOCKERS -->
+            <div class="ops-blockers">
+                <div class="blocker">
+                    <h3>MIGRATIONS</h3>
+                    <p>Migrations of deprecated services, old OSS and legacy. Managing production with zero risks</p>
+                </div>
+                <div class="blocker">
+                    <h3>VERSIONING</h3>
+                    <p>Ensure consistent versioning, maintenance, and security across all layers</p>
+                </div>
+                <div class="blocker">
+                    <h3>Change / Improve</h3>
+                    <p>"Don't touch approach" - Barriers to adapting, modifying, rolling back</p>
+                </div>
+                <div class="blocker">
+                    <h3>Multi cloud</h3>
+                    <p>Migrate apps to new cloud, centralize shared services</p>
+                </div>
+                <div class="blocker">
+                    <h3>Standardization</h3>
+                    <p>AI-generated configs with inconsistent styles - Tower of Babel</p>
+                </div>
+                <div class="blocker">
+                    <h3>Tracking</h3>
+                    <p>No centralized view for Audit, SecOps, Observability, OPEX</p>
+                </div>
+            </div>
+
+            <!-- WORKLOAD AREA -->
+            <div class="workload-area">
+                <div class="top-bar">
+                    <span class="person">👤</span>
+                    <span class="code-tag">&lt;/&gt;</span>
+                    <span>Legacy automation</span>
+                    <span class="arrow-text">──────────→</span>
+                    <span class="person">👤</span>
+                    <span class="code-tag">&lt;/&gt;</span>
+                </div>
+
+                <div class="deprecated-notice">
+                    <span>⚠️ Deprecated & EOL services in production</span>
+                </div>
+
+                <div class="zones-grid">
+                    <!-- CONFIG PUSH ZONE -->
+                    <div class="zone zone-config zone-full" id="zone-config">
+                        <div class="zone-problem-overlay"></div>
+                        <div class="zone-header">
+                            <span class="zone-icon">📝</span>
+                            <span class="zone-title">CONFIG PUSH ZONE</span>
+                            <span class="zone-subtitle">Different people, different AI tools, no standards</span>
+                        </div>
+                        <div class="zone-content">
+                            <div class="icon yaml" data-tech="yaml">📄<span class="label">YAML</span></div>
+                            <div class="icon json" data-tech="json">{ }<span class="label">JSON</span></div>
+                            <div class="icon py" data-tech="py">🐍<span class="label">Python</span></div>
+                            <div class="icon api" data-tech="api">⚡<span class="label">API</span></div>
+
+                            <span class="plus-divider">+</span>
+
+                            <div class="icon ai chatgpt" data-tech="chatgpt">🤖<span class="label">ChatGPT</span></div>
+                            <div class="icon ai claude" data-tech="claude">🧠<span class="label">Claude</span></div>
+                            <div class="icon ai copilot" data-tech="copilot">✈️<span class="label">Copilot</span></div>
+                            <div class="icon ai gemini" data-tech="gemini">✨<span class="label">Gemini</span></div>
+
+                            <span class="arrow-divider">→</span>
+
+                            <span class="person">👤</span>
+                            <span class="code-tag">&lt;/&gt;</span>
+                            <span class="person">👤</span>
+                            <span class="code-tag">&lt;/&gt;</span>
+                            <span class="person">👤</span>
+                            <span class="code-tag">&lt;/&gt;</span>
+                        </div>
+                    </div>
+
+                    <!-- KUBERNETES ZONE -->
+                    <div class="zone zone-k8s" id="zone-k8s">
+                        <div class="zone-problem-overlay"></div>
+                        <div class="zone-header">
+                            <span class="zone-icon">☸️</span>
+                            <span class="zone-title">KUBERNETES</span>
+                            <span class="zone-subtitle">Source code / Apps</span>
+                        </div>
+                        <div class="zone-content">
+                            <div class="icon k8s" data-tech="k8s">☸️<span class="label">K8s</span></div>
+                            <div class="icon docker" data-tech="docker">🐳<span class="label">Docker</span></div>
+                            <div class="icon django" data-tech="django">dj<span class="label">Django</span></div>
+                            <div class="icon node" data-tech="node">N<span class="label">Node.js</span></div>
+                            <div class="icon react" data-tech="react">⚛️<span class="label">React</span></div>
+                            <div class="icon go" data-tech="go">Go<span class="label">Golang</span></div>
+                            <div class="icon java" data-tech="java">☕<span class="label">Java</span></div>
+                            <div class="icon nginx" data-tech="nginx">N<span class="label">Nginx</span></div>
+                            <div class="icon argocd" data-tech="argocd">🔄<span class="label">Argo</span></div>
+                            <div class="icon helm" data-tech="helm">⎈<span class="label">Helm</span></div>
+                        </div>
+                    </div>
+
+                    <!-- VM / LEGACY ZONE -->
+                    <div class="zone zone-vm" id="zone-vm">
+                        <div class="zone-problem-overlay"></div>
+                        <div class="zone-header">
+                            <span class="zone-icon">🖥️</span>
+                            <span class="zone-title">VM / LEGACY</span>
+                            <span class="zone-subtitle">Deprecated databases</span>
+                        </div>
+                        <div class="zone-content">
+                            <div class="icon vm" data-tech="vm1">🖥️<span class="label">VM</span></div>
+                            <div class="icon vm" data-tech="vm2">🖥️<span class="label">VM</span></div>
+                            <div class="icon elastic" data-tech="elastic" style="position:relative;">
+                                🔍<span class="label">Elastic</span>
+                                <span class="badge eol" style="position:absolute;top:-8px;right:-8px;font-size:5px;padding:2px 4px;">EOL</span>
+                            </div>
+                            <div class="icon oracle" data-tech="oracle">🔴<span class="label">Oracle</span></div>
+                            <div class="icon sqlserver" data-tech="sqlserver">📊<span class="label">SQL Srv</span></div>
+                            <div class="icon postgres" data-tech="postgres">🐘<span class="label">Postgres</span></div>
+                            <div class="icon mongo" data-tech="mongo">🍃<span class="label">Mongo</span></div>
+                        </div>
+                    </div>
+
+                    <!-- AWS ZONE -->
+                    <div class="zone zone-aws" id="zone-aws">
+                        <div class="zone-problem-overlay"></div>
+                        <div class="zone-header">
+                            <span class="zone-icon">☁️</span>
+                            <span class="zone-title">AWS MANAGED</span>
+                            <span class="zone-subtitle">Vendor Lock-in ⚠️</span>
+                        </div>
+                        <div class="zone-content">
+                            <div class="icon rds" data-tech="rds">🗄️<span class="label">RDS</span></div>
+                            <div class="icon aurora" data-tech="aurora">⭐<span class="label">Aurora</span></div>
+                            <div class="icon s3" data-tech="s3">📦<span class="label">S3</span></div>
+                            <div class="icon documentdb" data-tech="documentdb">📄<span class="label">DocDB</span></div>
+                            <div class="icon elasticache" data-tech="elasticache">⚡<span class="label">Cache</span></div>
+                            <div class="icon lambda" data-tech="lambda">λ<span class="label">Lambda</span></div>
+                            <span class="badge lockin">🔒 LOCK-IN</span>
+                        </div>
+                    </div>
+
+                    <!-- EXTERNAL SYSTEMS -->
+                    <div class="zone zone-external" id="zone-external">
+                        <div class="zone-problem-overlay"></div>
+                        <div class="zone-header">
+                            <span class="zone-icon">🔗</span>
+                            <span class="zone-title">EXTERNAL SYSTEMS</span>
+                            <span class="zone-subtitle">Identity / Secrets / Monitoring</span>
+                        </div>
+                        <div class="zone-content">
+                            <div class="icon entra" data-tech="entra">🔐<span class="label">Entra</span></div>
+                            <div class="icon vault" data-tech="vault">🔒<span class="label">Vault</span></div>
+                            <div class="icon okta" data-tech="okta">🎫<span class="label">Okta</span></div>
+                            <div class="icon ldap" data-tech="ldap">📇<span class="label">LDAP</span></div>
+                            <div class="icon datadog" data-tech="datadog">🐕<span class="label">Datadog</span></div>
+                            <div class="icon pagerduty" data-tech="pagerduty">📟<span class="label">Pager</span></div>
+                        </div>
+                    </div>
+
+                    <!-- CROSS PLATFORM COMMUNICATION -->
+                    <div class="cross-section" id="cross-section">
+                        <div class="cross-title">
+                            <span>⚠️</span>
+                            CROSS PLATFORM COMMUNICATION
+                            <span>⚠️</span>
+                        </div>
+                        <div class="cross-grid">
+                            <div class="cross-item" id="cross-k8s-vm">
+                                <div class="from-to">
+                                    <span class="zone-badge" style="background:#e3f2fd;color:#1565c0;">K8s</span>
+                                    <span class="arrows">⟷</span>
+                                    <span class="zone-badge" style="background:#efebe9;color:#5d4037;">VM</span>
+                                </div>
+                                <div class="breaks">
+                                    <span class="break-tag">❌ Breaks IAC</span>
+                                    <span class="break-tag">❌ Breaks GitOps</span>
+                                </div>
+                            </div>
+                            <div class="cross-item" id="cross-k8s-aws">
+                                <div class="from-to">
+                                    <span class="zone-badge" style="background:#e3f2fd;color:#1565c0;">K8s</span>
+                                    <span class="arrows">⟷</span>
+                                    <span class="zone-badge" style="background:#fff3e0;color:#e65100;">AWS</span>
+                                </div>
+                                <div class="breaks">
+                                    <span class="break-tag">❌ Breaks Automation</span>
+                                    <span class="break-tag">❌ Vendor Lock-in</span>
+                                </div>
+                            </div>
+                            <div class="cross-item" id="cross-vm-aws">
+                                <div class="from-to">
+                                    <span class="zone-badge" style="background:#efebe9;color:#5d4037;">VM</span>
+                                    <span class="arrows">⟷</span>
+                                    <span class="zone-badge" style="background:#fff3e0;color:#e65100;">AWS</span>
+                                </div>
+                                <div class="breaks">
+                                    <span class="break-tag">❌ Breaks Security</span>
+                                    <span class="break-tag">❌ No Observability</span>
+                                </div>
+                            </div>
+                            <div class="cross-item" id="cross-all-external">
+                                <div class="from-to">
+                                    <span class="zone-badge" style="background:#ddd;color:#333;">ALL</span>
+                                    <span class="arrows">⟷</span>
+                                    <span class="zone-badge" style="background:#e0f2f1;color:#00695c;">External</span>
+                                </div>
+                                <div class="breaks">
+                                    <span class="break-tag">❌ Split Policies</span>
+                                    <span class="break-tag">❌ No Single RBAC</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- IAC / GITOPS -->
+                    <div class="iac-section">
+                        <div class="iac-box" id="iac-terraform">
+                            <h4>📄 IAC (Terraform)</h4>
+                            <div class="content">
+                                <span class="person">👤</span>
+                                <div class="terraform">TF</div>
+                                <span class="code-tag">&lt;/&gt;</span>
+                                <span class="person">👤</span>
+                            </div>
+                            <div class="warn">❌ No single source of truth automation</div>
+                        </div>
+                        <div class="iac-box" id="iac-argocd">
+                            <h4>🔄 GitOps (ArgoCD)</h4>
+                            <div class="content">
+                                <span class="person">👤</span>
+                                <div class="icon argocd" style="width:40px;height:40px;">🔄</div>
+                                <span class="status">IN PROGRESS</span>
+                            </div>
+                            <div class="warn">❌ Doesn't cover managed services or VMs</div>
+                        </div>
+                    </div>
+
+                    <!-- PROBLEMS -->
+                    <div class="problems-box" id="problems-box">
+                        <h4>🔥 THE CHAOS - What's Broken</h4>
+                        <div class="problems-list">
+                            <span class="problem-tag">No centralized observability</span>
+                            <span class="problem-tag">Vendor Lock-in</span>
+                            <span class="problem-tag">Cross platform breaks IAC</span>
+                            <span class="problem-tag">Security policies split</span>
+                            <span class="problem-tag">Inconsistent configuration</span>
+                            <span class="problem-tag">AI tools = different configs</span>
+                            <span class="problem-tag">Human errors & chaos</span>
+                            <span class="problem-tag">Compliance (DORA, PCI-DSS)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2030 ROADMAP -->
+            <div class="roadmap">
+                <div class="roadmap-item">
+                    <h3>SCALE FROM ZERO</h3>
+                    <div class="roadmap-icons">
+                        <div class="roadmap-icon keda" style="font-size:10px;">☸️<span class="label">KEDA</span></div>
+                        <div class="roadmap-icon" style="background:#4caf50;color:#fff;">📈<span class="label">Scale</span></div>
+                    </div>
+                </div>
+                <div class="roadmap-item">
+                    <h3>Private AI RAG</h3>
+                    <div class="roadmap-icons">
+                        <div class="roadmap-icon" style="background:#10a37f;color:#fff;">🤖<span class="label">LLM</span></div>
+                        <span class="roadmap-arrow">→</span>
+                        <div class="roadmap-icon" style="background:#7c4dff;color:#fff;">📚<span class="label">Vector</span></div>
+                        <span class="roadmap-arrow">→</span>
+                        <div class="roadmap-icon" style="background:#326ce5;color:#fff;">☸️<span class="label">K8s</span></div>
+                    </div>
+                </div>
+                <div class="roadmap-item">
+                    <h3>Service Mesh</h3>
+                    <div class="roadmap-icons">
+                        <div class="roadmap-icon istio">🔷<span class="label">Istio</span></div>
+                        <div class="roadmap-icon linkerd">🔗<span class="label">Linkerd</span></div>
+                    </div>
+                </div>
+                <div class="roadmap-item">
+                    <h3>Legacy Migration</h3>
+                    <div class="roadmap-icons">
+                        <div class="roadmap-icon vm">🖥️<span class="label">VM</span></div>
+                        <span class="roadmap-arrow">→</span>
+                        <div class="roadmap-icon k8s">☸️<span class="label">K8s</span></div>
+                    </div>
+                </div>
+                <div class="roadmap-item">
+                    <h3>Deprecated CRDs</h3>
+                    <p style="font-size:7px;color:#666;margin-bottom:6px;">EOL Migration</p>
+                    <div class="roadmap-icons">
+                        <div class="roadmap-icon ingress">🚪<span class="label">Ingress</span></div>
+                        <span class="roadmap-arrow">→</span>
+                        <div class="roadmap-icon gateway">🌐<span class="label">Gateway</span></div>
+                    </div>
+                </div>
+                <div class="roadmap-item">
+                    <h3>OSS Migrations</h3>
+                    <div class="roadmap-icons">
+                        <div class="roadmap-icon elastic">🔍<span class="label">Elastic</span></div>
+                        <span class="roadmap-arrow">→</span>
+                        <div class="roadmap-icon opensearch">🔎<span class="label">Open</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timeline Control -->
+    <div class="timeline-control">
+        <div class="timeline-labels">
+            <span>2020: Start</span>
+            <span>2021: Growth</span>
+            <span>2022: Complexity</span>
+            <span>2023: Crisis</span>
+            <span>2024: Locked</span>
+        </div>
+        <div class="timeline-bar" id="timelineBar">
+            <div class="timeline-progress" id="timelineProgress"></div>
+        </div>
+        <div class="timeline-buttons">
+            <button class="control-btn" id="playBtn">▶ Play</button>
+            <button class="control-btn pause" id="pauseBtn">⏸ Pause</button>
+            <button class="control-btn reset" id="resetBtn">↻ Reset</button>
+            <button class="control-btn" id="speedBtn">2x</button>
+        </div>
+    </div>
+
+    <script>
+        const scenarios = [
+            // 2020 - Year 1
+            {
+                time: 5,
+                category: "setup",
+                title: "Manual YAML deployments working",
+                desc: "DevOps team manages Kubernetes with kubectl and manual YAML files. Simple but effective.",
+                impact: "Clean start",
+                color: "#22c55e",
+                bg: "rgba(34, 197, 94, 0.2)",
+                affectedZones: [],
+                affectedTechs: []
+            },
+
+            // 2021 - Year 2
+            {
+                time: 22,
+                category: "automation",
+                title: "Team A adopts GitOps (ArgoCD)",
+                desc: "Frontend team starts using ArgoCD for automated deployments. Works great in isolation.",
+                impact: "First automation layer added",
+                color: "#3b82f6",
+                bg: "rgba(59, 130, 246, 0.2)",
+                affectedZones: ["zone-k8s", "iac-argocd"],
+                affectedTechs: ["argocd", "k8s"],
+                problemType: "automation"
+            },
+            {
+                time: 26,
+                category: "automation",
+                title: "Team B implements Terraform",
+                desc: "Infrastructure team starts managing AWS resources with Terraform. Creates parallel automation path.",
+                impact: "Double automation begins",
+                color: "#eab308",
+                bg: "rgba(234, 179, 8, 0.2)",
+                affectedZones: ["zone-aws", "iac-terraform"],
+                affectedTechs: ["rds", "aurora", "s3"],
+                problemType: "automation"
+            },
+            {
+                time: 30,
+                category: "conflict",
+                title: "First automation conflict detected",
+                desc: "ArgoCD and Terraform both trying to manage the same resources. Manual intervention required.",
+                impact: "+1 Automation Conflict",
+                color: "#ef4444",
+                bg: "rgba(239, 68, 68, 0.2)",
+                affectedZones: ["zone-k8s", "zone-aws", "iac-terraform", "iac-argocd", "cross-k8s-aws"],
+                affectedTechs: ["argocd", "helm", "rds", "aurora"],
+                problemType: "conflict"
+            },
+
+            // 2022 - Year 3
+            {
+                time: 42,
+                category: "security",
+                title: "Security policy fragmentation",
+                desc: "K8s RBAC, AWS IAM, and VM permissions managed separately. No unified view.",
+                impact: "Security becomes fragmented",
+                color: "#f97316",
+                bg: "rgba(249, 115, 22, 0.2)",
+                affectedZones: ["zone-k8s", "zone-vm", "zone-aws", "zone-external", "cross-all-external"],
+                affectedTechs: ["k8s", "vm1", "vm2", "entra", "vault", "okta"],
+                problemType: "security"
+            },
+            {
+                time: 45,
+                category: "conflict",
+                title: "GitOps overwrites Terraform changes",
+                desc: "ArgoCD deployment rolls back Terraform-managed infrastructure. 2-hour outage.",
+                impact: "+2 Automation Conflicts",
+                color: "#ef4444",
+                bg: "rgba(239, 68, 68, 0.2)",
+                affectedZones: ["zone-k8s", "zone-aws", "iac-terraform", "iac-argocd", "cross-k8s-aws"],
+                affectedTechs: ["argocd", "k8s", "helm", "rds", "s3", "lambda"],
+                problemType: "conflict"
+            },
+            {
+                time: 48,
+                category: "cost",
+                title: "AWS costs spike unexpectedly",
+                desc: "No visibility into what's creating resources. Terraform state drift causes duplicate resources.",
+                impact: "Cost control lost",
+                color: "#eab308",
+                bg: "rgba(234, 179, 8, 0.2)",
+                affectedZones: ["zone-aws", "iac-terraform"],
+                affectedTechs: ["aurora", "s3", "lambda", "elasticache", "documentdb"],
+                problemType: "cost"
+            },
+            {
+                time: 51,
+                category: "migration",
+                title: "First migration attempt fails",
+                desc: "Tried to migrate PostgreSQL from VM to RDS. Rollback after 8 hours due to data inconsistencies.",
+                impact: "+1 Failed Migration",
+                color: "#f97316",
+                bg: "rgba(249, 115, 22, 0.2)",
+                affectedZones: ["zone-vm", "zone-aws", "cross-vm-aws"],
+                affectedTechs: ["postgres", "rds", "vm1"],
+                problemType: "migration"
+            },
+            {
+                time: 55,
+                category: "adoption",
+                title: "Teams resist new platform",
+                desc: "Backend team refuses to migrate from VMs. Knowledge silos deepen. Documentation scattered.",
+                impact: "Adoption blocked",
+                color: "#a855f7",
+                bg: "rgba(168, 85, 247, 0.2)",
+                affectedZones: ["zone-vm", "zone-k8s"],
+                affectedTechs: ["vm1", "vm2", "oracle", "sqlserver", "mongo"],
+                problemType: "legacy"
+            },
+
+            // 2023 - Year 4
+            {
+                time: 62,
+                category: "conflict",
+                title: "Manual changes break automation",
+                desc: "Emergency fix applied manually in production. Now GitOps and Terraform state permanently diverged.",
+                impact: "+3 Automation Conflicts",
+                color: "#ef4444",
+                bg: "rgba(239, 68, 68, 0.2)",
+                affectedZones: ["zone-config", "zone-k8s", "zone-aws", "iac-terraform", "iac-argocd"],
+                affectedTechs: ["yaml", "json", "argocd", "helm", "k8s", "rds", "aurora"],
+                problemType: "conflict"
+            },
+            {
+                time: 65,
+                category: "security",
+                title: "Compliance audit failure",
+                desc: "Can't prove who changed what. No unified audit trail across K8s, AWS, and VMs.",
+                impact: "Critical security gaps",
+                color: "#f97316",
+                bg: "rgba(249, 115, 22, 0.2)",
+                affectedZones: ["zone-k8s", "zone-vm", "zone-aws", "zone-external", "cross-all-external"],
+                affectedTechs: ["k8s", "vm1", "vm2", "datadog", "pagerduty", "vault"],
+                problemType: "security"
+            },
+            {
+                time: 68,
+                category: "migration",
+                title: "Second migration abandoned",
+                desc: "VM to K8s migration cancelled after 3 months. Too risky, no rollback path.",
+                impact: "+2 Failed Migrations",
+                color: "#f97316",
+                bg: "rgba(249, 115, 22, 0.2)",
+                affectedZones: ["zone-vm", "zone-k8s", "cross-k8s-vm"],
+                affectedTechs: ["vm1", "vm2", "oracle", "mongo", "k8s", "docker"],
+                problemType: "migration"
+            },
+            {
+                time: 71,
+                category: "lockin",
+                title: "Vendor lock-in realized",
+                desc: "Heavy use of AWS-specific services (Aurora, Lambda). Migration to other cloud impossible.",
+                impact: "Lock-in: MEDIUM",
+                color: "#ec4899",
+                bg: "rgba(236, 72, 153, 0.2)",
+                affectedZones: ["zone-aws", "cross-k8s-aws", "cross-vm-aws"],
+                affectedTechs: ["aurora", "lambda", "documentdb", "elasticache"],
+                problemType: "lockin"
+            },
+            {
+                time: 74,
+                category: "legacy",
+                title: "EOL database still in production",
+                desc: "PostgreSQL 9.6 EOL. Can't upgrade due to app dependencies. Security risk growing.",
+                impact: "Legacy debt compounds",
+                color: "#8b5cf6",
+                bg: "rgba(139, 92, 246, 0.2)",
+                affectedZones: ["zone-vm"],
+                affectedTechs: ["postgres", "elastic", "oracle"],
+                problemType: "legacy"
+            },
+            {
+                time: 77,
+                category: "cost",
+                title: "Hidden costs discovered",
+                desc: "Data egress fees, support contracts, duplicate services. Real cost 3x the estimate.",
+                impact: "Cost overrun critical",
+                color: "#eab308",
+                bg: "rgba(234, 179, 8, 0.2)",
+                affectedZones: ["zone-aws", "zone-vm"],
+                affectedTechs: ["aurora", "s3", "rds", "lambda", "vm1", "vm2"],
+                problemType: "cost"
+            },
+
+            // 2024 - Year 5
+            {
+                time: 82,
+                category: "conflict",
+                title: "Automation completely broken",
+                desc: "GitOps, Terraform, and manual changes all conflicting. Deployments require 3-team coordination.",
+                impact: "+5 Automation Conflicts",
+                color: "#ef4444",
+                bg: "rgba(239, 68, 68, 0.2)",
+                affectedZones: ["zone-config", "zone-k8s", "zone-vm", "zone-aws", "iac-terraform", "iac-argocd", "cross-k8s-vm", "cross-k8s-aws"],
+                affectedTechs: ["yaml", "json", "py", "argocd", "helm", "k8s", "rds", "aurora", "vm1", "vm2"],
+                problemType: "conflict"
+            },
+            {
+                time: 84,
+                category: "security",
+                title: "Security team blocks all changes",
+                desc: "Too many unknowns. Change freeze in effect. Innovation stopped.",
+                impact: "Complete security failure",
+                color: "#f97316",
+                bg: "rgba(249, 115, 22, 0.2)",
+                affectedZones: ["zone-k8s", "zone-vm", "zone-aws", "zone-external", "cross-all-external"],
+                affectedTechs: ["k8s", "vm1", "vm2", "entra", "vault", "okta", "ldap", "datadog"],
+                problemType: "security"
+            },
+            {
+                time: 86,
+                category: "migration",
+                title: "Third migration cancelled",
+                desc: "Board demands cloud migration. Technical team says it's impossible without complete rewrite.",
+                impact: "+3 Failed Migrations",
+                color: "#f97316",
+                bg: "rgba(249, 115, 22, 0.2)",
+                affectedZones: ["zone-vm", "zone-k8s", "zone-aws", "cross-k8s-vm", "cross-vm-aws"],
+                affectedTechs: ["vm1", "vm2", "oracle", "sqlserver", "mongo", "elastic", "postgres"],
+                problemType: "migration"
+            },
+            {
+                time: 88,
+                category: "lockin",
+                title: "Complete vendor lock-in",
+                desc: "Architecture deeply coupled to AWS. Multi-cloud strategy impossible. Negotiating power lost.",
+                impact: "Lock-in: CRITICAL",
+                color: "#ec4899",
+                bg: "rgba(236, 72, 153, 0.2)",
+                affectedZones: ["zone-aws", "cross-k8s-aws", "cross-vm-aws"],
+                affectedTechs: ["aurora", "lambda", "documentdb", "elasticache", "rds", "s3"],
+                problemType: "lockin"
+            },
+            {
+                time: 90,
+                category: "adoption",
+                title: "Team exodus begins",
+                desc: "Senior engineers leaving. Platform too complex, no documentation, constant firefighting.",
+                impact: "Knowledge loss critical",
+                color: "#a855f7",
+                bg: "rgba(168, 85, 247, 0.2)",
+                affectedZones: ["zone-config", "zone-k8s", "zone-vm"],
+                affectedTechs: ["chatgpt", "claude", "copilot", "gemini", "k8s", "docker", "vm1", "vm2"],
+                problemType: "legacy"
+            },
+            {
+                time: 93,
+                category: "legacy",
+                title: "Legacy systems spread",
+                desc: "More systems reach EOL. Can't migrate due to lock-in. Technical debt at maximum.",
+                impact: "Legacy everywhere",
+                color: "#8b5cf6",
+                bg: "rgba(139, 92, 246, 0.2)",
+                affectedZones: ["zone-vm", "zone-aws"],
+                affectedTechs: ["postgres", "elastic", "oracle", "sqlserver", "mongo", "rds"],
+                problemType: "legacy"
+            },
+            {
+                time: 96,
+                category: "cost",
+                title: "Board demands answers",
+                desc: "Infrastructure cost 5x original. CTO can't explain why. Platform replacement considered.",
+                impact: "Financial crisis",
+                color: "#eab308",
+                bg: "rgba(234, 179, 8, 0.2)",
+                affectedZones: ["zone-aws", "zone-vm", "zone-external"],
+                affectedTechs: ["aurora", "s3", "rds", "lambda", "elasticache", "documentdb", "vm1", "vm2", "datadog", "pagerduty"],
+                problemType: "cost"
+            }
+        ];
+
+        class EnterpriseStory {
+            constructor() {
+                this.progress = 0;
+                this.isPlaying = false;
+                this.speed = 1;
+                this.shownScenarios = new Set();
+                this.conflictsCount = 0;
+                this.securityGaps = 0;
+                this.failedMigrations = 0;
+                this.lockinLevel = "LOW";
+                this.activeProblems = new Map(); // Track active problem indicators
+
+                this.init();
+            }
+
+            init() {
+                document.getElementById('playBtn').addEventListener('click', () => this.play());
+                document.getElementById('pauseBtn').addEventListener('click', () => this.pause());
+                document.getElementById('resetBtn').addEventListener('click', () => this.reset());
+                document.getElementById('speedBtn').addEventListener('click', () => this.toggleSpeed());
+                document.getElementById('timelineBar').addEventListener('click', (e) => this.seek(e));
+
+                this.play();
+            }
+
+            play() {
+                this.isPlaying = true;
+                this.animate();
+            }
+
+            pause() {
+                this.isPlaying = false;
+            }
+
+            reset() {
+                this.progress = 0;
+                this.shownScenarios.clear();
+                this.conflictsCount = 0;
+                this.securityGaps = 0;
+                this.failedMigrations = 0;
+                this.lockinLevel = "LOW";
+                this.activeProblems.clear();
+                document.getElementById('scenarioList').innerHTML = '';
+
+                // Clear all problem indicators
+                document.querySelectorAll('.problem-indicator').forEach(el => el.remove());
+                document.querySelectorAll('.problem-line').forEach(el => el.remove());
+
+                // Reset visual effects
+                document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                document.getElementById('mainPage').style.background = '#fff';
+                document.getElementById('scenarioOverlay').classList.remove('visible');
+                document.getElementById('impactSummary').classList.remove('visible');
+
+                // Reset zone degradation
+                document.querySelectorAll('.zone').forEach(z => {
+                    z.classList.remove('degraded-1', 'degraded-2', 'degraded-3', 'degraded-4');
+                    const overlay = z.querySelector('.zone-problem-overlay');
+                    if (overlay) overlay.classList.remove('active');
+                });
+
+                // Reset icon degradation
+                document.querySelectorAll('.icon').forEach(icon => {
+                    icon.classList.remove('degraded', 'critical');
+                });
+
+                this.updateUI();
+                this.play();
+            }
+
+            toggleSpeed() {
+                this.speed = this.speed === 1 ? 2 : this.speed === 2 ? 4 : 1;
+                document.getElementById('speedBtn').textContent = `${this.speed}x`;
+            }
+
+            seek(e) {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                this.progress = (x / rect.width) * 100;
+                this.updateUI();
+            }
+
+            animate() {
+                if (!this.isPlaying) return;
+
+                this.progress += 0.025 * this.speed;
+
+                if (this.progress >= 100) {
+                    this.progress = 100;
+                    this.isPlaying = false;
+                }
+
+                this.updateUI();
+                this.checkScenarios();
+
+                if (this.isPlaying) {
+                    requestAnimationFrame(() => this.animate());
+                }
+            }
+
+            updateUI() {
+                document.getElementById('timelineProgress').style.width = `${this.progress}%`;
+
+                // Year
+                const year = 2020 + Math.floor(this.progress / 20);
+                document.getElementById('yearOverlay').textContent = Math.min(2024, year);
+
+                // Show overlays after 15%
+                if (this.progress > 15) {
+                    document.getElementById('scenarioOverlay').classList.add('visible');
+                    document.getElementById('impactSummary').classList.add('visible');
+                }
+
+                // Update background
+                if (this.progress > 60) {
+                    document.body.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+                } else if (this.progress > 40) {
+                    document.body.style.background = 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)';
+                } else if (this.progress > 20) {
+                    document.body.style.background = 'linear-gradient(135deg, #eab308 0%, #d97706 100%)';
+                }
+
+                // Update page background
+                if (this.progress > 60) {
+                    document.getElementById('mainPage').style.background = 'linear-gradient(135deg, #fef2f2, #fee2e2)';
+                } else if (this.progress > 40) {
+                    document.getElementById('mainPage').style.background = 'linear-gradient(135deg, #fff7ed, #ffedd5)';
+                } else if (this.progress > 20) {
+                    document.getElementById('mainPage').style.background = 'linear-gradient(135deg, #fffbeb, #fef3c7)';
+                }
+
+                // Degrade zones
+                const zones = ['zone-config', 'zone-k8s', 'zone-vm', 'zone-aws', 'zone-external'];
+                zones.forEach(zoneId => {
+                    const zone = document.getElementById(zoneId);
+                    zone.classList.remove('degraded-1', 'degraded-2', 'degraded-3', 'degraded-4');
+
+                    if (this.progress > 75) zone.classList.add('degraded-4');
+                    else if (this.progress > 50) zone.classList.add('degraded-3');
+                    else if (this.progress > 30) zone.classList.add('degraded-2');
+                    else if (this.progress > 15) zone.classList.add('degraded-1');
+                });
+
+                // Update counters
+                document.getElementById('conflictsCount').textContent = this.conflictsCount;
+                document.getElementById('securityCount').textContent = this.securityGaps;
+                document.getElementById('migrationsCount').textContent = this.failedMigrations;
+                document.getElementById('lockinSeverity').textContent = this.lockinLevel;
+
+                // Update details
+                const conflictDetails = [
+                    "No conflicts yet",
+                    "Teams coordinating manually",
+                    "Conflicts require intervention",
+                    "Deployment coordination needed",
+                    "Complete automation breakdown"
+                ];
+                document.getElementById('conflictsDetail').textContent = conflictDetails[Math.min(4, Math.floor(this.conflictsCount / 2))];
+
+                const securityDetails = [
+                    "Unified security",
+                    "Minor policy drift",
+                    "Fragmented RBAC",
+                    "No audit trail",
+                    "Security freeze in effect"
+                ];
+                document.getElementById('securityDetail').textContent = securityDetails[Math.min(4, this.securityGaps)];
+
+                const migrationDetails = [
+                    "No failures yet",
+                    "First setback",
+                    "Pattern of failures",
+                    "Migrations abandoned"
+                ];
+                document.getElementById('migrationsDetail').textContent = migrationDetails[Math.min(3, this.failedMigrations)];
+
+                const lockinDetails = {
+                    "LOW": "Cloud-agnostic design",
+                    "MEDIUM": "AWS services in use",
+                    "HIGH": "Deep AWS integration",
+                    "CRITICAL": "No migration path exists"
+                };
+                document.getElementById('lockinDetail').textContent = lockinDetails[this.lockinLevel];
+            }
+
+            checkScenarios() {
+                scenarios.forEach(scenario => {
+                    if (scenario.time <= this.progress && !this.shownScenarios.has(scenario.time)) {
+                        this.showScenario(scenario);
+                        this.shownScenarios.add(scenario.time);
+
+                        // Update counters
+                        if (scenario.category === "conflict") {
+                            this.conflictsCount += scenario.title.includes("+") ?
+                                parseInt(scenario.title.match(/\+(\d+)/)[1]) : 1;
+                        }
+                        if (scenario.category === "security") this.securityGaps++;
+                        if (scenario.category === "migration") this.failedMigrations++;
+                        if (scenario.impact.includes("MEDIUM")) this.lockinLevel = "MEDIUM";
+                        if (scenario.impact.includes("HIGH")) this.lockinLevel = "HIGH";
+                        if (scenario.impact.includes("CRITICAL")) this.lockinLevel = "CRITICAL";
+
+                        // Show visual problems
+                        this.showVisualProblems(scenario);
+                    }
+                });
+            }
+
+            showScenario(scenario) {
+                const item = document.createElement('div');
+                item.className = 'scenario-item';
+                item.style.setProperty('--scenario-color', scenario.color);
+                item.style.setProperty('--scenario-bg', scenario.bg);
+
+                const affectedText = scenario.affectedZones && scenario.affectedZones.length > 0
+                    ? `<div class="scenario-affected">🎯 Affects: ${this.getZoneNames(scenario.affectedZones).join(', ')}</div>`
+                    : '';
+
+                item.innerHTML = `
+                    <div class="scenario-header">
+                        <div class="scenario-title">${scenario.title}</div>
+                        <div class="scenario-category">${scenario.category}</div>
+                    </div>
+                    <div class="scenario-desc">${scenario.desc}</div>
+                    <div class="scenario-impact">→ ${scenario.impact}</div>
+                    ${affectedText}
+                `;
+
+                const list = document.getElementById('scenarioList');
+                list.insertBefore(item, list.firstChild);
+            }
+
+            getZoneNames(zoneIds) {
+                const names = {
+                    'zone-config': 'Config Push',
+                    'zone-k8s': 'K8s',
+                    'zone-vm': 'VM/Legacy',
+                    'zone-aws': 'AWS',
+                    'zone-external': 'External',
+                    'iac-terraform': 'Terraform',
+                    'iac-argocd': 'ArgoCD',
+                    'cross-k8s-vm': 'K8s↔VM',
+                    'cross-k8s-aws': 'K8s↔AWS',
+                    'cross-vm-aws': 'VM↔AWS',
+                    'cross-all-external': 'All↔External'
+                };
+                return zoneIds.map(id => names[id] || id);
+            }
+
+            showVisualProblems(scenario) {
+                if (!scenario.affectedZones || scenario.affectedZones.length === 0) return;
+
+                // Add problem overlay to affected zones
+                scenario.affectedZones.forEach(zoneId => {
+                    const zone = document.getElementById(zoneId);
+                    if (zone) {
+                        const overlay = zone.querySelector('.zone-problem-overlay');
+                        if (overlay) {
+                            overlay.classList.add('active');
+                        }
+
+                        // Add problem indicator if doesn't exist
+                        if (!zone.querySelector('.problem-indicator')) {
+                            const indicator = document.createElement('div');
+                            indicator.className = `problem-indicator ${scenario.problemType || ''}`;
+                            indicator.textContent = '⚠️';
+                            zone.style.position = 'relative';
+                            zone.appendChild(indicator);
+                        }
+                    }
+                });
+
+                // Degrade affected technologies
+                if (scenario.affectedTechs && scenario.affectedTechs.length > 0) {
+                    scenario.affectedTechs.forEach(techId => {
+                        const icons = document.querySelectorAll(`[data-tech="${techId}"]`);
+                        icons.forEach(icon => {
+                            if (this.progress > 70) {
+                                icon.classList.add('critical');
+                            } else if (this.progress > 40) {
+                                icon.classList.add('degraded');
+                            }
+                        });
+                    });
+                }
+            }
+        }
+
+        new EnterpriseStory();
+    </script>
+</body>
+</html>

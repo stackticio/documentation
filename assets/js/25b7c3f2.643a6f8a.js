@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmy_website=self.webpackChunkmy_website||[]).push([[9847],{693:(e,s,t)=>{t.r(s),t.d(s,{default:()=>u});t(6540);var i=t(781),n=t(4848);const u=function(){return(0,n.jsx)(i.A,{title:"Docs",children:(0,n.jsxs)("div",{children:[(0,n.jsx)("h1",{children:"Our Solution"}),(0,n.jsx)("p",{children:"Details about our solution..."})]})})}}}]);

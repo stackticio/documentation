@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-operational_guide" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.1.1">
+<title data-rh="true">📘 Stacktic Operational Guide: Complete Day 0–2 Workflow | STACKTIC</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://stackticio.github.io/documentation/docs/operational_guide"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="📘 Stacktic Operational Guide: Complete Day 0–2 Workflow | STACKTIC"><meta data-rh="true" name="description" content="📋 Table of Contents"><meta data-rh="true" property="og:description" content="📋 Table of Contents"><link data-rh="true" rel="icon" href="/documentation/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://stackticio.github.io/documentation/docs/operational_guide"><link data-rh="true" rel="alternate" href="https://stackticio.github.io/documentation/docs/operational_guide" hreflang="en"><link data-rh="true" rel="alternate" href="https://stackticio.github.io/documentation/docs/operational_guide" hreflang="x-default"><link rel="alternate" type="application/rss+xml" href="/documentation/blog/rss.xml" title="STACKTIC RSS Feed">
+<link rel="alternate" type="application/atom+xml" href="/documentation/blog/atom.xml" title="STACKTIC Atom Feed"><link rel="stylesheet" href="/documentation/assets/css/styles.4fa2565d.css">
+<script src="/documentation/assets/js/runtime~main.02528627.js" defer="defer"></script>
+<script src="/documentation/assets/js/main.02fa6706.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<script>!function(){function t(t){document.documentElement.setAttribute("data-theme",t)}var e=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return localStorage.getItem("theme")}catch(t){}}();t(null!==e?e:"light")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="navbar navbar--fixed-top"><div class="navbar__inner"><div class="navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" target="_self" href="/documentation/docs/overview"><div class="navbar__logo"><img src="/documentation/img/transparent_logo_black.png" alt="Stacktic" class="themedComponent_mlkZ themedComponent--light_NVdE"><img src="/documentation/img/transparent_logo_black.png" alt="Stacktic" class="themedComponent_mlkZ themedComponent--dark_xIcU"></div><b class="navbar__title text--truncate"></b></a></div><div class="navbar__items navbar__items--right"><a class="navbar__item navbar__link" href="/documentation/docs/overview">Documentation</a><a class="navbar__item navbar__link" href="/documentation/calculateAllTasksROI">ROI</a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="Switch between dark and light mode (currently light mode)" aria-label="Switch between dark and light mode (currently light mode)" aria-live="polite"><svg viewBox="0 0 24 24" width="24" height="24" class="lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" class="darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg></button></div><div class="navbarSearchContainer_Bca1"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><aside class="theme-doc-sidebar-container docSidebarContainer_YfHR"><div class="sidebarViewport_aRkj"><div class="sidebar_njMd"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_SIkG"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/documentation/docs/vision">Introduction and Vision</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/documentation/docs/enterprise_vision_solution">Enterprise Vision &amp; Solution</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/documentation/docs/overview">Overview</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/documentation/docs/Core_Concepts">Core Concepts</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/documentation/docs/quick_start">Quick Start</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/documentation/docs/prerequisites">Prerequisites</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/documentation/docs/architecture">Architecture</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/documentation/docs/adoption">Adoption and Customization</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" href="/documentation/docs/operational_guide">Operational Guide</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/documentation/docs/migration">Migration</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/documentation/docs/migration_vm_example">Example: VM to Kubernetes</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/documentation/docs/self-service">Self-service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/documentation/docs/security">Security</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/documentation/docs/services">Services</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/documentation/docs/stack_liveview">Stack LiveView</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/documentation/docs/common_use_cases">Common Use Cases</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/documentation/docs/private_saas_deployment">Private SaaS Deployment</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/documentation/docs/organizational_control">organizational control layers</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/documentation/docs/sovereignty">Sovereignty &amp; Agnostic Freedom</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/documentation/docs/qna">Q&amp;A</a></li></ul></nav></div></div></aside><main class="docMainContainer_TBSr"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col"><div class="docItemContainer_Djhp"><article><nav class="theme-doc-breadcrumbs breadcrumbsContainer_Z_bl" aria-label="Breadcrumbs"><ul class="breadcrumbs" itemscope="" itemtype="https://schema.org/BreadcrumbList"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/documentation/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_YNFT"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li itemscope="" itemprop="itemListElement" itemtype="https://schema.org/ListItem" class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link" itemprop="name">Operational Guide</span><meta itemprop="position" content="1"></li></ul></nav><div class="theme-doc-markdown markdown"><h1>📘 Stacktic Operational Guide: Complete Day 0–2 Workflow</h1>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-table-of-contents">📋 Table of Contents<a href="#-table-of-contents" class="hash-link" aria-label="Direct link to 📋 Table of Contents" title="Direct link to 📋 Table of Contents">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="quick-navigation">Quick Navigation<a href="#quick-navigation" class="hash-link" aria-label="Direct link to Quick Navigation" title="Direct link to Quick Navigation">​</a></h3>
+<ol>
+<li><a href="#-executive-overview">Executive Overview</a></li>
+<li><a href="#-introduction--objectives">Introduction &amp; Objectives</a></li>
+<li><a href="#-prerequisites--requirements">Prerequisites &amp; Requirements</a></li>
+<li><a href="#-day-0-architecture--design">Day 0: Architecture &amp; Design</a>
+<ul>
+<li><a href="#41--application-topology-design">4.1 Application Topology Design</a></li>
+<li><a href="#42--import-strategies">4.2 Import Strategies</a></li>
+<li><a href="#43--base-stack-construction">4.3 Base Stack Construction</a></li>
+<li><a href="#44--scale-planning--forecasting">4.4 Scale Planning &amp; Forecasting</a></li>
+<li><a href="#45--database-initialization">4.5 Database Initialization</a></li>
+</ul>
+</li>
+<li><a href="#-day-1-deployment--environment-setup">Day 1: Deployment &amp; Environment Setup</a>
+<ul>
+<li><a href="#51--production-preparation">5.1 Production Preparation</a></li>
+<li><a href="#52--operational-components">5.2 Operational Components</a></li>
+</ul>
+</li>
+<li><a href="#-day-2-operations--management">Day 2: Operations &amp; Management</a>
+<ul>
+<li><a href="#61--security-hardening">6.1 Security Hardening</a></li>
+<li><a href="#62--version-management">6.2 Version Management</a></li>
+<li><a href="#63--operational-readiness">6.3 Operational Readiness</a></li>
+<li><a href="#64--monitoring--observability">6.4 Monitoring &amp; Observability</a></li>
+</ul>
+</li>
+<li><a href="#best-practices--guidelines">Best Practices &amp; Guidelines</a></li>
+<li><a href="#troubleshooting--faq">Troubleshooting &amp; FAQ</a></li>
+<li><a href="#next-steps--resources">Next Steps &amp; Resources</a></li>
+</ol>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-executive-overview">🎯 Executive Overview<a href="#-executive-overview" class="hash-link" aria-label="Direct link to 🎯 Executive Overview" title="Direct link to 🎯 Executive Overview">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="what-this-guide-delivers">What This Guide Delivers<a href="#what-this-guide-delivers" class="hash-link" aria-label="Direct link to What This Guide Delivers" title="Direct link to What This Guide Delivers">​</a></h3>
+<p><strong>Stacktic</strong> transforms your application <strong>from concept to production-ready full stack in minutes</strong>. This comprehensive guide provides a structured workflow covering:</p>
+<table><thead><tr><th>Phase</th><th>Focus</th><th>Outcome</th></tr></thead><tbody><tr><td><strong>Day 0</strong></td><td>Architecture &amp; Topology</td><td>Complete application design with all components</td></tr><tr><td><strong>Day 1</strong></td><td>Deployment &amp; Setup</td><td>Multi-environment deployment ready</td></tr><tr><td><strong>Day 2</strong></td><td>Operations &amp; Security</td><td>Production-grade operations with full observability</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="time-to-production">Time to Production<a href="#time-to-production" class="hash-link" aria-label="Direct link to Time to Production" title="Direct link to Time to Production">​</a></h3>
+<ul>
+<li><strong>Traditional Approach:</strong> 4-6 weeks</li>
+<li><strong>With Stacktic:</strong> 2-3 days</li>
+<li><strong>Time Saved:</strong> ~90%</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-introduction--objectives">🚀 Introduction &amp; Objectives<a href="#-introduction--objectives" class="hash-link" aria-label="Direct link to 🚀 Introduction &amp; Objectives" title="Direct link to 🚀 Introduction &amp; Objectives">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="learning-objectives">Learning Objectives<a href="#learning-objectives" class="hash-link" aria-label="Direct link to Learning Objectives" title="Direct link to Learning Objectives">​</a></h3>
+<p>After completing this guide, you will be able to:</p>
+<ul>
+<li>✅ Design complex application topologies using Stacktic components</li>
+<li>✅ Import and configure existing code and containers</li>
+<li>✅ Deploy multi-environment setups (dev, staging, production)</li>
+<li>✅ Implement enterprise-grade security and compliance</li>
+<li>✅ Establish Day 2 operations including monitoring, backup, and scaling</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="target-audience">Target Audience<a href="#target-audience" class="hash-link" aria-label="Direct link to Target Audience" title="Direct link to Target Audience">​</a></h3>
+<ul>
+<li><strong>DevOps Engineers</strong> - Streamline deployment workflows</li>
+<li><strong>Platform Engineers</strong> - Build standardized stacks</li>
+<li><strong>SRE Teams</strong> - Implement operational excellence</li>
+<li><strong>Security Teams</strong> - Ensure compliance and hardening</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-prerequisites--requirements">📋 Prerequisites &amp; Requirements<a href="#-prerequisites--requirements" class="hash-link" aria-label="Direct link to 📋 Prerequisites &amp; Requirements" title="Direct link to 📋 Prerequisites &amp; Requirements">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="technical-requirements">Technical Requirements<a href="#technical-requirements" class="hash-link" aria-label="Direct link to Technical Requirements" title="Direct link to Technical Requirements">​</a></h3>
+<table><thead><tr><th>Component</th><th>Requirement</th><th>Notes</th></tr></thead><tbody><tr><td><strong>Kubernetes Cluster</strong></td><td>1.24+</td><td>EKS, GKE, AKS, or local</td></tr><tr><td><strong>Stacktic Account</strong></td><td>Active subscription</td><td>Free trial available</td></tr><tr><td><strong>Source Code Access</strong></td><td>Git repositories</td><td>GitHub, GitLab, Bitbucket</td></tr><tr><td><strong>Container Registry</strong></td><td>Write access</td><td>For image deployments</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="knowledge-prerequisites">Knowledge Prerequisites<a href="#knowledge-prerequisites" class="hash-link" aria-label="Direct link to Knowledge Prerequisites" title="Direct link to Knowledge Prerequisites">​</a></h3>
+<ul>
+<li>Basic Kubernetes concepts</li>
+<li>Understanding of microservices architecture</li>
+<li>Familiarity with Git workflows</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-day-0-architecture--design">📅 Day 0: Architecture &amp; Design<a href="#-day-0-architecture--design" class="hash-link" aria-label="Direct link to 📅 Day 0: Architecture &amp; Design" title="Direct link to 📅 Day 0: Architecture &amp; Design">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="chapter-overview">Chapter Overview<a href="#chapter-overview" class="hash-link" aria-label="Direct link to Chapter Overview" title="Direct link to Chapter Overview">​</a></h3>
+<p>Day 0 focuses on <strong>designing your application architecture</strong> and establishing the foundation for your stack.</p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="41--application-topology-design">4.1 🧩 Application Topology Design<a href="#41--application-topology-design" class="hash-link" aria-label="Direct link to 4.1 🧩 Application Topology Design" title="Direct link to 4.1 🧩 Application Topology Design">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="getting-started">Getting Started<a href="#getting-started" class="hash-link" aria-label="Direct link to Getting Started" title="Direct link to Getting Started">​</a></h4>
+<p>Begin by designing your application using Stacktic&#x27;s visual topology builder:</p>
+<h5 class="anchor anchorWithStickyNavbar_LWe7" id="core-components-setup">Core Components Setup<a href="#core-components-setup" class="hash-link" aria-label="Direct link to Core Components Setup" title="Direct link to Core Components Setup">​</a></h5>
+<ul>
+<li>✅ Define <strong>databases</strong> (PostgreSQL, MongoDB, Redis)</li>
+<li>✅ Configure <strong>backend services</strong> (APIs, microservices)</li>
+<li>✅ Design <strong>frontend applications</strong> (React, Vue, Angular)</li>
+<li>➕ Use the <strong>&quot;+&quot;</strong> icon on each service to explore available links</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="component-linking-strategy">Component Linking Strategy<a href="#component-linking-strategy" class="hash-link" aria-label="Direct link to Component Linking Strategy" title="Direct link to Component Linking Strategy">​</a></h4>
+<table><thead><tr><th>From Component</th><th>To Component</th><th>Link Type</th><th>Purpose</th></tr></thead><tbody><tr><td>Backend</td><td>Database</td><td>Data connection</td><td>Persistent storage</td></tr><tr><td>Frontend</td><td>Backend</td><td>API connection</td><td>Business logic</td></tr><tr><td>API Gateway</td><td>Backend</td><td>Routing</td><td>External access</td></tr><tr><td>Cache</td><td>Backend</td><td>Performance</td><td>Response optimization</td></tr></tbody></table>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="42--import-strategies">4.2 🔗 Import Strategies<a href="#42--import-strategies" class="hash-link" aria-label="Direct link to 4.2 🔗 Import Strategies" title="Direct link to 4.2 🔗 Import Strategies">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="choose-your-import-method">Choose Your Import Method<a href="#choose-your-import-method" class="hash-link" aria-label="Direct link to Choose Your Import Method" title="Direct link to Choose Your Import Method">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_LWe7" id="option-1-import-source-code">Option 1: Import Source Code<a href="#option-1-import-source-code" class="hash-link" aria-label="Direct link to Option 1: Import Source Code" title="Direct link to Option 1: Import Source Code">​</a></h5>
+<p>Use the <code>external_source_code</code> component for direct repository integration:</p>
+<img src="/documentation/assets/images/image-21-268a82a4c3b6eced559e1208d8ce6179.png" alt="alt text" width="500">
+<p><strong>Best for:</strong></p>
+<ul>
+<li>Active development environments</li>
+<li>CI/CD integration</li>
+<li>Automated builds</li>
+</ul>
+<h5 class="anchor anchorWithStickyNavbar_LWe7" id="option-2-import-container-images">Option 2: Import Container Images<a href="#option-2-import-container-images" class="hash-link" aria-label="Direct link to Option 2: Import Container Images" title="Direct link to Option 2: Import Container Images">​</a></h5>
+<p>Use the <code>image_base</code> component for pre-built containers:</p>
+<img src="/documentation/assets/images/image-20-0bbc5722f0664921c6b374870d06446b.png" alt="alt text" width="500">
+<p><strong>Best for:</strong></p>
+<ul>
+<li>Production deployments</li>
+<li>Third-party services</li>
+<li>Stable releases</li>
+</ul>
+<blockquote>
+<p>💡 <strong>Pro Tip:</strong> After importing, adjust settings such as:</p>
+<ul>
+<li>Container ports configuration</li>
+<li>UID/GID numbers for security</li>
+<li>PVC enablement for persistent storage</li>
+<li>Environment-specific configurations</li>
+</ul>
+</blockquote>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="43-️-base-stack-construction">4.3 🏗️ Base Stack Construction<a href="#43-️-base-stack-construction" class="hash-link" aria-label="Direct link to 4.3 🏗️ Base Stack Construction" title="Direct link to 4.3 🏗️ Base Stack Construction">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="building-your-foundation">Building Your Foundation<a href="#building-your-foundation" class="hash-link" aria-label="Direct link to Building Your Foundation" title="Direct link to Building Your Foundation">​</a></h4>
+<p>Create a comprehensive base stack including:</p>
+<p><img decoding="async" loading="lazy" alt="alt text" src="/documentation/assets/images/image-15-44318056b1e97581148417914e20b58b.png" width="1402" height="660" class="img_ev3q"></p>
+<h5 class="anchor anchorWithStickyNavbar_LWe7" id="essential-components">Essential Components<a href="#essential-components" class="hash-link" aria-label="Direct link to Essential Components" title="Direct link to Essential Components">​</a></h5>
+<ol>
+<li><strong>Backend Services</strong> - API endpoints, business logic</li>
+<li><strong>Data Layer</strong> - Databases, caches, message queues</li>
+<li><strong>API Gateway</strong> - External access, routing, rate limiting</li>
+<li><strong>Authentication</strong> - Identity providers, OIDC/SAML</li>
+</ol>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="extending-functionality">Extending Functionality<a href="#extending-functionality" class="hash-link" aria-label="Direct link to Extending Functionality" title="Direct link to Extending Functionality">​</a></h4>
+<p>Add advanced capabilities like <strong>API endpoints</strong> or <strong>messaging services</strong>:</p>
+<p><img decoding="async" loading="lazy" alt="alt text" src="/documentation/assets/images/image-16-20cf32df335794e0bfde57aa08c2316e.png" width="1848" height="1366" class="img_ev3q"></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-demo-initial-app-topology">📦 Demo: Initial App Topology<a href="#-demo-initial-app-topology" class="hash-link" aria-label="Direct link to 📦 Demo: Initial App Topology" title="Direct link to 📦 Demo: Initial App Topology">​</a></h3>
+<p><strong>See it in action!</strong> Click below to watch the demo:</p>
+<video controls="" preload="metadata" width="100%" poster="https://via.placeholder.com/1280x720.png?text=Click+to+Play+Video" playsinline=""><source src="https://video.wixstatic.com/video/06ddae_156895725d83421bae1cc5e90362b682/1080p/mp4/file.mp4" type="video/mp4"><p>Your browser doesn’t support the video tag.</p></video>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="44--scale-planning--forecasting">4.4 🔧 Scale Planning &amp; Forecasting<a href="#44--scale-planning--forecasting" class="hash-link" aria-label="Direct link to 4.4 🔧 Scale Planning &amp; Forecasting" title="Direct link to 4.4 🔧 Scale Planning &amp; Forecasting">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="capacity-planning-inputs">Capacity Planning Inputs<a href="#capacity-planning-inputs" class="hash-link" aria-label="Direct link to Capacity Planning Inputs" title="Direct link to Capacity Planning Inputs">​</a></h4>
+<p>Provide forecast values on components for <strong>intelligent scaling recommendations</strong>:</p>
+<table><thead><tr><th>Metric</th><th>Description</th><th>Example</th><th>Impact</th></tr></thead><tbody><tr><td><strong>RPS</strong></td><td>Requests per second</td><td>1000 RPS</td><td>CPU/Memory sizing</td></tr><tr><td><strong>IO</strong></td><td>Storage I/O estimates</td><td>500 IOPS</td><td>Disk performance</td></tr><tr><td><strong>Connections</strong></td><td>Concurrent users</td><td>5000</td><td>Connection pooling</td></tr><tr><td><strong>Bandwidth</strong></td><td>Network throughput</td><td>100 Mbps</td><td>Network capacity</td></tr></tbody></table>
+<img width="897" alt="image" src="https://github.com/user-attachments/assets/73c7644a-355b-4476-923f-cf0f724235de">
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="cost-analysis-report">Cost Analysis Report<a href="#cost-analysis-report" class="hash-link" aria-label="Direct link to Cost Analysis Report" title="Direct link to Cost Analysis Report">​</a></h4>
+<p>Review the <strong>scale cost report</strong> for production planning:</p>
+<img width="1442" alt="image" src="https://github.com/user-attachments/assets/f112ff77-92f1-4c2f-9043-cd7665873511">
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="45-️-database-initialization">4.5 🗄️ Database Initialization<a href="#45-️-database-initialization" class="hash-link" aria-label="Direct link to 4.5 🗄️ Database Initialization" title="Direct link to 4.5 🗄️ Database Initialization">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="important-note">Important Note<a href="#important-note" class="hash-link" aria-label="Direct link to Important Note" title="Direct link to Important Note">​</a></h4>
+<p><strong>Stacktic creates empty databases by default.</strong> You&#x27;ll need to import your data into the Kubernetes cluster.</p>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="migration-options">Migration Options<a href="#migration-options" class="hash-link" aria-label="Direct link to Migration Options" title="Direct link to Migration Options">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_LWe7" id="automated-migration-recommended">Automated Migration (Recommended)<a href="#automated-migration-recommended" class="hash-link" aria-label="Direct link to Automated Migration (Recommended)" title="Direct link to Automated Migration (Recommended)">​</a></h5>
+<p>Use bucket jobs for automated data migration (covered in migration chapter)</p>
+<h5 class="anchor anchorWithStickyNavbar_LWe7" id="manual-migration-scripts">Manual Migration Scripts<a href="#manual-migration-scripts" class="hash-link" aria-label="Direct link to Manual Migration Scripts" title="Direct link to Manual Migration Scripts">​</a></h5>
+<p>Find import scripts in the <code>data</code> components&#x27; Day 0 folder:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#bfc7d5"><span class="token plain">tree mongodb/day0</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">mongodb/day0</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">├── README.md</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">├── backup-all-db.sh</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">├── backup.sh</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  └── restore.sh</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-day-1-deployment--environment-setup">📅 Day 1: Deployment &amp; Environment Setup<a href="#-day-1-deployment--environment-setup" class="hash-link" aria-label="Direct link to 📅 Day 1: Deployment &amp; Environment Setup" title="Direct link to 📅 Day 1: Deployment &amp; Environment Setup">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="chapter-overview-1">Chapter Overview<a href="#chapter-overview-1" class="hash-link" aria-label="Direct link to Chapter Overview" title="Direct link to Chapter Overview">​</a></h3>
+<p>Day 1 transforms your design into deployable environments with operational readiness.</p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="51-️-production-preparation">5.1 🛠️ Production Preparation<a href="#51-️-production-preparation" class="hash-link" aria-label="Direct link to 5.1 🛠️ Production Preparation" title="Direct link to 5.1 🛠️ Production Preparation">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="multi-environment-strategy">Multi-Environment Strategy<a href="#multi-environment-strategy" class="hash-link" aria-label="Direct link to Multi-Environment Strategy" title="Direct link to Multi-Environment Strategy">​</a></h4>
+<p>With your base skeleton ready, create production-ready environments:</p>
+<table><thead><tr><th>Environment</th><th>Purpose</th><th>Configuration</th></tr></thead><tbody><tr><td><strong>Development</strong></td><td>Feature development</td><td>Minimal resources, debug enabled</td></tr><tr><td><strong>Staging</strong></td><td>Pre-production testing</td><td>Production-like, synthetic data</td></tr><tr><td><strong>Production</strong></td><td>Live system</td><td>Full resources, monitoring, backups</td></tr></tbody></table>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="implementation-approach">Implementation Approach<a href="#implementation-approach" class="hash-link" aria-label="Direct link to Implementation Approach" title="Direct link to Implementation Approach">​</a></h4>
+<ul>
+<li>🔄 Create environments (<strong>dev</strong>, <strong>staging</strong>, <strong>prod</strong>)</li>
+<li>🔐 Add <strong>security layers</strong> (NetworkPolicies, RBAC)</li>
+<li>💾 Deploy <strong>backup solutions</strong> (Velero, snapshots)</li>
+<li>📊 Enable <strong>Day 2 operational components</strong></li>
+</ul>
+<blockquote>
+<p><strong>💡 Best Practice:</strong></p>
+<ul>
+<li>Use <code>external_source_code</code> for active development</li>
+<li>Use <code>image_base</code> for production deployments</li>
+<li>For dev/staging with custom CI, <code>image_base</code> works well</li>
+</ul>
+</blockquote>
+<p><img decoding="async" loading="lazy" alt="alt text" src="/documentation/assets/images/image-17-4e49f5e9d7304e7a3ffd9dc06b399577.png" width="1834" height="1378" class="img_ev3q"></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="52--operational-components">5.2 ➕ Operational Components<a href="#52--operational-components" class="hash-link" aria-label="Direct link to 5.2 ➕ Operational Components" title="Direct link to 5.2 ➕ Operational Components">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="essential-operational-stack">Essential Operational Stack<a href="#essential-operational-stack" class="hash-link" aria-label="Direct link to Essential Operational Stack" title="Direct link to Essential Operational Stack">​</a></h4>
+<p>Extend your infrastructure with critical operational tools:</p>
+<p><img decoding="async" loading="lazy" alt="alt text" src="/documentation/assets/images/image-22-ee0081b3fa20d34bbb9cec8e02d078a6.png" width="1880" height="1498" class="img_ev3q"></p>
+<h5 class="anchor anchorWithStickyNavbar_LWe7" id="component-breakdown">Component Breakdown<a href="#component-breakdown" class="hash-link" aria-label="Direct link to Component Breakdown" title="Direct link to Component Breakdown">​</a></h5>
+<table><thead><tr><th>Component</th><th>Purpose</th><th>Auto-Generated Assets</th></tr></thead><tbody><tr><td><strong>Velero</strong></td><td>Backup &amp; Restore</td><td>Backup pipelines, restore procedures, schedules</td></tr><tr><td><strong>ArgoCD</strong></td><td>GitOps Deployment</td><td>Application manifests, sync policies</td></tr><tr><td><strong>Prometheus</strong></td><td>Metrics Collection</td><td>Service monitors, alert rules</td></tr><tr><td><strong>Grafana</strong></td><td>Visualization</td><td>Preconfigured dashboards, data sources</td></tr><tr><td><strong>Loki</strong></td><td>Log Aggregation</td><td>Log streams, queries</td></tr></tbody></table>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="integration-benefits">Integration Benefits<a href="#integration-benefits" class="hash-link" aria-label="Direct link to Integration Benefits" title="Direct link to Integration Benefits">​</a></h4>
+<ul>
+<li><strong>Prometheus → Services:</strong> Automatic metric scraping</li>
+<li><strong>Prometheus → Grafana:</strong> Pre-built dashboards per service</li>
+<li><strong>ArgoCD → Git:</strong> Automated deployment on commit</li>
+<li><strong>Velero → Storage:</strong> Scheduled backups with retention</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-day-2-operations--management">📅 Day 2: Operations &amp; Management<a href="#-day-2-operations--management" class="hash-link" aria-label="Direct link to 📅 Day 2: Operations &amp; Management" title="Direct link to 📅 Day 2: Operations &amp; Management">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="chapter-overview-2">Chapter Overview<a href="#chapter-overview-2" class="hash-link" aria-label="Direct link to Chapter Overview" title="Direct link to Chapter Overview">​</a></h3>
+<p>Day 2 ensures your stack is production-ready with enterprise-grade security, monitoring, and operational excellence.</p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="61--security-hardening">6.1 🔐 Security Hardening<a href="#61--security-hardening" class="hash-link" aria-label="Direct link to 6.1 🔐 Security Hardening" title="Direct link to 6.1 🔐 Security Hardening">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="comprehensive-security-implementation">Comprehensive Security Implementation<a href="#comprehensive-security-implementation" class="hash-link" aria-label="Direct link to Comprehensive Security Implementation" title="Direct link to Comprehensive Security Implementation">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_LWe7" id="security-layers">Security Layers<a href="#security-layers" class="hash-link" aria-label="Direct link to Security Layers" title="Direct link to Security Layers">​</a></h5>
+<p><strong>1. OPA Policy Enforcement</strong></p>
+<ul>
+<li>Add Open Policy Agent rules for compliance</li>
+<li>Enforce security standards automatically</li>
+<li>Validate configurations before deployment</li>
+</ul>
+<p><strong>2. RBAC Configuration</strong>
+Implement role-based access control:</p>
+<ul>
+<li>Include RBAC components in topology</li>
+<li>Link users/groups to appropriate services</li>
+<li>Examples:<!-- -->
+<ul>
+<li>Data teams → MongoDB access</li>
+<li>Ops groups → Backend service management</li>
+<li>Security teams → Audit log access</li>
+</ul>
+</li>
+</ul>
+<p><img decoding="async" loading="lazy" alt="alt text" src="/documentation/assets/images/image-23-1112ac70879261fe836dd4b6fdb66748.png" width="1870" height="1520" class="img_ev3q"></p>
+<p><strong>3. Source Code Security Hardening</strong>
+Stacktic automatically adjusts security settings:</p>
+<img src="/documentation/assets/images/image-24-6917c20b60f24d100a696d6c12c26b2d.png" alt="alt text" width="500">
+<h5 class="anchor anchorWithStickyNavbar_LWe7" id="security-checklist">Security Checklist<a href="#security-checklist" class="hash-link" aria-label="Direct link to Security Checklist" title="Direct link to Security Checklist">​</a></h5>
+<ul>
+<li>✅ SecurityContext configuration</li>
+<li>✅ Network policies enabled</li>
+<li>✅ Pod security standards</li>
+<li>✅ Secret management</li>
+<li>✅ Image scanning</li>
+<li>✅ Admission controllers</li>
+</ul>
+<blockquote>
+<p>⚠️ <strong>Warning:</strong> Overly strict settings may disrupt your application. Test thoroughly in staging.</p>
+</blockquote>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="ciso-audit-report">CISO Audit Report<a href="#ciso-audit-report" class="hash-link" aria-label="Direct link to CISO Audit Report" title="Direct link to CISO Audit Report">​</a></h4>
+<p>Stacktic generates a comprehensive <strong>CISO Audit Report</strong> automatically:</p>
+<p><img decoding="async" loading="lazy" alt="alt text" src="/documentation/assets/images/image-32-d5f10ed9ceef7e1a3c6e33a8f28ca85c.png" width="2878" height="1672" class="img_ev3q"></p>
+<p><strong>Report Includes:</strong></p>
+<ul>
+<li>Real-time security assessment</li>
+<li>Compliance status (CIS, PCI-DSS, HIPAA)</li>
+<li>Vulnerability analysis</li>
+<li>Remediation recommendations</li>
+<li>Risk scoring</li>
+</ul>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="62--version-management">6.2 📦 Version Management<a href="#62--version-management" class="hash-link" aria-label="Direct link to 6.2 📦 Version Management" title="Direct link to 6.2 📦 Version Management">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="version-control-strategy">Version Control Strategy<a href="#version-control-strategy" class="hash-link" aria-label="Direct link to Version Control Strategy" title="Direct link to Version Control Strategy">​</a></h4>
+<p>Stacktic provides powerful version management capabilities:</p>
+<p><img decoding="async" loading="lazy" alt="alt text" src="/documentation/assets/images/image-25-3e02f316efd9aa43268c3d58dcb65cb3.png" width="2910" height="820" class="img_ev3q"></p>
+<h5 class="anchor anchorWithStickyNavbar_LWe7" id="version-control-features">Version Control Features<a href="#version-control-features" class="hash-link" aria-label="Direct link to Version Control Features" title="Direct link to Version Control Features">​</a></h5>
+<table><thead><tr><th>Feature</th><th>Description</th><th>Use Case</th></tr></thead><tbody><tr><td><strong>Stack Versioning</strong></td><td>Save complete stack configurations</td><td>Environment snapshots</td></tr><tr><td><strong>Component Versioning</strong></td><td>Individual service versions</td><td>Gradual rollouts</td></tr><tr><td><strong>Branch Management</strong></td><td>Create version branches</td><td>A/B testing, experiments</td></tr><tr><td><strong>Rollback Capability</strong></td><td>Instant version reversal</td><td>Emergency recovery</td></tr></tbody></table>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="component-version-updates">Component Version Updates<a href="#component-version-updates" class="hash-link" aria-label="Direct link to Component Version Updates" title="Direct link to Component Version Updates">​</a></h4>
+<p>Change component versions easily:</p>
+<img src="/documentation/assets/images/image-26-3c3563562b6aea6c5c1516c32c6bd1a9.png" alt="alt text" width="300">
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="version-notifications">Version Notifications<a href="#version-notifications" class="hash-link" aria-label="Direct link to Version Notifications" title="Direct link to Version Notifications">​</a></h4>
+<p>Receive alerts for new versions and changes:</p>
+<img src="/documentation/assets/images/image-27-eb7d861dbb5c8413dc28004aa05e9aa7.png" alt="alt text" width="500">
+<blockquote>
+<p>💡 <strong>Best Practice:</strong> Always test version upgrades in <strong>staging</strong> before production deployment.</p>
+</blockquote>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="configuration-management">Configuration Management<a href="#configuration-management" class="hash-link" aria-label="Direct link to Configuration Management" title="Direct link to Configuration Management">​</a></h4>
+<p>Use the <strong>Sections</strong> area for centralized management:</p>
+<p><img decoding="async" loading="lazy" alt="alt text" src="/documentation/assets/images/image-28-d5c672ca2374ce36a187e5b47a583ca3.png" width="1996" height="880" class="img_ev3q"></p>
+<p><img decoding="async" loading="lazy" alt="alt text" src="/documentation/assets/images/image-29-905a01ce506c8af530b2b116cbd03aa5.png" width="1982" height="1274" class="img_ev3q"></p>
+<h5 class="anchor anchorWithStickyNavbar_LWe7" id="custom-sections">Custom Sections<a href="#custom-sections" class="hash-link" aria-label="Direct link to Custom Sections" title="Direct link to Custom Sections">​</a></h5>
+<p>Create custom groupings for specific needs:</p>
+<p><img decoding="async" loading="lazy" alt="alt text" src="/documentation/assets/images/image-30-0fc1c692d1385fffe321bb823788fb3f.png" width="2236" height="1888" class="img_ev3q"></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="63-️-operational-readiness">6.3 🗂️ Operational Readiness<a href="#63-️-operational-readiness" class="hash-link" aria-label="Direct link to 6.3 🗂️ Operational Readiness" title="Direct link to 6.3 🗂️ Operational Readiness">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="day-2-operations-structure">Day-2 Operations Structure<a href="#day-2-operations-structure" class="hash-link" aria-label="Direct link to Day-2 Operations Structure" title="Direct link to Day-2 Operations Structure">​</a></h4>
+<p>Review and understand your operational configuration:</p>
+<p><img decoding="async" loading="lazy" alt="alt text" src="/documentation/assets/images/image-31-43aff2499aeba69ea08afe6e18b16563.png" width="810" height="802" class="img_ev3q"></p>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="automated-backup-configuration">Automated Backup Configuration<a href="#automated-backup-configuration" class="hash-link" aria-label="Direct link to Automated Backup Configuration" title="Direct link to Automated Backup Configuration">​</a></h4>
+<p>Velero integration creates comprehensive backup strategies:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#bfc7d5"><span class="token plain">tree velero/day2</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">velero/day2</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">├── README.md</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">├── backup</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│   ├── mongodb-backup.yaml</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│   └── opensearch-backup.yaml</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">├── restore</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│   ├── mongodb-restore.yaml</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">│   └── opensearch-restore.yaml</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">└── schedule</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    ├── mongodb-schedule.yaml</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">    └── opensearch-schedule.yaml</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p><strong>Backup Features:</strong></p>
+<ul>
+<li>Automated scheduling</li>
+<li>Point-in-time recovery</li>
+<li>Cross-region replication</li>
+<li>Disaster recovery procedures</li>
+</ul>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="64--monitoring--observability">6.4 📊 Monitoring &amp; Observability<a href="#64--monitoring--observability" class="hash-link" aria-label="Direct link to 6.4 📊 Monitoring &amp; Observability" title="Direct link to 6.4 📊 Monitoring &amp; Observability">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="comprehensive-monitoring-stack">Comprehensive Monitoring Stack<a href="#comprehensive-monitoring-stack" class="hash-link" aria-label="Direct link to Comprehensive Monitoring Stack" title="Direct link to Comprehensive Monitoring Stack">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_LWe7" id="out-of-the-box-dashboards">Out-of-the-Box Dashboards<a href="#out-of-the-box-dashboards" class="hash-link" aria-label="Direct link to Out-of-the-Box Dashboards" title="Direct link to Out-of-the-Box Dashboards">​</a></h5>
+<p>Stacktic provides maintained, auto-updating dashboards for:</p>
+<ul>
+<li>Infrastructure metrics</li>
+<li>Application performance</li>
+<li>Business KPIs</li>
+<li>Security events</li>
+</ul>
+<h5 class="anchor anchorWithStickyNavbar_LWe7" id="live-view-capabilities">Live View Capabilities<a href="#live-view-capabilities" class="hash-link" aria-label="Direct link to Live View Capabilities" title="Direct link to Live View Capabilities">​</a></h5>
+<p>Stacktic&#x27;s <strong>Live View</strong> provides deep, relationship-aware insights:</p>
+<p><img decoding="async" loading="lazy" alt="alt text" src="/documentation/assets/images/image-33-d4efcd866ebdac8fcaa8748a85b19b15.png" width="1846" height="752" class="img_ev3q"></p>
+<p><img decoding="async" loading="lazy" alt="alt text" src="/documentation/assets/images/image-34-9403e5e7ae9c2099ce836f8da8f9826c.png" width="2014" height="1304" class="img_ev3q"></p>
+<p><strong>Live View Features:</strong></p>
+<table><thead><tr><th>Check Type</th><th>Description</th><th>Frequency</th></tr></thead><tbody><tr><td><strong>API Health</strong></td><td>Endpoint availability and latency</td><td>30 seconds</td></tr><tr><td><strong>Data Component Health</strong></td><td>Database connectivity and performance</td><td>1 minute</td></tr><tr><td><strong>Route Scanning</strong></td><td>Ingress and service mesh validation</td><td>2 minutes</td></tr><tr><td><strong>SSL Health</strong></td><td>Certificate expiry and validation</td><td>1 hour</td></tr><tr><td><strong>Security Validation</strong></td><td>Policy compliance tests</td><td>5 minutes</td></tr></tbody></table>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-best-practices--guidelines">📚 Best Practices &amp; Guidelines<a href="#-best-practices--guidelines" class="hash-link" aria-label="Direct link to 📚 Best Practices &amp; Guidelines" title="Direct link to 📚 Best Practices &amp; Guidelines">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="deployment-best-practices">Deployment Best Practices<a href="#deployment-best-practices" class="hash-link" aria-label="Direct link to Deployment Best Practices" title="Direct link to Deployment Best Practices">​</a></h3>
+<table><thead><tr><th>Practice</th><th>Description</th><th>Benefit</th></tr></thead><tbody><tr><td><strong>Environment Parity</strong></td><td>Keep environments similar</td><td>Reduces production surprises</td></tr><tr><td><strong>Gradual Rollouts</strong></td><td>Deploy to staging first</td><td>Catches issues early</td></tr><tr><td><strong>Version Pinning</strong></td><td>Lock critical component versions</td><td>Stability assurance</td></tr><tr><td><strong>Resource Limits</strong></td><td>Set CPU/memory constraints</td><td>Prevents resource exhaustion</td></tr><tr><td><strong>Health Checks</strong></td><td>Configure liveness/readiness probes</td><td>Automatic recovery</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="security-best-practices">Security Best Practices<a href="#security-best-practices" class="hash-link" aria-label="Direct link to Security Best Practices" title="Direct link to Security Best Practices">​</a></h3>
+<ol>
+<li><strong>Least Privilege</strong> - Grant minimal required permissions</li>
+<li><strong>Defense in Depth</strong> - Multiple security layers</li>
+<li><strong>Regular Updates</strong> - Keep components current</li>
+<li><strong>Audit Logging</strong> - Track all changes</li>
+<li><strong>Encryption</strong> - TLS everywhere, encrypted storage</li>
+</ol>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-troubleshooting--faq">❓ Troubleshooting &amp; FAQ<a href="#-troubleshooting--faq" class="hash-link" aria-label="Direct link to ❓ Troubleshooting &amp; FAQ" title="Direct link to ❓ Troubleshooting &amp; FAQ">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="common-issues--solutions">Common Issues &amp; Solutions<a href="#common-issues--solutions" class="hash-link" aria-label="Direct link to Common Issues &amp; Solutions" title="Direct link to Common Issues &amp; Solutions">​</a></h3>
+<table><thead><tr><th>Issue</th><th>Symptoms</th><th>Solution</th></tr></thead><tbody><tr><td><strong>Import Failure</strong></td><td>Code won&#x27;t import</td><td>Check repository permissions</td></tr><tr><td><strong>Scaling Issues</strong></td><td>Pods not scaling</td><td>Verify metrics server installation</td></tr><tr><td><strong>Network Policies</strong></td><td>Services can&#x27;t communicate</td><td>Review policy rules</td></tr><tr><td><strong>Backup Failures</strong></td><td>Velero errors</td><td>Check storage credentials</td></tr><tr><td><strong>Monitoring Gaps</strong></td><td>Missing metrics</td><td>Ensure ServiceMonitor labels</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="frequently-asked-questions">Frequently Asked Questions<a href="#frequently-asked-questions" class="hash-link" aria-label="Direct link to Frequently Asked Questions" title="Direct link to Frequently Asked Questions">​</a></h3>
+<p><strong>Q: How long does the full Day 0-2 process take?</strong>
+A: Typically 2-3 days for a production-ready stack</p>
+<p><strong>Q: Can I skip Day 1 and go directly to Day 2?</strong>
+A: Not recommended - Day 1 establishes critical foundations</p>
+<p><strong>Q: How do I handle existing applications?</strong>
+A: Use the migration tools and import features</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-next-steps--resources">🚀 Next Steps &amp; Resources<a href="#-next-steps--resources" class="hash-link" aria-label="Direct link to 🚀 Next Steps &amp; Resources" title="Direct link to 🚀 Next Steps &amp; Resources">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="recommended-learning-path">Recommended Learning Path<a href="#recommended-learning-path" class="hash-link" aria-label="Direct link to Recommended Learning Path" title="Direct link to Recommended Learning Path">​</a></h3>
+<ol>
+<li>✅ Complete this Day 0-2 workflow</li>
+<li>📖 Review the Security Framework documentation</li>
+<li>🔄 Explore CI/CD integration options</li>
+<li>📊 Master the monitoring stack</li>
+<li>🎯 Implement advanced features (service mesh, ML ops)</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="additional-resources">Additional Resources<a href="#additional-resources" class="hash-link" aria-label="Direct link to Additional Resources" title="Direct link to Additional Resources">​</a></h3>
+<ul>
+<li>📚 <a href="https://docs.stacktic.io" target="_blank" rel="noopener noreferrer">Stacktic Documentation</a></li>
+<li>🎥 <a href="https://stacktic.io/tutorials" target="_blank" rel="noopener noreferrer">Video Tutorials</a></li>
+<li>💬 <a href="https://stacktic.io/slack" target="_blank" rel="noopener noreferrer">Community Slack</a></li>
+<li>📧 <a href="https://support.stacktic.io" target="_blank" rel="noopener noreferrer">Support Portal</a></li>
+<li>🎓 <a href="https://stacktic.io/training" target="_blank" rel="noopener noreferrer">Training Programs</a></li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="get-support">Get Support<a href="#get-support" class="hash-link" aria-label="Direct link to Get Support" title="Direct link to Get Support">​</a></h3>
+<table><thead><tr><th>Support Type</th><th>Contact</th><th>Response Time</th></tr></thead><tbody><tr><td><strong>Community</strong></td><td>Slack channel</td><td>&lt; 24 hours</td></tr><tr><td><strong>Standard</strong></td><td><a href="mailto:support@stacktic.io" target="_blank" rel="noopener noreferrer">support@stacktic.io</a></td><td>&lt; 8 hours</td></tr><tr><td><strong>Enterprise</strong></td><td>Dedicated channel</td><td>&lt; 1 hour</td></tr><tr><td><strong>Emergency</strong></td><td>Hotline (Enterprise)</td><td>&lt; 15 minutes</td></tr></tbody></table>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-summary">🎯 Summary<a href="#-summary" class="hash-link" aria-label="Direct link to 🎯 Summary" title="Direct link to 🎯 Summary">​</a></h2>
+<p>You&#x27;ve now mastered the complete Stacktic workflow from <strong>architecture to production operations</strong>. Your stack is:</p>
+<p>✅ <strong>Professionally Designed</strong> - Following best practices<br>
+<!-- -->✅ <strong>Fully Deployed</strong> - Across multiple environments<br>
+<!-- -->✅ <strong>Operationally Ready</strong> - With monitoring and backups<br>
+<!-- -->✅ <strong>Security Hardened</strong> - Meeting compliance standards<br>
+<!-- -->✅ <strong>Future-Proof</strong> - Ready for scaling and evolution</p>
+<hr>
+<p><em>Transform your infrastructure from idea to production in minutes, not months.</em></p>
+<p><strong>Version:</strong> 2.0<br>
+<strong>Last Updated:</strong> September 2025<br>
+<strong>© Stacktic - Intelligent Stack Automation</strong></p></div></article><nav class="pagination-nav docusaurus-mt-lg" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/documentation/docs/adoption"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">🔧 Stacktic Adoption and Customization</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/documentation/docs/migration"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">🚀 Migration Guide: Moving to Stacktic</div></a></nav></div></div></div></div></main></div></div></div></div>
+</body>
+</html>

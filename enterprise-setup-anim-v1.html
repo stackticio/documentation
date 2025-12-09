@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Pain: The Complete Story</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #e2e8f0;
+            overflow-x: hidden;
+            position: relative;
+            padding: 10px;
+        }
+
+        body.iframe-embed {
+            overflow: hidden;
+            padding: 5px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        body.iframe-embed .container {
+            transform: scale(0.48);
+            transform-origin: top center;
+        }
+
+        body:not(.iframe-embed) .container {
+            transform: scale(1);
+        }
+
+        /* Page wrapper for background */
+        .page {
+            background: #fff;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+            transition: background 2s ease;
+        }
+
+        /* Timeline Control */
+        .timeline-control {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            border-radius: 20px;
+            padding: 25px 40px;
+            z-index: 1000;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            min-width: 600px;
+        }
+
+        .timeline-title {
+            text-align: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #6366f1;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+
+        .timeline-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            position: relative;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .timeline-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e 0%, #eab308 30%, #f97316 60%, #ef4444 100%);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.1s linear;
+            position: relative;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 3px solid #6366f1;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.8);
+            right: 0;
+        }
+
+        .timeline-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #94a3b8;
+            margin-bottom: 15px;
+        }
+
+        .timeline-controls-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .control-btn {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .control-btn.pause {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .control-btn.reset {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        /* Story Header */
+        .story-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-radius: 16px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .story-title {
+            font-size: 36px;
+            font-weight: 300;
+            margin-bottom: 10px;
+            letter-spacing: 6px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .story-subtitle {
+            font-size: 16px;
+            color: #64748b;
+            font-weight: 400;
+        }
+
+        .current-phase {
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+            margin-top: 15px;
+            min-height: 25px;
+        }
+
+        /* === ENTERPRISE SETUP DIAGRAM (from original) === */
+        .header {
+            display: grid;
+            grid-template-columns: 190px 1fr 190px;
+            margin-bottom: 20px;
+            align-items: end;
+        }
+
+        .header-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: #7b1fa2;
+            text-align: center;
+            padding: 8px;
+            border-radius: 8px;
+            background: rgba(123, 31, 162, 0.08);
+        }
+
+        .human-factors {
+            display: flex;
+            justify-content: space-around;
+            gap: 15px;
+            padding: 0 15px;
+        }
+
+        .factor {
+            text-align: center;
+            flex: 1;
+        }
+
+        .factor h2 {
+            font-size: 18px;
+            font-weight: 800;
+            color: #7b1fa2;
+            margin-bottom: 6px;
+        }
+
+        .factor p {
+            font-size: 11px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        /* Main zones grid */
+        .zones-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .zone {
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            border: 2px solid #dee2e6;
+            border-radius: 12px;
+            padding: 15px 12px;
+            position: relative;
+            overflow: hidden;
+            min-height: 200px;
+            transition: all 0.3s ease;
+        }
+
+        .zone::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--zone-color);
+        }
+
+        .zone-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--zone-color);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .zone-tech {
+            font-size: 10px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .zone-issues {
+            background: rgba(239, 68, 68, 0.05);
+            border-left: 3px solid #ef4444;
+            padding: 8px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .zone-issues-title {
+            font-size: 9px;
+            font-weight: 700;
+            color: #ef4444;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .zone-issues-text {
+            font-size: 9px;
+            color: #dc2626;
+            line-height: 1.4;
+        }
+
+        .zone-health {
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            display: inline-block;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        /* Connection lines section */
+        .connections-section {
+            background: rgba(123, 31, 162, 0.05);
+            border: 2px dashed #7b1fa2;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .connections-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: #7b1fa2;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .connection-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .connection-item {
+            background: white;
+            border: 1.5px solid #dee2e6;
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .connection-item:hover {
+            border-color: #7b1fa2;
+            background: rgba(123, 31, 162, 0.02);
+        }
+
+        .connection-path {
+            font-size: 11px;
+            font-weight: 700;
+            color: #7b1fa2;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .arrow-divider {
+            font-size: 20px;
+            color: #7b1fa2;
+        }
+
+        .connection-impact {
+            font-size: 9px;
+            color: #dc2626;
+            flex: 1;
+        }
+
+        /* Pain Points Summary */
+        .pain-summary {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), rgba(220, 38, 38, 0.05));
+            border: 2px solid #ef4444;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .pain-summary-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #ef4444;
+            text-align: center;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .pain-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .pain-item {
+            background: white;
+            border-left: 4px solid #ef4444;
+            padding: 12px;
+            border-radius: 6px;
+        }
+
+        .pain-category {
+            font-size: 11px;
+            font-weight: 800;
+            color: #ef4444;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .pain-desc {
+            font-size: 10px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        /* === DEGRADATION OVERLAY === */
+        .degradation-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .degradation-overlay.active {
+            opacity: 1;
+        }
+
+        /* Metrics Dashboard Overlay */
+        .metrics-overlay {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(239, 68, 68, 0.4);
+            border-radius: 20px;
+            padding: 20px 30px;
+            z-index: 200;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            min-width: 800px;
+            opacity: 0;
+            transform: translateX(-50%) translateY(-20px);
+            transition: all 0.5s ease;
+            pointer-events: none;
+        }
+
+        .metrics-overlay.visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .metrics-title-overlay {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #ef4444;
+            text-align: center;
+        }
+
+        .metrics-grid-overlay {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .metric-card-overlay {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .metric-label-overlay {
+            font-size: 10px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .metric-value-overlay {
+            font-size: 24px;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .metric-change-overlay {
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .metric-bar-overlay {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .metric-bar-fill-overlay {
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        /* Cost Meter */
+        .cost-meter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 2px solid rgba(239, 68, 68, 0.4);
+            border-radius: 16px;
+            padding: 15px 20px;
+            min-width: 200px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            z-index: 998;
+            opacity: 0;
+            transform: translateX(20px);
+            transition: all 0.5s ease;
+            pointer-events: none;
+        }
+
+        .cost-meter.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .cost-label {
+            font-size: 10px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .cost-value {
+            font-size: 36px;
+            font-weight: 900;
+            font-family: 'JetBrains Mono', monospace;
+            text-align: center;
+            background: linear-gradient(135deg, #ef4444, #f97316);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .cost-chart {
+            width: 100%;
+            height: 50px;
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cost-bar {
+            position: absolute;
+            bottom: 0;
+            width: 6px;
+            background: linear-gradient(to top, #22c55e, #eab308, #f97316, #ef4444);
+            border-radius: 4px 4px 0 0;
+            transition: height 0.3s ease;
+        }
+
+        /* Technical Debt Indicator */
+        .debt-indicator {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 2px solid rgba(168, 85, 247, 0.4);
+            border-radius: 16px;
+            padding: 15px 20px;
+            min-width: 200px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            z-index: 998;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.5s ease;
+            pointer-events: none;
+        }
+
+        .debt-indicator.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .debt-label {
+            font-size: 10px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .debt-level {
+            font-size: 28px;
+            font-weight: 900;
+            font-family: 'JetBrains Mono', monospace;
+            text-align: center;
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .debt-items {
+            font-size: 9px;
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .debt-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            padding: 4px;
+            background: rgba(168, 85, 247, 0.1);
+            border-radius: 4px;
+        }
+
+        /* Alert Storm */
+        .alert-storm {
+            position: fixed;
+            top: 300px;
+            right: 20px;
+            width: 320px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        .alert-item {
+            background: rgba(239, 68, 68, 0.95);
+            border-left: 4px solid #dc2626;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
+            opacity: 0;
+            transform: translateX(400px);
+            animation: alertSlide 0.4s ease forwards;
+        }
+
+        @keyframes alertSlide {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .alert-header {
+            font-size: 11px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .alert-body {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Incident Feed Overlay */
+        .incident-overlay {
+            position: fixed;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            border-radius: 20px;
+            padding: 20px;
+            width: 700px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 200;
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px);
+            transition: all 0.5s ease;
+            pointer-events: none;
+        }
+
+        .incident-overlay.visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .incident-feed-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #ef4444;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .incident-item {
+            background: rgba(30, 41, 59, 0.6);
+            border-left: 4px solid var(--incident-color);
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: slideIn 0.3s ease forwards;
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .incident-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .incident-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .incident-severity {
+            font-size: 9px;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            background: var(--incident-bg);
+            color: var(--incident-color);
+        }
+
+        .incident-desc {
+            font-size: 10px;
+            color: #94a3b8;
+            line-height: 1.4;
+        }
+
+        .incident-time {
+            font-size: 9px;
+            color: #64748b;
+            margin-top: 4px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Failure Cascade Overlay */
+        .failure-cascade {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(239, 68, 68, 0.1);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 50;
+        }
+
+        .failure-cascade.active {
+            opacity: 1;
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Migration Failed Badge */
+        .migration-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 8px;
+            font-weight: 700;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s ease;
+        }
+
+        .migration-badge.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Security Breach Indicator */
+        .breach-indicator {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 3px solid #ef4444;
+            border-radius: 12px;
+            opacity: 0;
+            pointer-events: none;
+            animation: breachPulse 0.5s ease-in-out infinite;
+        }
+
+        @keyframes breachPulse {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        /* Fullscreen Button */
+        .fullscreen-btn {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            z-index: 1001;
+            transition: all 0.3s ease;
+        }
+
+        .fullscreen-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.6);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <button class="fullscreen-btn" onclick="window.open(window.location.href, '_blank')">⛶ View Full Screen</button>
+
+    <script>
+        if (window.self !== window.top) {
+            document.body.classList.add('iframe-embed');
+        }
+    </script>
+
+    <div class="failure-cascade" id="failureCascade"></div>
+    <div class="degradation-overlay" id="degradationOverlay"></div>
+
+    <!-- Cost Meter -->
+    <div class="cost-meter" id="costMeter">
+        <div class="cost-label">MONTHLY OPEX</div>
+        <div class="cost-value" id="costValue">$50K</div>
+        <div class="cost-chart" id="costChart"></div>
+    </div>
+
+    <!-- Technical Debt -->
+    <div class="debt-indicator" id="debtIndicator">
+        <div class="debt-label">TECHNICAL DEBT</div>
+        <div class="debt-level" id="debtLevel">0%</div>
+        <div class="debt-items" id="debtItems"></div>
+    </div>
+
+    <!-- Metrics Dashboard Overlay -->
+    <div class="metrics-overlay" id="metricsOverlay">
+        <div class="metrics-title-overlay">REAL-TIME ENTERPRISE METRICS</div>
+        <div class="metrics-grid-overlay">
+            <div class="metric-card-overlay">
+                <div class="metric-label-overlay">Failed Deployments</div>
+                <div class="metric-value-overlay" id="metricFailures">0</div>
+                <div class="metric-change-overlay" style="color: #22c55e;">
+                    <span id="failuresChange">+0%</span>
+                </div>
+                <div class="metric-bar-overlay">
+                    <div class="metric-bar-fill-overlay" id="failuresBar" style="background: #ef4444;"></div>
+                </div>
+            </div>
+
+            <div class="metric-card-overlay">
+                <div class="metric-label-overlay">Security Incidents</div>
+                <div class="metric-value-overlay" id="metricSecurity">0</div>
+                <div class="metric-change-overlay" style="color: #22c55e;">
+                    <span id="securityChange">+0%</span>
+                </div>
+                <div class="metric-bar-overlay">
+                    <div class="metric-bar-fill-overlay" id="securityBar" style="background: #f97316;"></div>
+                </div>
+            </div>
+
+            <div class="metric-card-overlay">
+                <div class="metric-label-overlay">Mean Time to Recovery</div>
+                <div class="metric-value-overlay" id="metricMTTR" style="font-size: 20px;">5m</div>
+                <div class="metric-change-overlay" style="color: #22c55e;">
+                    <span id="mttrChange">+0%</span>
+                </div>
+                <div class="metric-bar-overlay">
+                    <div class="metric-bar-fill-overlay" id="mttrBar" style="background: #eab308;"></div>
+                </div>
+            </div>
+
+            <div class="metric-card-overlay">
+                <div class="metric-label-overlay">Team Burnout</div>
+                <div class="metric-value-overlay" id="metricBurnout">12%</div>
+                <div class="metric-change-overlay" style="color: #22c55e;">
+                    <span id="burnoutChange">+0%</span>
+                </div>
+                <div class="metric-bar-overlay">
+                    <div class="metric-bar-fill-overlay" id="burnoutBar" style="background: #a855f7;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Storm -->
+    <div class="alert-storm" id="alertStorm"></div>
+
+    <!-- Incident Feed Overlay -->
+    <div class="incident-overlay" id="incidentOverlay">
+        <div class="incident-feed-title">
+            <span>🚨 INCIDENT TIMELINE</span>
+            <span style="font-size: 11px; color: #64748b;">Live Feed</span>
+        </div>
+        <div id="incidentList"></div>
+    </div>
+
+    <div class="container">
+        <div class="page" id="mainPage">
+            <!-- Story Header -->
+            <div class="story-header">
+                <div class="story-title">ENTERPRISE REALITY</div>
+                <div class="story-subtitle">From Complex Setup to Complete Degradation</div>
+                <div class="current-phase" id="currentPhase">Current Setup: See the Complexity</div>
+            </div>
+
+            <!-- === ENTERPRISE SETUP DIAGRAM === -->
+            <div class="header">
+                <div class="header-label">OPS BLOCKERS</div>
+                <div class="human-factors">
+                    <div class="factor">
+                        <h2>PROCESS</h2>
+                        <p>Human Approvals &<br>validation process</p>
+                    </div>
+                    <div class="factor">
+                        <h2>SECURITY</h2>
+                        <p>Security Reviews &<br>Compliance gates</p>
+                    </div>
+                    <div class="factor">
+                        <h2>CHANGE MGMT</h2>
+                        <p>Change Advisory Board<br>& Approvals</p>
+                    </div>
+                </div>
+                <div class="header-label">SLOW DELIVERY</div>
+            </div>
+
+            <!-- Zones Row -->
+            <div class="zones-row" id="zonesRow">
+                <!-- Config Push -->
+                <div class="zone" style="--zone-color: #ec4899;" id="zone-config">
+                    <div class="migration-badge">MIGRATION FAILED</div>
+                    <div class="zone-title">Config Push</div>
+                    <div class="zone-tech">
+                        YAML<br>
+                        JSON<br>
+                        Python<br>
+                        API + AI
+                    </div>
+                    <div class="zone-health" id="health-config">HEALTHY</div>
+                    <div class="zone-issues">
+                        <div class="zone-issues-title">Challenges</div>
+                        <div class="zone-issues-text">No standards, inconsistent outputs, challenge to track & rollback</div>
+                    </div>
+                </div>
+
+                <!-- Kubernetes -->
+                <div class="zone" style="--zone-color: #3b82f6;" id="zone-k8s">
+                    <div class="migration-badge">MIGRATION FAILED</div>
+                    <div class="zone-title">Kubernetes</div>
+                    <div class="zone-tech">
+                        Containers<br>
+                        Microservices<br>
+                        GitOps
+                    </div>
+                    <div class="zone-health" id="health-k8s">HEALTHY</div>
+                    <div class="zone-issues">
+                        <div class="zone-issues-title">Challenges</div>
+                        <div class="zone-issues-text">Partial GitOps, old CRDs, not up-to-date, no DB in K8s</div>
+                    </div>
+                </div>
+
+                <!-- VM/Legacy -->
+                <div class="zone" style="--zone-color: #f97316;" id="zone-vm">
+                    <div class="migration-badge">MIGRATION FAILED</div>
+                    <div class="zone-title">VM / Legacy</div>
+                    <div class="zone-tech">
+                        Deprecated DBs<br>
+                        Old Systems<br>
+                        EOL Services
+                    </div>
+                    <div class="zone-health" id="health-vm">HEALTHY</div>
+                    <div class="zone-issues">
+                        <div class="zone-issues-title">Challenges</div>
+                        <div class="zone-issues-text">EOL in production, lots of migration plans in roadmap</div>
+                    </div>
+                </div>
+
+                <!-- AWS Managed -->
+                <div class="zone" style="--zone-color: #eab308;" id="zone-aws">
+                    <div class="migration-badge">MIGRATION FAILED</div>
+                    <div class="zone-title">AWS Managed</div>
+                    <div class="zone-tech">
+                        RDS<br>
+                        Aurora<br>
+                        S3, Lambda
+                    </div>
+                    <div class="zone-health" id="health-aws">HEALTHY</div>
+                    <div class="zone-issues">
+                        <div class="zone-issues-title">Challenges</div>
+                        <div class="zone-issues-text">Vendor lock-in by design, no cloud agnostic, no portability</div>
+                    </div>
+                </div>
+
+                <!-- External Systems -->
+                <div class="zone" style="--zone-color: #8b5cf6;" id="zone-external">
+                    <div class="migration-badge">MIGRATION FAILED</div>
+                    <div class="zone-title">External</div>
+                    <div class="zone-tech">
+                        Identity<br>
+                        Secrets<br>
+                        Monitoring
+                    </div>
+                    <div class="zone-health" id="health-external">HEALTHY</div>
+                    <div class="zone-issues">
+                        <div class="zone-issues-title">Challenges</div>
+                        <div class="zone-issues-text">Split policies, fragmented RBAC & policies</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Connections -->
+            <div class="connections-section">
+                <div class="connections-title">CROSS-PLATFORM COMMUNICATION BREAKS EVERYTHING</div>
+                <div class="connection-grid">
+                    <div class="connection-item">
+                        <span class="connection-path">K8s ⟷ VM</span>
+                        <span class="arrow-divider">→</span>
+                        <span class="connection-impact">Breaks: IAC (Terraform), GitOps, Declarative yaml</span>
+                    </div>
+                    <div class="connection-item">
+                        <span class="connection-path">K8s ⟷ AWS</span>
+                        <span class="arrow-divider">→</span>
+                        <span class="connection-impact">Breaks: Automation, creates lock-in, security overhead</span>
+                    </div>
+                    <div class="connection-item">
+                        <span class="connection-path">VM ⟷ AWS</span>
+                        <span class="arrow-divider">→</span>
+                        <span class="connection-impact">Breaks: Security, observability split</span>
+                    </div>
+                    <div class="connection-item">
+                        <span class="connection-path">ALL ⟷ External</span>
+                        <span class="arrow-divider">→</span>
+                        <span class="connection-impact">Breaks: Unified RBAC, policies</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pain Summary -->
+            <div class="pain-summary">
+                <div class="pain-summary-title">Enterprise Pain Points Summary</div>
+                <div class="pain-grid">
+                    <div class="pain-item">
+                        <div class="pain-category">Architecture</div>
+                        <div class="pain-desc">Vendor lock-in by design, fragmented stacks</div>
+                    </div>
+                    <div class="pain-item">
+                        <div class="pain-category">Operations</div>
+                        <div class="pain-desc">Broken automation, high costs</div>
+                    </div>
+                    <div class="pain-item">
+                        <div class="pain-category">Security</div>
+                        <div class="pain-desc">Weakened posture due to fragmentation</div>
+                    </div>
+                    <div class="pain-item">
+                        <div class="pain-category">Agility</div>
+                        <div class="pain-desc">Unable to adapt at business speed</div>
+                    </div>
+                    <div class="pain-item">
+                        <div class="pain-category">Visibility</div>
+                        <div class="pain-desc">No unified 360° view of the stack</div>
+                    </div>
+                    <div class="pain-item">
+                        <div class="pain-category">Control</div>
+                        <div class="pain-desc">No stack-level governance layer</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timeline Control -->
+    <div class="timeline-control">
+        <div class="timeline-title">ENTERPRISE EVOLUTION TIMELINE</div>
+        <div class="timeline-labels">
+            <span>Year 1: Setup</span>
+            <span>Year 2: Growing Pains</span>
+            <span>Year 3: Fragmentation</span>
+            <span>Year 4: Crisis</span>
+            <span>Year 5: Chaos</span>
+        </div>
+        <div class="timeline-bar" id="timelineBar">
+            <div class="timeline-progress" id="timelineProgress">
+                <div class="timeline-marker"></div>
+            </div>
+        </div>
+        <div class="timeline-controls-buttons">
+            <button class="control-btn" id="playBtn">▶ Play</button>
+            <button class="control-btn pause" id="pauseBtn">⏸ Pause</button>
+            <button class="control-btn reset" id="resetBtn">↻ Reset</button>
+            <button class="control-btn" id="speedBtn">2x Speed</button>
+        </div>
+    </div>
+
+    <script>
+        // Animation Engine
+        class EnterpriseAnimation {
+            constructor() {
+                this.progress = 0;
+                this.isPlaying = false;
+                this.speed = 1;
+                this.maxProgress = 100;
+                this.incidents = [];
+                this.costHistory = [];
+                this.alertCount = 0;
+
+                this.phases = [
+                    { name: "Year 1: Current Setup", start: 0, end: 20, description: "See the complex enterprise architecture" },
+                    { name: "Year 2: Growing Pains", start: 20, end: 40, description: "Complexity introduces failures" },
+                    { name: "Year 3: Fragmentation", start: 40, end: 60, description: "Multiple platforms break automation" },
+                    { name: "Year 4: Crisis Mode", start: 60, end: 80, description: "Daily incidents, failed migrations" },
+                    { name: "Year 5: Complete Chaos", start: 80, end: 100, description: "System on life support, team exodus" }
+                ];
+
+                this.incidentDatabase = [
+                    // Year 1
+                    { time: 5, severity: "low", title: "Minor Config Drift", desc: "Manual YAML update in production", zone: "config" },
+                    { time: 12, severity: "low", title: "Pod Restart", desc: "Memory limit reached, auto-recovery successful", zone: "k8s" },
+
+                    // Year 2
+                    { time: 22, severity: "medium", title: "GitOps Sync Failed", desc: "ArgoCD out of sync, manual intervention required", zone: "k8s" },
+                    { time: 25, severity: "medium", title: "Database Connection Pool Exhausted", desc: "Legacy app not handling connections", zone: "vm" },
+                    { time: 28, severity: "low", title: "S3 Access Denied", desc: "IAM policy drift between environments", zone: "aws" },
+                    { time: 32, severity: "medium", title: "Secret Rotation Failed", desc: "Manual update missed in vault", zone: "external" },
+                    { time: 36, severity: "medium", title: "First Migration Failed", desc: "VM to K8s migration rolled back after 6 hours", zone: "vm" },
+
+                    // Year 3
+                    { time: 42, severity: "high", title: "RBAC Mismatch", desc: "K8s and AWS permissions out of sync", zone: "external" },
+                    { time: 45, severity: "high", title: "Observability Blind Spot", desc: "VM metrics not reaching monitoring", zone: "vm" },
+                    { time: 48, severity: "critical", title: "Data Breach - Unpatched DB", desc: "EOL PostgreSQL 9.6 compromised", zone: "vm" },
+                    { time: 51, severity: "high", title: "K8s CRD Version Conflict", desc: "Old operators breaking deployments", zone: "k8s" },
+                    { time: 54, severity: "medium", title: "Lambda Cold Start Cascade", desc: "API gateway timeouts", zone: "aws" },
+                    { time: 57, severity: "high", title: "Config Automation Broke Prod", desc: "AI-generated Terraform destroyed resources", zone: "config" },
+
+                    // Year 4
+                    { time: 62, severity: "critical", title: "Automation Breakdown", desc: "GitOps, Terraform conflicting", zone: "config" },
+                    { time: 64, severity: "critical", title: "Second Migration Failed", desc: "Database migration corrupted, 12hr rollback", zone: "aws" },
+                    { time: 66, severity: "high", title: "Multi-Zone Network Partition", desc: "K8s, VM, AWS unable to communicate", zone: "k8s" },
+                    { time: 68, severity: "critical", title: "Compliance Violation", desc: "147 untracked configuration changes", zone: "external" },
+                    { time: 70, severity: "high", title: "Vendor Lock-in Realized", desc: "AWS cost spike, no migration path", zone: "aws" },
+                    { time: 72, severity: "critical", title: "Alert Fatigue Incident", desc: "Critical alert missed in 2,847 notifications", zone: "external" },
+                    { time: 74, severity: "high", title: "Team Member Quit Mid-Incident", desc: "Senior SRE left during outage", zone: "vm" },
+                    { time: 76, severity: "critical", title: "Cascading Failure", desc: "Secret expiration triggered chain reaction", zone: "external" },
+
+                    // Year 5
+                    { time: 82, severity: "critical", title: "Production Data Loss", desc: "Backup system failed, 3 months gone", zone: "aws" },
+                    { time: 84, severity: "critical", title: "Deployment Freeze", desc: "Security blocked all deployments", zone: "external" },
+                    { time: 86, severity: "critical", title: "CISO Resignation", desc: "Unable to provide visibility", zone: "external" },
+                    { time: 88, severity: "critical", title: "Business Revenue Impact", desc: "$2.4M lost in downtime", zone: "k8s" },
+                    { time: 90, severity: "critical", title: "Third Migration Abandoned", desc: "Project cancelled", zone: "vm" },
+                    { time: 92, severity: "critical", title: "Regulatory Fine", desc: "$500K penalty for compliance failures", zone: "external" },
+                    { time: 94, severity: "critical", title: "Team Burnout", desc: "70% turnover in 6 months", zone: "config" },
+                    { time: 96, severity: "critical", title: "Board Demands Answers", desc: "CTO on performance review", zone: "config" },
+                ];
+
+                this.init();
+            }
+
+            init() {
+                document.getElementById('playBtn').addEventListener('click', () => this.play());
+                document.getElementById('pauseBtn').addEventListener('click', () => this.pause());
+                document.getElementById('resetBtn').addEventListener('click', () => this.reset());
+                document.getElementById('speedBtn').addEventListener('click', () => this.toggleSpeed());
+                document.getElementById('timelineBar').addEventListener('click', (e) => this.seek(e));
+
+                // Initialize cost chart bars
+                for (let i = 0; i < 40; i++) {
+                    const bar = document.createElement('div');
+                    bar.className = 'cost-bar';
+                    bar.style.left = `${i * 2.5}%`;
+                    bar.style.height = '10%';
+                    document.getElementById('costChart').appendChild(bar);
+                }
+
+                this.play();
+            }
+
+            play() {
+                this.isPlaying = true;
+                this.animate();
+            }
+
+            pause() {
+                this.isPlaying = false;
+            }
+
+            reset() {
+                this.progress = 0;
+                this.incidents = [];
+                this.costHistory = [];
+                this.alertCount = 0;
+                document.getElementById('incidentList').innerHTML = '';
+                document.getElementById('alertStorm').innerHTML = '';
+
+                // Hide overlays
+                document.getElementById('degradationOverlay').classList.remove('active');
+                document.getElementById('metricsOverlay').classList.remove('visible');
+                document.getElementById('costMeter').classList.remove('visible');
+                document.getElementById('debtIndicator').classList.remove('visible');
+                document.getElementById('incidentOverlay').classList.remove('visible');
+
+                // Reset page background
+                document.getElementById('mainPage').style.background = '#fff';
+
+                // Hide all migration badges and breach indicators
+                document.querySelectorAll('.migration-badge').forEach(el => el.classList.remove('show'));
+                document.querySelectorAll('.breach-indicator').forEach(el => el.remove());
+
+                this.updateUI();
+                this.play();
+            }
+
+            toggleSpeed() {
+                this.speed = this.speed === 1 ? 2 : this.speed === 2 ? 4 : 1;
+                document.getElementById('speedBtn').textContent = `${this.speed}x Speed`;
+            }
+
+            seek(e) {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const percent = (x / rect.width) * 100;
+                this.progress = Math.max(0, Math.min(100, percent));
+                this.updateUI();
+            }
+
+            animate() {
+                if (!this.isPlaying) return;
+
+                this.progress += 0.04 * this.speed;
+
+                if (this.progress >= this.maxProgress) {
+                    this.progress = this.maxProgress;
+                    this.isPlaying = false;
+                }
+
+                this.updateUI();
+                this.checkIncidents();
+                this.updateMetrics();
+                this.updateZoneHealth();
+                this.updateCostAndDebt();
+                this.updateOverlays();
+                this.updatePageBackground();
+
+                if (this.isPlaying) {
+                    requestAnimationFrame(() => this.animate());
+                }
+            }
+
+            updateUI() {
+                document.getElementById('timelineProgress').style.width = `${this.progress}%`;
+
+                const currentPhase = this.phases.find(p => this.progress >= p.start && this.progress <= p.end);
+                if (currentPhase) {
+                    document.getElementById('currentPhase').textContent = `${currentPhase.name}: ${currentPhase.description}`;
+                }
+            }
+
+            updateOverlays() {
+                // Show overlays after 15% progress
+                if (this.progress > 15) {
+                    document.getElementById('degradationOverlay').classList.add('active');
+                    document.getElementById('metricsOverlay').classList.add('visible');
+                    document.getElementById('costMeter').classList.add('visible');
+                    document.getElementById('debtIndicator').classList.add('visible');
+                    document.getElementById('incidentOverlay').classList.add('visible');
+                }
+            }
+
+            updatePageBackground() {
+                const page = document.getElementById('mainPage');
+                if (this.progress < 20) {
+                    page.style.background = '#fff';
+                } else if (this.progress < 40) {
+                    page.style.background = 'linear-gradient(135deg, #fff 0%, #fef3c7 100%)';
+                } else if (this.progress < 60) {
+                    page.style.background = 'linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%)';
+                } else if (this.progress < 80) {
+                    page.style.background = 'linear-gradient(135deg, #fed7aa 0%, #fecaca 100%)';
+                } else {
+                    page.style.background = 'linear-gradient(135deg, #fecaca 0%, #fca5a5 100%)';
+                }
+            }
+
+            checkIncidents() {
+                this.incidentDatabase.forEach(incident => {
+                    if (incident.time <= this.progress && !this.incidents.includes(incident.time)) {
+                        this.incidents.push(incident.time);
+                        this.addIncident(incident);
+
+                        if (incident.severity === 'high' || incident.severity === 'critical') {
+                            this.addAlert(incident);
+                        }
+
+                        if (incident.desc.includes('migration') || incident.desc.includes('Migration')) {
+                            const zone = document.getElementById(`zone-${incident.zone}`);
+                            if (zone) {
+                                zone.querySelector('.migration-badge').classList.add('show');
+                            }
+                        }
+
+                        if (incident.severity === 'critical') {
+                            this.triggerFailureCascade();
+                        }
+                    }
+                });
+            }
+
+            addIncident(incident) {
+                const severityColors = {
+                    low: '#22c55e',
+                    medium: '#eab308',
+                    high: '#f97316',
+                    critical: '#ef4444'
+                };
+
+                const severityBg = {
+                    low: 'rgba(34, 197, 94, 0.2)',
+                    medium: 'rgba(234, 179, 8, 0.2)',
+                    high: 'rgba(249, 115, 22, 0.2)',
+                    critical: 'rgba(239, 68, 68, 0.2)'
+                };
+
+                const item = document.createElement('div');
+                item.className = 'incident-item';
+                item.style.setProperty('--incident-color', severityColors[incident.severity]);
+                item.style.setProperty('--incident-bg', severityBg[incident.severity]);
+
+                item.innerHTML = `
+                    <div class="incident-header">
+                        <div class="incident-title">${incident.title}</div>
+                        <div class="incident-severity">${incident.severity.toUpperCase()}</div>
+                    </div>
+                    <div class="incident-desc">${incident.desc}</div>
+                    <div class="incident-time">Year ${Math.floor(this.progress / 20) + 1} | Zone: ${incident.zone.toUpperCase()}</div>
+                `;
+
+                const list = document.getElementById('incidentList');
+                list.insertBefore(item, list.firstChild);
+            }
+
+            addAlert(incident) {
+                this.alertCount++;
+
+                if (this.alertCount > 15) {
+                    const alerts = document.querySelectorAll('.alert-item');
+                    if (alerts.length > 10) {
+                        alerts[alerts.length - 1].remove();
+                    }
+                }
+
+                const alert = document.createElement('div');
+                alert.className = 'alert-item';
+                alert.innerHTML = `
+                    <div class="alert-header">🚨 ${incident.severity.toUpperCase()} ALERT</div>
+                    <div class="alert-body">${incident.title}</div>
+                `;
+
+                document.getElementById('alertStorm').insertBefore(alert, document.getElementById('alertStorm').firstChild);
+
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 300);
+                }, 5000);
+            }
+
+            triggerFailureCascade() {
+                const cascade = document.getElementById('failureCascade');
+                cascade.classList.add('active');
+                setTimeout(() => cascade.classList.remove('active'), 2000);
+            }
+
+            updateMetrics() {
+                const failures = Math.floor(this.progress * 8);
+                document.getElementById('metricFailures').textContent = failures;
+                document.getElementById('failuresChange').textContent = `+${Math.floor(this.progress * 15)}%`;
+                document.getElementById('failuresBar').style.width = `${Math.min(100, this.progress)}%`;
+
+                const security = Math.floor(this.progress * 3);
+                document.getElementById('metricSecurity').textContent = security;
+                document.getElementById('securityChange').textContent = `+${Math.floor(this.progress * 12)}%`;
+                document.getElementById('securityBar').style.width = `${Math.min(100, this.progress * 0.8)}%`;
+
+                const mttrMinutes = Math.floor(5 + (this.progress * 5));
+                const mttrHours = Math.floor(mttrMinutes / 60);
+                const mttrDisplay = mttrHours > 0 ? `${mttrHours}h ${mttrMinutes % 60}m` : `${mttrMinutes}m`;
+                document.getElementById('metricMTTR').textContent = mttrDisplay;
+                document.getElementById('mttrChange').textContent = `+${Math.floor(this.progress * 20)}%`;
+                document.getElementById('mttrBar').style.width = `${Math.min(100, this.progress * 1.2)}%`;
+
+                const burnout = Math.floor(12 + (this.progress * 0.88));
+                document.getElementById('metricBurnout').textContent = `${burnout}%`;
+                document.getElementById('burnoutChange').textContent = `+${Math.floor(this.progress * 8)}%`;
+                document.getElementById('burnoutBar').style.width = `${Math.min(100, burnout)}%`;
+
+                if (this.progress > 40) {
+                    document.getElementById('failuresChange').style.color = '#ef4444';
+                    document.getElementById('securityChange').style.color = '#f97316';
+                    document.getElementById('mttrChange').style.color = '#eab308';
+                }
+                if (this.progress > 60) {
+                    document.getElementById('burnoutChange').style.color = '#ef4444';
+                }
+            }
+
+            updateZoneHealth() {
+                const zones = ['config', 'k8s', 'vm', 'aws', 'external'];
+
+                zones.forEach(zone => {
+                    const healthEl = document.getElementById(`health-${zone}`);
+                    const zoneEl = document.getElementById(`zone-${zone}`);
+
+                    if (this.progress < 20) {
+                        healthEl.textContent = 'HEALTHY';
+                        healthEl.style.background = 'rgba(34, 197, 94, 0.2)';
+                        healthEl.style.color = '#22c55e';
+                    } else if (this.progress < 40) {
+                        healthEl.textContent = 'DEGRADED';
+                        healthEl.style.background = 'rgba(234, 179, 8, 0.2)';
+                        healthEl.style.color = '#eab308';
+                    } else if (this.progress < 60) {
+                        healthEl.textContent = 'WARNING';
+                        healthEl.style.background = 'rgba(249, 115, 22, 0.2)';
+                        healthEl.style.color = '#f97316';
+                    } else if (this.progress < 80) {
+                        healthEl.textContent = 'CRITICAL';
+                        healthEl.style.background = 'rgba(239, 68, 68, 0.2)';
+                        healthEl.style.color = '#ef4444';
+
+                        if (!zoneEl.querySelector('.breach-indicator')) {
+                            const breach = document.createElement('div');
+                            breach.className = 'breach-indicator';
+                            zoneEl.appendChild(breach);
+                        }
+                    } else {
+                        healthEl.textContent = 'FAILED';
+                        healthEl.style.background = 'rgba(220, 38, 38, 0.2)';
+                        healthEl.style.color = '#dc2626';
+                    }
+                });
+            }
+
+            updateCostAndDebt() {
+                const baseCost = 50000;
+                const costMultiplier = 1 + (this.progress / 100) * 4;
+                const currentCost = Math.floor(baseCost * costMultiplier);
+
+                document.getElementById('costValue').textContent = `$${(currentCost / 1000).toFixed(0)}K`;
+
+                this.costHistory.push(currentCost);
+                if (this.costHistory.length > 40) this.costHistory.shift();
+
+                const bars = document.querySelectorAll('.cost-bar');
+                const maxCost = Math.max(...this.costHistory);
+
+                this.costHistory.forEach((cost, i) => {
+                    if (bars[i]) {
+                        const height = (cost / maxCost) * 100;
+                        bars[i].style.height = `${height}%`;
+                    }
+                });
+
+                const debtLevel = Math.floor(this.progress);
+                document.getElementById('debtLevel').textContent = `${debtLevel}%`;
+
+                const debtItemsEl = document.getElementById('debtItems');
+                const debtTypes = [
+                    { name: 'Deprecated Systems', value: Math.floor(this.progress * 0.5) },
+                    { name: 'Failed Migrations', value: Math.floor(this.progress * 0.3) },
+                    { name: 'Security Gaps', value: Math.floor(this.progress * 0.8) },
+                    { name: 'Config Drift', value: Math.floor(this.progress * 1.2) },
+                    { name: 'Knowledge Loss', value: Math.floor(this.progress * 0.6) }
+                ];
+
+                debtItemsEl.innerHTML = debtTypes.map(item =>
+                    `<div class="debt-item">
+                        <span>${item.name}</span>
+                        <span>${item.value}</span>
+                    </div>`
+                ).join('');
+            }
+        }
+
+        const animation = new EnterpriseAnimation();
+    </script>
+</body>
+</html>

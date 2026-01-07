@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Source Code Integration Options</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #ffffff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 18px;
+            color: #24292f;
+            font-weight: 600;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #d0d7de;
+            padding-bottom: 10px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .option-card {
+            background: #ffffff;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .option-card.recommended {
+            border-color: #1a7f37;
+            border-width: 2px;
+        }
+
+        .recommended-badge {
+            position: absolute;
+            top: -10px;
+            right: 15px;
+            background: #1a7f37;
+            color: #ffffff;
+            padding: 4px 10px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .option-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #24292f;
+            margin-bottom: 5px;
+        }
+
+        .option-tagline {
+            font-size: 12px;
+            color: #57606a;
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .features {
+            background: #f6f8fa;
+            border: 1px solid #d0d7de;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .features ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .features li {
+            padding: 4px 0;
+            padding-left: 18px;
+            position: relative;
+            color: #24292f;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .features li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #57606a;
+        }
+
+        .best-for {
+            border-left: 3px solid #0969da;
+            padding: 8px 12px;
+            background: #f6f8fa;
+        }
+
+        .best-for strong {
+            display: block;
+            font-size: 10px;
+            color: #0969da;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .best-for p {
+            font-size: 11px;
+            color: #24292f;
+            line-height: 1.4;
+        }
+
+        .complexity {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            color: #57606a;
+            margin-bottom: 12px;
+        }
+
+        .complexity-bars {
+            display: flex;
+            gap: 3px;
+        }
+
+        .bar {
+            width: 6px;
+            height: 12px;
+            border-radius: 2px;
+            background: #d0d7de;
+        }
+
+        .bar.filled {
+            background: #24292f;
+        }
+
+        /* Comparison Table */
+        .comparison {
+            background: #ffffff;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            padding: 15px;
+        }
+
+        .comparison h2 {
+            font-size: 14px;
+            color: #24292f;
+            margin-bottom: 12px;
+            font-weight: 600;
+            border-bottom: 1px solid #d0d7de;
+            padding-bottom: 8px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #d0d7de;
+        }
+
+        .comparison-table th {
+            background: #f6f8fa;
+            color: #24292f;
+            font-weight: 600;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        .comparison-table td {
+            color: #24292f;
+        }
+
+        .comparison-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .check {
+            color: #1a7f37;
+        }
+
+        .cross {
+            color: #cf222e;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Source Code Integration Options</h1>
+
+        <div class="options-grid">
+            <!-- Option 1 -->
+            <div class="option-card recommended">
+                <div class="recommended-badge">Recommended</div>
+                <h3 class="option-title">External Source Code</h3>
+                <p class="option-tagline">external_source_code + Kaniko</p>
+
+                <div class="complexity">
+                    <span>Complexity:</span>
+                    <div class="complexity-bars">
+                        <div class="bar filled"></div>
+                        <div class="bar filled"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                    </div>
+                </div>
+
+                <div class="features">
+                    <ul>
+                        <li>In-cluster Kaniko builds</li>
+                        <li>GitOps workflow integration</li>
+                        <li>Automatic secret injection</li>
+                        <li>Build triggers on push</li>
+                    </ul>
+                </div>
+
+                <div class="best-for">
+                    <strong>Best For</strong>
+                    <p>Teams with Git repos + Dockerfile, want full CI/CD automation</p>
+                </div>
+            </div>
+
+            <!-- Option 2 -->
+            <div class="option-card">
+                <h3 class="option-title">Pre-Built Images</h3>
+                <p class="option-tagline">image_base</p>
+
+                <div class="complexity">
+                    <span>Complexity:</span>
+                    <div class="complexity-bars">
+                        <div class="bar filled"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                    </div>
+                </div>
+
+                <div class="features">
+                    <ul>
+                        <li>Use existing CI pipeline</li>
+                        <li>Deployment automation only</li>
+                        <li>ConfigMaps & Secrets mgmt</li>
+                        <li>Auto-scaling configuration</li>
+                    </ul>
+                </div>
+
+                <div class="best-for">
+                    <strong>Best For</strong>
+                    <p>Existing CI/CD pipeline, need deployment + operations only</p>
+                </div>
+            </div>
+
+            <!-- Option 3 -->
+            <div class="option-card">
+                <h3 class="option-title">Stacktic Templates</h3>
+                <p class="option-tagline">Pre-configured source</p>
+
+                <div class="complexity">
+                    <span>Complexity:</span>
+                    <div class="complexity-bars">
+                        <div class="bar filled"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                    </div>
+                </div>
+
+                <div class="features">
+                    <ul>
+                        <li>Production-ready templates</li>
+                        <li>API scaffolding included</li>
+                        <li>Database integrations ready</li>
+                        <li>Complete build + deploy</li>
+                    </ul>
+                </div>
+
+                <div class="best-for">
+                    <strong>Best For</strong>
+                    <p>New projects, opinionated starting point with zero setup</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison -->
+        <div class="comparison">
+            <h2>Feature Comparison</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>External Source</th>
+                        <th>Pre-Built Images</th>
+                        <th>Templates</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Automated Builds</td>
+                        <td><span class="check">✓</span> In-cluster Kaniko</td>
+                        <td><span class="cross">✗</span> Use your CI</td>
+                        <td><span class="check">✓</span> In-cluster Kaniko</td>
+                    </tr>
+                    <tr>
+                        <td>GitOps Workflow</td>
+                        <td><span class="check">✓</span> Full integration</td>
+                        <td><span class="check">✓</span> Deployment only</td>
+                        <td><span class="check">✓</span> Full integration</td>
+                    </tr>
+                    <tr>
+                        <td>Requires Dockerfile</td>
+                        <td><span class="check">✓</span> Yes</td>
+                        <td><span class="cross">✗</span> No</td>
+                        <td><span class="cross">✗</span> Included</td>
+                    </tr>
+                    <tr>
+                        <td>Keep Custom CI</td>
+                        <td><span class="cross">✗</span> Uses Stacktic</td>
+                        <td><span class="check">✓</span> Keep existing</td>
+                        <td><span class="cross">✗</span> Uses Stacktic</td>
+                    </tr>
+                    <tr>
+                        <td>Setup Time</td>
+                        <td>5-10 minutes</td>
+                        <td>2-5 minutes</td>
+                        <td>1-2 minutes</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

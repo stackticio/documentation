@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stacktic Workflow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #ffffff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 20px;
+            color: #0969da;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Workflow Steps */
+        .workflow {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .step {
+            background: #ffffff;
+            border: 2px solid #d0d7de;
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .step:hover {
+            border-color: #0969da;
+            box-shadow: 0 4px 12px rgba(9, 105, 218, 0.15);
+        }
+
+        .step::after {
+            content: "→";
+            position: absolute;
+            right: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 30px;
+            color: #0969da;
+            z-index: 1;
+        }
+
+        .step:last-child::after {
+            display: none;
+        }
+
+        .step-number {
+            position: absolute;
+            top: -12px;
+            left: 15px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #0969da;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .step-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #24292f;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+
+        .step-action {
+            font-size: 11px;
+            color: #0969da;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .step-details {
+            background: #f6f8fa;
+            border-radius: 6px;
+            padding: 12px;
+            flex: 1;
+        }
+
+        .step-details ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .step-details li {
+            padding: 5px 0;
+            padding-left: 18px;
+            position: relative;
+            color: #57606a;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .step-details li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #0969da;
+            font-weight: 700;
+        }
+
+        /* Output Section */
+        .output {
+            background: #f6f8fa;
+            border: 2px solid #0969da;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .output h2 {
+            font-size: 14px;
+            color: #0969da;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .output-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .output-item {
+            background: #ffffff;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #d0d7de;
+        }
+
+        .output-item strong {
+            display: block;
+            font-size: 11px;
+            color: #24292f;
+            margin-bottom: 4px;
+        }
+
+        .output-item span {
+            font-size: 10px;
+            color: #57606a;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .workflow {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .step::after {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>How Stacktic Works</h1>
+
+        <div class="workflow">
+            <!-- Step 1 -->
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3 class="step-title">Design</h3>
+                <p class="step-action">Topology Definition</p>
+                <div class="step-details">
+                    <ul>
+                        <li>Drag-drop components</li>
+                        <li>Define relationships</li>
+                        <li>Set properties</li>
+                        <li>Configure connections</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3 class="step-title">Build</h3>
+                <p class="step-action">Code Generation</p>
+                <div class="step-details">
+                    <ul>
+                        <li>K8s manifests</li>
+                        <li>Dependencies</li>
+                        <li>Policies</li>
+                        <li>Audit reports</li>
+                        <li>Ops config ready</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3 class="step-title">Deploy</h3>
+                <p class="step-action">kubectl apply</p>
+                <div class="step-details">
+                    <ul>
+                        <li>Git push to stacktic branch</li>
+                        <li>Review & merge to main</li>
+                        <li>Apply to cluster</li>
+                        <li>Services running</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="step">
+                <div class="step-number">4</div>
+                <h3 class="step-title">Automated Ops</h3>
+                <p class="step-action">Day 2 Operations</p>
+                <div class="step-details">
+                    <ul>
+                        <li>Versioning automation</li>
+                        <li>Full stack relation validation</li>
+                        <li>Security & compliant mgmt</li>
+                        <li>Daily ops (updates, rollback, envs)</li>
+                        <li>Knowledge sharing</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Output -->
+        <div class="output">
+            <h2>Automation Summary</h2>
+            <div class="output-grid">
+                <div class="output-item">
+                    <strong>Architecture Day 0</strong>
+                    <span>Topology, dependencies, planning</span>
+                </div>
+                <div class="output-item">
+                    <strong>Deployment Day 1</strong>
+                    <span>Manifests, configs, deployment</span>
+                </div>
+                <div class="output-item">
+                    <strong>Ops Day 2</strong>
+                    <span>Monitoring, scaling, operations</span>
+                </div>
+                <div class="output-item">
+                    <strong>Security Compliant</strong>
+                    <span>RBAC, policies, audit reports</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

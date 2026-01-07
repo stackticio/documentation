@@ -1,0 +1,2549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stacktic ROI Calculator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+      /* FIXED: Remove any potential overflow issues */
+      overflow-x: auto;
+      /* FIXED: Add margin for Wix embedding - shift content 2cm to right */
+      margin-left: 75px;
+      padding-right: 75px;
+    }
+
+    .header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 20px 0;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      /* FIXED: Ensure full width */
+      width: 100%;
+      /* FIXED: Compensate for body margin */
+      margin-left: -75px;
+      padding-left: 75px;
+      padding-right: 75px;
+    }
+
+    .header-content {
+      /* FIXED: Use standard max-width instead of viewport calc */
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      /* FIXED: Ensure it doesn't get cut off */
+      width: 100%;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: bold;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 15px;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #667eea;
+      border: 2px solid #667eea;
+    }
+
+    .btn-secondary:hover {
+      background: #667eea;
+      color: white;
+    }
+
+    .container {
+      /* FIXED: Use standard max-width with proper margins */
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 30px 20px;
+      /* FIXED: Ensure container doesn't get cut off */
+      width: 100%;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    .summary-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .summary-card h2 {
+      margin-bottom: 20px;
+      color: #333;
+      font-size: 24px;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .metric {
+      text-align: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #f8f9ff 0%, #e8f0ff 100%);
+      border-radius: 12px;
+      border: 1px solid #e0e8ff;
+    }
+
+    .metric-value {
+      font-size: 28px;
+      font-weight: bold;
+      color: #667eea;
+      margin-bottom: 8px;
+    }
+
+    .metric-label {
+      font-size: 14px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .section-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .section-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .table-wrapper {
+      /* FIXED: Better responsive table handling */
+      overflow-x: auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      /* FIXED: Ensure table doesn't get cut off */
+      width: 100%;
+      margin: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      table-layout: auto;
+      /* FIXED: Reduce minimum width for better Wix compatibility */
+      min-width: 1200px;
+    }
+
+    /* FIXED: More conservative column sizing for Wix */
+    th:nth-child(1), td:nth-child(1) { min-width: 120px; } /* Team */
+    th:nth-child(2), td:nth-child(2) { min-width: 80px; } /* Phase */
+    th:nth-child(3), td:nth-child(3) { min-width: 180px; } /* Process */
+    th:nth-child(4), td:nth-child(4) { min-width: 80px; } /* Services */
+    th:nth-child(5), td:nth-child(5) { min-width: 80px; } /* Hours */
+    th:nth-child(6), td:nth-child(6) { min-width: 80px; } /* $/Hour */
+    th:nth-child(7), td:nth-child(7) { min-width: 110px; } /* Static Support */
+    th:nth-child(8), td:nth-child(8) { min-width: 90px; } /* Frequency */
+    th:nth-child(9), td:nth-child(9) { min-width: 100px; } /* Description */
+    th:nth-child(10), td:nth-child(10) { min-width: 100px; } /* Total Cost */
+    th:nth-child(11), td:nth-child(11) { min-width: 80px; } /* Action */
+
+    .description-btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.3s ease;
+      min-width: 80px;
+    }
+
+    .description-btn:hover {
+      background: #5a6fd8;
+      transform: scale(1.05);
+    }
+
+    .description-bubble {
+      position: absolute;
+      background: #333;
+      color: white;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      max-width: 400px;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      display: none;
+      word-wrap: break-word;
+      line-height: 1.4;
+    }
+
+    .description-bubble:before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: 20px;
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 8px solid #333;
+    }
+
+    .description-bubble.show {
+      display: block;
+    }
+
+    th {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 15px 12px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 15px 12px;
+      border-bottom: 1px solid #f0f0f0;
+      vertical-align: middle;
+    }
+
+    tr:hover {
+      background-color: #f8f9ff;
+    }
+
+    .day2-row {
+      background-color: #e8f4fd !important;
+    }
+
+    .day2-row:hover {
+      background-color: #d1e7fc !important;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px 12px;
+      border: 2px solid #e0e8ff;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .inputs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+
+    .delete-btn {
+      background: #ff4757;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .delete-btn:hover {
+      background: #ff3838;
+      transform: scale(1.05);
+    }
+
+    .total-cell {
+      font-weight: bold;
+      color: #2ed573;
+    }
+
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .tooltip {
+      position: relative;
+      cursor: help;
+    }
+
+    .tooltip:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      white-space: nowrap;
+      z-index: 1000;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin-top: 20px;
+    }
+
+    .savings-highlight {
+      background: linear-gradient(135deg, #2ed573 0%, #17a2b8 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .roi-gauge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .gauge-value {
+      font-size: 48px;
+      font-weight: bold;
+      color: #2ed573;
+    }
+
+    /* FIXED: More conservative process column sizing */
+    .process-cell {
+      min-width: 120px;
+      max-width: 200px;
+      width: auto;
+    }
+
+    .process-cell input {
+      width: 100%;
+      min-width: 110px;
+      resize: horizontal;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* FIXED: Conservative description column sizing */
+    .description-cell {
+      min-width: 300px;
+      max-width: 400px;
+      width: auto;
+    }
+
+    .description-cell input {
+      width: 100%;
+      min-width: 290px;
+      height: auto;
+      min-height: 34px;
+      resize: both;
+      overflow: hidden;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .description-input {
+      min-height: 40px;
+      line-height: 1.4;
+      padding: 10px 12px;
+      min-width: 290px;
+      overflow: hidden;
+      resize: none;
+    }
+
+    /* FIXED: Conservative input sizing */
+    .process-input {
+      min-width: 150px;
+    }
+
+    .team-input {
+      min-width: 110px;
+    }
+
+    /* FIXED: Better mobile responsiveness for Wix */
+    @media (max-width: 768px) {
+      body {
+        margin-left: 20px;
+        padding-right: 20px;
+      }
+
+      .header {
+        margin-left: -20px;
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+      .container {
+        padding: 20px 10px;
+      }
+
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .metric-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .inputs-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .header-content {
+        flex-direction: column;
+        gap: 15px;
+        padding: 0 10px;
+      }
+
+      table {
+        font-size: 12px;
+        min-width: 800px; /* Reduced for mobile */
+      }
+
+      th, td {
+        padding: 8px 6px;
+      }
+
+      /* FIXED: Even smaller columns for mobile */
+      th:nth-child(1), td:nth-child(1) { min-width: 80px; }
+      th:nth-child(2), td:nth-child(2) { min-width: 60px; }
+      th:nth-child(3), td:nth-child(3) { min-width: 120px; }
+      th:nth-child(4), td:nth-child(4) { min-width: 60px; }
+      th:nth-child(5), td:nth-child(5) { min-width: 60px; }
+      th:nth-child(6), td:nth-child(6) { min-width: 60px; }
+      th:nth-child(7), td:nth-child(7) { min-width: 80px; }
+      th:nth-child(8), td:nth-child(8) { min-width: 70px; }
+      th:nth-child(9), td:nth-child(9) { min-width: 80px; }
+      th:nth-child(10), td:nth-child(10) { min-width: 80px; }
+      th:nth-child(11), td:nth-child(11) { min-width: 60px; }
+    }
+
+    .phase-badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .phase-day0 {
+      background: #ffeaa7;
+      color: #d63031;
+    }
+
+    .phase-day1 {
+      background: #a8e6cf;
+      color: #00b894;
+    }
+
+    .phase-day2 {
+      background: #81ecec;
+      color: #0984e3;
+    }
+
+    .instruction-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+    }
+
+    .instruction-card h3 {
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+
+    .instruction-card ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .instruction-card li {
+      margin-bottom: 12px;
+      padding-left: 20px;
+      position: relative;
+    }
+
+    .instruction-card li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #2ed573;
+      font-weight: bold;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e0e8ff;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      transition: width 0.5s ease;
+    }
+
+    .stacktic-cost-highlight {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    /* FIXED: Additional Wix-specific fixes */
+    html, body {
+      /* FIXED: Ensure no horizontal scroll issues */
+      overflow-x: auto;
+      width: 100%;
+    }
+
+    /* FIXED: Ensure all elements respect container boundaries */
+    * {
+      max-width: 100%;
+    }
+
+    /* NEW STICKY METRICS SIDEBAR STYLES */
+    .sticky-metrics {
+      position: fixed;
+      right: 20px;
+      top: 100px;
+      width: 280px;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      z-index: 90;
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+    }
+
+    .sticky-metrics h3 {
+      font-size: 18px;
+      margin-bottom: 20px;
+      color: #333;
+      text-align: center;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #e0e8ff;
+    }
+
+    .sticky-metric-item {
+      margin-bottom: 18px;
+      padding: 12px;
+      background: linear-gradient(135deg, #f8f9ff 0%, #e8f0ff 100%);
+      border-radius: 10px;
+      border: 1px solid #e0e8ff;
+    }
+
+    .sticky-metric-value {
+      font-size: 22px;
+      font-weight: bold;
+      color: #667eea;
+      margin-bottom: 4px;
+    }
+
+    .sticky-metric-label {
+      font-size: 12px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .sticky-roi-breakdown {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 2px solid #e0e8ff;
+    }
+
+    .sticky-roi-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      font-size: 13px;
+    }
+
+    .sticky-roi-label {
+      color: #666;
+      flex: 1;
+    }
+
+    .sticky-roi-value {
+      color: #333;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .sticky-roi-value.positive {
+      color: #2ed573;
+    }
+
+    .sticky-roi-value.negative {
+      color: #ff6b6b;
+    }
+
+    .sticky-total {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 2px solid #667eea;
+    }
+
+    .sticky-total .sticky-roi-item {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .sticky-total .sticky-roi-value {
+      color: #667eea;
+    }
+
+    /* Hide sticky metrics on smaller screens */
+    @media (max-width: 1400px) {
+      .sticky-metrics {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-content">
+      <div class="logo">Stacktic ROI Calculator</div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" onclick="exportResults()">📊 Export Report</button>
+        <button class="btn btn-primary" onclick="calculateResults()">🔄 Calculate ROI</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEW STICKY METRICS SIDEBAR -->
+  <div class="sticky-metrics" id="stickyMetrics">
+    <h3>📊 Live ROI Metrics</h3>
+    
+    <div class="sticky-metric-item">
+      <div class="sticky-metric-value" id="stickyTotalSavings">$0</div>
+      <div class="sticky-metric-label">Annual Net Profit</div>
+    </div>
+    
+    <div class="sticky-metric-item">
+      <div class="sticky-metric-value" id="stickyROI">0%</div>
+      <div class="sticky-metric-label">3-Year ROI</div>
+    </div>
+    
+    <div class="sticky-metric-item">
+      <div class="sticky-metric-value" id="stickyPayback">0</div>
+      <div class="sticky-metric-label">Payback (Months)</div>
+    </div>
+    
+    <div class="sticky-metric-item">
+      <div class="sticky-metric-value" id="stickyTimeToMarket">0</div>
+      <div class="sticky-metric-label">Days Saved</div>
+    </div>
+    
+    <div class="sticky-roi-breakdown">
+      <h4 style="font-size: 14px; margin-bottom: 12px; color: #333;">💰 Annual Breakdown</h4>
+      
+      <div class="sticky-roi-item">
+        <span class="sticky-roi-label">CAPEX Savings</span>
+        <span class="sticky-roi-value positive" id="stickyCapexSavings">$0</span>
+      </div>
+      
+      <div class="sticky-roi-item">
+        <span class="sticky-roi-label">Task Automation</span>
+        <span class="sticky-roi-value positive" id="stickyOpexSavings">$0</span>
+      </div>
+      
+      <div class="sticky-roi-item">
+        <span class="sticky-roi-label">Service Savings</span>
+        <span class="sticky-roi-value positive" id="stickyServiceSavings">$0</span>
+      </div>
+      
+      <div class="sticky-roi-item">
+        <span class="sticky-roi-label">Team Focus Value</span>
+        <span class="sticky-roi-value positive" id="stickyTeamValue">$0</span>
+      </div>
+      
+      <div class="sticky-roi-item">
+        <span class="sticky-roi-label">Revenue Growth</span>
+        <span class="sticky-roi-value positive" id="stickyRevenueBenefits">$0</span>
+      </div>
+      
+      <div class="sticky-roi-item">
+        <span class="sticky-roi-label">Stacktic Costs</span>
+        <span class="sticky-roi-value negative" id="stickyStackticCosts">$0</span>
+      </div>
+      
+      <div class="sticky-total">
+        <div class="sticky-roi-item">
+          <span class="sticky-roi-label">NET ANNUAL PROFIT</span>
+          <span class="sticky-roi-value" id="stickyNetProfit">$0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Instructions Section -->
+    <div class="instruction-card">
+      <h3>How It Works</h3>
+      <p style="margin-bottom: 20px;">This tool helps calculate ROI by estimating time-to-market improvements, cost savings, and revenue gains from implementing Stacktic.</p>
+      <ul>
+        <li><strong>Tasks:</strong> Pre-loaded with industry-standard DevOps tasks across Day 0 (Architecture), Day 1 (Infrastructure), and Day 2 (Operations)</li>
+        <li><strong>Static Support:</strong> Percentage of task automation provided by Stacktic (higher % = more savings)</li>
+        <li><strong>Cost Savings:</strong> Direct service replacement savings (40% typical for open source vs managed services)</li>
+        <li><strong>Real-time Updates:</strong> All calculations sync automatically as you make changes</li>
+      </ul>
+      <div class="progress-bar">
+        <div class="progress-fill" id="completionProgress" style="width: 60%"></div>
+      </div>
+    </div>
+
+    <!-- Dashboard Summary -->
+    <div class="dashboard-grid">
+      <div class="summary-card">
+        <h2>Financial Impact Summary</h2>
+        <div class="metric-grid">
+          <div class="metric">
+            <div class="metric-value" id="totalSavingsMetric">$0</div>
+            <div class="metric-label">Total Savings</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value" id="roiPercentageMetric">0%</div>
+            <div class="metric-label">ROI Percentage</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value" id="paybackPeriodMetric">0</div>
+            <div class="metric-label">Payback (Months)</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value" id="timeToMarketMetric">0</div>
+            <div class="metric-label">Days Saved</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <h2>ROI Breakdown</h2>
+        <div class="chart-container">
+          <canvas id="roiChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Additional Charts Section -->
+    <div class="dashboard-grid" style="margin-bottom: 30px;">
+      <div class="summary-card">
+        <h2>First Year Financial Impact</h2>
+        <div class="chart-container">
+          <canvas id="savingsProjectionChart"></canvas>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <h2>Annual Operating Costs Breakdown</h2>
+        <div class="chart-container">
+          <canvas id="costComparisonChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-grid" style="margin-bottom: 30px;">
+      <div class="summary-card">
+        <h2>Break-Even Analysis</h2>
+        <div class="chart-container">
+          <canvas id="roiProgressionChart"></canvas>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <h2>Engineering Hours by Phase</h2>
+        <div class="chart-container">
+          <canvas id="taskHoursSavedChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card" style="margin-bottom: 30px;">
+      <h2 class="section-title">Annual Benefits by Category</h2>
+      <div class="chart-container" style="height: 400px;">
+        <canvas id="savingsByCategoryChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Tasks Section -->
+    <div class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">Development & Operations Tasks</h2>
+        <button class="btn btn-primary" onclick="addTask()">+ Add Custom Task</button>
+      </div>
+      <div class="table-wrapper">
+        <table id="tasks-table">
+          <thead>
+            <tr>
+              <th>Team</th>
+              <th>Phase</th>
+              <th>Process</th>
+              <th>Services</th>
+              <th>Hours</th>
+              <th>$/Hour</th>
+              <th class="tooltip" data-tooltip="% of task automated by Stacktic">Static Support (%)</th>
+              <th class="tooltip" data-tooltip="How often this task repeats">Frequency</th>
+              <th>Description</th>
+              <th>Total Cost</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Tasks will be dynamically added here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Cost Savings Section -->
+    <div class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">Managed Service Cost Savings</h2>
+        <button class="btn btn-primary" onclick="addSaving()">+ Add Service Saving</button>
+      </div>
+      <div class="savings-highlight">
+        <h3>💰 Typical savings: 40% by replacing managed services with open source alternatives</h3>
+        <p style="margin-top: 10px; opacity: 0.9;">Replace expensive cloud services with cost-effective open source solutions</p>
+      </div>
+      <div class="table-wrapper">
+        <table id="savings-table">
+          <thead>
+            <tr>
+              <th>Service Name</th>
+              <th>Category</th>
+              <th>Annual Cost</th>
+              <th>Stacktic Alternative</th>
+              <th>Savings %</th>
+              <th>Annual Savings</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Cost savings rows will be dynamically added here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Team Optimization Section -->
+    <div class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">Team Efficiency & Strategic Focus</h2>
+        <button class="btn btn-primary" onclick="addTeamOptimization()">+ Add Team Focus Area</button>
+      </div>
+      <div class="savings-highlight" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <h3>🎯 Teams can focus on high-value strategic work when automation handles routine tasks</h3>
+        <p style="margin-top: 10px; opacity: 0.9;">Stacktic automates operational overhead, enabling teams to focus on innovation, architecture, and business growth</p>
+      </div>
+      <div class="table-wrapper">
+        <table id="team-table">
+          <thead>
+            <tr>
+              <th>Team/Role</th>
+              <th>Team Size</th>
+              <th>Average Salary</th>
+              <th>Total Annual Cost</th>
+              <th>Strategic Focus %</th>
+              <th>Strategic Value Created</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Team optimization rows will be dynamically added here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Configuration Inputs -->
+    <div class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">Configuration & Business Parameters</h2>
+      </div>
+      <div class="inputs-grid">
+        <!-- Revenue Improvements Section -->
+        <div>
+          <h3 style="margin-bottom: 20px; color: #667eea;">Revenue Improvements & Efficiency Gains (%)</h3>
+          <div class="input-group">
+            <label class="tooltip" data-tooltip="Revenue increase from faster feature delivery">Revenue from New Features/Apps</label>
+            <input type="number" id="revenue-features" value="2" oninput="debouncedCalculate()">
+          </div>
+          <div class="input-group">
+            <label class="tooltip" data-tooltip="Productivity gains from automation">Developer Efficiency Gains</label>
+            <input type="number" id="dev-efficiency" value="1" oninput="debouncedCalculate()">
+          </div>
+          <div class="input-group">
+            <label class="tooltip" data-tooltip="Cost savings from reduced errors">Error Rate Reduction</label>
+            <input type="number" id="error-reduction" value="2" oninput="debouncedCalculate()">
+          </div>
+          <div class="input-group">
+            <label class="tooltip" data-tooltip="Value from better compliance and risk management">Compliance & Risk Mitigation</label>
+            <input type="number" id="compliance-efficiency" value="3" oninput="debouncedCalculate()">
+          </div>
+          <div class="input-group">
+            <label class="tooltip" data-tooltip="Benefits like vendor lock-in reduction">Technology Gains</label>
+            <input type="number" id="tech-gain" value="3" oninput="debouncedCalculate()">
+          </div>
+        </div>
+
+        <!-- Business Parameters Section -->
+        <div>
+          <h3 style="margin-bottom: 20px; color: #667eea;">Business Parameters</h3>
+          <div class="input-group">
+            <label>Number of New Applications</label>
+            <input type="number" id="num-new-apps" value="2" oninput="debouncedCalculate()">
+          </div>
+          <div class="input-group">
+            <label>Number of Existing Applications</label>
+            <input type="number" id="num-existing-apps" value="2" oninput="debouncedCalculate()">
+          </div>
+          <div class="input-group">
+            <label>Current Time to Market (Days)</label>
+            <input type="number" id="time-to-market" value="60" oninput="debouncedCalculate()">
+            <span id="recommended-time" style="font-size: 12px; color: #666;">(Estimated: -- Days)</span>
+          </div>
+          <div class="input-group">
+            <label class="tooltip" data-tooltip="Overhead factor for coordination and complexity">Coordination Efficiency Factor (>% = faster delivery)</label>
+            <input type="number" id="coordination-factor" value="100" oninput="debouncedCalculate()">
+          </div>
+          <div class="input-group">
+            <label class="tooltip" data-tooltip="Daily revenue impact from delayed delivery">Revenue Lost Per Day</label>
+            <input type="number" id="revenue-lost" value="1000" oninput="debouncedCalculate()">
+          </div>
+          <div class="input-group">
+            <label class="tooltip" data-tooltip="One-time cost to migrate to Stacktic">Migration Cost to Stacktic </label>
+            <input type="number" id="cost-migrate" value="25000" oninput="debouncedCalculate()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Stacktic Costs Section -->
+      <div style="margin-top: 30px;">
+        <div class="stacktic-cost-highlight">
+          <h3>💸 Stacktic Investment Costs</h3>
+          <p style="margin-top: 10px; opacity: 0.9;">Monthly subscription and engineer time allocation</p>
+        </div>
+        
+        <div class="inputs-grid">
+          <div>
+            <div class="input-group">
+              <label class="tooltip" data-tooltip="Monthly Stacktic subscription cost">Stacktic Price (Monthly)</label>
+              <input type="number" id="stacktic-price" value="8000" oninput="debouncedCalculate()">
+            </div>
+          </div>
+          
+          <div>
+            <div class="input-group">
+              <label class="tooltip" data-tooltip="Number of engineers working with Stacktic">Number of Engineers on Stacktic</label>
+              <input type="number" id="num-engineers" value="1" min="0.1" step="0.1" oninput="debouncedCalculate()">
+            </div>
+            <div class="input-group">
+              <label class="tooltip" data-tooltip="Percentage of their time spent on Stacktic (e.g., 80%)">Engineer Time Allocation (%)</label>
+              <input type="number" id="engineer-time-percentage" value="60" min="1" max="100" oninput="debouncedCalculate()">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="section-card" id="results">
+      <h2 class="section-title">Detailed ROI Analysis</h2>
+      <div id="results-content">
+        <!-- Results will be displayed dynamically -->
+      </div>
+      
+      <!-- CAPEX vs OPEX Breakdown -->
+      <div id="capex-opex-breakdown" style="margin-top: 30px;">
+        <!-- CAPEX/OPEX breakdown will be displayed here -->
+      </div>
+      
+      <!-- Calculation Details -->
+      <div id="calculation-details" style="margin-top: 30px;">
+        <!-- Detailed calculations will be displayed here -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Global state
+    let tasks = [];
+    let savings = [];
+    let teamOptimizations = [];
+    let calculationTimeout = null;
+    let roiChart = null;
+    let savingsProjectionChart = null;
+    let costComparisonChart = null;
+    let roiProgressionChart = null;
+    let savingsByCategoryChart = null;
+    let taskHoursSavedChart = null;
+    let isInitialized = false;
+
+    // Default cost savings data
+    const defaultSavings = [
+      { id: 1, serviceName: 'Commerical Database (RDS/Aurora)', category: 'Database', originalCost: 10000, alternative: 'PostgreSQL/MySQL on K8s', savingsPercentage: 40 },
+      { id: 2, serviceName: 'Commercial CI/CD', category: 'CI/CD', originalCost: 12000, alternative: 'Harbor Registry', savingsPercentage: 45 },
+      { id: 3, serviceName: 'Monitoring (DataDog/NewRelic)', category: 'Observability', originalCost: 30000, alternative: 'Prometheus/Grafana', savingsPercentage: 50 },
+      { id: 4, serviceName: 'Log Management (Splunk)', category: 'Observability', originalCost: 10000, alternative: 'ELK Stack', savingsPercentage: 60 },
+      { id: 5, serviceName: 'Secret Management', category: 'Security', originalCost: 8000, alternative: 'Vault + K8s Secrets', savingsPercentage: 35 }
+    ];
+
+    // Default team optimization data
+    const defaultTeamOptimizations = [
+      { id: 1, teamName: 'Dev/Data/Sec Ops Engineers', teamSize: 2, averageSalary: 110000, efficiencyGain: 35, strategicValue: 'Infrastructure Innovation & Automation Strategy' },
+      { id: 2, teamName: 'Platform Engineers', teamSize: 1, averageSalary: 110000, efficiencyGain: 25, strategicValue: 'Platform Architecture & Developer Experience' },
+      { id: 3, teamName: 'SRE Team', teamSize: 2, averageSalary: 110000, efficiencyGain: 40, strategicValue: 'Reliability Engineering & Performance Optimization' }
+    ];
+
+    // Default tasks data
+    const defaultTasks = [
+      { id: 1, team: 'Architects', phase: 'day0', process: 'Design', description: 'Design topology, flows versioning strategies, API definitions, libraries...', numberOfServices: 8, numberOfHours: 5, salaryPerHour: 60, staticSupport: 90, frequency: 1 },
+      { id: 2, team: 'Architects', phase: 'day0', process: 'Test and validation', description: 'POC the foundational structure & core functionalities...', numberOfServices: 8, numberOfHours: 5, salaryPerHour: 60, staticSupport: 90, frequency: 1 },
+      { id: 3, team: 'Architects', phase: 'day0', process: 'Security Planning', description: 'Identifying potential security threats & planning mitigation strategies...', numberOfServices: 8, numberOfHours: 2, salaryPerHour: 60, staticSupport: 95, frequency: 1 },
+      { id: 4, team: 'Architects', phase: 'day0', process: 'Knowledge & Onboarding', description: 'Knowledge-base to the team with: API Design, stack components, Architecture Design, Security, etc..', numberOfServices: 10, numberOfHours: 1, salaryPerHour: 60, staticSupport: 95, frequency: 1 },
+      { id: 5, team: 'DevOps', phase: 'day1', process: 'Build/Packaging', description: 'Encapsulating the source code within containers to fulfill specific requirements, API interactions, and microservices connectivity.', numberOfServices: 4, numberOfHours: 6, salaryPerHour: 60, staticSupport: 80, frequency: 1 },
+      { id: 6, team: 'DevOps', phase: 'day1', process: 'Templating Deployment', description: 'Crafting HELM charts and K8s YAML files for resources like Ingress, ConfigMaps and Deployments..', numberOfServices: 8, numberOfHours: 1, salaryPerHour: 60, staticSupport: 90, frequency: 1 },
+      { id: 7, team: 'SecOps', phase: 'day1', process: '3 Layers RBAC', description: 'Users level, service level and relation between apps', numberOfServices: 8, numberOfHours: 2, salaryPerHour: 60, staticSupport: 90, frequency: 1 },
+      { id: 8, team: 'DevOps', phase: 'day1', process: 'K8s Resource Management', description: 'Implementing GitOps like Argo, and Kustomize for resource management in K8s...', numberOfServices: 10, numberOfHours: 2, salaryPerHour: 60, staticSupport: 95, frequency: 1 },
+      { id: 9, team: 'SRE', phase: 'day1', process: 'Monitoring and Dashboards', description: 'Setting up monitoring such as Prometheus/Grafana for service-specific metrics and dashboard configuration...', numberOfServices: 8, numberOfHours: 4, salaryPerHour: 60, staticSupport: 85, frequency: 1 },
+      { id: 10, team: 'DevOps', phase: 'day1', process: 'API Routing', description: 'Creation of API-GW or Ingress controller to manage routing, CORS & access control and SSL issuing', numberOfServices: 5, numberOfHours: 3, salaryPerHour: 60, staticSupport: 90, frequency: 1 },
+      { id: 11, team: 'SRE', phase: 'day1', process: 'Logs Aggregation', description: 'Implementing centralized log aggregation solutions using stacks such as ELK, Loki, or Minio.', numberOfServices: 10, numberOfHours: 3, salaryPerHour: 60, staticSupport: 80, frequency: 1 },
+      { id: 12, team: 'DevOps', phase: 'day1', process: 'Data Backup Strategy', description: 'Set up data backup solutions using tools like Velero and Minio for robust recovery.', numberOfServices: 8, numberOfHours: 3, salaryPerHour: 60, staticSupport: 85, frequency: 1 },
+      { id: 13, team: 'DataOps', phase: 'day1', process: 'Data Application Flow', description: 'Define RabbitMQ messaging flows, topics, and sinks for structured app behavior.', numberOfServices: 6, numberOfHours: 3, salaryPerHour: 60, staticSupport: 85, frequency: 1 },
+      { id: 14, team: 'SecOps', phase: 'day1', process: 'Authentication Setup', description: 'Configure Keycloak realms and users to manage app authentication flows.', numberOfServices: 6, numberOfHours: 3, salaryPerHour: 60, staticSupport: 90, frequency: 2 },
+      { id: 15, team: 'DevOps', phase: 'day1', process: 'CI/CD Process Definition', description: 'Build a full-stack CI/CD pipeline for code integration and deployment.', numberOfServices: 7, numberOfHours: 4, salaryPerHour: 60, staticSupport: 85, frequency: 2 },
+      { id: 16, team: 'SecOps', phase: 'day1', process: 'Security Policies/Rules', description: 'Define OPA rules for security policies, Network policies, etc..', numberOfServices: 7, numberOfHours: 8, salaryPerHour: 60, staticSupport: 85, frequency: 12 },
+      { id: 17, team: 'DevOps', phase: 'day1', process: 'Development Environment', description: 'Prepare development environment like IDEs sync, Local dev docker environment, migration to prod...', numberOfServices: 8, numberOfHours: 3, salaryPerHour: 60, staticSupport: 85, frequency: 4 },
+      { id: 18, team: 'Developers', phase: 'day2', process: 'Secret Management ', description: 'Implementing SOPs and secrets management, retentions, data encryption ', numberOfServices: 10, numberOfHours: 3, salaryPerHour: 60, staticSupport: 90, frequency: 5 },
+      { id: 19, team: 'DevOps', phase: 'day2', process: 'Migration Ready', description: 'Create migration strategy using standard tools like Argo Rollout, canary or manual blue green migration', numberOfServices: 5, numberOfHours: 5, salaryPerHour: 60, staticSupport: 90, frequency: 5 },
+      { id: 20, team: 'All Teams', phase: 'day2', process: 'Documentation', description: 'Ensuring ongoing knowledge sharing and documentation updates for APIs, new versions, and more.', numberOfServices: 10, numberOfHours: 1, salaryPerHour: 60, staticSupport: 85, frequency: 12 },
+      { id: 21, team: 'All Teams', phase: 'day2', process: 'Scale Strategy', description: 'Deploy, test and maintain Scale strategy using tools like KEDA, HPA....', numberOfServices: 10, numberOfHours: 2, salaryPerHour: 60, staticSupport: 90, frequency: 3 },
+      { id: 22, team: 'All Teams', phase: 'day2', process: 'Versioning', description: 'Ensure maintenance and versioning of full-stack dependencies, covering also the transition from staging to production', numberOfServices: 10, numberOfHours: 3, salaryPerHour: 60, staticSupport: 90, frequency: 12 },
+      { id: 23, team: 'All Teams', phase: 'day2', process: 'Modify Stack', description: 'Add new features and services to your stack, automate their processes, and incorporate security into your workflow', numberOfServices: 10, numberOfHours: 8, salaryPerHour: 60, staticSupport: 80, frequency: 2 },
+      { id: 24, team: 'All Teams', phase: 'day2', process: 'Onboarding New Dev', description: 'Onboard new Dev or Ops, setup Dev env and tools...', numberOfServices: 10, numberOfHours: 8, salaryPerHour: 60, staticSupport: 80, frequency: 3 },
+      { id: 25, team: 'DataOps', phase: 'day2', process: 'Modify Logic/Data/Flow', description: 'Modify queue, kafka topic, define new connectors or define new bucket sink..', numberOfServices: 4, numberOfHours: 8, salaryPerHour: 60, staticSupport: 80, frequency: 2 },
+      { id: 26, team: 'SecOps', phase: 'day2', process: 'Audit & Compliance Report', description: 'Create mechanism of awareness and reporting for audit and compliance', numberOfServices: 10, numberOfHours: 4, salaryPerHour: 60, staticSupport: 80, frequency: 12 }
+    ];
+
+    // Debounced calculation function
+    function debouncedCalculate() {
+      if (!isInitialized) return;
+      clearTimeout(calculationTimeout);
+      calculationTimeout = setTimeout(calculateResults, 300);
+    }
+
+    // Auto-resize function for dynamic input sizing
+    function autoResize(input) {
+      // For process inputs, adjust width based on content
+      if (input.classList.contains('process-input')) {
+        const textLength = input.value.length;
+        input.style.width = Math.min(250, Math.max(150, textLength * 8)) + 'px';
+      }
+      // For team inputs, adjust width based on content  
+      else if (input.classList.contains('team-input')) {
+        const textLength = input.value.length;
+        input.style.width = Math.min(180, Math.max(110, textLength * 10)) + 'px';
+      }
+    }
+
+    // Initialize auto-resize on existing inputs
+    function initializeAutoResize() {
+      document.querySelectorAll('.process-input, .team-input').forEach(input => {
+        autoResize(input);
+      });
+    }
+
+    // Description bubble functions
+    function showDescription(id) {
+      const bubble = document.getElementById(`desc-${id}`);
+      if (bubble) {
+        bubble.classList.add('show');
+      }
+    }
+
+    function hideDescription(id) {
+      const bubble = document.getElementById(`desc-${id}`);
+      if (bubble) {
+        bubble.classList.remove('show');
+      }
+    }
+
+    function toggleDescription(id) {
+      const bubble = document.getElementById(`desc-${id}`);
+      if (bubble) {
+        bubble.classList.toggle('show');
+      }
+    }
+
+    // Team optimization management functions
+    function addTeamOptimization() {
+      const id = Math.max(...teamOptimizations.map(t => t.id), 0) + 1;
+      teamOptimizations.push({
+        id,
+        teamName: '',
+        teamSize: 5,
+        averageSalary: 100000,
+        efficiencyGain: 30,
+        strategicValue: '',
+        totalCost: 0,
+        optimizationValue: 0
+      });
+      renderTeamOptimizations();
+    }
+
+    function deleteTeamOptimization(id) {
+      teamOptimizations = teamOptimizations.filter(team => team.id !== id);
+      renderTeamOptimizations();
+      debouncedCalculate();
+    }
+
+    function updateTeamOptimization(id, field, value) {
+      const team = teamOptimizations.find(t => t.id === id);
+      if (team) {
+        if (['teamSize', 'averageSalary', 'efficiencyGain'].includes(field)) {
+          const parsedValue = parseFloat(value);
+          team[field] = isNaN(parsedValue) || parsedValue < 0 ? 0 : parsedValue;
+        } else {
+          team[field] = value;
+        }
+        calculateTeamOptimizationTotals(team);
+        updateTeamOptimizationRow(team);
+        debouncedCalculate();
+      }
+    }
+
+    function calculateTeamOptimizationTotals(team) {
+      team.totalCost = team.teamSize * team.averageSalary;
+      team.optimizationValue = team.totalCost * (team.efficiencyGain / 100);
+    }
+
+    function updateTeamOptimizationRow(team) {
+      const row = document.querySelector(`#team-${team.id}`);
+      if (row) {
+        const totalCostCell = row.querySelector('.total-cost-cell');
+        const optimizationValueCell = row.querySelector('.optimization-value-cell');
+        if (totalCostCell) {
+          totalCostCell.innerText = formatCurrency(team.totalCost);
+        }
+        if (optimizationValueCell) {
+          optimizationValueCell.innerText = formatCurrency(team.optimizationValue);
+        }
+      }
+    }
+
+    function renderTeamOptimizations() {
+      const tbody = document.querySelector('#team-table tbody');
+      tbody.innerHTML = '';
+
+      teamOptimizations.forEach(team => {
+        calculateTeamOptimizationTotals(team);
+
+        const row = document.createElement('tr');
+        row.id = `team-${team.id}`;
+        row.innerHTML = `
+          <td><input type="text" value="${team.teamName}" oninput="updateTeamOptimization(${team.id}, 'teamName', this.value)"></td>
+          <td><input type="number" min="1" value="${team.teamSize}" oninput="updateTeamOptimization(${team.id}, 'teamSize', this.value)"></td>
+          <td><input type="number" min="0" value="${team.averageSalary}" oninput="updateTeamOptimization(${team.id}, 'averageSalary', this.value)"></td>
+          <td class="total-cost-cell">${formatCurrency(team.totalCost)}</td>
+          <td><input type="number" min="0" max="100" value="${team.efficiencyGain}" oninput="updateTeamOptimization(${team.id}, 'efficiencyGain', this.value)"></td>
+          <td class="optimization-value-cell">${formatCurrency(team.optimizationValue)}</td>
+          <td><button class="delete-btn" onclick="deleteTeamOptimization(${team.id})">Delete</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // Task management functions
+    function addTask() {
+      const id = Math.max(...tasks.map(t => t.id), 0) + 1;
+      tasks.push({
+        id,
+        team: '',
+        phase: 'day0',
+        process: '',
+        description: '',
+        numberOfServices: 1,
+        numberOfHours: 1,
+        salaryPerHour: 60,
+        staticSupport: 80,
+        frequency: 1,
+        total: 0,
+        totalCostAfterStatic: 0,
+      });
+      renderTasks();
+    }
+
+    function deleteTask(id) {
+      tasks = tasks.filter(task => task.id !== id);
+      renderTasks();
+      debouncedCalculate();
+    }
+
+    function updateTask(id, field, value) {
+      const task = tasks.find(t => t.id === id);
+      if (task) {
+        if (['numberOfServices', 'numberOfHours', 'salaryPerHour', 'staticSupport', 'frequency'].includes(field)) {
+          const parsedValue = parseFloat(value);
+          task[field] = isNaN(parsedValue) || parsedValue < 0 ? 0 : parsedValue;
+        } else {
+          task[field] = value;
+        }
+        calculateTaskTotals(task);
+        updateTaskRow(task);
+        debouncedCalculate();
+      }
+    }
+
+    function calculateTaskTotals(task) {
+      const frequencyMultiplier = task.phase === 'day2' ? Math.max(1, task.frequency) : 1;
+      task.total = task.numberOfServices * task.numberOfHours * task.salaryPerHour * frequencyMultiplier;
+      task.totalCostAfterStatic = task.total * (1 - task.staticSupport / 100);
+    }
+
+    function updateTaskRow(task) {
+      const row = document.querySelector(`#task-${task.id}`);
+      if (row) {
+        const totalCell = row.querySelector('.total-cell');
+        if (totalCell) {
+          totalCell.innerText = formatCurrency(task.total);
+        }
+      }
+    }
+
+    function renderTasks() {
+      const tbody = document.querySelector('#tasks-table tbody');
+      tbody.innerHTML = '';
+
+      tasks.forEach(task => {
+        calculateTaskTotals(task);
+
+        const row = document.createElement('tr');
+        row.id = `task-${task.id}`;
+        row.className = task.phase === 'day2' ? 'day2-row' : '';
+        
+        row.innerHTML = `
+          <td><input type="text" class="team-input" value="${task.team}" oninput="updateTask(${task.id}, 'team', this.value); autoResize(this)"></td>
+          <td>
+            <select onchange="updateTask(${task.id}, 'phase', this.value); renderTasks();">
+              <option value="day0" ${task.phase === 'day0' ? 'selected' : ''}>Day 0</option>
+              <option value="day1" ${task.phase === 'day1' ? 'selected' : ''}>Day 1</option>
+              <option value="day2" ${task.phase === 'day2' ? 'selected' : ''}>Day 2</option>
+            </select>
+          </td>
+          <td class="process-cell"><input type="text" class="process-input" value="${task.process}" oninput="updateTask(${task.id}, 'process', this.value); autoResize(this)" title="${task.process}"></td>
+          <td><input type="number" min="0" value="${task.numberOfServices}" oninput="updateTask(${task.id}, 'numberOfServices', this.value)"></td>
+          <td><input type="number" min="0" value="${task.numberOfHours}" oninput="updateTask(${task.id}, 'numberOfHours', this.value)"></td>
+          <td><input type="number" min="0" value="${task.salaryPerHour}" oninput="updateTask(${task.id}, 'salaryPerHour', this.value)"></td>
+          <td><input type="number" min="0" max="100" value="${task.staticSupport}" oninput="updateTask(${task.id}, 'staticSupport', this.value)"></td>
+          <td><input type="number" min="1" value="${task.frequency}" oninput="updateTask(${task.id}, 'frequency', this.value)"></td>
+          <td style="position: relative;">
+            <button class="description-btn" onclick="toggleDescription(${task.id})" onmouseover="showDescription(${task.id})" onmouseout="hideDescription(${task.id})">
+              View Details
+            </button>
+            <div class="description-bubble" id="desc-${task.id}">
+              ${task.description}
+            </div>
+            <input type="hidden" value="${task.description}" oninput="updateTask(${task.id}, 'description', this.value)">
+          </td>
+          <td class="total-cell">${formatCurrency(task.total)}</td>
+          <td><button class="delete-btn" onclick="deleteTask(${task.id})">Delete</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      setTimeout(initializeAutoResize, 50);
+    }
+
+    // Savings management functions
+    function addSaving() {
+      const id = Math.max(...savings.map(s => s.id), 0) + 1;
+      savings.push({
+        id,
+        serviceName: '',
+        category: '',
+        originalCost: 0,
+        alternative: '',
+        savingsPercentage: 40,
+        calculatedSavings: 0,
+      });
+      renderSavings();
+    }
+
+    function deleteSaving(id) {
+      savings = savings.filter(saving => saving.id !== id);
+      renderSavings();
+      debouncedCalculate();
+    }
+
+    function updateSaving(id, field, value) {
+      const saving = savings.find(s => s.id === id);
+      if (saving) {
+        if (['originalCost', 'savingsPercentage'].includes(field)) {
+          const parsedValue = parseFloat(value);
+          saving[field] = isNaN(parsedValue) || parsedValue < 0 ? 0 : parsedValue;
+        } else {
+          saving[field] = value;
+        }
+        calculateSavingsTotals(saving);
+        updateSavingRow(saving);
+        debouncedCalculate();
+      }
+    }
+
+    function calculateSavingsTotals(saving) {
+      saving.calculatedSavings = saving.originalCost * (saving.savingsPercentage / 100);
+    }
+
+    function updateSavingRow(saving) {
+      const row = document.querySelector(`#saving-${saving.id}`);
+      if (row) {
+        const savingsCell = row.querySelector('.calculated-savings-cell');
+        if (savingsCell) {
+          savingsCell.innerText = formatCurrency(saving.calculatedSavings);
+        }
+      }
+    }
+
+    function renderSavings() {
+      const tbody = document.querySelector('#savings-table tbody');
+      tbody.innerHTML = '';
+
+      savings.forEach(saving => {
+        calculateSavingsTotals(saving);
+
+        const row = document.createElement('tr');
+        row.id = `saving-${saving.id}`;
+        row.innerHTML = `
+          <td><input type="text" value="${saving.serviceName}" oninput="updateSaving(${saving.id}, 'serviceName', this.value)"></td>
+          <td><input type="text" value="${saving.category}" oninput="updateSaving(${saving.id}, 'category', this.value)"></td>
+          <td><input type="number" min="0" value="${saving.originalCost}" oninput="updateSaving(${saving.id}, 'originalCost', this.value)"></td>
+          <td><input type="text" value="${saving.alternative}" oninput="updateSaving(${saving.id}, 'alternative', this.value)"></td>
+          <td><input type="number" min="0" max="100" value="${saving.savingsPercentage}" oninput="updateSaving(${saving.id}, 'savingsPercentage', this.value)"></td>
+          <td class="calculated-savings-cell">${formatCurrency(saving.calculatedSavings)}</td>
+          <td><button class="delete-btn" onclick="deleteSaving(${saving.id})">Delete</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // Main calculation function
+    function calculateResults() {
+      const numNewApps = parseInt(document.getElementById('num-new-apps').value, 10) || 0;
+      const numExistingApps = parseInt(document.getElementById('num-existing-apps').value, 10) || 0;
+      const timeToMarket = parseInt(document.getElementById('time-to-market').value, 10) || 0;
+      const revenueLost = parseFloat(document.getElementById('revenue-lost').value) || 0;
+      const costToMigrate = parseFloat(document.getElementById('cost-migrate').value) || 0;
+      const coordinationFactor = parseFloat(document.getElementById('coordination-factor').value) || 0;
+
+      const stackticMonthlyPrice = parseFloat(document.getElementById('stacktic-price').value) || 0;
+      const numEngineers = parseFloat(document.getElementById('num-engineers').value) || 0;
+      const engineerTimePercentage = parseFloat(document.getElementById('engineer-time-percentage').value) || 0;
+      
+      const stackticAnnualCost = stackticMonthlyPrice * 12;
+      // Calculate engineer cost
+      const baseEngineerAnnualCost = numEngineers * 120000 * (engineerTimePercentage / 100);
+      
+      // Calculate the strategic focus benefit from the engineers (this is already included in teamOptimizationValue)
+      // We need to calculate the NET engineer cost after strategic benefits
+      const totalTeamOptimizationValue = teamOptimizations.reduce((sum, team) => sum + team.optimizationValue, 0);
+      
+      // The engineer cost in our calculation should be the actual cost without double-counting the strategic benefit
+      const engineerAnnualCost = baseEngineerAnnualCost;
+      const totalStackticAnnualCost = stackticAnnualCost + engineerAnnualCost;
+
+      const revenueFeatures = parseFloat(document.getElementById('revenue-features').value) || 0;
+      const devEfficiency = parseFloat(document.getElementById('dev-efficiency').value) || 0;
+      const errorReduction = parseFloat(document.getElementById('error-reduction').value) || 0;
+      const complianceEfficiency = parseFloat(document.getElementById('compliance-efficiency').value) || 0;
+      const techGain = parseFloat(document.getElementById('tech-gain').value) || 0;
+
+      const capexDay01 = tasks.filter(t => t.phase !== 'day2').reduce((sum, t) => sum + t.total, 0);
+      const capexDay01Stacktic = tasks.filter(t => t.phase !== 'day2').reduce((sum, t) => sum + t.totalCostAfterStatic, 0);
+      const capexSavings = (capexDay01 - capexDay01Stacktic) * numNewApps;
+
+      const opexDay2 = tasks.filter(t => t.phase === 'day2').reduce((sum, t) => sum + t.total, 0);
+      const opexDay2Stacktic = tasks.filter(t => t.phase === 'day2').reduce((sum, t) => sum + t.totalCostAfterStatic, 0);
+      const opexTaskSavings = (opexDay2 - opexDay2Stacktic) * numExistingApps;
+
+      const totalServiceSavings = savings.reduce((sum, saving) => sum + saving.calculatedSavings, 0);
+      const totalOriginalServiceCost = savings.reduce((sum, saving) => sum + saving.originalCost, 0);
+
+      const avgStaticSupport = tasks.length > 0 ? tasks.reduce((sum, t) => sum + t.staticSupport, 0) / tasks.length : 0;
+	  const improvementFactor = (avgStaticSupport + coordinationFactor) * 0.5 / 100;
+      const improvedTimeToMarket = Math.max(1, Math.ceil(timeToMarket * (1 - improvementFactor)));
+      const daysSaved = timeToMarket - improvedTimeToMarket;
+      const timeToMarketValue = daysSaved * revenueLost;
+
+      const totalYearlyRevenue = 365 * revenueLost;
+      const revenueIncreasePercentage = revenueFeatures + devEfficiency + errorReduction + complianceEfficiency + techGain;
+      const revenueIncreaseValue = totalYearlyRevenue * (revenueIncreasePercentage / 100);
+
+      const totalCapexSavings = capexSavings;
+      const totalOpexSavings = opexTaskSavings + totalServiceSavings + totalTeamOptimizationValue;
+      const totalGrossBenefits = totalOpexSavings + timeToMarketValue + revenueIncreaseValue;
+
+      const totalNetAnnualBenefits = totalGrossBenefits - totalStackticAnnualCost;
+      const totalBenefitsIncludingCapex = totalCapexSavings + totalNetAnnualBenefits;
+
+      const totalInitialInvestment = costToMigrate;
+      const threeYearNetBenefits = totalNetAnnualBenefits * 3;
+      const threeYearStackticCosts = totalStackticAnnualCost * 3;
+      const threeYearTotalInvestment = totalInitialInvestment + threeYearStackticCosts;
+      
+      const threeYearROI = threeYearTotalInvestment > 0 ? (threeYearNetBenefits / threeYearTotalInvestment) * 100 : 0;
+      const annualROI = totalStackticAnnualCost > 0 ? (totalNetAnnualBenefits / totalStackticAnnualCost) * 100 : 0;
+      const paybackMonths = totalNetAnnualBenefits > 0 ? Math.max(0, (totalInitialInvestment / (totalNetAnnualBenefits / 12))) : 0;
+
+      updateDashboard(totalNetAnnualBenefits, threeYearROI, paybackMonths, daysSaved);
+
+      // UPDATE STICKY METRICS
+      updateStickyMetrics({
+        totalSavings: totalNetAnnualBenefits,
+        roi: threeYearROI,
+        paybackMonths: paybackMonths,
+        daysSaved: daysSaved,
+        capexSavings: totalCapexSavings,
+        opexSavings: opexTaskSavings,
+        serviceSavings: totalServiceSavings,
+        teamValue: totalTeamOptimizationValue,
+        revenueBenefits: timeToMarketValue + revenueIncreaseValue,
+        stackticCosts: totalStackticAnnualCost,
+        netProfit: totalNetAnnualBenefits
+      });
+
+      updateChart({
+        capexSavings: totalCapexSavings,
+        opexSavings: opexTaskSavings,
+        timeSavings: timeToMarketValue,
+        serviceSavings: totalServiceSavings,
+        teamOptimization: totalTeamOptimizationValue,
+        revenueBenefits: revenueIncreaseValue,
+        stackticCosts: -totalStackticAnnualCost
+      });
+
+      // Update all additional charts
+      console.log('Chart Data Debug:', {
+        monthlyNetBenefit: totalNetAnnualBenefits / 12,
+        totalCapexSavings,
+        totalNetAnnualBenefits,
+        costToMigrate,
+        totalStackticAnnualCost,
+        teamOptimizationValue: totalTeamOptimizationValue,
+        categories: {
+          taskAutomation: opexTaskSavings,
+          serviceOptimization: totalServiceSavings,
+          teamFocus: totalTeamOptimizationValue,
+          timeToMarket: timeToMarketValue,
+          revenueGrowth: revenueIncreaseValue
+        }
+      });
+
+      try {
+        updateSavingsProjectionChart(totalNetAnnualBenefits / 12, totalCapexSavings);
+      } catch (e) {
+        console.error('Error updating savings projection chart:', e);
+      }
+      
+      try {
+        updateTaskHoursSavedChart();
+      } catch (e) {
+        console.error('Error updating task hours chart:', e);
+      }
+      
+      try {
+        // FIXED: Updated cost comparison logic
+        updateCostComparisonChart({
+          capexWithout: capexDay01 * numNewApps,
+          capexWith: capexDay01Stacktic * numNewApps,
+          opexWithout: (opexDay2 * numExistingApps) + totalOriginalServiceCost,
+          opexWith: (opexDay2Stacktic * numExistingApps) + (totalOriginalServiceCost - totalServiceSavings),
+          stackticCost: totalStackticAnnualCost,
+          teamOptimization: totalTeamOptimizationValue
+        });
+      } catch (e) {
+        console.error('Error updating cost comparison chart:', e);
+      }
+      
+      try {
+        updateROIProgressionChart(totalNetAnnualBenefits, costToMigrate, totalStackticAnnualCost);
+      } catch (e) {
+        console.error('Error updating ROI progression chart:', e);
+      }
+      
+      try {
+        updateSavingsByCategoryChart({
+          taskAutomation: opexTaskSavings,
+          serviceOptimization: totalServiceSavings,
+          teamFocus: totalTeamOptimizationValue,
+          timeToMarket: timeToMarketValue,
+          revenueGrowth: revenueIncreaseValue
+        });
+      } catch (e) {
+        console.error('Error updating savings by category chart:', e);
+      }
+
+      calculateRecommendedTimeToMarket();
+
+      renderDetailedResults({
+        capexDay01, capexDay01Stacktic, totalCapexSavings,
+        opexDay2, opexDay2Stacktic, opexTaskSavings,
+        totalServiceSavings, totalOriginalServiceCost,
+        totalTeamOptimizationValue, totalOpexSavings,
+        stackticAnnualCost, engineerAnnualCost, totalStackticAnnualCost,
+        timeToMarket, timeToMarketValue, daysSaved, revenueIncreaseValue, revenueIncreasePercentage,
+        revenueLost,
+        totalGrossBenefits: totalOpexSavings + timeToMarketValue + revenueIncreaseValue, 
+        totalNetAnnualBenefits, 
+        totalBenefitsIncludingCapex,
+        annualROI, threeYearROI, paybackMonths, costToMigrate,
+        numNewApps, numExistingApps
+      });
+    }
+
+    // NEW FUNCTION: Update sticky metrics
+    function updateStickyMetrics(data) {
+      document.getElementById('stickyTotalSavings').innerText = formatCurrency(data.totalSavings);
+      document.getElementById('stickyROI').innerText = Math.round(data.roi) + '%';
+      document.getElementById('stickyPayback').innerText = Math.round(data.paybackMonths);
+      document.getElementById('stickyTimeToMarket').innerText = data.daysSaved;
+      
+      document.getElementById('stickyCapexSavings').innerText = formatCurrency(data.capexSavings);
+      document.getElementById('stickyOpexSavings').innerText = formatCurrency(data.opexSavings);
+      document.getElementById('stickyServiceSavings').innerText = formatCurrency(data.serviceSavings);
+      document.getElementById('stickyTeamValue').innerText = formatCurrency(data.teamValue);
+      document.getElementById('stickyRevenueBenefits').innerText = formatCurrency(data.revenueBenefits);
+      document.getElementById('stickyStackticCosts').innerText = '-' + formatCurrency(data.stackticCosts);
+      document.getElementById('stickyNetProfit').innerText = formatCurrency(data.netProfit);
+    }
+
+    function updateDashboard(totalSavings, roiPercentage, paybackMonths, daysSaved) {
+      document.getElementById('totalSavingsMetric').innerText = formatCurrency(totalSavings);
+      document.getElementById('roiPercentageMetric').innerText = Math.round(roiPercentage) + '%';
+      document.getElementById('paybackPeriodMetric').innerText = Math.round(paybackMonths);
+      document.getElementById('timeToMarketMetric').innerText = daysSaved;
+    }
+
+    function updateChart(data) {
+      const ctx = document.getElementById('roiChart').getContext('2d');
+      
+      if (roiChart) {
+        roiChart.destroy();
+      }
+
+      roiChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['CAPEX Savings', 'OPEX Task Savings', 'Time-to-Market Value', 'Service Savings', 'Team Strategic Focus', 'Revenue Benefits', 'Stacktic Costs'],
+          datasets: [{
+            data: [
+              Math.max(0, data.capexSavings || 0),
+              Math.max(0, data.opexSavings || 0),
+              Math.max(0, data.timeSavings || 0),
+              Math.max(0, data.serviceSavings || 0),
+              Math.max(0, data.teamOptimization || 0),
+              Math.max(0, data.revenueBenefits || 0),
+              Math.max(0, Math.abs(data.stackticCosts || 0))
+            ],
+            backgroundColor: [
+              '#667eea',
+              '#764ba2',
+              '#2ed573',
+              '#17a2b8',
+              '#ffa726',
+              '#e91e63',
+              '#ff6b6b'
+            ],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                padding: 15,
+                font: {
+                  size: 12
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateSavingsProjectionChart(monthlyNetBenefit, initialCapexSavings) {
+      const ctx = document.getElementById('savingsProjectionChart');
+      if (!ctx) return;
+      
+      if (savingsProjectionChart) {
+        savingsProjectionChart.destroy();
+      }
+
+      // Show monthly progression for 1 year
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const monthlySavings = months.map((_, i) => monthlyNetBenefit);
+      const cumulativeSavings = months.map((_, i) => initialCapexSavings + (monthlyNetBenefit * (i + 1)));
+
+      savingsProjectionChart = new Chart(ctx.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: months,
+          datasets: [{
+            label: 'Monthly Net Benefit',
+            data: monthlySavings,
+            backgroundColor: 'rgba(102, 126, 234, 0.6)',
+            borderColor: '#667eea',
+            borderWidth: 2,
+            type: 'bar',
+            yAxisID: 'y'
+          }, {
+            label: 'Cumulative Benefits',
+            data: cumulativeSavings,
+            borderColor: '#2ed573',
+            backgroundColor: 'rgba(46, 213, 115, 0.1)',
+            borderWidth: 3,
+            fill: false,
+            type: 'line',
+            tension: 0.4,
+            yAxisID: 'y1'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top'
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.dataset.label || '';
+                  return label + ': ' + formatCurrency(context.parsed.y);
+                }
+              }
+            },
+            title: {
+              display: true,
+              text: 'First Year Financial Impact',
+              font: {
+                size: 14
+              }
+            }
+          },
+          scales: {
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return formatCurrency(value);
+                }
+              }
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              beginAtZero: true,
+              grid: {
+                drawOnChartArea: false
+              },
+              ticks: {
+                callback: function(value) {
+                  return formatCurrency(value);
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateStackticCostChart(subscriptionCost, engineerCost) {
+      const ctx = document.getElementById('stackticCostChart');
+      if (!ctx) return;
+      
+      if (stackticCostChart) {
+        stackticCostChart.destroy();
+      }
+
+      stackticCostChart = new Chart(ctx.getContext('2d'), {
+        type: 'pie',
+        data: {
+          labels: ['Subscription Cost', 'Engineer Time Allocation'],
+          datasets: [{
+            data: [subscriptionCost, engineerCost],
+            backgroundColor: ['#ff6b6b', '#ff9999'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                padding: 15,
+                font: {
+                  size: 12
+                }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = formatCurrency(context.parsed);
+                  const percentage = Math.round((context.parsed / (subscriptionCost + engineerCost)) * 100);
+                  return label + ': ' + value + ' (' + percentage + '%)';
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateTaskHoursSavedChart() {
+      const ctx = document.getElementById('taskHoursSavedChart');
+      if (!ctx) return;
+      
+      if (taskHoursSavedChart) {
+        taskHoursSavedChart.destroy();
+      }
+
+      // Calculate hours by phase
+      const day0Hours = tasks.filter(t => t.phase === 'day0').reduce((sum, t) => sum + (t.numberOfHours * t.numberOfServices), 0);
+      const day1Hours = tasks.filter(t => t.phase === 'day1').reduce((sum, t) => sum + (t.numberOfHours * t.numberOfServices), 0);
+      const day2Hours = tasks.filter(t => t.phase === 'day2').reduce((sum, t) => sum + (t.numberOfHours * t.numberOfServices * t.frequency), 0);
+      
+      // Calculate hours saved by phase
+      const day0Saved = tasks.filter(t => t.phase === 'day0').reduce((sum, t) => sum + (t.numberOfHours * t.numberOfServices * t.staticSupport / 100), 0);
+      const day1Saved = tasks.filter(t => t.phase === 'day1').reduce((sum, t) => sum + (t.numberOfHours * t.numberOfServices * t.staticSupport / 100), 0);
+      const day2Saved = tasks.filter(t => t.phase === 'day2').reduce((sum, t) => sum + (t.numberOfHours * t.numberOfServices * t.frequency * t.staticSupport / 100), 0);
+
+      // Only create chart if we have data
+      if (day0Hours === 0 && day1Hours === 0 && day2Hours === 0) {
+        return;
+      }
+
+      taskHoursSavedChart = new Chart(ctx.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: ['Day 0 (Architecture)', 'Day 1 (Infrastructure)', 'Day 2 (Operations)'],
+          datasets: [{
+            label: 'Original Hours',
+            data: [day0Hours, day1Hours, day2Hours],
+            backgroundColor: 'rgba(255, 107, 107, 0.7)',
+            borderColor: '#ff6b6b',
+            borderWidth: 2
+          }, {
+            label: 'Hours Saved with Stacktic',
+            data: [day0Saved, day1Saved, day2Saved],
+            backgroundColor: 'rgba(46, 213, 115, 0.7)',
+            borderColor: '#2ed573',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top'
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return context.dataset.label + ': ' + Math.round(context.parsed.y) + ' hours';
+                },
+                afterLabel: function(context) {
+                  if (context.dataset.label === 'Hours Saved with Stacktic') {
+                    const originalHours = context.chart.data.datasets[0].data[context.dataIndex];
+                    const savedHours = context.parsed.y;
+                    const percentage = originalHours > 0 ? Math.round((savedHours / originalHours) * 100) : 0;
+                    return percentage + '% automation';
+                  }
+                  return '';
+                }
+              }
+            },
+            title: {
+              display: true,
+              text: 'Engineering Hours Impact by Development Phase',
+              font: {
+                size: 14
+              },
+              padding: 10
+            }
+          },
+          scales: {
+            x: {
+              stacked: false
+            },
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return value + ' hrs';
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateCostComparisonChart(data) {
+      const ctx = document.getElementById('costComparisonChart');
+      if (!ctx) return;
+      
+      if (costComparisonChart) {
+        costComparisonChart.destroy();
+      }
+
+      // FIXED: Proper calculation including strategic value
+      const originalTotalAnnualCosts = data.opexWithout;
+      const newOperatingCosts = data.opexWith;
+      const stackticInvestment = data.stackticCost;
+      const strategicValue = data.teamOptimization;
+      
+      // Calculate net position
+      const totalCostsWithStacktic = newOperatingCosts + stackticInvestment - strategicValue;
+      const netSavings = originalTotalAnnualCosts - totalCostsWithStacktic;
+
+      // Only show chart if there's meaningful data
+      if (originalTotalAnnualCosts <= 0 && stackticInvestment <= 0) {
+        return;
+      }
+
+      costComparisonChart = new Chart(ctx.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: ['Original Costs', 'With Stacktic'],
+          datasets: [{
+            label: 'Operating Costs',
+            data: [data.opexWithout, data.opexWith],
+            backgroundColor: 'rgba(224, 224, 224, 0.8)',
+            borderColor: '#e0e0e0',
+            borderWidth: 2
+          }, {
+            label: 'Stacktic Investment',
+            data: [0, stackticInvestment],
+            backgroundColor: 'rgba(255, 167, 38, 0.8)',
+            borderColor: '#ffa726',
+            borderWidth: 2
+          }, {
+            label: 'Strategic Value Created',
+            data: [0, -strategicValue],
+            backgroundColor: 'rgba(46, 213, 115, 0.8)',
+            borderColor: '#2ed573',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              stacked: true
+            },
+            y: {
+              stacked: true,
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return formatCurrency(Math.abs(value));
+                }
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              position: 'bottom'
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.dataset.label || '';
+                  const value = Math.abs(context.parsed.y);
+                  return label + ': ' + formatCurrency(value);
+                },
+                afterBody: function(context) {
+                  if (context[0].dataIndex === 1) {
+                    return [
+                      '',
+                      'Net Annual Position: ' + formatCurrency(totalCostsWithStacktic),
+                      'Annual Savings: ' + formatCurrency(netSavings),
+                      'Savings %: ' + Math.round((netSavings / originalTotalAnnualCosts) * 100) + '%'
+                    ];
+                  }
+                  return [];
+                }
+              }
+            },
+            title: {
+              display: true,
+              text: `Annual Operating Costs | Original: ${formatCurrency(originalTotalAnnualCosts)} → With Stacktic: ${formatCurrency(totalCostsWithStacktic)} | Savings: ${formatCurrency(netSavings)}`,
+              font: {
+                size: 14
+              },
+              padding: 10
+            }
+          }
+        }
+      });
+    }
+
+    function updateROIProgressionChart(annualNetBenefit, migrationCost, annualStackticCost) {
+      const ctx = document.getElementById('roiProgressionChart');
+      if (!ctx) return;
+      
+      if (roiProgressionChart) {
+        roiProgressionChart.destroy();
+      }
+
+      // Calculate monthly values
+      const monthlyNetBenefit = annualNetBenefit / 12;
+      
+      // Find break-even month
+      const breakEvenMonth = monthlyNetBenefit > 0 ? Math.ceil(migrationCost / monthlyNetBenefit) : 999;
+      
+      // Generate 24 months of data
+      const months = Array.from({length: 24}, (_, i) => `Month ${i + 1}`);
+      const cumulativeProfit = months.map((_, i) => {
+        const monthNumber = i + 1;
+        return (monthlyNetBenefit * monthNumber) - migrationCost;
+      });
+
+      // Find min and max for better scaling
+      const minValue = Math.min(...cumulativeProfit);
+      const maxValue = Math.max(...cumulativeProfit);
+
+      roiProgressionChart = new Chart(ctx.getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: [{
+            label: 'Cumulative Net Position',
+            data: cumulativeProfit,
+            borderColor: function(context) {
+              if (context.parsed) {
+                return context.parsed.y >= 0 ? '#2ed573' : '#ff6b6b';
+              }
+              return '#667eea';
+            },
+            backgroundColor: function(context) {
+              if (context.parsed) {
+                return context.parsed.y >= 0 ? 'rgba(46, 213, 115, 0.1)' : 'rgba(255, 107, 107, 0.1)';
+              }
+              return 'rgba(102, 126, 234, 0.1)';
+            },
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointRadius: function(context) {
+              return context.dataIndex === breakEvenMonth - 1 ? 8 : 3;
+            },
+            pointBackgroundColor: function(context) {
+              if (context.dataIndex === breakEvenMonth - 1) return '#ffa726';
+              if (context.parsed) {
+                return context.parsed.y >= 0 ? '#2ed573' : '#ff6b6b';
+              }
+              return '#667eea';
+            },
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top'
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const value = context.parsed.y;
+                  const label = value >= 0 ? 'Profit: ' : 'Investment: ';
+                  return label + formatCurrency(Math.abs(value));
+                },
+                afterLabel: function(context) {
+                  if (context.dataIndex === breakEvenMonth - 1) {
+                    return '🎯 Break-even point!';
+                  }
+                  return '';
+                }
+              }
+            },
+            title: {
+              display: true,
+              text: breakEvenMonth < 999 ? 
+                `Break-even: Month ${breakEvenMonth} | Monthly Benefit: ${formatCurrency(monthlyNetBenefit)}` :
+                `No break-even within 24 months | Monthly Net: ${formatCurrency(monthlyNetBenefit)}`,
+              font: {
+                size: 14
+              },
+              padding: 10
+            }
+          },
+          scales: {
+            y: {
+              min: Math.floor(minValue * 1.1),
+              max: Math.ceil(maxValue * 1.1),
+              ticks: {
+                callback: function(value) {
+                  return formatCurrency(value);
+                }
+              },
+              grid: {
+                color: function(context) {
+                  if (context.tick.value === 0) {
+                    return '#666';
+                  }
+                  return '#e0e0e0';
+                },
+                lineWidth: function(context) {
+                  if (context.tick.value === 0) {
+                    return 2;
+                  }
+                  return 1;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateSavingsByCategoryChart(data) {
+      const ctx = document.getElementById('savingsByCategoryChart');
+      if (!ctx) return;
+      
+      if (savingsByCategoryChart) {
+        savingsByCategoryChart.destroy();
+      }
+
+      // Filter out categories with zero values
+      const categories = [];
+      const values = [];
+      const colors = [];
+      const colorMap = {
+        'taskAutomation': '#667eea',
+        'serviceOptimization': '#764ba2',
+        'teamFocus': '#2ed573',
+        'timeToMarket': '#17a2b8',
+        'revenueGrowth': '#ffa726'
+      };
+
+      Object.entries(data).forEach(([key, value]) => {
+        if (value > 0) {
+          let label = '';
+          switch(key) {
+            case 'taskAutomation': label = 'Task Automation'; break;
+            case 'serviceOptimization': label = 'Service Optimization'; break;
+            case 'teamFocus': label = 'Team Strategic Focus'; break;
+            case 'timeToMarket': label = 'Time-to-Market'; break;
+            case 'revenueGrowth': label = 'Revenue Growth'; break;
+            default: label = key;
+          }
+          categories.push(label);
+          values.push(value);
+          colors.push(colorMap[key] || '#999');
+        }
+      });
+
+      // Only create chart if we have data
+      if (values.length === 0) {
+        return;
+      }
+
+      savingsByCategoryChart = new Chart(ctx.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: categories,
+          datasets: [{
+            label: 'Annual Value',
+            data: values,
+            backgroundColor: colors,
+            borderColor: colors.map(c => c),
+            borderWidth: 2
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = total > 0 ? Math.round((context.parsed.x / total) * 100) : 0;
+                  return 'Annual Value: ' + formatCurrency(context.parsed.x) + ' (' + percentage + '% of total)';
+                }
+              }
+            },
+            title: {
+              display: true,
+              text: 'Where Your Annual Benefits Come From',
+              font: {
+                size: 14
+              },
+              padding: 10
+            }
+          },
+          scales: {
+            x: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return formatCurrency(value);
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function renderDetailedResults(results) {
+      const {
+        capexDay01, capexDay01Stacktic, totalCapexSavings,
+        opexDay2, opexDay2Stacktic, opexTaskSavings,
+        totalServiceSavings, totalOriginalServiceCost,
+        totalTeamOptimizationValue, totalOpexSavings,
+        stackticAnnualCost, engineerAnnualCost, totalStackticAnnualCost,
+        timeToMarket, timeToMarketValue, daysSaved, revenueIncreaseValue, revenueIncreasePercentage,
+        revenueLost,
+        totalGrossBenefits, totalNetAnnualBenefits, totalBenefitsIncludingCapex,
+        annualROI, threeYearROI, paybackMonths, costToMigrate,
+        numNewApps, numExistingApps
+      } = results;
+
+      document.getElementById('results-content').innerHTML = `
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th>Without Stacktic</th>
+                <th>With Stacktic</th>
+                <th>Improvement</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="background: #fff3cd;">
+                <td><strong>CAPEX: New App Setup (Day0-1)</strong></td>
+                <td>${formatCurrency(capexDay01 * numNewApps)}</td>
+                <td style="color: #2ed573; font-weight: bold;">${formatCurrency(capexDay01Stacktic * numNewApps)}</td>
+                <td style="color: #2ed573; font-weight: bold;">${formatCurrency(totalCapexSavings)} One-time Savings</td>
+              </tr>
+              <tr style="background: #d1ecf1;">
+                <td><strong>OPEX: Operations & Maintenance (Day2)</strong></td>
+                <td>${formatCurrency(opexDay2 * numExistingApps)}</td>
+                <td style="color: #2ed573; font-weight: bold;">${formatCurrency(opexDay2Stacktic * numExistingApps)}</td>
+                <td style="color: #2ed573; font-weight: bold;">${formatCurrency(opexTaskSavings)} Annual Savings</td>
+              </tr>
+              <tr style="background: #d1ecf1;">
+                <td><strong>OPEX: infra & managedService Costs</strong></td>
+                <td>${formatCurrency(totalOriginalServiceCost)}</td>
+                <td style="color: #2ed573; font-weight: bold;">${formatCurrency(totalOriginalServiceCost - totalServiceSavings)}</td>
+                <td style="color: #2ed573; font-weight: bold;">${formatCurrency(totalServiceSavings)} Annual Savings</td>
+              </tr>
+              <tr style="background: #d1ecf1;">
+                <td><strong>OPEX: Team Strategic Focus Value</strong></td>
+                <td>$0</td>
+                <td style="color: #2ed573; font-weight: bold;">${formatCurrency(totalTeamOptimizationValue || 0)}</td>
+                <td style="color: #2ed573; font-weight: bold;">Annual Strategic Value</td>
+              </tr>
+              <tr style="background: #ffe6e6;">
+                <td><strong>OPEX: Stacktic Costs</strong></td>
+                <td>$0</td>
+                <td style="color: #ff6b6b; font-weight: bold;">${formatCurrency(totalStackticAnnualCost || 0)}</td>
+                <td style="color: #ff6b6b; font-weight: bold;">Annual Investment</td>
+              </tr>
+              <tr style="background: #e2e3e5;">
+                <td><strong>Time-to-Market Impact</strong></td>
+                <td>Delayed ${timeToMarket} days</td>
+                <td style="color: #2ed573; font-weight: bold;">Delivered ${daysSaved} days faster</td>
+                <td style="color: #2ed573; font-weight: bold;">${formatCurrency(timeToMarketValue)} Value</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="margin-top: 30px; padding: 25px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; color: white;">
+          <h3 style="margin-bottom: 20px; text-align: center;">Executive Summary</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; text-align: center;">
+            <div>
+              <div style="font-size: 32px; font-weight: bold; margin-bottom: 8px;">${formatCurrency(totalCapexSavings)}</div>
+              <div style="opacity: 0.9;">CAPEX Savings (One-time)</div>
+            </div>
+            <div>
+              <div style="font-size: 32px; font-weight: bold; margin-bottom: 8px;">${formatCurrency(totalOpexSavings)}</div>
+              <div style="opacity: 0.9;">OPEX Savings (Annual)</div>
+            </div>
+            <div>
+              <div style="font-size: 32px; font-weight: bold; margin-bottom: 8px;">${formatCurrency(timeToMarketValue + revenueIncreaseValue)}</div>
+              <div style="opacity: 0.9;">Revenue Gains (Annual)</div>
+            </div>
+            <div>
+              <div style="font-size: 32px; font-weight: bold; margin-bottom: 8px;">${formatCurrency(totalStackticAnnualCost)}</div>
+              <div style="opacity: 0.9;">Stacktic Costs (Annual)</div>
+            </div>
+            <div>
+              <div style="font-size: 32px; font-weight: bold; margin-bottom: 8px;">${formatCurrency(totalNetAnnualBenefits)}</div>
+              <div style="opacity: 0.9;">Net Profit (Annual)</div>
+            </div>
+            <div>
+              <div style="font-size: 32px; font-weight: bold; margin-bottom: 8px;">${Math.round(threeYearROI)}%</div>
+              <div style="opacity: 0.9;">3-Year ROI</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('capex-opex-breakdown').innerHTML = `
+        <div style="background: #f8f9ff; border-radius: 12px; padding: 25px; border-left: 4px solid #667eea;">
+          <h3 style="color: #667eea; margin-bottom: 20px;">CAPEX vs OPEX Breakdown (Including Stacktic Costs)</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+            <div>
+              <h4 style="color: #e67e22; margin-bottom: 15px;">💰 CAPEX (Capital Expenditure)</h4>
+              <ul style="list-style: none; padding: 0;">
+                <li style="margin-bottom: 8px;">• Day 0-1 Setup Savings: ${formatCurrency(totalCapexSavings)}</li>
+                <li style="margin-bottom: 8px;">• Migration Cost: ${formatCurrency(costToMigrate)}</li>
+                <li style="margin-bottom: 8px; font-weight: bold;">• Net CAPEX Impact: ${formatCurrency(totalCapexSavings - costToMigrate)}</li>
+              </ul>
+            </div>
+            <div>
+              <h4 style="color: #27ae60; margin-bottom: 15px;">🔄 OPEX (Operating Expenditure)</h4>
+              <ul style="list-style: none; padding: 0;">
+                <li style="margin-bottom: 8px;">• Task Automation Savings: ${formatCurrency(opexTaskSavings)}/year</li>
+                <li style="margin-bottom: 8px;">• Service Cost Savings: ${formatCurrency(totalServiceSavings)}/year</li>
+                <li style="margin-bottom: 8px;">• Team Strategic Focus Value: ${formatCurrency(totalTeamOptimizationValue)}/year</li>
+                <li style="margin-bottom: 8px; color: #ff6b6b;">• Stacktic Subscription: ${formatCurrency(stackticAnnualCost)}/year</li>
+                <li style="margin-bottom: 8px; color: #ff6b6b;">• Engineer Time Allocation: ${formatCurrency(engineerAnnualCost)}/year</li>
+                <li style="margin-bottom: 8px; font-weight: bold; color: #27ae60;">• Net OPEX Benefits: ${formatCurrency(totalNetAnnualBenefits)}/year</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 25px; background: #fff; border-radius: 12px; padding: 25px; border: 1px solid #ddd;">
+          <h3 style="color: #333; margin-bottom: 20px;">📊 ROI Analysis by Category</h3>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Type</th>
+                  <th>Annual Benefit/Cost</th>
+                  <th>3-Year Impact</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="background: #fff3cd;">
+                  <td><strong>Setup & Migration</strong></td>
+                  <td>CAPEX</td>
+                  <td style="color: #e67e22; font-weight: bold;">${formatCurrency(totalCapexSavings - costToMigrate)}</td>
+                  <td style="color: #e67e22; font-weight: bold;">${formatCurrency(totalCapexSavings - costToMigrate)}</td>
+                  <td>One-time savings minus migration cost</td>
+                </tr>
+                <tr style="background: #d1ecf1;">
+                  <td><strong>Task Automation</strong></td>
+                  <td>OPEX Benefit</td>
+                  <td style="color: #27ae60; font-weight: bold;">+${formatCurrency(opexTaskSavings)}</td>
+                  <td style="color: #27ae60; font-weight: bold;">+${formatCurrency(opexTaskSavings * 3)}</td>
+                  <td>Reduced manual work</td>
+                </tr>
+                <tr style="background: #d1ecf1;">
+                  <td><strong>Service Optimization</strong></td>
+                  <td>OPEX Benefit</td>
+                  <td style="color: #27ae60; font-weight: bold;">+${formatCurrency(totalServiceSavings)}</td>
+                  <td style="color: #27ae60; font-weight: bold;">+${formatCurrency(totalServiceSavings * 3)}</td>
+                  <td>Open source vs managed services</td>
+                </tr>
+                <tr style="background: #d1ecf1;">
+                  <td><strong>Team Strategic Focus</strong></td>
+                  <td>OPEX Benefit</td>
+                  <td style="color: #27ae60; font-weight: bold;">+${formatCurrency(totalTeamOptimizationValue)}</td>
+                  <td style="color: #27ae60; font-weight: bold;">+${formatCurrency(totalTeamOptimizationValue * 3)}</td>
+                  <td>Higher value work focus</td>
+                </tr>
+                <tr style="background: #ffe6e6;">
+                  <td><strong>Stacktic Investment</strong></td>
+                  <td>OPEX Cost</td>
+                  <td style="color: #ff6b6b; font-weight: bold;">-${formatCurrency(totalStackticAnnualCost)}</td>
+                  <td style="color: #ff6b6b; font-weight: bold;">-${formatCurrency(totalStackticAnnualCost * 3)}</td>
+                  <td>Subscription + engineer time</td>
+                </tr>
+                <tr style="background: #e2e3e5;">
+                  <td><strong>Revenue Growth</strong></td>
+                  <td>Revenue</td>
+                  <td style="color: #6f42c1; font-weight: bold;">+${formatCurrency(timeToMarketValue + revenueIncreaseValue)}</td>
+                  <td style="color: #6f42c1; font-weight: bold;">+${formatCurrency((timeToMarketValue + revenueIncreaseValue) * 3)}</td>
+                  <td>Faster delivery + efficiency</td>
+                </tr>
+                <tr style="background: #f8f9ff; font-weight: bold; border-top: 2px solid #667eea;">
+                  <td><strong>NET ANNUAL PROFIT</strong></td>
+                  <td>Combined</td>
+                  <td style="color: #2ed573; font-size: 18px;">${formatCurrency(totalNetAnnualBenefits)}</td>
+                  <td style="color: #2ed573; font-size: 18px;">${formatCurrency(totalNetAnnualBenefits * 3)}</td>
+                  <td style="color: #2ed573; font-weight: bold;">Annual ROI: ${Math.round(annualROI)}%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('calculation-details').innerHTML = `
+        <div style="background: #fff; border-radius: 12px; padding: 25px; border: 1px solid #ddd;">
+          <h3 style="color: #333; margin-bottom: 20px;">📊 Detailed Calculation Breakdown</h3>
+          
+          <div style="margin-bottom: 25px;">
+            <h4 style="color: #667eea; margin-bottom: 15px;">CAPEX Calculation:</h4>
+            <div style="font-family: monospace; background: #f8f9fa; padding: 15px; border-radius: 6px;">
+              Day 0-1 Tasks Without Stacktic: ${formatCurrency(capexDay01)} × ${numNewApps} apps = ${formatCurrency(capexDay01 * numNewApps)}<br>
+              Day 0-1 Tasks With Stacktic: ${formatCurrency(capexDay01Stacktic)} × ${numNewApps} apps = ${formatCurrency(capexDay01Stacktic * numNewApps)}<br>
+              <strong>CAPEX Savings: ${formatCurrency(totalCapexSavings)}</strong><br>
+              Migration Investment: ${formatCurrency(costToMigrate)}<br>
+              <strong>Net CAPEX Impact: ${formatCurrency(totalCapexSavings - costToMigrate)}</strong>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 25px;">
+            <h4 style="color: #667eea; margin-bottom: 15px;">OPEX Calculation (Annual):</h4>
+            <div style="font-family: monospace; background: #f8f9fa; padding: 15px; border-radius: 6px;">
+              <strong>Benefits:</strong><br>
+              Day 2 Tasks Savings: ${formatCurrency(opexTaskSavings)}<br>
+              Service Cost Savings: ${formatCurrency(totalServiceSavings)}<br>
+              Team Strategic Focus Value: ${formatCurrency(totalTeamOptimizationValue)}<br>
+              <strong>Total OPEX Benefits: ${formatCurrency(totalOpexSavings)}</strong><br><br>
+              <strong>Costs:</strong><br>
+              Stacktic Subscription (${formatCurrency(stackticAnnualCost / 12)}/month × 12): ${formatCurrency(stackticAnnualCost)}<br>
+              Engineer Time Allocation: ${formatCurrency(engineerAnnualCost)}<br>
+              <strong>Total Stacktic Costs: ${formatCurrency(totalStackticAnnualCost)}</strong><br><br>
+              <strong>Net OPEX Benefits: ${formatCurrency(totalNetAnnualBenefits)}</strong>
+            </div>
+          </div>
+
+          <div>
+            <h4 style="color: #667eea; margin-bottom: 15px;">ROI Calculation:</h4>
+            <div style="font-family: monospace; background: #f8f9fa; padding: 15px; border-radius: 6px;">
+              <strong>Investments:</strong><br>
+              Migration Cost (One-time): ${formatCurrency(costToMigrate)}<br>
+              Stacktic Annual Cost: ${formatCurrency(totalStackticAnnualCost)}<br>
+              3-Year Total Investment: ${formatCurrency(costToMigrate + (totalStackticAnnualCost * 3))}<br><br>
+              <strong>Returns:</strong><br>
+              Net Annual Profit: ${formatCurrency(totalNetAnnualBenefits)}<br>
+              3-Year Total Profit: ${formatCurrency(totalNetAnnualBenefits * 3)}<br><br>
+              <strong>ROI Calculations:</strong><br>
+              <strong>Annual ROI: ${Math.round(annualROI)}% = (${formatCurrency(totalNetAnnualBenefits)} ÷ ${formatCurrency(totalStackticAnnualCost)}) × 100</strong><br>
+              <strong>3-Year ROI: ${Math.round(threeYearROI)}% = (${formatCurrency(totalNetAnnualBenefits * 3)} ÷ ${formatCurrency(costToMigrate + (totalStackticAnnualCost * 3))}) × 100</strong><br>
+              <strong>Migration Payback: ${Math.round(paybackMonths)} months = ${formatCurrency(costToMigrate)} ÷ (${formatCurrency(totalNetAnnualBenefits)} ÷ 12)</strong>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function calculateRecommendedTimeToMarket() {
+      const coordinationFactor = parseFloat(document.getElementById('coordination-factor').value) || 0;
+      const numNewApps = parseInt(document.getElementById('num-new-apps').value, 10) || 0;
+      const numExistingApps = parseInt(document.getElementById('num-existing-apps').value, 10) || 0;
+
+      const totalHours = tasks.filter(t => t.phase !== 'day2').reduce((sum, t) => sum + t.numberOfHours, 0);
+      const totalApps = numNewApps + numExistingApps;
+      const baseDays = (totalHours / 8) * Math.max(1, totalApps);
+      const finalEstimate = Math.ceil(baseDays * (1 + coordinationFactor / 100));
+
+      document.getElementById('recommended-time').innerText = `(Estimated: ${finalEstimate} Days with coordination factor)`;
+    }
+
+    function formatCurrency(value) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(value);
+    }
+
+    function exportResults() {
+      const reportData = {
+        timestamp: new Date().toISOString(),
+        configuration: {
+          numNewApps: document.getElementById('num-new-apps').value,
+          numExistingApps: document.getElementById('num-existing-apps').value,
+          timeToMarket: document.getElementById('time-to-market').value,
+          revenueLost: document.getElementById('revenue-lost').value,
+          costToMigrate: document.getElementById('cost-migrate').value,
+          stackticPrice: document.getElementById('stacktic-price').value,
+          numEngineers: document.getElementById('num-engineers').value,
+          engineerTimePercentage: document.getElementById('engineer-time-percentage').value
+        },
+        tasks: tasks,
+        savings: savings,
+        teamOptimizations: teamOptimizations
+      };
+      
+      const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `stacktic-roi-analysis-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function init() {
+      tasks = [...defaultTasks];
+      savings = [...defaultSavings];
+      teamOptimizations = [...defaultTeamOptimizations];
+      
+      renderTasks();
+      renderSavings();
+      renderTeamOptimizations();
+      
+      // Give DOM time to render before calculating
+      setTimeout(() => {
+        isInitialized = true;
+        calculateResults();
+      }, 100);
+      
+      setTimeout(initializeAutoResize, 200);
+      
+      console.log('ROI Calculator initialized with', tasks.length, 'tasks and', savings.length, 'cost savings');
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

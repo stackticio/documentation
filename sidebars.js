@@ -7,6 +7,11 @@ module.exports = {
     },
     {
       type: 'doc',
+      id: 'enterprise_vision_solution',
+      label: 'Enterprise Vision & Solution',
+    },
+    {
+      type: 'doc',
       id: 'overview',
       label: 'Overview',
     },
@@ -19,6 +24,11 @@ module.exports = {
       type: 'doc',
       id: 'quick_start',
       label: 'Quick Start',
+    },
+    {
+      type: 'doc',
+      id: 'prerequisites',
+      label: 'Prerequisites',
     },
     {
       type: 'doc',
@@ -39,6 +49,11 @@ module.exports = {
       type: 'doc',
       id: 'migration',
       label: 'Migration',
+    },
+    {
+      type: 'doc',
+      id: 'migration_vm_example',
+      label: 'Example: VM to Kubernetes',
     },
     {
       type: 'doc',
@@ -65,6 +80,30 @@ module.exports = {
       id: 'common_use_cases',
       label: 'Common Use Cases',
     },
-    // Add other documents as needed
+    {
+      type: 'doc',
+      id: 'private_saas_deployment',
+      label: 'Private SaaS Deployment',
+    },
+    {
+      type: 'doc',
+      id: 'organizational_control',
+      label: 'Organizational Control',
+    },
+    {
+      type: 'doc',
+      id: 'sovereignty',
+      label: 'Sovereignty & Agnostic Freedom',
+    },
+    {
+      type: 'doc',
+      id: 'qna',
+      label: 'Q&A',
+    },
+    {
+      type: 'doc',
+      id: 'multi_stack_observability',
+      label: 'Multi-Stack Observability',
+    },
   ],
 };

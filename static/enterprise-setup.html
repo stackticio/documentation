@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Application Farms</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+            overflow-x: hidden;
+        }
+
+        /* Hide scroll in iframe, show in full screen */
+        body.iframe-embed {
+            overflow: hidden;
+            padding: 5px;
+        }
+
+        .page {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        /* Scale to fit in iframe without scroll */
+        body.iframe-embed .page {
+            transform: scale(0.48);
+            transform-origin: top center;
+        }
+
+        /* Full size when opened in new window */
+        body:not(.iframe-embed) .page {
+            transform: scale(1);
+        }
+
+        /* === HEADER === */
+        .header {
+            display: grid;
+            grid-template-columns: 190px 1fr 190px;
+            margin-bottom: 20px;
+            align-items: end;
+        }
+        .header-label {
+            font-size: 13px;
+            font-weight: 800;
+            color: #333;
+            letter-spacing: 0.5px;
+        }
+        .header-label.right { text-align: right; }
+        
+        .human-factors {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+        .factor {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            padding: 14px 22px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 160px;
+            border: 1px solid #ddd;
+        }
+        .factor h2 { 
+            font-size: 17px; 
+            font-weight: 700; 
+            margin-bottom: 6px;
+            color: #2c3e50;
+        }
+        .factor p { 
+            font-size: 9px; 
+            color: #666; 
+            line-height: 1.4; 
+        }
+
+        /* === MAIN === */
+        .main {
+            display: grid;
+            grid-template-columns: 190px 1fr 190px;
+            gap: 18px;
+        }
+
+        /* === OPS BLOCKERS === */
+        .ops-blockers { display: flex; flex-direction: column; gap: 10px; }
+        .blocker {
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
+            padding: 14px;
+            border-radius: 10px;
+            border-left: 4px solid #e53935;
+        }
+        .blocker h3 { 
+            font-size: 13px; 
+            font-weight: 700; 
+            color: #c62828; 
+            margin-bottom: 6px;
+        }
+        .blocker p { 
+            font-size: 8px; 
+            color: #555; 
+            line-height: 1.5; 
+        }
+
+        /* === ROADMAP === */
+        .roadmap { display: flex; flex-direction: column; gap: 10px; }
+        .roadmap-item {
+            background: linear-gradient(135deg, #f0f7ff 0%, #e3f0ff 100%);
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            border-right: 4px solid #1976d2;
+        }
+        .roadmap-item h3 { 
+            font-size: 10px; 
+            font-weight: 700; 
+            margin-bottom: 8px;
+            color: #1565c0;
+        }
+        .roadmap-icons { 
+            display: flex; 
+            justify-content: center; 
+            gap: 8px;
+            align-items: center;
+        }
+        .roadmap-icon {
+            width: 44px;
+            height: 44px;
+            background: #fff;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-direction: column;
+        }
+        .roadmap-icon .label {
+            font-size: 6px;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+        .roadmap-arrow {
+            font-size: 16px;
+            color: #1976d2;
+        }
+
+        /* === WORKLOAD AREA === */
+        .workload-area {
+            background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+            border: 2px solid #e0e0e0;
+            border-radius: 14px;
+            padding: 18px;
+        }
+
+        /* Top bar */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 11px;
+            color: #555;
+            margin-bottom: 12px;
+            padding: 8px;
+            background: #fff;
+            border-radius: 8px;
+            border: 1px dashed #bbb;
+        }
+        .top-bar .arrow-text { 
+            color: #888;
+            letter-spacing: 2px;
+        }
+
+        /* Deprecated notice */
+        .deprecated-notice {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .deprecated-notice span {
+            display: inline-block;
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border: 2px solid #ffa000;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #e65100;
+        }
+
+        /* === ZONES GRID === */
+        .zones-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        /* Zone base */
+        .zone {
+            background: #fff;
+            border-radius: 12px;
+            padding: 14px;
+            border: 2px solid;
+        }
+        .zone-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid;
+        }
+        .zone-icon {
+            font-size: 20px;
+        }
+        .zone-title {
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .zone-subtitle {
+            font-size: 8px;
+            color: #666;
+            margin-left: auto;
+            background: rgba(0,0,0,0.05);
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+        .zone-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        /* Zone colors */
+        .zone-config { 
+            border-color: #9c27b0; 
+            background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 100%);
+        }
+        .zone-config .zone-header { border-color: #9c27b0; }
+        .zone-config .zone-title { color: #7b1fa2; }
+
+        .zone-k8s { 
+            border-color: #326ce5; 
+            background: linear-gradient(135deg, #e3f2fd 0%, #e8eaf6 100%);
+        }
+        .zone-k8s .zone-header { border-color: #326ce5; }
+        .zone-k8s .zone-title { color: #1565c0; }
+
+        .zone-vm { 
+            border-color: #8d6e63; 
+            background: linear-gradient(135deg, #efebe9 0%, #d7ccc8 100%);
+        }
+        .zone-vm .zone-header { border-color: #8d6e63; }
+        .zone-vm .zone-title { color: #5d4037; }
+
+        .zone-aws { 
+            border-color: #ff9800; 
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+        }
+        .zone-aws .zone-header { border-color: #ff9800; }
+        .zone-aws .zone-title { color: #e65100; }
+
+        .zone-external { 
+            border-color: #00897b; 
+            background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+        }
+        .zone-external .zone-header { border-color: #00897b; }
+        .zone-external .zone-title { color: #00695c; }
+
+        /* === ICONS === */
+        .icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-size: 18px;
+            font-weight: 600;
+            border: 2px solid rgba(255,255,255,0.3);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+            transition: transform 0.2s;
+        }
+        .icon:hover { transform: translateY(-2px); }
+        .icon .label {
+            font-size: 7px;
+            font-weight: 600;
+            margin-top: 2px;
+            text-transform: uppercase;
+        }
+
+        /* AI icons - larger */
+        .icon.ai {
+            width: 56px;
+            height: 56px;
+        }
+
+        /* Icon colors */
+        .yaml { background: linear-gradient(135deg, #d32f2f, #b71c1c); color: #fff; }
+        .json { background: linear-gradient(135deg, #fdd835, #f9a825); color: #000; }
+        .py { background: linear-gradient(135deg, #3776ab, #2c5f86); color: #fff; }
+        .api { background: linear-gradient(135deg, #00897b, #00695c); color: #fff; }
+        
+        .chatgpt { background: linear-gradient(135deg, #10a37f, #0d8a6a); color: #fff; }
+        .claude { background: linear-gradient(135deg, #d97706, #b45309); color: #fff; }
+        .copilot { background: linear-gradient(135deg, #333, #111); color: #fff; }
+        .gemini { background: linear-gradient(135deg, #4285f4, #1a73e8); color: #fff; }
+
+        .k8s { background: linear-gradient(135deg, #326ce5, #2857b6); color: #fff; }
+        .docker { background: linear-gradient(135deg, #2496ed, #1a7cc7); color: #fff; }
+        .django { background: linear-gradient(135deg, #092e20, #0c4a33); color: #fff; }
+        .node { background: linear-gradient(135deg, #339933, #2d7d2d); color: #fff; }
+        .nginx { background: linear-gradient(135deg, #009639, #007a2e); color: #fff; }
+        .react { background: linear-gradient(135deg, #61dafb, #21a1c4); color: #000; }
+        .go { background: linear-gradient(135deg, #00add8, #0095ba); color: #fff; }
+        .argocd { background: linear-gradient(135deg, #ef7b4d, #e55a2b); color: #fff; }
+        .helm { background: linear-gradient(135deg, #0f1689, #0a0f5c); color: #fff; }
+        .java { background: linear-gradient(135deg, #ed8b00, #cc7700); color: #fff; }
+
+        .vm { background: linear-gradient(135deg, #795548, #5d4037); color: #fff; }
+        .elastic { background: linear-gradient(135deg, #fed10a, #f7c600); color: #000; }
+        .oracle { background: linear-gradient(135deg, #f80000, #cc0000); color: #fff; }
+        .sqlserver { background: linear-gradient(135deg, #cc2927, #a31f1d); color: #fff; }
+        .postgres { background: linear-gradient(135deg, #336791, #285578); color: #fff; }
+        .mongo { background: linear-gradient(135deg, #47a248, #3a863b); color: #fff; }
+
+        .rds { background: linear-gradient(135deg, #527fff, #3d66cc); color: #fff; }
+        .s3 { background: linear-gradient(135deg, #569a31, #458027); color: #fff; }
+        .documentdb { background: linear-gradient(135deg, #3b48cc, #2e39a3); color: #fff; }
+        .elasticache { background: linear-gradient(135deg, #c925d1, #a31ea9); color: #fff; }
+        .aurora { background: linear-gradient(135deg, #ff9900, #e68a00); color: #fff; }
+        .lambda { background: linear-gradient(135deg, #ff9900, #e68a00); color: #fff; }
+
+        .entra { background: linear-gradient(135deg, #0078d4, #005fa3); color: #fff; }
+        .vault { background: linear-gradient(135deg, #000, #333); color: #fff; }
+        .okta { background: linear-gradient(135deg, #007dc1, #00649a); color: #fff; }
+        .ldap { background: linear-gradient(135deg, #607d8b, #4b636e); color: #fff; }
+        .datadog { background: linear-gradient(135deg, #632ca6, #4e2282); color: #fff; }
+        .pagerduty { background: linear-gradient(135deg, #06ac38, #058a2d); color: #fff; }
+
+        /* Roadmap specific */
+        .keda { background: linear-gradient(135deg, #326ce5, #2857b6); color: #fff; }
+        .istio { background: linear-gradient(135deg, #466bb0, #37558c); color: #fff; }
+        .linkerd { background: linear-gradient(135deg, #2beda7, #20c98e); color: #000; }
+        .opensearch { background: linear-gradient(135deg, #005eb8, #004a91); color: #fff; }
+        .ingress { background: linear-gradient(135deg, #326ce5, #2857b6); color: #fff; }
+        .gateway { background: linear-gradient(135deg, #7c4dff, #651fff); color: #fff; }
+
+        /* Person & code */
+        .person { font-size: 24px; }
+        .code-tag {
+            background: linear-gradient(135deg, #fce4ec, #f8bbd9);
+            color: #c2185b;
+            font-family: 'Consolas', monospace;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #f48fb1;
+        }
+
+        /* Badges */
+        .badge {
+            font-size: 7px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge.eol { 
+            background: #ffebee; 
+            color: #c62828; 
+            border: 1px solid #ef9a9a;
+        }
+        .badge.deprecated { 
+            background: #fff3e0; 
+            color: #e65100; 
+            border: 1px solid #ffcc80;
+        }
+        .badge.managed { 
+            background: #e3f2fd; 
+            color: #1565c0; 
+            border: 1px solid #90caf9;
+        }
+        .badge.lockin {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+
+        /* === CROSS PLATFORM SECTION === */
+        .cross-section {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            border: 3px solid #e53935;
+            border-radius: 12px;
+            padding: 16px;
+        }
+        .cross-title {
+            text-align: center;
+            font-size: 13px;
+            font-weight: 800;
+            color: #c62828;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .cross-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        .cross-item {
+            background: #fff;
+            border: 2px solid #ef5350;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+        .cross-item .from-to {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .cross-item .zone-badge {
+            background: #f5f5f5;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 9px;
+            font-weight: 600;
+        }
+        .cross-item .arrows {
+            font-size: 16px;
+            color: #e53935;
+        }
+        .cross-item .breaks {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .cross-item .break-tag {
+            background: #ffcdd2;
+            color: #b71c1c;
+            font-size: 8px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        /* === IAC SECTION === */
+        .iac-section {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        .iac-box {
+            background: #fff;
+            border: 2px dashed #7b1fa2;
+            border-radius: 12px;
+            padding: 14px;
+        }
+        .iac-box h4 {
+            font-size: 13px;
+            font-weight: 700;
+            color: #7b1fa2;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .iac-box .content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .iac-box .terraform {
+            background: linear-gradient(135deg, #7b42bc, #5e329a);
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+        .iac-box .warn {
+            background: #ffebee;
+            border: 1px solid #ef9a9a;
+            color: #c62828;
+            font-size: 9px;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .iac-box .status {
+            background: #e8f5e9;
+            color: #2e7d32;
+            font-size: 8px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid #a5d6a7;
+        }
+
+        /* === PROBLEMS BOX === */
+        .problems-box {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #fff 0%, #fafafa 100%);
+            border: 2px solid #d32f2f;
+            border-radius: 12px;
+            padding: 16px;
+        }
+        .problems-box h4 {
+            font-size: 12px;
+            font-weight: 800;
+            color: #c62828;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .problems-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .problem-tag {
+            background: linear-gradient(135deg, #ffebee, #ffcdd2);
+            border: 1px solid #ef9a9a;
+            color: #b71c1c;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 9px;
+            font-weight: 600;
+        }
+
+        /* Full width zone */
+        .zone-full { grid-column: 1 / -1; }
+
+        /* Divider */
+        .plus-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: #7b1fa2;
+            margin: 0 8px;
+        }
+        .arrow-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #7b1fa2;
+            margin: 0 8px;
+        }
+
+        /* Fullscreen button */
+        .fullscreen-btn {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        .fullscreen-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <!-- Fullscreen Button -->
+    <button class="fullscreen-btn" onclick="window.open(window.location.href, '_blank')">⛶ View Full Screen</button>
+
+    <script>
+        // Detect if in iframe and add class
+        if (window.self !== window.top) {
+            document.body.classList.add('iframe-embed');
+        }
+    </script>
+
+<div class="page">
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-label">OPS BLOCKERS</div>
+        <div class="human-factors">
+            <div class="factor">
+                <h2>PROCESS</h2>
+                <p>Human Approvals &<br>validation process</p>
+            </div>
+            <div class="factor">
+                <h2>CONTROL</h2>
+                <p>Organization Hierarchy<br>permission and control</p>
+            </div>
+            <div class="factor">
+                <h2>STRATEGY</h2>
+                <p>Resistance to changes &<br>avoiding improvements</p>
+            </div>
+            <div class="factor">
+                <h2>TEAMS</h2>
+                <p>Onboarding, knowledge<br>sharing, collaboration</p>
+            </div>
+        </div>
+        <div class="header-label right">2030 ROADMAP</div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+        <!-- OPS BLOCKERS -->
+        <div class="ops-blockers">
+            <div class="blocker">
+                <h3>MIGRATIONS</h3>
+                <p>Migrations of deprecated services, old OSS and legacy. Managing production with zero risks</p>
+            </div>
+            <div class="blocker">
+                <h3>VERSIONING</h3>
+                <p>Ensure consistent versioning, maintenance, and security across all layers</p>
+            </div>
+            <div class="blocker">
+                <h3>Change / Improve</h3>
+                <p>"Don't touch approach" - Barriers to adapting, modifying, rolling back</p>
+            </div>
+            <div class="blocker">
+                <h3>Multi cloud</h3>
+                <p>Migrate apps to new cloud, centralize shared services</p>
+            </div>
+            <div class="blocker">
+                <h3>Standardization</h3>
+                <p>AI-generated configs with inconsistent styles - Tower of Babel</p>
+            </div>
+            <div class="blocker">
+                <h3>Tracking</h3>
+                <p>No centralized view for Audit, SecOps, Observability, OPEX</p>
+            </div>
+        </div>
+
+        <!-- WORKLOAD AREA -->
+        <div class="workload-area">
+            <div class="top-bar">
+                <span class="person">👤</span>
+                <span class="code-tag">&lt;/&gt;</span>
+                <span>Legacy automation</span>
+                <span class="arrow-text">──────────→</span>
+                <span class="person">👤</span>
+                <span class="code-tag">&lt;/&gt;</span>
+            </div>
+
+            <div class="deprecated-notice">
+                <span>⚠️ Deprecated & EOL services in production</span>
+            </div>
+
+            <div class="zones-grid">
+                <!-- CONFIG PUSH ZONE -->
+                <div class="zone zone-config zone-full">
+                    <div class="zone-header">
+                        <span class="zone-icon">📝</span>
+                        <span class="zone-title">CONFIG PUSH ZONE</span>
+                        <span class="zone-subtitle">Different people, different AI tools, no standards</span>
+                    </div>
+                    <div class="zone-content">
+                        <div class="icon yaml">📄<span class="label">YAML</span></div>
+                        <div class="icon json">{ }<span class="label">JSON</span></div>
+                        <div class="icon py">🐍<span class="label">Python</span></div>
+                        <div class="icon api">⚡<span class="label">API</span></div>
+                        
+                        <span class="plus-divider">+</span>
+                        
+                        <div class="icon ai chatgpt">🤖<span class="label">ChatGPT</span></div>
+                        <div class="icon ai claude">🧠<span class="label">Claude</span></div>
+                        <div class="icon ai copilot">✈️<span class="label">Copilot</span></div>
+                        <div class="icon ai gemini">✨<span class="label">Gemini</span></div>
+                        
+                        <span class="arrow-divider">→</span>
+                        
+                        <span class="person">👤</span>
+                        <span class="code-tag">&lt;/&gt;</span>
+                        <span class="person">👤</span>
+                        <span class="code-tag">&lt;/&gt;</span>
+                        <span class="person">👤</span>
+                        <span class="code-tag">&lt;/&gt;</span>
+                    </div>
+                </div>
+
+                <!-- KUBERNETES ZONE -->
+                <div class="zone zone-k8s">
+                    <div class="zone-header">
+                        <span class="zone-icon">☸️</span>
+                        <span class="zone-title">KUBERNETES</span>
+                        <span class="zone-subtitle">Source code / Apps</span>
+                    </div>
+                    <div class="zone-content">
+                        <div class="icon k8s">☸️<span class="label">K8s</span></div>
+                        <div class="icon docker">🐳<span class="label">Docker</span></div>
+                        <div class="icon django">dj<span class="label">Django</span></div>
+                        <div class="icon node">N<span class="label">Node.js</span></div>
+                        <div class="icon react">⚛️<span class="label">React</span></div>
+                        <div class="icon go">Go<span class="label">Golang</span></div>
+                        <div class="icon java">☕<span class="label">Java</span></div>
+                        <div class="icon nginx">N<span class="label">Nginx</span></div>
+                        <div class="icon argocd">🔄<span class="label">Argo</span></div>
+                        <div class="icon helm">⎈<span class="label">Helm</span></div>
+                    </div>
+                </div>
+
+                <!-- VM / LEGACY ZONE -->
+                <div class="zone zone-vm">
+                    <div class="zone-header">
+                        <span class="zone-icon">🖥️</span>
+                        <span class="zone-title">VM / LEGACY</span>
+                        <span class="zone-subtitle">Deprecated databases</span>
+                    </div>
+                    <div class="zone-content">
+                        <div class="icon vm">🖥️<span class="label">VM</span></div>
+                        <div class="icon vm">🖥️<span class="label">VM</span></div>
+                        <div class="icon elastic" style="position:relative;">
+                            🔍<span class="label">Elastic</span>
+                            <span class="badge eol" style="position:absolute;top:-8px;right:-8px;font-size:5px;padding:2px 4px;">EOL</span>
+                        </div>
+                        <div class="icon oracle">🔴<span class="label">Oracle</span></div>
+                        <div class="icon sqlserver">📊<span class="label">SQL Srv</span></div>
+                        <div class="icon postgres">🐘<span class="label">Postgres</span></div>
+                        <div class="icon mongo">🍃<span class="label">Mongo</span></div>
+                    </div>
+                </div>
+
+                <!-- AWS ZONE -->
+                <div class="zone zone-aws">
+                    <div class="zone-header">
+                        <span class="zone-icon">☁️</span>
+                        <span class="zone-title">AWS MANAGED</span>
+                        <span class="zone-subtitle">Vendor Lock-in ⚠️</span>
+                    </div>
+                    <div class="zone-content">
+                        <div class="icon rds">🗄️<span class="label">RDS</span></div>
+                        <div class="icon aurora">⭐<span class="label">Aurora</span></div>
+                        <div class="icon s3">📦<span class="label">S3</span></div>
+                        <div class="icon documentdb">📄<span class="label">DocDB</span></div>
+                        <div class="icon elasticache">⚡<span class="label">Cache</span></div>
+                        <div class="icon lambda">λ<span class="label">Lambda</span></div>
+                        <span class="badge lockin">🔒 LOCK-IN</span>
+                    </div>
+                </div>
+
+                <!-- EXTERNAL SYSTEMS -->
+                <div class="zone zone-external">
+                    <div class="zone-header">
+                        <span class="zone-icon">🔗</span>
+                        <span class="zone-title">EXTERNAL SYSTEMS</span>
+                        <span class="zone-subtitle">Identity / Secrets / Monitoring</span>
+                    </div>
+                    <div class="zone-content">
+                        <div class="icon entra">🔐<span class="label">Entra</span></div>
+                        <div class="icon vault">🔒<span class="label">Vault</span></div>
+                        <div class="icon okta">🎫<span class="label">Okta</span></div>
+                        <div class="icon ldap">📇<span class="label">LDAP</span></div>
+                        <div class="icon datadog">🐕<span class="label">Datadog</span></div>
+                        <div class="icon pagerduty">📟<span class="label">Pager</span></div>
+                    </div>
+                </div>
+
+                <!-- CROSS PLATFORM COMMUNICATION -->
+                <div class="cross-section">
+                    <div class="cross-title">
+                        <span>⚠️</span>
+                        CROSS PLATFORM COMMUNICATION
+                        <span>⚠️</span>
+                    </div>
+                    <div class="cross-grid">
+                        <div class="cross-item">
+                            <div class="from-to">
+                                <span class="zone-badge" style="background:#e3f2fd;color:#1565c0;">K8s</span>
+                                <span class="arrows">⟷</span>
+                                <span class="zone-badge" style="background:#efebe9;color:#5d4037;">VM</span>
+                            </div>
+                            <div class="breaks">
+                                <span class="break-tag">❌ Breaks IAC</span>
+                                <span class="break-tag">❌ Breaks GitOps</span>
+                            </div>
+                        </div>
+                        <div class="cross-item">
+                            <div class="from-to">
+                                <span class="zone-badge" style="background:#e3f2fd;color:#1565c0;">K8s</span>
+                                <span class="arrows">⟷</span>
+                                <span class="zone-badge" style="background:#fff3e0;color:#e65100;">AWS</span>
+                            </div>
+                            <div class="breaks">
+                                <span class="break-tag">❌ Breaks Automation</span>
+                                <span class="break-tag">❌ Vendor Lock-in</span>
+                            </div>
+                        </div>
+                        <div class="cross-item">
+                            <div class="from-to">
+                                <span class="zone-badge" style="background:#efebe9;color:#5d4037;">VM</span>
+                                <span class="arrows">⟷</span>
+                                <span class="zone-badge" style="background:#fff3e0;color:#e65100;">AWS</span>
+                            </div>
+                            <div class="breaks">
+                                <span class="break-tag">❌ Breaks Security</span>
+                                <span class="break-tag">❌ No Observability</span>
+                            </div>
+                        </div>
+                        <div class="cross-item">
+                            <div class="from-to">
+                                <span class="zone-badge" style="background:#ddd;color:#333;">ALL</span>
+                                <span class="arrows">⟷</span>
+                                <span class="zone-badge" style="background:#e0f2f1;color:#00695c;">External</span>
+                            </div>
+                            <div class="breaks">
+                                <span class="break-tag">❌ Split Policies</span>
+                                <span class="break-tag">❌ No Single RBAC</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- IAC / GITOPS -->
+                <div class="iac-section">
+                    <div class="iac-box">
+                        <h4>📄 IAC (Terraform)</h4>
+                        <div class="content">
+                            <span class="person">👤</span>
+                            <div class="terraform">TF</div>
+                            <span class="code-tag">&lt;/&gt;</span>
+                            <span class="person">👤</span>
+                        </div>
+                        <div class="warn">❌ No single source of truth automation</div>
+                    </div>
+                    <div class="iac-box">
+                        <h4>🔄 GitOps (ArgoCD)</h4>
+                        <div class="content">
+                            <span class="person">👤</span>
+                            <div class="icon argocd" style="width:40px;height:40px;">🔄</div>
+                            <span class="status">IN PROGRESS</span>
+                        </div>
+                        <div class="warn">❌ Doesn't cover managed services or VMs</div>
+                    </div>
+                </div>
+
+                <!-- PROBLEMS -->
+                <div class="problems-box">
+                    <h4>🔥 THE CHAOS - What's Broken</h4>
+                    <div class="problems-list">
+                        <span class="problem-tag">No centralized observability</span>
+                        <span class="problem-tag">Vendor Lock-in</span>
+                        <span class="problem-tag">Cross platform breaks IAC</span>
+                        <span class="problem-tag">Security policies split</span>
+                        <span class="problem-tag">Inconsistent configuration</span>
+                        <span class="problem-tag">AI tools = different configs</span>
+                        <span class="problem-tag">Human errors & chaos</span>
+                        <span class="problem-tag">Compliance (DORA, PCI-DSS)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2030 ROADMAP -->
+        <div class="roadmap">
+            <div class="roadmap-item">
+                <h3>SCALE FROM ZERO</h3>
+                <div class="roadmap-icons">
+                    <div class="roadmap-icon keda" style="font-size:10px;">☸️<span class="label">KEDA</span></div>
+                    <div class="roadmap-icon" style="background:#4caf50;color:#fff;">📈<span class="label">Scale</span></div>
+                </div>
+            </div>
+            <div class="roadmap-item">
+                <h3>Private AI RAG</h3>
+                <div class="roadmap-icons">
+                    <div class="roadmap-icon" style="background:#10a37f;color:#fff;">🤖<span class="label">LLM</span></div>
+                    <span class="roadmap-arrow">→</span>
+                    <div class="roadmap-icon" style="background:#7c4dff;color:#fff;">📚<span class="label">Vector</span></div>
+                    <span class="roadmap-arrow">→</span>
+                    <div class="roadmap-icon" style="background:#326ce5;color:#fff;">☸️<span class="label">K8s</span></div>
+                </div>
+            </div>
+            <div class="roadmap-item">
+                <h3>Service Mesh</h3>
+                <div class="roadmap-icons">
+                    <div class="roadmap-icon istio">🔷<span class="label">Istio</span></div>
+                    <div class="roadmap-icon linkerd">🔗<span class="label">Linkerd</span></div>
+                </div>
+            </div>
+            <div class="roadmap-item">
+                <h3>Legacy Migration</h3>
+                <div class="roadmap-icons">
+                    <div class="roadmap-icon vm">🖥️<span class="label">VM</span></div>
+                    <span class="roadmap-arrow">→</span>
+                    <div class="roadmap-icon k8s">☸️<span class="label">K8s</span></div>
+                </div>
+            </div>
+            <div class="roadmap-item">
+                <h3>Deprecated CRDs</h3>
+                <p style="font-size:7px;color:#666;margin-bottom:6px;">EOL Migration</p>
+                <div class="roadmap-icons">
+                    <div class="roadmap-icon ingress">🚪<span class="label">Ingress</span></div>
+                    <span class="roadmap-arrow">→</span>
+                    <div class="roadmap-icon gateway">🌐<span class="label">Gateway</span></div>
+                </div>
+            </div>
+            <div class="roadmap-item">
+                <h3>OSS Migrations</h3>
+                <div class="roadmap-icons">
+                    <div class="roadmap-icon elastic">🔍<span class="label">Elastic</span></div>
+                    <span class="roadmap-arrow">→</span>
+                    <div class="roadmap-icon opensearch">🔎<span class="label">Open</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

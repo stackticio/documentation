@@ -352,9 +352,9 @@ Stacktic is an **open platform**, providing:
 
 ### Next Steps
 
-1. 📖 Review the [Operational Guide](./operational-guide.md) for Day 0-2 workflow
-2. 🔒 Explore the [Security Framework](./security-framework.md) for hardening details
-3. 🚀 Start with a [Quick Start Guide](./quick-start.md) to build your first stack
+1. 📖 Review the [Operational Guide](./operational_guide.md) for Day 0-2 workflow
+2. 🔒 Explore the [Security Framework](./security.md) for hardening details
+3. 🚀 Start with a [Quick Start Guide](./quick_start.md) to build your first stack
 4. 💬 Join our [Community](https://stacktic.io/slack) for support
 
 ---

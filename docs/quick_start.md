@@ -60,9 +60,12 @@ Stacktic converts application topology into a fully versioned Git repository—c
 #### before we start, here is a 3 min video example 
 
 
-<video controls width="100%">
-  <source src={require('@site/static/videos/import-source-code-4.mp4').default} type="video/mp4" />
-</video>
+<div style={{maxWidth: '100%'}}>
+  <video width="100%" controls style={{maxWidth: '800px'}}>
+    <source src="https://video.wixstatic.com/video/06ddae_62e9379f2c8d4f0abd61b6a68282b721/1080p/mp4/file.mp4" type="video/mp4" />
+    <p>Your browser does not support the video tag.</p>
+  </video>
+</div>
 
 ---
 

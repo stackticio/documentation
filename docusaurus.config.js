@@ -7,6 +7,8 @@ module.exports = {
   trailingSlash: false,
   organizationName: 'stackticio',  // Your GitHub organization/user name
   projectName: 'documentation',  // Correct GitHub repository name
+  onBrokenLinks: 'warn',
+  onBrokenAnchors: 'warn',
 
   themeConfig: {
     navbar: {

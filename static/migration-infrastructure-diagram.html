@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infrastructure Comparison: VM vs Kubernetes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #ffffff;
+            color: #24292f;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: #0969da;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #57606a;
+            letter-spacing: 1px;
+        }
+
+        /* Main Comparison */
+        .comparison-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 100px 1fr;
+            gap: 40px;
+            align-items: start;
+            margin-bottom: 60px;
+        }
+
+        /* Stack Visual */
+        .stack-visual {
+            background: #f6f8fa;
+            border-radius: 16px;
+            padding: 30px;
+            position: relative;
+        }
+
+        .stack-visual.legacy {
+            border: 3px solid #cf222e;
+        }
+
+        .stack-visual.modern {
+            border: 3px solid #1a7f37;
+        }
+
+        .stack-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .stack-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .stack-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .legacy .stack-title {
+            color: #cf222e;
+        }
+
+        .modern .stack-title {
+            color: #1a7f37;
+        }
+
+        .stack-label {
+            font-size: 11px;
+            color: #57606a;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+
+        /* Tower Stack */
+        .tower {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .tower-block {
+            background: #ffffff;
+            border: 2px solid #d0d7de;
+            border-radius: 8px;
+            padding: 12px 16px;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .tower-block:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .legacy .tower-block {
+            border-left: 5px solid #cf222e;
+        }
+
+        .modern .tower-block {
+            border-left: 5px solid #1a7f37;
+        }
+
+        .block-emoji {
+            font-size: 24px;
+            margin-bottom: 6px;
+        }
+
+        .block-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #24292f;
+            margin-bottom: 4px;
+        }
+
+        .block-desc {
+            font-size: 10px;
+            color: #57606a;
+            line-height: 1.3;
+        }
+
+        /* VS Divider */
+        .vs-divider {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 150px;
+            gap: 20px;
+        }
+
+        .vs-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #cf222e 0%, #1a7f37 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 900;
+            color: #ffffff;
+            box-shadow: 0 8px 32px rgba(9, 105, 218, 0.3);
+            position: relative;
+        }
+
+        .arrow-down {
+            font-size: 36px;
+            color: #1a7f37;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(10px); }
+        }
+
+        /* Metrics Comparison */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 60px;
+        }
+
+        .metric-card {
+            background: #f6f8fa;
+            border: 2px solid #d0d7de;
+            border-radius: 12px;
+            padding: 28px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            border-color: #0969da;
+            transform: translateY(-5px);
+            box-shadow: 0 12px 32px rgba(9, 105, 218, 0.15);
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #57606a;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .metric-comparison {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .metric-old {
+            font-size: 18px;
+            font-weight: 700;
+            color: #cf222e;
+            text-decoration: line-through;
+        }
+
+        .metric-arrow {
+            font-size: 24px;
+            color: #0969da;
+        }
+
+        .metric-new {
+            font-size: 24px;
+            font-weight: 900;
+            color: #1a7f37;
+        }
+
+        .metric-improvement {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1a7f37;
+            background: #dafbe1;
+            padding: 6px 16px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        /* Cost Summary */
+        .cost-summary {
+            background: linear-gradient(135deg, #f6f8fa 0%, #ffffff 100%);
+            border: 3px solid #1a7f37;
+            border-radius: 16px;
+            padding: 40px;
+            margin-top: 60px;
+            text-align: center;
+        }
+
+        .cost-summary h2 {
+            font-size: 28px;
+            color: #0969da;
+            margin-bottom: 30px;
+        }
+
+        .savings-highlight {
+            font-size: 52px;
+            font-weight: 900;
+            color: #1a7f37;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(26, 127, 55, 0.1);
+        }
+
+        .savings-text {
+            font-size: 16px;
+            color: #57606a;
+            margin-bottom: 10px;
+        }
+
+        .roi-text {
+            font-size: 14px;
+            color: #0969da;
+            font-weight: 700;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .comparison-wrapper {
+                grid-template-columns: 1fr;
+                gap: 60px;
+            }
+
+            .vs-divider {
+                flex-direction: row;
+            }
+
+            .arrow-down {
+                transform: rotate(-90deg);
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>VM vs KUBERNETES</h1>
+            <p class="subtitle">Infrastructure Comparison</p>
+        </div>
+
+        <!-- Visual Comparison -->
+        <div class="comparison-wrapper">
+            <!-- Legacy VM Stack -->
+            <div class="stack-visual legacy">
+                <div class="stack-header">
+                    <div class="stack-icon">⚠️</div>
+                    <div class="stack-title">LEGACY VMs</div>
+                    <div class="stack-label">Traditional Infrastructure</div>
+                </div>
+
+                <div class="tower">
+                    <div class="tower-block">
+                        <div class="block-emoji">📦</div>
+                        <div class="block-name">Monolithic Apps</div>
+                        <div class="block-desc">Manual deployment, weeks to release</div>
+                    </div>
+
+                    <div class="tower-block">
+                        <div class="block-emoji">💾</div>
+                        <div class="block-name">Databases</div>
+                        <div class="block-desc">No HA, manual backups, single points of failure</div>
+                    </div>
+
+                    <div class="tower-block">
+                        <div class="block-emoji">🖥️</div>
+                        <div class="block-name">Full OS per VM</div>
+                        <div class="block-desc">2-4GB RAM overhead, slow boot times</div>
+                    </div>
+
+                    <div class="tower-block">
+                        <div class="block-emoji">🔒</div>
+                        <div class="block-name">Manual Security</div>
+                        <div class="block-desc">Perimeter firewall, manual patching</div>
+                    </div>
+
+                    <div class="tower-block">
+                        <div class="block-emoji">📊</div>
+                        <div class="block-name">Basic Monitoring</div>
+                        <div class="block-desc">Nagios/Zabbix, reactive alerts</div>
+                    </div>
+
+                    <div class="tower-block">
+                        <div class="block-emoji">⚡</div>
+                        <div class="block-name">VMware vSphere</div>
+                        <div class="block-desc">$120K/year licensing, vendor lock-in</div>
+                    </div>
+
+                    <div class="tower-block">
+                        <div class="block-emoji">🖧</div>
+                        <div class="block-name">Physical Hardware</div>
+                        <div class="block-desc">20-30% utilization, massive waste</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VS Divider -->
+            <div class="vs-divider">
+                <div class="vs-circle">VS</div>
+                <div class="arrow-down">→</div>
+            </div>
+
+            <!-- Modern K8s Stack -->
+            <div class="stack-visual modern">
+                <div class="stack-header">
+                    <div class="stack-icon">✨</div>
+                    <div class="stack-title">KUBERNETES</div>
+                    <div class="stack-label">Cloud-Native Platform</div>
+                </div>
+
+                <div class="tower">
+                    <div class="tower-block">
+                        <div class="block-emoji">🚀</div>
+                        <div class="block-name">Microservices</div>
+                        <div class="block-desc">GitOps, hourly deployments, instant rollback</div>
+                    </div>
+
+                    <div class="tower-block">
+                        <div class="block-emoji">💎</div>
+                        <div class="block-name">HA Databases</div>
+                        <div class="block-desc">CNPG operators, automated backups, zero downtime</div>
+                    </div>
+
+                    <div class="tower-block">
+                        <div class="block-emoji">🐳</div>
+                        <div class="block-name">Containers</div>
+                        <div class="block-desc">10-100MB footprint, instant startup</div>
+                    </div>
+
+                    <div class="tower-block">
+                        <div class="block-emoji">🛡️</div>
+                        <div class="block-name">Zero-Trust Security</div>
+                        <div class="block-desc">RBAC, NetworkPolicies, OPA, automated CVE scanning</div>
+                    </div>
+
+                    <div class="tower-block">
+                        <div class="block-emoji">📈</div>
+                        <div class="block-name">Full Observability</div>
+                        <div class="block-desc">Prometheus + Grafana, distributed tracing</div>
+                    </div>
+
+                    <div class="tower-block">
+                        <div class="block-emoji">☸️</div>
+                        <div class="block-name">Kubernetes</div>
+                        <div class="block-desc">Open source, auto-scaling, self-healing</div>
+                    </div>
+
+                    <div class="tower-block">
+                        <div class="block-emoji">☁️</div>
+                        <div class="block-name">Cloud Native</div>
+                        <div class="block-desc">70-80% utilization, right-sized resources</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Infrastructure Cost</div>
+                <div class="metric-comparison">
+                    <span class="metric-old">$500K</span>
+                    <span class="metric-arrow">→</span>
+                    <span class="metric-new">$150K</span>
+                </div>
+                <div class="metric-improvement">70% Savings</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">Operations Cost</div>
+                <div class="metric-comparison">
+                    <span class="metric-old">$300K</span>
+                    <span class="metric-arrow">→</span>
+                    <span class="metric-new">$80K</span>
+                </div>
+                <div class="metric-improvement">73% Savings</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">Licensing Fees</div>
+                <div class="metric-comparison">
+                    <span class="metric-old">$120K</span>
+                    <span class="metric-arrow">→</span>
+                    <span class="metric-new">$0</span>
+                </div>
+                <div class="metric-improvement">100% Savings</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">Resource Utilization</div>
+                <div class="metric-comparison">
+                    <span class="metric-old">20-30%</span>
+                    <span class="metric-arrow">→</span>
+                    <span class="metric-new">70-80%</span>
+                </div>
+                <div class="metric-improvement">3x Better</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">Deployment Speed</div>
+                <div class="metric-comparison">
+                    <span class="metric-old">Hours</span>
+                    <span class="metric-arrow">→</span>
+                    <span class="metric-new">Minutes</span>
+                </div>
+                <div class="metric-improvement">30x Faster</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">Recovery Time</div>
+                <div class="metric-comparison">
+                    <span class="metric-old">2-4 hrs</span>
+                    <span class="metric-arrow">→</span>
+                    <span class="metric-new">5-15 min</span>
+                </div>
+                <div class="metric-improvement">16x Faster</div>
+            </div>
+        </div>
+
+        <!-- Cost Summary -->
+        <div class="cost-summary">
+            <h2>💰 Total Economic Impact</h2>
+            <div class="savings-highlight">$1.01M/year</div>
+            <div class="savings-text">Annual savings for 100 VMs/Pods</div>
+            <div class="savings-text">82% TCO reduction</div>
+            <div class="roi-text">ROI Break-even: 4-6 months | 3-Year NPV: $3.03M</div>
+        </div>
+    </div>
+</body>
+</html>

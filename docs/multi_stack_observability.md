@@ -17,31 +17,7 @@ Stacktic enables centralized monitoring where one **Master Stack** collects metr
 
 ## Architecture
 
-```
-┌─────────────────────┐     ┌─────────────────────┐
-│   REMOTE STACK A    │     │   REMOTE STACK B    │
-│                     │     │                     │
-│    Prometheus       │     │    Prometheus       │
-│   (remote mode)     │     │   (remote mode)     │
-│         │           │     │         │           │
-│         ▼           │     │         ▼           │
-│    remote_write     │     │    remote_write     │
-└─────────┬───────────┘     └─────────┬───────────┘
-          │                           │
-          └───────────┬───────────────┘
-                      ▼
-┌─────────────────────────────────────────────────┐
-│              MASTER STACK                       │
-│                                                 │
-│  ┌───────────┐  ┌──────────┐  ┌─────────────┐  │
-│  │Prometheus │  │ Grafana  │  │Alertmanager │  │
-│  │ (master)  │  │          │  │             │  │
-│  │           │  │ - Master │  │ Centralized │  │
-│  │ Receives  │  │ - Stack-A│  │   alerts    │  │
-│  │all metrics│  │ - Stack-B│  │ from all    │  │
-│  └───────────┘  └──────────┘  └─────────────┘  │
-└─────────────────────────────────────────────────┘
-```
+<iframe src="/documentation/multi-stack-observability.html" width="100%" height="650px" frameBorder="0"></iframe>
 
 ## Setup Steps
 

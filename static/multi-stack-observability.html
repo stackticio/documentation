@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Stack Observability Architecture</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 40px;
+        }
+        .remote-stacks {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 20px;
+        }
+        .stack-box {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 2px solid #e0e0e0;
+            min-width: 280px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .stack-box:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+        .remote-stack {
+            border-top: 4px solid #667eea;
+        }
+        .stack-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        .component {
+            background: #f8f9fb;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 12px;
+            text-align: center;
+            border-left: 3px solid #667eea;
+        }
+        .component-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        .component-desc {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+        .arrow-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 60px;
+            position: relative;
+        }
+        .arrow-down {
+            width: 3px;
+            height: 40px;
+            background: linear-gradient(to bottom, #667eea, #764ba2);
+            position: relative;
+        }
+        .arrow-down::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 12px solid #764ba2;
+        }
+        .merge-arrows {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 80px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .merge-line-left, .merge-line-right {
+            position: absolute;
+            height: 3px;
+            background: linear-gradient(to right, #667eea, #764ba2);
+            top: 0;
+        }
+        .merge-line-left {
+            width: 180px;
+            right: 50%;
+            border-radius: 3px 0 0 3px;
+        }
+        .merge-line-right {
+            width: 180px;
+            left: 50%;
+            border-radius: 0 3px 3px 0;
+        }
+        .merge-line-down {
+            position: absolute;
+            width: 3px;
+            height: 60px;
+            background: linear-gradient(to bottom, #764ba2, #667eea);
+            left: 50%;
+            transform: translateX(-50%);
+            top: 0;
+        }
+        .merge-arrow {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 14px solid #667eea;
+        }
+        .master-stack {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 30px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .master-stack .stack-title {
+            color: white;
+            border-bottom-color: rgba(255,255,255,0.3);
+            font-size: 18px;
+        }
+        .master-components {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .master-component {
+            background: white;
+            border-radius: 10px;
+            padding: 18px;
+            flex: 1;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            border-left: none;
+            border-bottom: 3px solid;
+        }
+        .master-component.prometheus {
+            border-bottom-color: #e74c3c;
+        }
+        .master-component.grafana {
+            border-bottom-color: #f39c12;
+        }
+        .master-component.alertmanager {
+            border-bottom-color: #27ae60;
+        }
+        .master-component .component-name {
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+        .master-component .component-desc {
+            font-size: 11px;
+            line-height: 1.5;
+        }
+        .feature-list {
+            list-style: none;
+            margin-top: 10px;
+            text-align: left;
+            padding-left: 10px;
+        }
+        .feature-list li {
+            font-size: 11px;
+            color: #555;
+            padding: 3px 0;
+            position: relative;
+            padding-left: 14px;
+        }
+        .feature-list li::before {
+            content: '>';
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #666;
+        }
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+        .legend-color.remote {
+            background: #667eea;
+        }
+        .legend-color.master {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Multi-Stack Centralized Observability</h1>
+
+        <!-- Remote Stacks -->
+        <div class="remote-stacks">
+            <div class="stack-box remote-stack">
+                <div class="stack-title">REMOTE STACK A</div>
+                <div class="component">
+                    <div class="component-name">Prometheus</div>
+                    <div class="component-desc">(remote mode)</div>
+                </div>
+                <div class="arrow-container">
+                    <div class="arrow-down"></div>
+                </div>
+                <div class="component">
+                    <div class="component-name">remote_write</div>
+                    <div class="component-desc">Sends metrics to master</div>
+                </div>
+            </div>
+
+            <div class="stack-box remote-stack">
+                <div class="stack-title">REMOTE STACK B</div>
+                <div class="component">
+                    <div class="component-name">Prometheus</div>
+                    <div class="component-desc">(remote mode)</div>
+                </div>
+                <div class="arrow-container">
+                    <div class="arrow-down"></div>
+                </div>
+                <div class="component">
+                    <div class="component-name">remote_write</div>
+                    <div class="component-desc">Sends metrics to master</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Merge Arrows -->
+        <div class="merge-arrows">
+            <div class="merge-line-left"></div>
+            <div class="merge-line-right"></div>
+            <div class="merge-line-down"></div>
+            <div class="merge-arrow"></div>
+        </div>
+
+        <!-- Master Stack -->
+        <div class="stack-box master-stack">
+            <div class="stack-title">MASTER STACK</div>
+            <div class="master-components">
+                <div class="master-component prometheus">
+                    <div class="component-name">Prometheus</div>
+                    <div class="component-desc">(master mode)</div>
+                    <ul class="feature-list">
+                        <li>Receives all metrics</li>
+                        <li>Central storage</li>
+                        <li>Query federation</li>
+                    </ul>
+                </div>
+                <div class="master-component grafana">
+                    <div class="component-name">Grafana</div>
+                    <div class="component-desc">Visualization</div>
+                    <ul class="feature-list">
+                        <li>Master dashboards</li>
+                        <li>Stack-A dashboards</li>
+                        <li>Stack-B dashboards</li>
+                    </ul>
+                </div>
+                <div class="master-component alertmanager">
+                    <div class="component-name">Alertmanager</div>
+                    <div class="component-desc">Centralized alerts</div>
+                    <ul class="feature-list">
+                        <li>Alerts from all stacks</li>
+                        <li>Unified routing</li>
+                        <li>Deduplication</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color remote"></div>
+                <span>Remote Stack</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color master"></div>
+                <span>Master Stack</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

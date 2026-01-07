@@ -41,6 +41,8 @@ In your **Master Stack**, add a Prometheus component with master mode enabled.
 - Centralizes all alerting rules
 - Exposes Alertmanager UI for all clusters
 
+
+![alt text](image-68.png)
 ---
 
 ### Step 2: Configure Remote Prometheus
@@ -68,17 +70,22 @@ Create a **prometheus-prometheus** link from the Remote Prometheus to the Master
 | Target Component | Master Prometheus (e.g. `prometheus-master`) |
 | Link Type | `prometheus-prometheus` |
 
+
 **Link Attributes:**
 
 | Attribute | Value | Description |
 |-----------|-------|-------------|
 | `api_key` | (optional) | API key matching the master's `api_key` |
 
+![alt text](image-69.png)
+
+
 **What This Link Enables:**
 - Remote Prometheus automatically sends metrics to Master via remote_write
 - All metrics receive `cluster="<system_name>"` label
 - Alerts are forwarded to Master's Alertmanager
 - Grafana auto-discovers the remote stack
+
 
 ---
 

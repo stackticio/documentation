@@ -105,5 +105,10 @@ module.exports = {
       id: 'multi_stack_observability',
       label: 'Multi-Stack Observability',
     },
+    {
+      type: 'doc',
+      id: 'ai_ops',
+      label: 'AI Ops',
+    },
   ],
 };

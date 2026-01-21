@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise ROI - Stacktic</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #f8f9fc 0%, #e9ecf2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 12px;
+        }
+        .header p {
+            font-size: 16px;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .roi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        .roi-card {
+            background: white;
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            border-left: 5px solid;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .roi-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        }
+        .roi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.02) 50%);
+        }
+        .roi-card.greenfield { border-left-color: #10b981; }
+        .roi-card.operations { border-left-color: #3b82f6; }
+        .roi-card.security { border-left-color: #8b5cf6; }
+        .roi-card.cost { border-left-color: #f59e0b; }
+        .roi-card.portability { border-left-color: #06b6d4; }
+        .roi-card.legacy { border-left-color: #ec4899; }
+        .roi-card.downtime { border-left-color: #ef4444; }
+        .roi-card.innovation { border-left-color: #667eea; }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+        .greenfield .card-icon { background: #d1fae5; }
+        .operations .card-icon { background: #dbeafe; }
+        .security .card-icon { background: #ede9fe; }
+        .cost .card-icon { background: #fef3c7; }
+        .portability .card-icon { background: #cffafe; }
+        .legacy .card-icon { background: #fce7f3; }
+        .downtime .card-icon { background: #fee2e2; }
+        .innovation .card-icon { background: #e0e7ff; }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 10px;
+        }
+        .card-description {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        .card-impact {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+        .impact-value {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .greenfield .impact-value { color: #10b981; }
+        .operations .impact-value { color: #3b82f6; }
+        .security .impact-value { color: #8b5cf6; }
+        .cost .impact-value { color: #f59e0b; }
+        .portability .impact-value { color: #06b6d4; }
+        .legacy .impact-value { color: #ec4899; }
+        .downtime .impact-value { color: #ef4444; }
+        .innovation .impact-value { color: #667eea; }
+
+        .impact-label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .card-example {
+            font-size: 13px;
+            color: #555;
+            padding-left: 14px;
+            border-left: 3px solid #e5e7eb;
+            font-style: italic;
+        }
+
+        .summary-bar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            padding: 30px 40px;
+            color: white;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .summary-item {
+            text-align: center;
+        }
+        .summary-value {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .summary-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .roi-grid {
+                grid-template-columns: 1fr;
+            }
+            .summary-bar {
+                padding: 24px;
+            }
+            .summary-value {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Enterprise ROI with Stacktic</h1>
+            <p>Quantified value across operations, security, and infrastructure</p>
+        </div>
+
+        <div class="roi-grid">
+            <div class="roi-card greenfield">
+                <div class="card-icon">🚀</div>
+                <div class="card-title">Faster Time-to-Market</div>
+                <div class="card-description">
+                    Automate end-to-end deployment of new stacks with production-ready configurations.
+                </div>
+                <div class="card-impact">
+                    <div class="impact-value">80% Faster</div>
+                    <div class="impact-label">Reduction in deployment time</div>
+                </div>
+                <div class="card-example">
+                    Launch 5 months faster = $500k revenue gain per app
+                </div>
+            </div>
+
+            <div class="roi-card operations">
+                <div class="card-icon">⚙️</div>
+                <div class="card-title">Operations Cost Reduction</div>
+                <div class="card-description">
+                    Automate versioning, Day-2 operations, maintenance, and SecOps workflows.
+                </div>
+                <div class="card-impact">
+                    <div class="impact-value">60% Lower</div>
+                    <div class="impact-label">Ongoing operational cost</div>
+                </div>
+                <div class="card-example">
+                    $1M Ops salaries × 60% = $600k saved/year
+                </div>
+            </div>
+
+            <div class="roi-card security">
+                <div class="card-icon">🛡️</div>
+                <div class="card-title">Security Automation</div>
+                <div class="card-description">
+                    Enforce security controls across the stack without slowing delivery.
+                </div>
+                <div class="card-impact">
+                    <div class="impact-value">+50% Coverage</div>
+                    <div class="impact-label">Security with no slowdown</div>
+                </div>
+                <div class="card-example">
+                    OPA policies, RBAC, microsegmentation - all automated
+                </div>
+            </div>
+
+            <div class="roi-card cost">
+                <div class="card-icon">💰</div>
+                <div class="card-title">Infrastructure Savings</div>
+                <div class="card-description">
+                    Replace managed services with Kubernetes-native open-source alternatives.
+                </div>
+                <div class="card-impact">
+                    <div class="impact-value">~30% Savings</div>
+                    <div class="impact-label">Infrastructure cost reduction</div>
+                </div>
+                <div class="card-example">
+                    Move RDS/DocumentDB to K8s = ~30% lower cost
+                </div>
+            </div>
+
+            <div class="roi-card portability">
+                <div class="card-icon">☁️</div>
+                <div class="card-title">Multi-Cloud Portability</div>
+                <div class="card-description">
+                    Deploy the same stack on any K8s cloud or on-prem, including air-gapped.
+                </div>
+                <div class="card-impact">
+                    <div class="impact-value">Zero Lock-in</div>
+                    <div class="impact-label">Full cloud flexibility</div>
+                </div>
+                <div class="card-example">
+                    Move AWS → DigitalOcean with a click = ~20% cost reduction
+                </div>
+            </div>
+
+            <div class="roi-card legacy">
+                <div class="card-icon">🔄</div>
+                <div class="card-title">Legacy Modernization</div>
+                <div class="card-description">
+                    Automate upgrades, remove outdated CRDs, standardize versions across stacks.
+                </div>
+                <div class="card-impact">
+                    <div class="impact-value">$M+ Saved</div>
+                    <div class="impact-label">Migration cost avoided</div>
+                </div>
+                <div class="card-example">
+                    Eliminate expensive manual migration programs
+                </div>
+            </div>
+
+            <div class="roi-card downtime">
+                <div class="card-icon">⏱️</div>
+                <div class="card-title">Downtime Reduction</div>
+                <div class="card-description">
+                    Standardized, validated deployments with full rollback and versioned stacks.
+                </div>
+                <div class="card-impact">
+                    <div class="impact-value">90% Fewer</div>
+                    <div class="impact-label">Incidents from human error</div>
+                </div>
+                <div class="card-example">
+                    $200k/year downtime cost → reduced via automation
+                </div>
+            </div>
+
+            <div class="roi-card innovation">
+                <div class="card-icon">💡</div>
+                <div class="card-title">Fast Tech Adoption</div>
+                <div class="card-description">
+                    Integrate and deploy the latest technologies as soon as they're available.
+                </div>
+                <div class="card-impact">
+                    <div class="impact-value">10x Faster</div>
+                    <div class="impact-label">Technology adoption cycles</div>
+                </div>
+                <div class="card-example">
+                    Deploy private AI/RAG stack in days, not months
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-bar">
+            <div class="summary-item">
+                <div class="summary-value">80%</div>
+                <div class="summary-label">Faster Delivery</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value">60%</div>
+                <div class="summary-label">Ops Cost Reduction</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value">30%</div>
+                <div class="summary-label">Infra Savings</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value">90%</div>
+                <div class="summary-label">Fewer Incidents</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

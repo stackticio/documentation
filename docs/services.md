@@ -12,8 +12,10 @@ hide_table_of_contents: true
 3. [Kafka/Strimzi Automation](#-kafka-automation)
 4. [FastAPI Automation](#-fastapi-automation)
 5. [k6 Load Testing Automation](#-k6-load-testing-automation)
-6. [Best Practices](#best-practices)
-7. [Additional Resources](#additional-resources)
+6. [OpenTelemetry (OTEL) Automation](#-opentelemetry-otel-automation)
+7. [Valkey (Redis Alternative) Automation](#-valkey-redis-alternative-automation)
+8. [Best Practices](#best-practices)
+9. [Additional Resources](#additional-resources)
 
 ---
 
@@ -260,6 +262,143 @@ Use **APISIX** and **Keycloak** for enterprise-grade authentication:
 | **Build Image** | Link | Required when linking APIs |
 
 > 💡 **Build Note:** Build image is required when linking APIs to ensure dependency compatibility.
+
+---
+
+## 🔭 OpenTelemetry (OTEL) Automation
+
+### Observability Data Collection
+
+OpenTelemetry automation enables centralized collection of **traces**, **metrics**, and **logs** from your applications with automatic storage backend configuration.
+
+#### Component Overview
+
+| Feature | Description |
+|---------|-------------|
+| **Collector Deployment** | OTEL Collector with configurable resources |
+| **Auto-instrumentation** | Kubernetes instrumentation for supported languages |
+| **Storage Integration** | Automatic ClickHouse backend configuration |
+
+### OTEL to ClickHouse Integration
+
+Link OTEL to a **clickhouse_db** sub-component to automatically store telemetry data in ClickHouse.
+
+#### Link Configuration
+
+| Field | Description |
+|-------|-------------|
+| Source Component | OTEL Collector |
+| Target Component | ClickHouse Database (sub-component) |
+| Link Type | `otel-clickhouse_db` |
+
+#### What This Link Enables
+
+- OTEL Collector automatically uses **contrib image** (includes ClickHouse exporter)
+- Creates database, user, and grants via Kubernetes Job
+- Configures exporter with correct endpoint and credentials
+- Creates tables: `otel_logs`, `otel_traces`, `otel_metrics_*`
+
+### Component Attributes
+
+#### OTEL Component
+
+| Attribute | Example | Description |
+|-----------|---------|-------------|
+| `namespace` | `otel` | Kubernetes namespace |
+| `replicas` | `1` | Number of collector replicas |
+| `batch_size` | `1000` | Batch size for exports (lower = less memory) |
+| `batch_timeout` | `10s` | Timeout before sending batch |
+| `memory_limit_mib` | `1000` | Memory limiter for collector |
+| `memory_spike_limit_mib` | `200` | Spike limit for memory |
+| `cpu_request` | `100m` | CPU request |
+| `mem_request` | `256Mi` | Memory request |
+| `cpu_limit` | `500m` | CPU limit |
+| `mem_limit` | `512Mi` | Memory limit |
+
+#### ClickHouse Database Sub-Component
+
+| Attribute | Example | Description |
+|-----------|---------|-------------|
+| `database` | `sourcecode` | Database name for telemetry data |
+| `username` | `otel_user` | Database user |
+| `password` | `secret` | Database password |
+| `ttl` | `72h` | Data retention period |
+
+### Example Configuration
+
+**Stack Metadata:**
+```yaml
+components:
+  - name: clickhouse
+    type: clickhouse
+    attributes:
+      namespace: clickhouse
+      admin_user: admin
+      admin_password: My_Pass_word1
+    sub_components:
+      - name: sourcecode
+        type: clickhouse_db
+        attributes:
+          database: sourcecode
+          username: otel_user
+          password: secret_password
+          ttl: 72h
+
+  - name: otel
+    type: otel
+    attributes:
+      namespace: otel
+      replicas: 1
+      batch_size: 1000
+      batch_timeout: 10s
+      memory_limit_mib: 1000
+      memory_spike_limit_mib: 200
+
+links:
+  - type: otel-clickhouse_db
+    from: otel
+    to: clickhouse/sourcecode
+```
+
+### Querying Telemetry Data
+
+Once deployed, query your data in ClickHouse:
+
+```sql
+-- View metrics
+SELECT ServiceName, MetricName, Value, TimeUnix
+FROM sourcecode.otel_metrics_gauge
+ORDER BY TimeUnix DESC
+LIMIT 20
+
+-- View unique metric names
+SELECT DISTINCT MetricName, MetricDescription
+FROM sourcecode.otel_metrics_gauge
+
+-- Count data by type
+SELECT 'logs' as table, count() as cnt FROM sourcecode.otel_logs
+UNION ALL
+SELECT 'traces', count() FROM sourcecode.otel_traces
+UNION ALL
+SELECT 'metrics_gauge', count() FROM sourcecode.otel_metrics_gauge
+```
+
+### Sending Data to OTEL Collector
+
+Configure your applications to send telemetry to:
+
+| Protocol | Endpoint |
+|----------|----------|
+| gRPC | `otel-collector-collector.<namespace>.svc:4317` |
+| HTTP | `otel-collector-collector.<namespace>.svc:4318` |
+
+### Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| ClickHouse memory errors | Reduce `batch_size` attribute |
+| Connection refused | Ensure ClickHouse is running before OTEL |
+| Empty tables | Applications need OTEL SDK instrumentation |
 
 ---
 

@@ -47,48 +47,44 @@ sidebar_position: 4
 ## Step 1 — Prerequisites
 
 <div style={{background: '#f8f9fb', borderRadius: '12px', padding: '24px', border: '1px solid #e0e4e8', marginBottom: '24px'}}>
-
-Before you start, prepare the following:
-
-<div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginBottom: '16px'}}>
-  <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
-    <h4 style={{margin: '0 0 8px 0'}}>Container Registry Token</h4>
-    <p style={{margin: 0, fontSize: '0.9rem', color: '#555'}}>
-      Create a token with <strong>read/write access</strong> to your container registry (Docker Hub, GHCR, GitLab Registry, etc.). Stacktic uses this to push and pull images.
-    </p>
+  <p>Before you start, prepare the following:</p>
+  <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginBottom: '16px'}}>
+    <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
+      <h4 style={{margin: '0 0 8px 0'}}>Container Registry Token</h4>
+      <p style={{margin: 0, fontSize: '0.9rem', color: '#555'}}>
+        Create a token with <strong>read/write access</strong> to your container registry (Docker Hub, GHCR, GitLab Registry, etc.). Stacktic uses this to push and pull images.
+      </p>
+    </div>
+    <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
+      <h4 style={{margin: '0 0 8px 0'}}>Git Repository Token</h4>
+      <p style={{margin: 0, fontSize: '0.9rem', color: '#555'}}>
+        Create a <strong>fine-grained personal access token</strong> with full repository permissions. Stacktic uses this to create and manage your stack repo.
+      </p>
+    </div>
+    <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
+      <h4 style={{margin: '0 0 8px 0'}}>Domain</h4>
+      <p style={{margin: 0, fontSize: '0.9rem', color: '#555'}}>
+        Have a valid domain ready. After deploying, update your DNS A-record to point to the APISIX gateway external IP.
+      </p>
+      <pre style={{margin: '8px 0 0 0', fontSize: '0.8rem', background: '#f0f4f8', borderRadius: '6px', padding: '8px 12px', overflow: 'auto'}}><code>kubectl get svc apisix-gateway -n ingress-apisix{"\n"}# EXTERNAL-IP → update your DNS A-record</code></pre>
+    </div>
   </div>
-  <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
-    <h4 style={{margin: '0 0 8px 0'}}>Git Repository Token</h4>
-    <p style={{margin: 0, fontSize: '0.9rem', color: '#555'}}>
-      Create a <strong>fine-grained personal access token</strong> with full repository permissions. Stacktic uses this to create and manage your stack repo.
-    </p>
-  </div>
-  <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
-    <h4 style={{margin: '0 0 8px 0'}}>Domain</h4>
-    <p style={{margin: 0, fontSize: '0.9rem', color: '#555'}}>
-      Have a valid domain ready. After deploying, update your DNS A-record to point to the APISIX gateway external IP.
-    </p>
-    <pre style={{margin: '8px 0 0 0', fontSize: '0.8rem', background: '#f0f4f8', borderRadius: '6px', padding: '8px 12px', overflow: 'auto'}}><code>kubectl get svc apisix-gateway -n ingress-apisix{"\n"}# EXTERNAL-IP → update your DNS A-record</code></pre>
-  </div>
-</div>
-
-<details>
-<summary><strong>GitHub token setup (click to expand)</strong></summary>
-
-1. Go to [github.com/settings/personal-access-tokens](https://github.com/settings/personal-access-tokens)
-2. Click **Generate new token**
-3. Under **Repository access**, select the repositories Stacktic will manage
-4. Under **Permissions**, enable all **Repository** and **Account** permissions
-5. Generate and copy the token
-
-:::tip
-Use **fine-grained tokens** over classic tokens for better security. Grant only the repositories Stacktic needs.
-:::
-
-<img src={require('./image-70.png').default} alt="GitHub token setup" width="650" />
-
-</details>
-
+  <details>
+    <summary><strong>GitHub token setup (click to expand)</strong></summary>
+    <div style={{padding: '12px 0'}}>
+      <ol>
+        <li>Go to <a href="https://github.com/settings/personal-access-tokens">github.com/settings/personal-access-tokens</a></li>
+        <li>Click <strong>Generate new token</strong></li>
+        <li>Under <strong>Repository access</strong>, select the repositories Stacktic will manage</li>
+        <li>Under <strong>Permissions</strong>, enable all <strong>Repository</strong> and <strong>Account</strong> permissions</li>
+        <li>Generate and copy the token</li>
+      </ol>
+      <div style={{background: '#e6f7e6', borderLeft: '4px solid #2e7d32', borderRadius: '6px', padding: '12px 16px', marginBottom: '12px'}}>
+        <strong>Tip:</strong> Use <strong>fine-grained tokens</strong> over classic tokens for better security. Grant only the repositories Stacktic needs.
+      </div>
+      <img src={require('./image-70.png').default} alt="GitHub token setup" width="650" />
+    </div>
+  </details>
 </div>
 
 ---
@@ -96,31 +92,27 @@ Use **fine-grained tokens** over classic tokens for better security. Grant only 
 ## Step 2 — Configure
 
 <div style={{background: '#f8f9fb', borderRadius: '12px', padding: '24px', border: '1px solid #e0e4e8', marginBottom: '24px'}}>
-
-<div style={{background: 'white', borderRadius: '10px', padding: '16px 20px', marginBottom: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
-  <strong>Sign in</strong> at <a href="https://staging.app.stacktic.io/">staging.app.stacktic.io</a> and create or select a <strong>Stack</strong>.
-</div>
-
-Paste your tokens in the Stack settings:
-
-<div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
-  <div style={{background: 'white', borderRadius: '10px', padding: '16px 20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
-    <p style={{fontWeight: 600, color: '#0052cc', marginBottom: '10px', fontSize: '1rem'}}>2a. Paste your Registry Token</p>
-    <a href={require('./image-65.png').default} target="_blank"><img src={require('./image-65.png').default} alt="Registry token" width="780" style={{borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', cursor: 'zoom-in'}} /></a>
-    <p style={{margin: '6px 0 0 0', fontSize: '0.75rem', color: '#999'}}>Click image to enlarge</p>
+  <div style={{background: 'white', borderRadius: '10px', padding: '16px 20px', marginBottom: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
+    <strong>Sign in</strong> at <a href="https://staging.app.stacktic.io/">staging.app.stacktic.io</a> and create or select a <strong>Stack</strong>.
   </div>
-  <div style={{background: 'white', borderRadius: '10px', padding: '16px 20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
-    <p style={{fontWeight: 600, color: '#0052cc', marginBottom: '10px', fontSize: '1rem'}}>2b. Paste your Repo Token</p>
-    <a href={require('./image-66.png').default} target="_blank"><img src={require('./image-66.png').default} alt="Repo token" width="780" style={{borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', cursor: 'zoom-in'}} /></a>
-    <p style={{margin: '6px 0 0 0', fontSize: '0.75rem', color: '#999'}}>Click image to enlarge</p>
+  <p>Paste your tokens in the Stack settings:</p>
+  <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
+    <div style={{background: 'white', borderRadius: '10px', padding: '16px 20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
+      <p style={{fontWeight: 600, color: '#0052cc', marginBottom: '10px', fontSize: '1rem'}}>2a. Paste your Registry Token</p>
+      <a href={require('./image-65.png').default} target="_blank"><img src={require('./image-65.png').default} alt="Registry token" width="780" style={{borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', cursor: 'zoom-in'}} /></a>
+      <p style={{margin: '6px 0 0 0', fontSize: '0.75rem', color: '#999'}}>Click image to enlarge</p>
+    </div>
+    <div style={{background: 'white', borderRadius: '10px', padding: '16px 20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
+      <p style={{fontWeight: 600, color: '#0052cc', marginBottom: '10px', fontSize: '1rem'}}>2b. Paste your Repo Token</p>
+      <a href={require('./image-66.png').default} target="_blank"><img src={require('./image-66.png').default} alt="Repo token" width="780" style={{borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', cursor: 'zoom-in'}} /></a>
+      <p style={{margin: '6px 0 0 0', fontSize: '0.75rem', color: '#999'}}>Click image to enlarge</p>
+    </div>
+    <div style={{background: 'white', borderRadius: '10px', padding: '16px 20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
+      <p style={{fontWeight: 600, color: '#0052cc', marginBottom: '10px', fontSize: '1rem'}}>2c. SOPS Key (optional)</p>
+      <a href={require('./image-67.png').default} target="_blank"><img src={require('./image-67.png').default} alt="SOPS key" width="780" style={{borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', cursor: 'zoom-in'}} /></a>
+      <p style={{margin: '6px 0 0 0', fontSize: '0.75rem', color: '#999'}}>Click image to enlarge</p>
+    </div>
   </div>
-  <div style={{background: 'white', borderRadius: '10px', padding: '16px 20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
-    <p style={{fontWeight: 600, color: '#0052cc', marginBottom: '10px', fontSize: '1rem'}}>2c. SOPS Key (optional)</p>
-    <a href={require('./image-67.png').default} target="_blank"><img src={require('./image-67.png').default} alt="SOPS key" width="780" style={{borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', cursor: 'zoom-in'}} /></a>
-    <p style={{margin: '6px 0 0 0', fontSize: '0.75rem', color: '#999'}}>Click image to enlarge</p>
-  </div>
-</div>
-
 </div>
 
 ---
@@ -128,28 +120,20 @@ Paste your tokens in the Stack settings:
 ## Step 3 — Design & Build
 
 <div style={{background: '#f8f9fb', borderRadius: '12px', padding: '24px', border: '1px solid #e0e4e8', marginBottom: '24px'}}>
-
-### Drag, connect, build
-
-Drag components onto the canvas and connect them. Stacktic maps all relationships automatically.
-
-<div style={{maxWidth: '100%', marginBottom: '20px'}}>
-  <video width="100%" controls style={{maxWidth: '800px', borderRadius: '10px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)'}}>
-    <source src="https://video.wixstatic.com/video/06ddae_7d1d30abd775432083213b4f2d86c4ac/1080p/mp4/file.mp4" type="video/mp4" />
-    <p>Your browser does not support the video tag.</p>
-  </video>
-</div>
-
-Click **Build** to generate the full repository:
-
-<img src={require('./image-71.png').default} alt="Build button" width="650" />
-
-:::info Merge Strategy
-The `stacktic` branch contains generated code; `main` is yours. Stacktic auto-merges while respecting your custom edits. You can ignore, overwrite, or merge from the UI.
-:::
-
-<img src={require('./image-72.png').default} alt="Merge strategy" width="650" />
-
+  <h3 style={{marginTop: 0}}>Drag, connect, build</h3>
+  <p>Drag components onto the canvas and connect them. Stacktic maps all relationships automatically.</p>
+  <div style={{maxWidth: '100%', marginBottom: '20px'}}>
+    <video width="100%" controls style={{maxWidth: '800px', borderRadius: '10px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)'}}>
+      <source src="https://video.wixstatic.com/video/06ddae_7d1d30abd775432083213b4f2d86c4ac/1080p/mp4/file.mp4" type="video/mp4" />
+      <p>Your browser does not support the video tag.</p>
+    </video>
+  </div>
+  <p>Click <strong>Build</strong> to generate the full repository:</p>
+  <img src={require('./image-71.png').default} alt="Build button" width="650" />
+  <div style={{background: '#e3f2fd', borderLeft: '4px solid #1976d2', borderRadius: '6px', padding: '12px 16px', margin: '16px 0'}}>
+    <strong>Merge Strategy:</strong> The <code>stacktic</code> branch contains generated code; <code>main</code> is yours. Stacktic auto-merges while respecting your custom edits. You can ignore, overwrite, or merge from the UI.
+  </div>
+  <img src={require('./image-72.png').default} alt="Merge strategy" width="650" />
 </div>
 
 ---
@@ -157,11 +141,8 @@ The `stacktic` branch contains generated code; `main` is yours. Stacktic auto-me
 ## Step 4 — Deploy
 
 <div style={{background: '#f8f9fb', borderRadius: '12px', padding: '24px', border: '1px solid #e0e4e8', marginBottom: '24px'}}>
-
-Clone the generated repo and apply to your Kubernetes cluster:
-
-```bash
-# Clone the generated repo
+  <p>Clone the generated repo and apply to your Kubernetes cluster:</p>
+  <pre style={{background: '#1e1e1e', color: '#d4d4d4', borderRadius: '8px', padding: '16px', fontSize: '0.9rem', overflow: 'auto'}}><code>{`# Clone the generated repo
 git clone <your-stack-repo>
 cd <your-stack-repo>
 
@@ -172,13 +153,10 @@ kubectl apply -k k8s/build/overlays/dev/ --server-side --force-conflicts
 kubectl apply -k k8s/deploy/overlays/dev/ --server-side --force-conflicts
 
 # Verify route
-kubectl get apisixroute -A
-```
-
-:::tip Done!
-Your stack is now running. Every component is connected, secured, and version-controlled.
-:::
-
+kubectl get apisixroute -A`}</code></pre>
+  <div style={{background: '#e6f7e6', borderLeft: '4px solid #2e7d32', borderRadius: '6px', padding: '12px 16px', marginTop: '16px'}}>
+    <strong>Done!</strong> Your stack is now running. Every component is connected, secured, and version-controlled.
+  </div>
 </div>
 
 ---
@@ -186,40 +164,39 @@ Your stack is now running. Every component is connected, secured, and version-co
 ## What's Next?
 
 <div style={{background: '#f8f9fb', borderRadius: '12px', padding: '24px', border: '1px solid #e0e4e8', marginBottom: '24px'}}>
-
-<div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px'}}>
-  <div style={{background: 'white', borderRadius: '10px', padding: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
-    <h4 style={{margin: '0 0 8px 0', color: '#0052cc'}}>FastBuild</h4>
-    <p style={{margin: '0 0 8px 0', fontSize: '0.9rem', color: '#555'}}>
-      Changed tokens, secrets, or component values? Use <strong>FastBuild</strong> — it captures ~95% of relationships and rebuilds in seconds.
-    </p>
-    <pre style={{margin: 0, fontSize: '0.85rem', background: '#f0f4f8', borderRadius: '6px', padding: '12px', overflow: 'auto'}}><code>git fetch origin main{"\n"}git checkout main{"\n"}git reset --hard origin/main</code></pre>
+  <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px'}}>
+    <div style={{background: 'white', borderRadius: '10px', padding: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
+      <h4 style={{margin: '0 0 8px 0', color: '#0052cc'}}>FastBuild</h4>
+      <p style={{margin: '0 0 8px 0', fontSize: '0.9rem', color: '#555'}}>
+        Changed tokens, secrets, or component values? Use <strong>FastBuild</strong> — it captures ~95% of relationships and rebuilds in seconds.
+      </p>
+      <pre style={{margin: 0, fontSize: '0.85rem', background: '#f0f4f8', borderRadius: '6px', padding: '12px', overflow: 'auto'}}><code>git fetch origin main{"\n"}git checkout main{"\n"}git reset --hard origin/main</code></pre>
+    </div>
+    <div style={{background: 'white', borderRadius: '10px', padding: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
+      <h4 style={{margin: '0 0 8px 0', color: '#0052cc'}}>Source Code Options</h4>
+      <table style={{fontSize: '0.9rem', width: '100%'}}>
+        <thead><tr><th style={{textAlign: 'left', padding: '6px 8px'}}>Option</th><th style={{textAlign: 'left', padding: '6px 8px'}}>Best for</th></tr></thead>
+        <tbody>
+          <tr><td style={{padding: '6px 8px'}}><strong>External source</strong></td><td style={{padding: '6px 8px'}}>Point to your repo & Dockerfile</td></tr>
+          <tr><td style={{padding: '6px 8px'}}><strong>image_base</strong></td><td style={{padding: '6px 8px'}}>Push your own image</td></tr>
+          <tr><td style={{padding: '6px 8px'}}><strong>Templates</strong></td><td style={{padding: '6px 8px'}}>100% hands-off</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
-  <div style={{background: 'white', borderRadius: '10px', padding: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
-    <h4 style={{margin: '0 0 8px 0', color: '#0052cc'}}>Source Code Options</h4>
-    <table style={{fontSize: '0.9rem', width: '100%'}}>
-      <thead><tr><th style={{textAlign: 'left', padding: '6px 8px'}}>Option</th><th style={{textAlign: 'left', padding: '6px 8px'}}>Best for</th></tr></thead>
-      <tbody>
-        <tr><td style={{padding: '6px 8px'}}><strong>External source</strong></td><td style={{padding: '6px 8px'}}>Point to your repo & Dockerfile</td></tr>
-        <tr><td style={{padding: '6px 8px'}}><strong>image_base</strong></td><td style={{padding: '6px 8px'}}>Push your own image</td></tr>
-        <tr><td style={{padding: '6px 8px'}}><strong>Templates</strong></td><td style={{padding: '6px 8px'}}>100% hands-off</td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<details>
-<summary><strong>Migrating an existing app?</strong></summary>
-
-1. **Import code** — external repo or pre-built image
-2. **Add databases** and create links between components
-3. **Load data** — MinIO bucket job (recommended), manual restore, or `initdb` scripts
-4. **Validate** ingress & health checks
-5. **Add complexity** — Airflow, Kafka, RabbitMQ, etc.
-6. **Enable Day-2 Ops** — logging, monitoring, autoscaling, security policies
-
-</details>
-
+  <details>
+    <summary><strong>Migrating an existing app?</strong></summary>
+    <div style={{padding: '12px 0'}}>
+      <ol>
+        <li><strong>Import code</strong> — external repo or pre-built image</li>
+        <li><strong>Add databases</strong> and create links between components</li>
+        <li><strong>Load data</strong> — MinIO bucket job (recommended), manual restore, or <code>initdb</code> scripts</li>
+        <li><strong>Validate</strong> ingress & health checks</li>
+        <li><strong>Add complexity</strong> — Airflow, Kafka, RabbitMQ, etc.</li>
+        <li><strong>Enable Day-2 Ops</strong> — logging, monitoring, autoscaling, security policies</li>
+      </ol>
+    </div>
+  </details>
 </div>
 
 ---
@@ -227,39 +204,36 @@ Your stack is now running. Every component is connected, secured, and version-co
 ## Understanding the Automation Flow
 
 <div style={{background: '#f8f9fb', borderRadius: '12px', padding: '24px', border: '1px solid #e0e4e8', marginBottom: '24px'}}>
-
-Once your stack is running, here's how to explore what Stacktic automates for you — in 3 steps:
-
-<div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
-  <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', display: 'flex', gap: '16px', alignItems: 'flex-start'}}>
-    <div style={{background: '#0052cc', color: 'white', borderRadius: '50%', minWidth: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.1rem'}}>1</div>
-    <div>
-      <h4 style={{margin: '0 0 6px 0'}}>Discover available links</h4>
-      <p style={{margin: 0, fontSize: '0.9rem', color: '#555'}}>
-        Press the <strong>+ button</strong> on any component to see all available link types. Each link represents a relationship Stacktic can automate — for example, connecting a backend to a database, or Grafana to Prometheus.
-      </p>
+  <p>Once your stack is running, here's how to explore what Stacktic automates for you — in 3 steps:</p>
+  <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
+    <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', display: 'flex', gap: '16px', alignItems: 'flex-start'}}>
+      <div style={{background: '#0052cc', color: 'white', borderRadius: '50%', minWidth: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.1rem'}}>1</div>
+      <div>
+        <h4 style={{margin: '0 0 6px 0'}}>Discover available links</h4>
+        <p style={{margin: 0, fontSize: '0.9rem', color: '#555'}}>
+          Press the <strong>+ button</strong> on any component to see all available link types. Each link represents a relationship Stacktic can automate — for example, connecting a backend to a database, or Grafana to Prometheus.
+        </p>
+      </div>
+    </div>
+    <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', display: 'flex', gap: '16px', alignItems: 'flex-start'}}>
+      <div style={{background: '#0052cc', color: 'white', borderRadius: '50%', minWidth: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.1rem'}}>2</div>
+      <div>
+        <h4 style={{margin: '0 0 6px 0'}}>See exactly what each link automates</h4>
+        <p style={{margin: 0, fontSize: '0.9rem', color: '#555'}}>
+          Click the <strong>info button</strong> on any component, sub-component, or link to see the exact automation flow — what files are generated, what configurations are injected, and how the relationship is wired end-to-end.
+        </p>
+      </div>
+    </div>
+    <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', display: 'flex', gap: '16px', alignItems: 'flex-start'}}>
+      <div style={{background: '#0052cc', color: 'white', borderRadius: '50%', minWidth: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.1rem'}}>3</div>
+      <div>
+        <h4 style={{margin: '0 0 6px 0'}}>Read your stack-specific operations docs</h4>
+        <p style={{margin: 0, fontSize: '0.9rem', color: '#555'}}>
+          Stacktic auto-generates <strong>deep operational documentation</strong> for each component in your stack. These are not generic docs — they are written specifically for your stack's configuration, specifications, and relationships. Use them to understand Day-2 operations, troubleshooting, and how every piece fits together.
+        </p>
+      </div>
     </div>
   </div>
-  <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', display: 'flex', gap: '16px', alignItems: 'flex-start'}}>
-    <div style={{background: '#0052cc', color: 'white', borderRadius: '50%', minWidth: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.1rem'}}>2</div>
-    <div>
-      <h4 style={{margin: '0 0 6px 0'}}>See exactly what each link automates</h4>
-      <p style={{margin: 0, fontSize: '0.9rem', color: '#555'}}>
-        Click the <strong>info button</strong> on any component, sub-component, or link to see the exact automation flow — what files are generated, what configurations are injected, and how the relationship is wired end-to-end.
-      </p>
-    </div>
-  </div>
-  <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', display: 'flex', gap: '16px', alignItems: 'flex-start'}}>
-    <div style={{background: '#0052cc', color: 'white', borderRadius: '50%', minWidth: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.1rem'}}>3</div>
-    <div>
-      <h4 style={{margin: '0 0 6px 0'}}>Read your stack-specific operations docs</h4>
-      <p style={{margin: 0, fontSize: '0.9rem', color: '#555'}}>
-        Stacktic auto-generates <strong>deep operational documentation</strong> for each component in your stack. These are not generic docs — they are written specifically for your stack's configuration, specifications, and relationships. Use them to understand Day-2 operations, troubleshooting, and how every piece fits together.
-      </p>
-    </div>
-  </div>
-</div>
-
 </div>
 
 ---
@@ -267,44 +241,48 @@ Once your stack is running, here's how to explore what Stacktic automates for yo
 ## Reference
 
 <div style={{background: '#f8f9fb', borderRadius: '12px', padding: '24px', border: '1px solid #e0e4e8'}}>
-
-<details>
-<summary><strong>Core Concepts</strong></summary>
-
-| Concept | Description |
-|---------|-------------|
-| **Component** | A service — backend, PostgreSQL, Prometheus, etc. |
-| **Sub-component** | A unit inside a component (DB schema, Kafka topic) |
-| **Link** | Relationship between components (backend → DB) |
-| **Attribute** | Parameter used for automation (ports, secrets, flags) |
-
-</details>
-
-<details>
-<summary><strong>Automation Examples</strong></summary>
-
-| When you connect… | Stacktic generates… |
-|---|---|
-| Source Code → Database | DB & user creation, connection string as Secret |
-| Grafana → Prometheus | Metrics, ServiceMonitor, dashboard JSON |
-| ArgoCD GitOps | `Application` CRs per component for multi-cluster sync |
-| Kafka Topic → Database | Topic, ACLs, and KafkaConnect sink |
-| **Security policies** | RBAC, NetworkPolicy, OPA Gatekeeper rules |
-
-</details>
-
-<details>
-<summary><strong>Examples & Resources</strong></summary>
-
-**Starter repos:**
-- [Kafka Connect starter](https://github.com/stackticio/strimzi_basic_setup/tree/main)
-- [Easy Llama](https://github.com/stackticio/Llama_base/tree/main)
-
-**Links:**
-- [Q&A](https://www.stacktic.io/differentiators) | [ROI Calculator](https://www.stacktic.io/roi) | [Blog](https://www.stacktic.io/blog) | [Demos](https://www.stacktic.io/demos)
-
-Need help? **[support@stacktic.io](mailto:support@stacktic.io)**
-
-</details>
-
+  <details>
+    <summary><strong>Core Concepts</strong></summary>
+    <div style={{padding: '12px 0'}}>
+      <table style={{fontSize: '0.9rem', width: '100%'}}>
+        <thead><tr><th style={{textAlign: 'left', padding: '8px'}}>Concept</th><th style={{textAlign: 'left', padding: '8px'}}>Description</th></tr></thead>
+        <tbody>
+          <tr><td style={{padding: '8px'}}><strong>Component</strong></td><td style={{padding: '8px'}}>A service — backend, PostgreSQL, Prometheus, etc.</td></tr>
+          <tr><td style={{padding: '8px'}}><strong>Sub-component</strong></td><td style={{padding: '8px'}}>A unit inside a component (DB schema, Kafka topic)</td></tr>
+          <tr><td style={{padding: '8px'}}><strong>Link</strong></td><td style={{padding: '8px'}}>Relationship between components (backend → DB)</td></tr>
+          <tr><td style={{padding: '8px'}}><strong>Attribute</strong></td><td style={{padding: '8px'}}>Parameter used for automation (ports, secrets, flags)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+  <details>
+    <summary><strong>Automation Examples</strong></summary>
+    <div style={{padding: '12px 0'}}>
+      <table style={{fontSize: '0.9rem', width: '100%'}}>
+        <thead><tr><th style={{textAlign: 'left', padding: '8px'}}>When you connect…</th><th style={{textAlign: 'left', padding: '8px'}}>Stacktic generates…</th></tr></thead>
+        <tbody>
+          <tr><td style={{padding: '8px'}}>Source Code → Database</td><td style={{padding: '8px'}}>DB & user creation, connection string as Secret</td></tr>
+          <tr><td style={{padding: '8px'}}>Grafana → Prometheus</td><td style={{padding: '8px'}}>Metrics, ServiceMonitor, dashboard JSON</td></tr>
+          <tr><td style={{padding: '8px'}}>ArgoCD GitOps</td><td style={{padding: '8px'}}>Application CRs per component for multi-cluster sync</td></tr>
+          <tr><td style={{padding: '8px'}}>Kafka Topic → Database</td><td style={{padding: '8px'}}>Topic, ACLs, and KafkaConnect sink</td></tr>
+          <tr><td style={{padding: '8px'}}><strong>Security policies</strong></td><td style={{padding: '8px'}}>RBAC, NetworkPolicy, OPA Gatekeeper rules</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+  <details>
+    <summary><strong>Examples & Resources</strong></summary>
+    <div style={{padding: '12px 0'}}>
+      <p><strong>Starter repos:</strong></p>
+      <ul>
+        <li><a href="https://github.com/stackticio/strimzi_basic_setup/tree/main">Kafka Connect starter</a></li>
+        <li><a href="https://github.com/stackticio/Llama_base/tree/main">Easy Llama</a></li>
+      </ul>
+      <p><strong>Links:</strong></p>
+      <p>
+        <a href="https://www.stacktic.io/differentiators">Q&A</a> | <a href="https://www.stacktic.io/roi">ROI Calculator</a> | <a href="https://www.stacktic.io/blog">Blog</a> | <a href="https://www.stacktic.io/demos">Demos</a>
+      </p>
+      <p>Need help? <strong><a href="mailto:support@stacktic.io">support@stacktic.io</a></strong></p>
+    </div>
+  </details>
 </div>

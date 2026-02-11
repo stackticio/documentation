@@ -106,15 +106,18 @@ Paste your tokens in the Stack settings:
 <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
   <div style={{background: 'white', borderRadius: '10px', padding: '16px 20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
     <p style={{fontWeight: 600, color: '#0052cc', marginBottom: '10px', fontSize: '1rem'}}>2a. Paste your Registry Token</p>
-    <img src={require('./image-65.png').default} alt="Registry token" width="780" style={{borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)'}} />
+    <a href={require('./image-65.png').default} target="_blank"><img src={require('./image-65.png').default} alt="Registry token" width="780" style={{borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', cursor: 'zoom-in'}} /></a>
+    <p style={{margin: '6px 0 0 0', fontSize: '0.75rem', color: '#999'}}>Click image to enlarge</p>
   </div>
   <div style={{background: 'white', borderRadius: '10px', padding: '16px 20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
     <p style={{fontWeight: 600, color: '#0052cc', marginBottom: '10px', fontSize: '1rem'}}>2b. Paste your Repo Token</p>
-    <img src={require('./image-66.png').default} alt="Repo token" width="780" style={{borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)'}} />
+    <a href={require('./image-66.png').default} target="_blank"><img src={require('./image-66.png').default} alt="Repo token" width="780" style={{borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', cursor: 'zoom-in'}} /></a>
+    <p style={{margin: '6px 0 0 0', fontSize: '0.75rem', color: '#999'}}>Click image to enlarge</p>
   </div>
   <div style={{background: 'white', borderRadius: '10px', padding: '16px 20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
     <p style={{fontWeight: 600, color: '#0052cc', marginBottom: '10px', fontSize: '1rem'}}>2c. SOPS Key (optional)</p>
-    <img src={require('./image-67.png').default} alt="SOPS key" width="780" style={{borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)'}} />
+    <a href={require('./image-67.png').default} target="_blank"><img src={require('./image-67.png').default} alt="SOPS key" width="780" style={{borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', cursor: 'zoom-in'}} /></a>
+    <p style={{margin: '6px 0 0 0', fontSize: '0.75rem', color: '#999'}}>Click image to enlarge</p>
   </div>
 </div>
 
@@ -216,6 +219,46 @@ Your stack is now running. Every component is connected, secured, and version-co
 6. **Enable Day-2 Ops** — logging, monitoring, autoscaling, security policies
 
 </details>
+
+</div>
+
+---
+
+## Understanding the Automation Flow
+
+<div style={{background: '#f8f9fb', borderRadius: '12px', padding: '24px', border: '1px solid #e0e4e8', marginBottom: '24px'}}>
+
+Once your stack is running, here's how to explore what Stacktic automates for you — in 3 steps:
+
+<div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
+  <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', display: 'flex', gap: '16px', alignItems: 'flex-start'}}>
+    <div style={{background: '#0052cc', color: 'white', borderRadius: '50%', minWidth: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.1rem'}}>1</div>
+    <div>
+      <h4 style={{margin: '0 0 6px 0'}}>Discover available links</h4>
+      <p style={{margin: 0, fontSize: '0.9rem', color: '#555'}}>
+        Press the <strong>+ button</strong> on any component to see all available link types. Each link represents a relationship Stacktic can automate — for example, connecting a backend to a database, or Grafana to Prometheus.
+      </p>
+    </div>
+  </div>
+  <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', display: 'flex', gap: '16px', alignItems: 'flex-start'}}>
+    <div style={{background: '#0052cc', color: 'white', borderRadius: '50%', minWidth: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.1rem'}}>2</div>
+    <div>
+      <h4 style={{margin: '0 0 6px 0'}}>See exactly what each link automates</h4>
+      <p style={{margin: 0, fontSize: '0.9rem', color: '#555'}}>
+        Click the <strong>info button</strong> on any component, sub-component, or link to see the exact automation flow — what files are generated, what configurations are injected, and how the relationship is wired end-to-end.
+      </p>
+    </div>
+  </div>
+  <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', display: 'flex', gap: '16px', alignItems: 'flex-start'}}>
+    <div style={{background: '#0052cc', color: 'white', borderRadius: '50%', minWidth: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.1rem'}}>3</div>
+    <div>
+      <h4 style={{margin: '0 0 6px 0'}}>Read your stack-specific operations docs</h4>
+      <p style={{margin: 0, fontSize: '0.9rem', color: '#555'}}>
+        Stacktic auto-generates <strong>deep operational documentation</strong> for each component in your stack. These are not generic docs — they are written specifically for your stack's configuration, specifications, and relationships. Use them to understand Day-2 operations, troubleshooting, and how every piece fits together.
+      </p>
+    </div>
+  </div>
+</div>
 
 </div>
 

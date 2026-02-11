@@ -159,8 +159,8 @@ Before proceeding, verify you have:
 Once you have all prerequisites in place:
 
 1. Review the [Quick Start](/documentation/docs/quick_start) guide
-2. Configure your [System Settings](/documentation/docs/quick_start#system-configuration)
-3. Design your [first application](/documentation/docs/quick_start#designing-your-first-app)
+2. Configure your [Stack settings](/documentation/docs/quick_start#step-2--configure)
+3. Design your [first stack](/documentation/docs/quick_start#step-3--design--build)
 4. Review [Private SaaS Deployment](/documentation/docs/private_saas_deployment)
 
 ## Troubleshooting
@@ -172,4 +172,4 @@ Once you have all prerequisites in place:
 Need help with prerequisites? Contact us at:
 
 - **Support**: [support@stacktic.io](mailto:support@stacktic.io)
-- **Documentation**: Visit our [resources](/documentation/docs/quick_start#resources)
+- **Documentation**: Visit our [resources](/documentation/docs/quick_start#reference)

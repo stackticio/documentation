@@ -1,226 +1,253 @@
 ---
 sidebar_position: 4
-hide_table_of_contents: true
----
-# Stacktic
-
-> **Version‑controlled automation for full‑stack complexity**
-
-Stacktic converts application topology into a fully versioned Git repository—complete with deployment manifests, security policies, and Day‑2 operations. Design your stack visually; we generate the code and keep it in sync.
-
 ---
 
-## Why Stacktic?
+# Quick Start Guide
 
-| Feature                           | What you gain                                                                    |
-| --------------------------------- | -------------------------------------------------------------------------------- |
-| **🚀 Automated relationships**    | Service links and dependencies are mapped for you—no manual YAML.                |
-| **🧠 Metadata‑driven**            | Declarative metadata eliminates human error and operational drift.               |
-| **📦 Full‑stack version control** | Roll back or branch entire environments, not just code.                          |
-| **🔒 Autonomous security**        | RBAC, NetworkPolicy, and OPA rules generated at build time.                      |
-| **☁️ Cloud‑agnostic migration**   | Import workloads from VMs, managed services, or Docker to Kubernetes in minutes. |
+<div style={{background: 'linear-gradient(135deg, #0052cc 0%, #003d99 100%)', borderRadius: '12px', padding: '32px 40px', color: 'white', marginBottom: '32px'}}>
+  <h2 style={{color: 'white', margin: '0 0 8px 0', fontSize: '1.6rem'}}>From zero to a running stack in 4 steps</h2>
+  <p style={{margin: 0, opacity: 0.9, fontSize: '1.05rem'}}>
+    Design your stack visually, Stacktic generates the code — deployment manifests, security policies, and Day-2 operations — all version-controlled in Git.
+  </p>
+</div>
 
----
-
-## High‑Level Workflow
-
-1. **initilze configuration** – configure Repo and Regsitry tokens
-2. **Design topology** – Drag components and connect them.
-3. **Generate your stack** – Build to create the Git skeleton (`k8s/`, `scripts/`, dashboards, secrets).
-4. **Deploy Your Stack** – Kustomize your full stack on K8s Cluster
-
----
-
-## Core Concepts
-
-| Concept           | Description                                                   |
-| ----------------- | ------------------------------------------------------------- |
-| **Component**     | A service such as backend, PostgreSQL, or Prometheus.         |
-| **Sub‑component** | A unit inside a component (e.g., a DB schema, a Kafka topic). |
-| **Link**          | Relationship between components (backend → DB).               |
-| **Attribute**     | Parameter used for automation (ports, secrets, flags).        |
-
----
-
-## Automation Scenarios (Examples)
-
-| Trigger                    | What Stacktic generates                                    |
-| -------------------------- | ---------------------------------------------------------- |
-| *Source Code* → *Database* | Creates DB & user, injects connection string as Secret.    |
-| *Grafana* → *Prometheus*   | Enables metrics, ServiceMonitor, and dashboard JSON.       |
-| *ArgoCD GitOps*            | `Application` CRs per component for multi‑cluster sync.    |
-| *Kafka Topic* → *Database* | Provisions topic, ACLs, and KafkaConnect sink.             |
-| **Policies**               | RBAC, NetworkPolicy, and OPA Gatekeeper rules via toggles. |
+<div style={{display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '32px'}}>
+  <a href="#step-1--prerequisites" style={{textDecoration: 'none'}}>
+    <div style={{background: '#f0f4f8', borderRadius: '10px', padding: '16px', textAlign: 'center', border: '2px solid transparent', transition: 'border 0.2s'}}>
+      <div style={{fontSize: '1.6rem', marginBottom: '4px'}}>1</div>
+      <div style={{fontWeight: 600, color: '#0052cc', fontSize: '0.85rem'}}>Prerequisites</div>
+      <div style={{fontSize: '0.75rem', color: '#666'}}>Tokens & access</div>
+    </div>
+  </a>
+  <a href="#step-2--configure" style={{textDecoration: 'none'}}>
+    <div style={{background: '#f0f4f8', borderRadius: '10px', padding: '16px', textAlign: 'center', border: '2px solid transparent', transition: 'border 0.2s'}}>
+      <div style={{fontSize: '1.6rem', marginBottom: '4px'}}>2</div>
+      <div style={{fontWeight: 600, color: '#0052cc', fontSize: '0.85rem'}}>Configure</div>
+      <div style={{fontSize: '0.75rem', color: '#666'}}>Connect registry & repo</div>
+    </div>
+  </a>
+  <a href="#step-3--design--build" style={{textDecoration: 'none'}}>
+    <div style={{background: '#f0f4f8', borderRadius: '10px', padding: '16px', textAlign: 'center', border: '2px solid transparent', transition: 'border 0.2s'}}>
+      <div style={{fontSize: '1.6rem', marginBottom: '4px'}}>3</div>
+      <div style={{fontWeight: 600, color: '#0052cc', fontSize: '0.85rem'}}>Design & Build</div>
+      <div style={{fontSize: '0.75rem', color: '#666'}}>Drag, connect, build</div>
+    </div>
+  </a>
+  <a href="#step-4--deploy" style={{textDecoration: 'none'}}>
+    <div style={{background: '#f0f4f8', borderRadius: '10px', padding: '16px', textAlign: 'center', border: '2px solid transparent', transition: 'border 0.2s'}}>
+      <div style={{fontSize: '1.6rem', marginBottom: '4px'}}>4</div>
+      <div style={{fontWeight: 600, color: '#0052cc', fontSize: '0.85rem'}}>Deploy</div>
+      <div style={{fontSize: '0.75rem', color: '#666'}}>Apply to Kubernetes</div>
+    </div>
+  </a>
+</div>
 
 ---
 
-## Quick Start
+## Step 1 — Prerequisites
 
+Before you start, prepare the following:
 
----
+<div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginBottom: '16px'}}>
+  <div style={{background: '#f9f9f9', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc'}}>
+    <h4 style={{margin: '0 0 8px 0'}}>Container Registry Token</h4>
+    <p style={{margin: 0, fontSize: '0.9rem', color: '#555'}}>
+      Create a token with <strong>read/write access</strong> to your container registry (Docker Hub, GHCR, GitLab Registry, etc.). Stacktic uses this to push and pull images.
+    </p>
+  </div>
+  <div style={{background: '#f9f9f9', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc'}}>
+    <h4 style={{margin: '0 0 8px 0'}}>Git Repository Token</h4>
+    <p style={{margin: 0, fontSize: '0.9rem', color: '#555'}}>
+      Create a <strong>fine-grained personal access token</strong> with full repository permissions. Stacktic uses this to create and manage your stack repo.
+    </p>
+  </div>
+  <div style={{background: '#f9f9f9', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc'}}>
+    <h4 style={{margin: '0 0 8px 0'}}>Domain</h4>
+    <p style={{margin: 0, fontSize: '0.9rem', color: '#555'}}>
+      Have a valid domain ready. After deploying, update your DNS A-record to point to the APISIX gateway external IP:
+    </p>
 
-### Prepare in Advance
+```bash
+kubectl get svc apisix-gateway -n ingress-apisix
+# EXTERNAL-IP → update your DNS A-record
+```
 
-Before configuring Stacktic, create the following tokens:
+  </div>
+</div>
 
-#### 1. Container Registry Token
+<details>
+<summary><strong>GitHub token setup (click to expand)</strong></summary>
 
-Create a token with **full read/write access** to your container registry (Docker Hub, GitHub Container Registry, GitLab Registry, etc.).
-
-This token allows Stacktic to push and pull container images during build and deploy.
-
-#### 2. Git Repository Token
-
-Create a **fine-grained personal access token** with full permissions to your repositories.
-
-**GitHub example** (GitLab and other providers follow the same concept):
-
-1. Go to [https://github.com/settings/personal-access-tokens](https://github.com/settings/personal-access-tokens)
+1. Go to [github.com/settings/personal-access-tokens](https://github.com/settings/personal-access-tokens)
 2. Click **Generate new token**
-3. Under **Repository access**, select the repositories Stacktic will manage (or select all)
-4. Under **Permissions**, set both **Repository permissions** and **Account permissions** to allow all
+3. Under **Repository access**, select the repositories Stacktic will manage
+4. Under **Permissions**, enable all **Repository** and **Account** permissions
 5. Generate and copy the token
 
 :::tip
 Use **fine-grained tokens** over classic tokens for better security. Grant only the repositories Stacktic needs.
 :::
 
+<img src={require('./image-70.png').default} alt="GitHub token setup" width="500" />
 
-<img src={require('./image-70.png').default} alt="alt text" width="500" />
-
----
-
-### Configure Stacktic
-
-```shell
-# 1. Sign in
-https://staging.app.stacktic.io/
-
-# 2. Create or select a Stack
-https://staging.app.stacktic.io/systems
-
-# 3. Configure system (tokens, domain)
-```
-Initialize Stack configuration before stack design
-
-1. **Initialize configuration** — paste your Registry token
-
-<img src={require('./image-65.png').default} alt="alt text" width="500" />
-
-2. **Initialize configuration** — paste your Repo token
-
-<img src={require('./image-66.png').default} alt="alt text" width="500" />
-
-3. **SOPS support (optional)** — enable encryption by adding your Age public key
-
-<img src={require('./image-67.png').default} alt="alt text" width="500" />
+</details>
 
 ---
 
-## Designing Your First App
+## Step 2 — Configure
 
-1. **Drag‑and‑drop** a backend and a database, then connect them.
+<div style={{background: '#f0f4f8', borderRadius: '10px', padding: '20px', marginBottom: '20px'}}>
+  <strong>Sign in</strong> at <a href="https://staging.app.stacktic.io/">staging.app.stacktic.io</a> and create or select a <strong>Stack</strong>.
+</div>
 
-<div style={{maxWidth: '100%'}}>
-  <video width="100%" controls style={{maxWidth: '800px'}}>
-    <source src="https://video.wixstatic.com/video/06ddae_62e9379f2c8d4f0abd61b6a68282b721/1080p/mp4/file.mp4" type="video/mp4" />
-    <p>Your browser does not support the video tag.</p>
-  </video>
+Paste your tokens in the Stack settings:
+
+<div style={{display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '16px'}}>
+  <div style={{background: '#f9f9f9', borderRadius: '10px', padding: '16px 20px', borderLeft: '4px solid #0052cc'}}>
+    <p style={{fontWeight: 600, color: '#0052cc', marginBottom: '10px', fontSize: '1rem'}}>2a. Paste your Registry Token</p>
+    <img src={require('./image-65.png').default} alt="Registry token" width="600" style={{borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)'}} />
+  </div>
+  <div style={{background: '#f9f9f9', borderRadius: '10px', padding: '16px 20px', borderLeft: '4px solid #0052cc'}}>
+    <p style={{fontWeight: 600, color: '#0052cc', marginBottom: '10px', fontSize: '1rem'}}>2b. Paste your Repo Token</p>
+    <img src={require('./image-66.png').default} alt="Repo token" width="600" style={{borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)'}} />
+  </div>
+  <div style={{background: '#f9f9f9', borderRadius: '10px', padding: '16px 20px', borderLeft: '4px solid #0052cc'}}>
+    <p style={{fontWeight: 600, color: '#0052cc', marginBottom: '10px', fontSize: '1rem'}}>2c. SOPS Key (optional)</p>
+    <img src={require('./image-67.png').default} alt="SOPS key" width="600" style={{borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)'}} />
+  </div>
 </div>
 
 ---
 
-2. **Build** (first time) – choose **Build**, not *FastBuild*, to create the full repo.
+## Step 3 — Design & Build
 
+### Drag, connect, build
 
-<img src={require('./image-71.png').default} alt="alt text" width="500" />
+Drag components onto the canvas and connect them. Stacktic maps all relationships automatically.
+
+<div style={{maxWidth: '100%', marginBottom: '20px'}}>
+  <video width="100%" controls style={{maxWidth: '800px', borderRadius: '10px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)'}}>
+    <source src="https://video.wixstatic.com/video/06ddae_7d1d30abd775432083213b4f2d86c4ac/1080p/mp4/file.mp4" type="video/mp4" />
+    <p>Your browser does not support the video tag.</p>
+  </video>
+</div>
+
+Click **Build** to generate the full repository:
+
+<img src={require('./image-71.png').default} alt="Build button" width="500" />
+
+:::info Merge Strategy
+The `stacktic` branch contains generated code; `main` is yours. Stacktic auto-merges while respecting your custom edits. You can ignore, overwrite, or merge from the UI.
+:::
+
+<img src={require('./image-72.png').default} alt="Merge strategy" width="500" />
 
 ---
 
-3. **Merge strategy** – The `stacktic` branch is the generated skeleton; `main` is yours. Automatic merges respect your custom edits.  we merge changes to main, and give you the option to ignore, overwriteor merge directly from stacktic UI:
+## Step 4 — Deploy
 
-
-<img src={require('./image-72.png').default} alt="alt text" width="500" />
-
-
-
----
-
-## Deploying
+Clone the generated repo and apply to your Kubernetes cluster:
 
 ```bash
 # Clone the generated repo
-$ git clone <your‑stack‑repo>
-$ cd <your‑stack‑repo>
+git clone <your-stack-repo>
+cd <your-stack-repo>
 
 # Build & push images (Kaniko jobs)
-$ kubectl apply -k k8s/build/overlays/dev/ --server-side --force-conflicts
+kubectl apply -k k8s/build/overlays/dev/ --server-side --force-conflicts
 
 # Deploy manifests
-$ kubectl apply -k k8s/deploy/overlays/dev/ --server-side --force-conflicts
+kubectl apply -k k8s/deploy/overlays/dev/ --server-side --force-conflicts
 
 # Verify route
-$ kubectl get apisixroute -A
+kubectl get apisixroute -A
 ```
+
+:::tip Done!
+Your stack is now running. Every component is connected, secured, and version-controlled.
+:::
 
 ---
 
-## Updating & FastBuild
+## What's Next?
 
-Use **FastBuild** when you only tweak component values (tokens, secrets). It captures \~95 % of relationships for the selected service and rebuilds quickly.
+<div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px'}}>
+  <div style={{background: '#f9f9f9', borderRadius: '10px', padding: '20px', border: '1px solid #e0e0e0'}}>
+    <h4 style={{margin: '0 0 8px 0', color: '#0052cc'}}>FastBuild</h4>
+    <p style={{margin: '0 0 8px 0', fontSize: '0.9rem', color: '#555'}}>
+      Changed tokens, secrets, or component values? Use <strong>FastBuild</strong> — it captures ~95% of relationships and rebuilds in seconds.
+    </p>
 
 ```bash
-# Keep local main up‑to‑date
-$ git fetch origin main
-$ git checkout main
-$ git reset --hard origin/main
+git fetch origin main
+git checkout main
+git reset --hard origin/main
 ```
 
----
+  </div>
+  <div style={{background: '#f9f9f9', borderRadius: '10px', padding: '20px', border: '1px solid #e0e0e0'}}>
+    <h4 style={{margin: '0 0 8px 0', color: '#0052cc'}}>Source Code Options</h4>
 
-## Managing Source Code
+| Option | Best for |
+|--------|----------|
+| **External source** | Point to your repo & Dockerfile |
+| **image_base** | Push your own image |
+| **Templates** | 100% hands-off |
 
-| Option                   | Best for             | How it works                                            |
-| ------------------------ | -------------------- | ------------------------------------------------------- |
-| **External source code** | Full code ownership  | Point to repo & Dockerfile; Stacktic builds + deploys.  |
-| **image\_base**          | Teams with custom CI | Push your own image; Stacktic handles deploy & config.  |
-| **Stacktic templates**   | 100 % hands‑off      | Use pre‑built service templates (contact us to enable). |
+  </div>
+</div>
 
----
+<details>
+<summary><strong>Migrating an existing app?</strong></summary>
 
-## Migrating an Existing App
+1. **Import code** — external repo or pre-built image
+2. **Add databases** and create links between components
+3. **Load data** — MinIO bucket job (recommended), manual restore, or `initdb` scripts
+4. **Validate** ingress & health checks
+5. **Add complexity** — Airflow, Kafka, RabbitMQ, etc.
+6. **Enable Day-2 Ops** — logging, monitoring, autoscaling, security policies
 
-1. **Import code** (external repo or pre‑built image).
-2. **Add databases** and links.
-3. **Load data**:
-
-   * Manual restore
-   * MinIO bucket‑based job (recommended)
-   * `initdb` scripts during container start
-4. **Validate** ingress & health checks.
-5. **Add complexity** – Airflow, Kafka, RabbitMQ, etc.
-6. **Enable Day‑2 Ops** – logging (Loki), monitoring (Prometheus + Grafana), autoscaling, security policies.
-
----
-
-## Examples
-
-* **Kafka Connect starter** – [https://github.com/stackticio/strimzi\_basic\_setup/tree/main](https://github.com/stackticio/strimzi_basic_setup/tree/main)
-* **Easy Llama** – [https://github.com/stackticio/Llama\_base/tree/main](https://github.com/stackticio/Llama_base/tree/main)
+</details>
 
 ---
 
+## Reference
 
+<details>
+<summary><strong>Core Concepts</strong></summary>
 
-## Resources
+| Concept | Description |
+|---------|-------------|
+| **Component** | A service — backend, PostgreSQL, Prometheus, etc. |
+| **Sub-component** | A unit inside a component (DB schema, Kafka topic) |
+| **Link** | Relationship between components (backend → DB) |
+| **Attribute** | Parameter used for automation (ports, secrets, flags) |
 
-* Q\&A: [https://www.stacktic.io/differentiators](https://www.stacktic.io/differentiators)
-* ROI calculator: [https://www.stacktic.io/roi](https://www.stacktic.io/roi)
-* Blog: [https://www.stacktic.io/blog](https://www.stacktic.io/blog)
-* Demos: [https://www.stacktic.io/demos](https://www.stacktic.io/demos)
+</details>
+
+<details>
+<summary><strong>Automation Examples</strong></summary>
+
+| When you connect… | Stacktic generates… |
+|---|---|
+| Source Code → Database | DB & user creation, connection string as Secret |
+| Grafana → Prometheus | Metrics, ServiceMonitor, dashboard JSON |
+| ArgoCD GitOps | `Application` CRs per component for multi-cluster sync |
+| Kafka Topic → Database | Topic, ACLs, and KafkaConnect sink |
+| **Security policies** | RBAC, NetworkPolicy, OPA Gatekeeper rules |
+
+</details>
+
+<details>
+<summary><strong>Examples & Resources</strong></summary>
+
+**Starter repos:**
+- [Kafka Connect starter](https://github.com/stackticio/strimzi_basic_setup/tree/main)
+- [Easy Llama](https://github.com/stackticio/Llama_base/tree/main)
+
+**Links:**
+- [Q&A](https://www.stacktic.io/differentiators) | [ROI Calculator](https://www.stacktic.io/roi) | [Blog](https://www.stacktic.io/blog) | [Demos](https://www.stacktic.io/demos)
 
 Need help? **[support@stacktic.io](mailto:support@stacktic.io)**
 
----
-
-© 2025 Stacktic. All rights reserved. This guide is provided "as is"; test in non‑production environments first.
+</details>

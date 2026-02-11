@@ -56,14 +56,6 @@ Stacktic converts application topology into a fully versioned Git repository—c
 
 ## Quick Start
 
-#### Before we start, here is a 3 min video example
-
-<div style={{maxWidth: '100%'}}>
-  <video width="100%" controls style={{maxWidth: '800px'}}>
-    <source src="https://video.wixstatic.com/video/06ddae_62e9379f2c8d4f0abd61b6a68282b721/1080p/mp4/file.mp4" type="video/mp4" />
-    <p>Your browser does not support the video tag.</p>
-  </video>
-</div>
 
 ---
 
@@ -93,6 +85,9 @@ Create a **fine-grained personal access token** with full permissions to your re
 Use **fine-grained tokens** over classic tokens for better security. Grant only the repositories Stacktic needs.
 :::
 
+
+<img src={require('./image-70.png').default} alt="alt text" width="500" />
+
 ---
 
 ### Configure Stacktic
@@ -106,6 +101,7 @@ https://staging.app.stacktic.io/systems
 
 # 3. Configure system (tokens, domain)
 ```
+Initialize Stack configuration before stack design
 
 1. **Initialize configuration** — paste your Registry token
 
@@ -124,8 +120,24 @@ https://staging.app.stacktic.io/systems
 ## Designing Your First App
 
 1. **Drag‑and‑drop** a backend and a database, then connect them.
+
+<div style={{maxWidth: '100%'}}>
+  <video width="100%" controls style={{maxWidth: '800px'}}>
+    <source src="https://video.wixstatic.com/video/06ddae_62e9379f2c8d4f0abd61b6a68282b721/1080p/mp4/file.mp4" type="video/mp4" />
+    <p>Your browser does not support the video tag.</p>
+  </video>
+</div>
+
+
 2. **Build** (first time) – choose **Build**, not *FastBuild*, to create the full repo.
-3. **Merge strategy** – The `stacktic` branch is the generated skeleton; `main` is yours. Automatic merges respect your custom edits.
+
+
+<img src={require('./image-71.png').default} alt="alt text" width="500" />
+
+3. **Merge strategy** – The `stacktic` branch is the generated skeleton; `main` is yours. Automatic merges respect your custom edits.  we merge changes to main, and give you the option to ignore, overwriteor merge directly from stacktic UI:
+
+
+<img src={require('./image-72.png').default} alt="alt text" width="500" />
 
 ---
 
@@ -192,6 +204,8 @@ $ git reset --hard origin/main
 * **Easy Llama** – [https://github.com/stackticio/Llama\_base/tree/main](https://github.com/stackticio/Llama_base/tree/main)
 
 ---
+
+
 
 ## Resources
 

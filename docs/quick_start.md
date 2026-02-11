@@ -128,14 +128,14 @@ Initialize Stack configuration before stack design
   </video>
 </div>
 
-
+---
 
 2. **Build** (first time) – choose **Build**, not *FastBuild*, to create the full repo.
 
 
 <img src={require('./image-71.png').default} alt="alt text" width="500" />
 
-
+---
 
 3. **Merge strategy** – The `stacktic` branch is the generated skeleton; `main` is yours. Automatic merges respect your custom edits.  we merge changes to main, and give you the option to ignore, overwriteor merge directly from stacktic UI:
 

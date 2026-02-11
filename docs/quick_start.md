@@ -46,32 +46,29 @@ sidebar_position: 4
 
 ## Step 1 — Prerequisites
 
+<div style={{background: '#f8f9fb', borderRadius: '12px', padding: '24px', border: '1px solid #e0e4e8', marginBottom: '24px'}}>
+
 Before you start, prepare the following:
 
 <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginBottom: '16px'}}>
-  <div style={{background: '#f9f9f9', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc'}}>
+  <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
     <h4 style={{margin: '0 0 8px 0'}}>Container Registry Token</h4>
     <p style={{margin: 0, fontSize: '0.9rem', color: '#555'}}>
       Create a token with <strong>read/write access</strong> to your container registry (Docker Hub, GHCR, GitLab Registry, etc.). Stacktic uses this to push and pull images.
     </p>
   </div>
-  <div style={{background: '#f9f9f9', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc'}}>
+  <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
     <h4 style={{margin: '0 0 8px 0'}}>Git Repository Token</h4>
     <p style={{margin: 0, fontSize: '0.9rem', color: '#555'}}>
       Create a <strong>fine-grained personal access token</strong> with full repository permissions. Stacktic uses this to create and manage your stack repo.
     </p>
   </div>
-  <div style={{background: '#f9f9f9', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc'}}>
+  <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
     <h4 style={{margin: '0 0 8px 0'}}>Domain</h4>
     <p style={{margin: 0, fontSize: '0.9rem', color: '#555'}}>
-      Have a valid domain ready. After deploying, update your DNS A-record to point to the APISIX gateway external IP:
+      Have a valid domain ready. After deploying, update your DNS A-record to point to the APISIX gateway external IP.
     </p>
-
-```bash
-kubectl get svc apisix-gateway -n ingress-apisix
-# EXTERNAL-IP → update your DNS A-record
-```
-
+    <pre style={{margin: '8px 0 0 0', fontSize: '0.8rem', background: '#f0f4f8', borderRadius: '6px', padding: '8px 12px', overflow: 'auto'}}><code>kubectl get svc apisix-gateway -n ingress-apisix{"\n"}# EXTERNAL-IP → update your DNS A-record</code></pre>
   </div>
 </div>
 
@@ -88,38 +85,46 @@ kubectl get svc apisix-gateway -n ingress-apisix
 Use **fine-grained tokens** over classic tokens for better security. Grant only the repositories Stacktic needs.
 :::
 
-<img src={require('./image-70.png').default} alt="GitHub token setup" width="500" />
+<img src={require('./image-70.png').default} alt="GitHub token setup" width="650" />
 
 </details>
+
+</div>
 
 ---
 
 ## Step 2 — Configure
 
-<div style={{background: '#f0f4f8', borderRadius: '10px', padding: '20px', marginBottom: '20px'}}>
+<div style={{background: '#f8f9fb', borderRadius: '12px', padding: '24px', border: '1px solid #e0e4e8', marginBottom: '24px'}}>
+
+<div style={{background: 'white', borderRadius: '10px', padding: '16px 20px', marginBottom: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
   <strong>Sign in</strong> at <a href="https://staging.app.stacktic.io/">staging.app.stacktic.io</a> and create or select a <strong>Stack</strong>.
 </div>
 
 Paste your tokens in the Stack settings:
 
-<div style={{display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '16px'}}>
-  <div style={{background: '#f9f9f9', borderRadius: '10px', padding: '16px 20px', borderLeft: '4px solid #0052cc'}}>
+<div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
+  <div style={{background: 'white', borderRadius: '10px', padding: '16px 20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
     <p style={{fontWeight: 600, color: '#0052cc', marginBottom: '10px', fontSize: '1rem'}}>2a. Paste your Registry Token</p>
-    <img src={require('./image-65.png').default} alt="Registry token" width="600" style={{borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)'}} />
+    <img src={require('./image-65.png').default} alt="Registry token" width="780" style={{borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)'}} />
   </div>
-  <div style={{background: '#f9f9f9', borderRadius: '10px', padding: '16px 20px', borderLeft: '4px solid #0052cc'}}>
+  <div style={{background: 'white', borderRadius: '10px', padding: '16px 20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
     <p style={{fontWeight: 600, color: '#0052cc', marginBottom: '10px', fontSize: '1rem'}}>2b. Paste your Repo Token</p>
-    <img src={require('./image-66.png').default} alt="Repo token" width="600" style={{borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)'}} />
+    <img src={require('./image-66.png').default} alt="Repo token" width="780" style={{borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)'}} />
   </div>
-  <div style={{background: '#f9f9f9', borderRadius: '10px', padding: '16px 20px', borderLeft: '4px solid #0052cc'}}>
+  <div style={{background: 'white', borderRadius: '10px', padding: '16px 20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
     <p style={{fontWeight: 600, color: '#0052cc', marginBottom: '10px', fontSize: '1rem'}}>2c. SOPS Key (optional)</p>
-    <img src={require('./image-67.png').default} alt="SOPS key" width="600" style={{borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)'}} />
+    <img src={require('./image-67.png').default} alt="SOPS key" width="780" style={{borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)'}} />
   </div>
+</div>
+
 </div>
 
 ---
 
 ## Step 3 — Design & Build
+
+<div style={{background: '#f8f9fb', borderRadius: '12px', padding: '24px', border: '1px solid #e0e4e8', marginBottom: '24px'}}>
 
 ### Drag, connect, build
 
@@ -134,17 +139,21 @@ Drag components onto the canvas and connect them. Stacktic maps all relationship
 
 Click **Build** to generate the full repository:
 
-<img src={require('./image-71.png').default} alt="Build button" width="500" />
+<img src={require('./image-71.png').default} alt="Build button" width="650" />
 
 :::info Merge Strategy
 The `stacktic` branch contains generated code; `main` is yours. Stacktic auto-merges while respecting your custom edits. You can ignore, overwrite, or merge from the UI.
 :::
 
-<img src={require('./image-72.png').default} alt="Merge strategy" width="500" />
+<img src={require('./image-72.png').default} alt="Merge strategy" width="650" />
+
+</div>
 
 ---
 
 ## Step 4 — Deploy
+
+<div style={{background: '#f8f9fb', borderRadius: '12px', padding: '24px', border: '1px solid #e0e4e8', marginBottom: '24px'}}>
 
 Clone the generated repo and apply to your Kubernetes cluster:
 
@@ -167,33 +176,32 @@ kubectl get apisixroute -A
 Your stack is now running. Every component is connected, secured, and version-controlled.
 :::
 
+</div>
+
 ---
 
 ## What's Next?
 
-<div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px'}}>
-  <div style={{background: '#f9f9f9', borderRadius: '10px', padding: '20px', border: '1px solid #e0e0e0'}}>
+<div style={{background: '#f8f9fb', borderRadius: '12px', padding: '24px', border: '1px solid #e0e4e8', marginBottom: '24px'}}>
+
+<div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px'}}>
+  <div style={{background: 'white', borderRadius: '10px', padding: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
     <h4 style={{margin: '0 0 8px 0', color: '#0052cc'}}>FastBuild</h4>
     <p style={{margin: '0 0 8px 0', fontSize: '0.9rem', color: '#555'}}>
       Changed tokens, secrets, or component values? Use <strong>FastBuild</strong> — it captures ~95% of relationships and rebuilds in seconds.
     </p>
-
-```bash
-git fetch origin main
-git checkout main
-git reset --hard origin/main
-```
-
+    <pre style={{margin: 0, fontSize: '0.85rem', background: '#f0f4f8', borderRadius: '6px', padding: '12px', overflow: 'auto'}}><code>git fetch origin main{"\n"}git checkout main{"\n"}git reset --hard origin/main</code></pre>
   </div>
-  <div style={{background: '#f9f9f9', borderRadius: '10px', padding: '20px', border: '1px solid #e0e0e0'}}>
+  <div style={{background: 'white', borderRadius: '10px', padding: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
     <h4 style={{margin: '0 0 8px 0', color: '#0052cc'}}>Source Code Options</h4>
-
-| Option | Best for |
-|--------|----------|
-| **External source** | Point to your repo & Dockerfile |
-| **image_base** | Push your own image |
-| **Templates** | 100% hands-off |
-
+    <table style={{fontSize: '0.9rem', width: '100%'}}>
+      <thead><tr><th style={{textAlign: 'left', padding: '6px 8px'}}>Option</th><th style={{textAlign: 'left', padding: '6px 8px'}}>Best for</th></tr></thead>
+      <tbody>
+        <tr><td style={{padding: '6px 8px'}}><strong>External source</strong></td><td style={{padding: '6px 8px'}}>Point to your repo & Dockerfile</td></tr>
+        <tr><td style={{padding: '6px 8px'}}><strong>image_base</strong></td><td style={{padding: '6px 8px'}}>Push your own image</td></tr>
+        <tr><td style={{padding: '6px 8px'}}><strong>Templates</strong></td><td style={{padding: '6px 8px'}}>100% hands-off</td></tr>
+      </tbody>
+    </table>
   </div>
 </div>
 
@@ -209,9 +217,13 @@ git reset --hard origin/main
 
 </details>
 
+</div>
+
 ---
 
 ## Reference
+
+<div style={{background: '#f8f9fb', borderRadius: '12px', padding: '24px', border: '1px solid #e0e4e8'}}>
 
 <details>
 <summary><strong>Core Concepts</strong></summary>
@@ -251,3 +263,5 @@ git reset --hard origin/main
 Need help? **[support@stacktic.io](mailto:support@stacktic.io)**
 
 </details>
+
+</div>

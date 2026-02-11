@@ -205,6 +205,12 @@ kubectl get apisixroute -A`}</code></pre>
 
 <div style={{background: '#f8f9fb', borderRadius: '12px', padding: '24px', border: '1px solid #e0e4e8', marginBottom: '24px'}}>
   <p>Once your stack is running, here's how to explore what Stacktic automates for you — in 3 steps:</p>
+  <div style={{maxWidth: '100%', marginBottom: '20px'}}>
+    <video width="100%" controls style={{maxWidth: '800px', borderRadius: '10px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)'}}>
+      <source src="https://video.wixstatic.com/video/06ddae_0cc72b5c41d1430b9333f2163de62fdb/1080p/mp4/file.mp4" type="video/mp4" />
+      <p>Your browser does not support the video tag.</p>
+    </video>
+  </div>
   <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
     <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', display: 'flex', gap: '16px', alignItems: 'flex-start'}}>
       <div style={{background: '#0052cc', color: 'white', borderRadius: '50%', minWidth: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.1rem'}}>1</div>

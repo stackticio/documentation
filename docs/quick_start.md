@@ -129,15 +129,20 @@ Initialize Stack configuration before stack design
 </div>
 
 
+
 2. **Build** (first time) – choose **Build**, not *FastBuild*, to create the full repo.
 
 
 <img src={require('./image-71.png').default} alt="alt text" width="500" />
 
+
+
 3. **Merge strategy** – The `stacktic` branch is the generated skeleton; `main` is yours. Automatic merges respect your custom edits.  we merge changes to main, and give you the option to ignore, overwriteor merge directly from stacktic UI:
 
 
 <img src={require('./image-72.png').default} alt="alt text" width="500" />
+
+
 
 ---
 
@@ -154,7 +159,7 @@ $ kubectl apply -k k8s/build/overlays/dev/ --server-side --force-conflicts
 # Deploy manifests
 $ kubectl apply -k k8s/deploy/overlays/dev/ --server-side --force-conflicts
 
-# Verify ingress
+# Verify route
 $ kubectl get apisixroute -A
 ```
 

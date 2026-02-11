@@ -56,9 +56,7 @@ Stacktic converts application topology into a fully versioned Git repository—c
 
 ## Quick Start
 
-
-#### before we start, here is a 3 min video example 
-
+#### Before we start, here is a 3 min video example
 
 <div style={{maxWidth: '100%'}}>
   <video width="100%" controls style={{maxWidth: '800px'}}>
@@ -69,6 +67,36 @@ Stacktic converts application topology into a fully versioned Git repository—c
 
 ---
 
+### Prepare in Advance
+
+Before configuring Stacktic, create the following tokens:
+
+#### 1. Container Registry Token
+
+Create a token with **full read/write access** to your container registry (Docker Hub, GitHub Container Registry, GitLab Registry, etc.).
+
+This token allows Stacktic to push and pull container images during build and deploy.
+
+#### 2. Git Repository Token
+
+Create a **fine-grained personal access token** with full permissions to your repositories.
+
+**GitHub example** (GitLab and other providers follow the same concept):
+
+1. Go to [https://github.com/settings/personal-access-tokens](https://github.com/settings/personal-access-tokens)
+2. Click **Generate new token**
+3. Under **Repository access**, select the repositories Stacktic will manage (or select all)
+4. Under **Permissions**, set both **Repository permissions** and **Account permissions** to allow all
+5. Generate and copy the token
+
+:::tip
+Use **fine-grained tokens** over classic tokens for better security. Grant only the repositories Stacktic needs.
+:::
+
+---
+
+### Configure Stacktic
+
 ```shell
 # 1. Sign in
 https://staging.app.stacktic.io/
@@ -76,23 +104,18 @@ https://staging.app.stacktic.io/
 # 2. Create or select a Stack
 https://staging.app.stacktic.io/systems
 
-# 3. Configure system (tokens > passwords!) and domain
+# 3. Configure system (tokens, domain)
 ```
 
-1. **initilze configuration** – configure Regsitry token
-
+1. **Initialize configuration** — paste your Registry token
 
 <img src={require('./image-65.png').default} alt="alt text" width="500" />
 
-
-2. **initilze configuration** – configure Repo token
-
+2. **Initialize configuration** — paste your Repo token
 
 <img src={require('./image-66.png').default} alt="alt text" width="500" />
 
-
-3. **SOPS support (optional)** – Enable encryption by adding your Age public key (optional only)
-
+3. **SOPS support (optional)** — enable encryption by adding your Age public key
 
 <img src={require('./image-67.png').default} alt="alt text" width="500" />
 

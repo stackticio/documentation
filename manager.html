@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stacktic - Executive Brief</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        @page { size: A4; margin: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #ffffff;
+            color: #1e293b;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            margin: 0 auto;
+            background: #ffffff;
+        }
+
+        @media print {
+            body { background: #ffffff; }
+            .page { padding: 15mm; page-break-after: always; }
+            .page:last-child { page-break-after: avoid; }
+        }
+
+        .accent { color: #0d9488; }
+        .accent-bg { background-color: #0d9488; }
+        .light-bg { background-color: #f0fdfa; }
+        .border-accent { border-color: #0d9488; }
+
+        h1 { font-size: 32px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+        h2 { font-size: 18px; font-weight: 600; color: #0f172a; margin-bottom: 12px; border-bottom: 2px solid #0d9488; padding-bottom: 6px; }
+        h3 { font-size: 14px; font-weight: 600; color: #0f172a; margin-bottom: 6px; }
+
+        .stat-box {
+            text-align: center;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .stat-number { font-size: 28px; font-weight: 700; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { text-align: left; padding: 10px 12px; background: #f1f5f9; color: #475569; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 10px 12px; border-bottom: 1px solid #e2e8f0; }
+
+        .tech-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #f0fdfa;
+            color: #0d9488;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            margin: 2px;
+        }
+
+        .check { color: #10b981; }
+        .cross { color: #ef4444; }
+
+        ul { margin: 0; padding-left: 16px; }
+        li { margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+    <!-- PAGE 1 -->
+    <div class="page">
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; padding-bottom: 16px; border-bottom: 2px solid #e2e8f0;">
+            <div>
+                <p style="font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Platform Engineering Solution</p>
+                <h1>Stacktic</h1>
+                <p style="color: #475569;">Full-Stack Automation for Enterprise Kubernetes</p>
+            </div>
+            <div style="text-align: right; font-size: 11px; color: #64748b;">
+                <p>Executive Brief</p>
+                <p>Q1 2026</p>
+            </div>
+        </div>
+
+        <!-- Executive Summary -->
+        <div style="margin-bottom: 28px;">
+            <h2>Executive Summary</h2>
+            <p style="color: #475569; margin-bottom: 12px;">
+                Stacktic is a platform engineering solution that automates the deployment, configuration, and lifecycle management of full-stack applications on Kubernetes. It delivers <strong>managed-service speed</strong> with <strong>open-source control</strong> and <strong>full data sovereignty</strong>.
+            </p>
+            <div class="light-bg" style="border-left: 4px solid #0d9488; padding: 12px 16px; border-radius: 0 6px 6px 0;">
+                <p style="color: #334155; margin: 0;"><strong>Core Value Proposition:</strong> Reduce infrastructure operational costs by 70%, accelerate time-to-market by 80%, while maintaining zero vendor lock-in and complete data sovereignty.</p>
+            </div>
+        </div>
+
+        <!-- The Problem -->
+        <div style="margin-bottom: 28px;">
+            <h2>Market Challenge</h2>
+            <p style="color: #475569; margin-bottom: 12px;">Organizations face a strategic dilemma when building modern infrastructure:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Approach</th>
+                        <th>Advantages</th>
+                        <th>Disadvantages</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Managed Services</strong><br><span style="font-size: 10px; color: #64748b;">AWS, Azure, GCP</span></td>
+                        <td class="check">Fast deployment, managed ops</td>
+                        <td class="cross">Vendor lock-in, premium pricing, no data control</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DIY Open Source</strong><br><span style="font-size: 10px; color: #64748b;">Self-managed K8s</span></td>
+                        <td class="check">Full control, sovereignty</td>
+                        <td class="cross">High ops burden, slow TTM, requires experts</td>
+                    </tr>
+                    <tr class="light-bg">
+                        <td><strong class="accent">Stacktic</strong><br><span style="font-size: 10px; color: #64748b;">The Third Way</span></td>
+                        <td class="check">Fast deployment, full control, sovereignty</td>
+                        <td>—</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Technical Overview -->
+        <div style="margin-bottom: 28px;">
+            <h2>Technical Overview</h2>
+            <p style="color: #475569; margin-bottom: 12px;">Stacktic automates the complex relationships between infrastructure components through a topology-aware platform:</p>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px;">
+                <div class="stat-box">
+                    <p style="font-size: 10px; color: #64748b; margin-bottom: 4px;">Day 0</p>
+                    <h3 style="margin-bottom: 4px;">Plan</h3>
+                    <p style="font-size: 11px; color: #475569; margin: 0;">Architecture mapping & dependency resolution in hours</p>
+                </div>
+                <div class="stat-box">
+                    <p style="font-size: 10px; color: #64748b; margin-bottom: 4px;">Day 1</p>
+                    <h3 style="margin-bottom: 4px;">Deploy</h3>
+                    <p style="font-size: 11px; color: #475569; margin: 0;">One-click deployment to any Kubernetes cluster</p>
+                </div>
+                <div class="stat-box" style="border: 2px solid #0d9488;">
+                    <p style="font-size: 10px; color: #64748b; margin-bottom: 4px;">Day 2</p>
+                    <h3 style="margin-bottom: 4px;">Operate</h3>
+                    <p style="font-size: 11px; color: #475569; margin: 0;">Automated upgrades, rollbacks, security, monitoring</p>
+                </div>
+            </div>
+
+            <h3>Core Capabilities</h3>
+            <ul style="color: #475569; font-size: 12px;">
+                <li><strong>Relationship Automation:</strong> Automatic configuration of service connections, networking, secrets, and policies</li>
+                <li><strong>Stack Versioning:</strong> Snapshot entire stack configurations for instant rollback and disaster recovery</li>
+                <li><strong>Security Automation:</strong> Auto-generated RBAC, network policies, certificates, and compliance reports</li>
+                <li><strong>Cloud Portability:</strong> Deploy identical stacks across AWS, Azure, GCP, or on-premises without code changes</li>
+            </ul>
+        </div>
+
+        <!-- Technology Stack -->
+        <div>
+            <h2>Supported Technology Stack</h2>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                <div>
+                    <h3>Compute & Orchestration</h3>
+                    <div style="margin-bottom: 12px;">
+                        <span class="tech-tag">Kubernetes</span>
+                        <span class="tech-tag">Docker</span>
+                        <span class="tech-tag">Helm</span>
+                        <span class="tech-tag">ArgoCD</span>
+                    </div>
+                    <h3>Databases</h3>
+                    <div style="margin-bottom: 12px;">
+                        <span class="tech-tag">PostgreSQL</span>
+                        <span class="tech-tag">MongoDB</span>
+                        <span class="tech-tag">Redis</span>
+                        <span class="tech-tag">Elasticsearch</span>
+                        <span class="tech-tag">ClickHouse</span>
+                    </div>
+                    <h3>Messaging & Streaming</h3>
+                    <div>
+                        <span class="tech-tag">Kafka</span>
+                        <span class="tech-tag">RabbitMQ</span>
+                        <span class="tech-tag">NATS</span>
+                    </div>
+                </div>
+                <div>
+                    <h3>Observability</h3>
+                    <div style="margin-bottom: 12px;">
+                        <span class="tech-tag">Prometheus</span>
+                        <span class="tech-tag">Grafana</span>
+                        <span class="tech-tag">Jaeger</span>
+                        <span class="tech-tag">OpenTelemetry</span>
+                    </div>
+                    <h3>Security & Networking</h3>
+                    <div style="margin-bottom: 12px;">
+                        <span class="tech-tag">Vault</span>
+                        <span class="tech-tag">Cert-Manager</span>
+                        <span class="tech-tag">APISIX</span>
+                        <span class="tech-tag">Istio</span>
+                    </div>
+                    <h3>AI/ML Infrastructure</h3>
+                    <div>
+                        <span class="tech-tag">LangFlow</span>
+                        <span class="tech-tag">Ollama</span>
+                        <span class="tech-tag">Milvus</span>
+                        <span class="tech-tag">MLflow</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 2 -->
+    <div class="page">
+        <!-- Financial Impact -->
+        <div style="margin-bottom: 28px;">
+            <h2>Financial Impact</h2>
+            <p style="color: #475569; margin-bottom: 12px;">Stacktic delivers measurable ROI through operational efficiency and cost reduction:</p>
+
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px;">
+                <div class="stat-box">
+                    <p class="stat-number accent">70%</p>
+                    <p style="font-size: 11px; color: #475569; margin: 0;">Cost Reduction</p>
+                </div>
+                <div class="stat-box">
+                    <p class="stat-number" style="color: #0ea5e9;">80%</p>
+                    <p style="font-size: 11px; color: #475569; margin: 0;">Faster TTM</p>
+                </div>
+                <div class="stat-box">
+                    <p class="stat-number" style="color: #8b5cf6;">Zero</p>
+                    <p style="font-size: 11px; color: #475569; margin: 0;">Vendor Lock-in</p>
+                </div>
+                <div class="stat-box">
+                    <p class="stat-number" style="color: #f59e0b;">100%</p>
+                    <p style="font-size: 11px; color: #475569; margin: 0;">Data Sovereignty</p>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cost Category</th>
+                        <th>Traditional ($M/yr)</th>
+                        <th>With Stacktic ($M/yr)</th>
+                        <th>Savings</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Legacy Maintenance</td>
+                        <td>$4.0M</td>
+                        <td>$0.5M</td>
+                        <td class="check" style="font-weight: 600;">87%</td>
+                    </tr>
+                    <tr>
+                        <td>Operations Labor</td>
+                        <td>$3.0M</td>
+                        <td>$0.6M</td>
+                        <td class="check" style="font-weight: 600;">80%</td>
+                    </tr>
+                    <tr>
+                        <td>Cloud Infrastructure</td>
+                        <td>$2.5M</td>
+                        <td>$1.2M</td>
+                        <td class="check" style="font-weight: 600;">52%</td>
+                    </tr>
+                    <tr>
+                        <td>Vendor Licensing</td>
+                        <td>$1.5M</td>
+                        <td>$0.0M</td>
+                        <td class="check" style="font-weight: 600;">100%</td>
+                    </tr>
+                    <tr class="light-bg" style="font-weight: 600;">
+                        <td>Total</td>
+                        <td>$11.0M</td>
+                        <td>$2.3M</td>
+                        <td class="accent">$8.7M (79%)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Risk Mitigation -->
+        <div style="margin-bottom: 28px;">
+            <h2>Risk Mitigation</h2>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                <div class="stat-box">
+                    <h3>Current State: Tribal Knowledge</h3>
+                    <p style="font-size: 12px; color: #475569; margin: 0;">Infrastructure configuration stored in human expertise. Runbooks outdated. High key-person risk.</p>
+                </div>
+                <div class="stat-box" style="border: 2px solid #0d9488;">
+                    <h3>With Stacktic: Versioned Asset</h3>
+                    <p style="font-size: 12px; color: #475569; margin: 0;">Configuration as code. Auditable history. Instant rollback. Zero key-person dependency.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Target Segments -->
+        <div style="margin-bottom: 28px;">
+            <h2>Target Market</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Segment</th>
+                        <th>Use Case</th>
+                        <th>Key Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Startups & Scale-ups</strong></td>
+                        <td>Rapid production deployment</td>
+                        <td>Enterprise-grade infrastructure without enterprise team</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Regulated Industries</strong></td>
+                        <td>GDPR, HIPAA, PCI compliance</td>
+                        <td>Air-gapped deployments, full data sovereignty</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AI & Data Companies</strong></td>
+                        <td>Private AI infrastructure</td>
+                        <td>Automated DataOps with privacy controls</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Enterprise IT</strong></td>
+                        <td>Legacy modernization</td>
+                        <td>Automated migration, multi-cloud portability</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Service Tiers -->
+        <div style="margin-bottom: 28px;">
+            <h2>Service Tiers</h2>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                <div class="stat-box">
+                    <p style="font-size: 10px; color: #64748b; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Start Point</p>
+                    <h3 style="margin-bottom: 8px;">MVP Validation</h3>
+                    <ul style="font-size: 11px; color: #475569; text-align: left; padding-left: 16px;">
+                        <li>1 Stack</li>
+                        <li>5 Users</li>
+                        <li>Standard automation</li>
+                    </ul>
+                </div>
+                <div class="stat-box" style="border: 2px solid #0d9488;">
+                    <p style="font-size: 10px; color: #0d9488; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Scale</p>
+                    <h3 style="margin-bottom: 8px;">Platform Teams</h3>
+                    <ul style="font-size: 11px; color: #475569; text-align: left; padding-left: 16px;">
+                        <li>10 Stacks</li>
+                        <li>30 Users</li>
+                        <li>Private SaaS option</li>
+                    </ul>
+                </div>
+                <div class="stat-box">
+                    <p style="font-size: 10px; color: #64748b; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Enterprise</p>
+                    <h3 style="margin-bottom: 8px;">Fleet Management</h3>
+                    <ul style="font-size: 11px; color: #475569; text-align: left; padding-left: 16px;">
+                        <li>100+ Stacks</li>
+                        <li>Unlimited Users</li>
+                        <li>Dedicated engineer</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendation -->
+        <div class="light-bg" style="border: 2px solid #0d9488; border-radius: 8px; padding: 20px;">
+            <h2 style="border: none; padding-bottom: 0; margin-bottom: 12px;">Recommendation</h2>
+            <table style="margin-bottom: 16px;">
+                <thead>
+                    <tr>
+                        <th>Objective</th>
+                        <th>Action</th>
+                        <th>Expected Outcome</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Modernize Legacy</td>
+                        <td>Automated migration</td>
+                        <td>Retire VMs, reduce tech debt</td>
+                    </tr>
+                    <tr>
+                        <td>Enable Portability</td>
+                        <td>Cloud-agnostic architecture</td>
+                        <td>Freedom to move between providers</td>
+                    </tr>
+                    <tr>
+                        <td>Mitigate Risk</td>
+                        <td>Configuration as code</td>
+                        <td>Eliminate key-person dependency</td>
+                    </tr>
+                    <tr>
+                        <td>Ensure Sovereignty</td>
+                        <td>100% open source</td>
+                        <td>Complete data control</td>
+                    </tr>
+                    <tr style="font-weight: 600;">
+                        <td>Maximize ROI</td>
+                        <td>Automate Day-2 operations</td>
+                        <td class="accent">$8.7M annual savings</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="text-align: center; padding-top: 12px; border-top: 1px solid #cbd5e1;">
+                <p style="font-size: 11px; color: #64748b; margin-bottom: 4px;">Recommended Next Step</p>
+                <p style="font-size: 16px; font-weight: 600; color: #0f172a; margin: 0;">Initiate Pilot Migration for Core AI Stack</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="margin-top: 24px; padding-top: 12px; border-top: 1px solid #e2e8f0; text-align: center;">
+            <p style="font-size: 11px; color: #64748b; margin: 0;">Stacktic - Platform Engineering Solution | stacktic.io</p>
+        </div>
+    </div>
+
+</body>
+</html>

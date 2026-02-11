@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stacktic & SUSE Rancher Partnership</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #0a0e1a;
+            color: #e2e8f0;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .slide {
+            width: 100%;
+            min-height: 100vh;
+            padding: 60px 80px;
+            position: relative;
+            overflow: hidden;
+            page-break-after: always;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Slide backgrounds */
+        .bg-dark {
+            background: linear-gradient(135deg, #0a0e1a 0%, #111827 50%, #0f172a 100%);
+        }
+        .bg-navy {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+        .bg-gradient-hero {
+            background: linear-gradient(160deg, #0a0e1a 0%, #0f1d3d 30%, #0a1628 60%, #0f172a 100%);
+        }
+        .bg-gradient-green {
+            background: linear-gradient(135deg, #0a1a14 0%, #0f172a 50%, #0a1628 100%);
+        }
+        .bg-gradient-purple {
+            background: linear-gradient(135deg, #120a20 0%, #0f172a 50%, #0a1628 100%);
+        }
+
+        /* Subtle grid pattern overlay */
+        .slide::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        /* Glow accents */
+        .glow-blue { position: relative; }
+        .glow-blue::after {
+            content: '';
+            position: absolute;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%);
+            top: -100px; right: -100px;
+            pointer-events: none;
+        }
+        .glow-green::after {
+            content: '';
+            position: absolute;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(16,185,129,0.06) 0%, transparent 70%);
+            bottom: -100px; left: -100px;
+            pointer-events: none;
+        }
+
+        /* Glass cards */
+        .glass {
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+        }
+        .glass-bright {
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 16px;
+        }
+        .glass-accent {
+            background: linear-gradient(135deg, rgba(59,130,246,0.08) 0%, rgba(16,185,129,0.06) 100%);
+            border: 1px solid rgba(59,130,246,0.15);
+            border-radius: 16px;
+        }
+
+        /* Typography */
+        .slide-number {
+            position: absolute;
+            top: 30px; right: 40px;
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.15);
+            letter-spacing: 2px;
+        }
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        h1 { font-size: 3.8rem; font-weight: 900; letter-spacing: -0.04em; line-height: 1; }
+        h2 { font-size: 2.6rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+        h3 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; }
+        .subtitle { font-size: 1.15rem; color: rgba(255,255,255,0.5); font-weight: 400; }
+
+        /* Gradient texts */
+        .text-grad-blue { background: linear-gradient(135deg, #60a5fa, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .text-grad-green { background: linear-gradient(135deg, #34d399, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .text-grad-white { background: linear-gradient(180deg, #ffffff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* Metric circles */
+        .metric-ring { position: relative; width: 140px; height: 140px; }
+        .metric-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+        .metric-ring .value {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .metric-ring .value .num { font-size: 2rem; font-weight: 800; }
+        .metric-ring .value .label { font-size: 0.7rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+        /* Layout helpers */
+        .flex-center { display: flex; align-items: center; justify-content: center; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+        .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; }
+        .grid-6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
+        .gap-16 { gap: 16px; }
+        .gap-24 { gap: 24px; }
+        .gap-40 { gap: 40px; }
+        .mb-16 { margin-bottom: 16px; }
+        .mb-24 { margin-bottom: 24px; }
+        .mb-32 { margin-bottom: 32px; }
+        .mb-40 { margin-bottom: 40px; }
+        .mb-48 { margin-bottom: 48px; }
+        .mb-64 { margin-bottom: 64px; }
+        .text-center { text-align: center; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+        .relative { position: relative; }
+        .z-10 { position: relative; z-index: 10; }
+
+        /* Print */
+        @media print {
+            body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            @page { size: A4 landscape; margin: 0; }
+            .slide { min-height: auto; height: 100vh; padding: 40px 60px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============================================ -->
+<!-- PAGE 1: HERO                                 -->
+<!-- ============================================ -->
+<div class="slide bg-gradient-hero glow-blue">
+    <div class="slide-number">01 / 11</div>
+
+    <!-- Top tag -->
+    <div class="text-center mb-48 z-10">
+        <span class="tag" style="background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); color: #34d399;">
+            <i class="fa-solid fa-handshake"></i> Strategic Partnership
+        </span>
+    </div>
+
+    <!-- Main title -->
+    <div class="text-center mb-48 z-10">
+        <p style="font-size: 2rem; color: rgba(255,255,255,0.5); font-weight: 500; margin-bottom: 20px; letter-spacing: 1px;">
+            The First Truly Managed Open-Source Platform
+        </p>
+        <h1 class="mb-24">
+            STACK<span style="color: #3b82f6;">TIC</span>
+            <span style="color: rgba(255,255,255,0.2); margin: 0 16px;">&</span>
+            <span class="text-grad-green">SUSE Rancher</span>
+        </h1>
+        <p style="font-size: 1.2rem; color: rgba(255,255,255,0.4); font-weight: 400; max-width: 700px; margin: 0 auto;">
+            Speed of managed services. Openness of Kubernetes. Sovereignty by design.
+        </p>
+    </div>
+
+    <!-- 4 metric donut rings -->
+    <div style="display: flex; justify-content: center; gap: 60px;" class="z-10 mb-64">
+        <!-- 70% Cost Reduction -->
+        <div class="metric-ring">
+            <svg viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+                <circle cx="60" cy="60" r="52" fill="none" stroke="url(#grad1)" stroke-width="8" stroke-linecap="round"
+                    stroke-dasharray="228.08" stroke-dashoffset="68.42"/>
+                <defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#10b981"/><stop offset="100%" style="stop-color:#34d399"/></linearGradient></defs>
+            </svg>
+            <div class="value"><div class="num" style="color: #34d399;">70%+</div><div class="label">Cost Reduction</div></div>
+        </div>
+        <!-- 80% Faster -->
+        <div class="metric-ring">
+            <svg viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+                <circle cx="60" cy="60" r="52" fill="none" stroke="url(#grad2)" stroke-width="8" stroke-linecap="round"
+                    stroke-dasharray="228.08" stroke-dashoffset="45.62"/>
+                <defs><linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#3b82f6"/><stop offset="100%" style="stop-color:#60a5fa"/></linearGradient></defs>
+            </svg>
+            <div class="value"><div class="num" style="color: #60a5fa;">80%</div><div class="label">Faster Delivery</div></div>
+        </div>
+        <!-- Zero Lock-in -->
+        <div class="metric-ring">
+            <svg viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+                <circle cx="60" cy="60" r="52" fill="none" stroke="url(#grad3)" stroke-width="8" stroke-linecap="round"
+                    stroke-dasharray="228.08" stroke-dashoffset="0"/>
+                <defs><linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#8b5cf6"/><stop offset="100%" style="stop-color:#a78bfa"/></linearGradient></defs>
+            </svg>
+            <div class="value"><div class="num" style="color: #a78bfa;">Zero</div><div class="label">Vendor Lock-in</div></div>
+        </div>
+        <!-- 100% Sovereignty -->
+        <div class="metric-ring">
+            <svg viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+                <circle cx="60" cy="60" r="52" fill="none" stroke="url(#grad4)" stroke-width="8" stroke-linecap="round"
+                    stroke-dasharray="228.08" stroke-dashoffset="0"/>
+                <defs><linearGradient id="grad4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#f59e0b"/><stop offset="100%" style="stop-color:#fbbf24"/></linearGradient></defs>
+            </svg>
+            <div class="value"><div class="num" style="color: #fbbf24;">100%</div><div class="label">Sovereignty</div></div>
+        </div>
+    </div>
+
+    <!-- Bottom callout -->
+    <div class="text-center z-10">
+        <div class="glass-accent" style="display: inline-block; padding: 20px 48px;">
+            <p style="font-size: 1.1rem; color: rgba(255,255,255,0.7);">
+                Compete head-to-head with <span style="color: #f87171; font-weight: 600;">AWS, Azure, GCP</span> &mdash; without sacrificing control or freedom
+            </p>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================================ -->
+<!-- PAGE 2: THE OPEN SOURCE REALITY              -->
+<!-- ============================================ -->
+<div class="slide bg-navy glow-green" style="padding: 40px 80px;">
+    <div class="slide-number">02 / 11</div>
+
+    <div class="text-center z-10" style="margin-bottom: 24px;">
+        <h2 class="text-grad-white" style="font-size: 2.2rem; margin-bottom: 10px;">The Open Source Reality</h2>
+        <p style="font-size: 1rem; color: rgba(255,255,255,0.5); font-weight: 400; max-width: 900px; margin: 0 auto; line-height: 1.5;">
+            OpenAI, Netflix, Uber run pure open-source K8s &mdash; because they have <span style="color: #fbbf24; font-weight: 600;">1,000+ engineer powerhouses</span> with unlimited skill and resources.<br>Everyone else settles for <span style="color: #f87171; font-weight: 600;">managed services</span> &mdash; the compromise, not the choice.
+        </p>
+    </div>
+
+    <!-- Visual: Two worlds -->
+    <div class="z-10" style="display: grid; grid-template-columns: 1fr 60px 1fr; gap: 0; align-items: center; margin-bottom: 20px;">
+        <!-- Left: Managed world (bad) -->
+        <div class="glass" style="padding: 24px; border-color: rgba(248,113,113,0.2);">
+            <div class="text-center" style="margin-bottom: 16px;">
+                <div style="width: 56px; height: 56px; border-radius: 16px; background: rgba(248,113,113,0.15); display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+                    <i class="fa-solid fa-lock" style="font-size: 24px; color: #f87171;"></i>
+                </div>
+                <h3 style="color: #f87171; font-size: 1.1rem;">Managed Services</h3>
+                <p style="color: rgba(255,255,255,0.35); font-size: 12px; margin-top: 2px;">AWS / Azure / GCP</p>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(248,113,113,0.06); border-radius: 8px; border: 1px solid rgba(248,113,113,0.1);">
+                    <i class="fa-solid fa-xmark" style="color: #f87171; width: 16px; text-align: center; font-size: 13px;"></i>
+                    <span style="color: rgba(255,255,255,0.6); font-size: 13px;">Old open source wrapped in proprietary APIs</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(248,113,113,0.06); border-radius: 8px; border: 1px solid rgba(248,113,113,0.1);">
+                    <i class="fa-solid fa-xmark" style="color: #f87171; width: 16px; text-align: center; font-size: 13px;"></i>
+                    <span style="color: rgba(255,255,255,0.6); font-size: 13px;">30-50% markup for a convenience layer</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(248,113,113,0.06); border-radius: 8px; border: 1px solid rgba(248,113,113,0.1);">
+                    <i class="fa-solid fa-xmark" style="color: #f87171; width: 16px; text-align: center; font-size: 13px;"></i>
+                    <span style="color: rgba(255,255,255,0.6); font-size: 13px;">Yesterday's versions, permanently locked in</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(248,113,113,0.06); border-radius: 8px; border: 1px solid rgba(248,113,113,0.1);">
+                    <i class="fa-solid fa-xmark" style="color: #f87171; width: 16px; text-align: center; font-size: 13px;"></i>
+                    <span style="color: rgba(255,255,255,0.6); font-size: 13px;">Zero innovation &mdash; you get what the vendor allows</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center: VS arrow -->
+        <div class="text-center">
+            <svg width="60" height="60" viewBox="0 0 80 80"><defs><linearGradient id="arrowG" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#f87171"/><stop offset="100%" style="stop-color:#34d399"/></linearGradient></defs><path d="M 15 40 L 55 40" stroke="url(#arrowG)" stroke-width="3" fill="none" stroke-linecap="round"/><polygon points="55,34 65,40 55,46" fill="#34d399"/></svg>
+        </div>
+
+        <!-- Right: The Real Blocker -->
+        <div class="glass" style="padding: 24px; border-color: rgba(251,191,36,0.2);">
+            <div class="text-center" style="margin-bottom: 16px;">
+                <div style="width: 56px; height: 56px; border-radius: 16px; background: rgba(251,191,36,0.15); display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+                    <i class="fa-solid fa-puzzle-piece" style="font-size: 24px; color: #fbbf24;"></i>
+                </div>
+                <h3 style="color: #fbbf24; font-size: 1.1rem;">The Real Blocker</h3>
+                <p style="color: rgba(255,255,255,0.35); font-size: 12px; margin-top: 2px;">Why enterprises can't do open-source at scale</p>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(251,191,36,0.06); border-radius: 8px; border: 1px solid rgba(251,191,36,0.1);">
+                    <i class="fa-solid fa-exclamation" style="color: #fbbf24; width: 16px; text-align: center; font-size: 13px;"></i>
+                    <span style="color: rgba(255,255,255,0.6); font-size: 13px;">Dependencies &amp; versioning across services and foundations</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(251,191,36,0.06); border-radius: 8px; border: 1px solid rgba(251,191,36,0.1);">
+                    <i class="fa-solid fa-exclamation" style="color: #fbbf24; width: 16px; text-align: center; font-size: 13px;"></i>
+                    <span style="color: rgba(255,255,255,0.6); font-size: 13px;">AI open source is skyrocketing, built for K8s, extremely hard to manage</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(251,191,36,0.06); border-radius: 8px; border: 1px solid rgba(251,191,36,0.1);">
+                    <i class="fa-solid fa-exclamation" style="color: #fbbf24; width: 16px; text-align: center; font-size: 13px;"></i>
+                    <span style="color: rgba(255,255,255,0.6); font-size: 13px;">No one owns the full-stack lifecycle &mdash; gaps everywhere</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(251,191,36,0.06); border-radius: 8px; border: 1px solid rgba(251,191,36,0.1);">
+                    <i class="fa-solid fa-exclamation" style="color: #fbbf24; width: 16px; text-align: center; font-size: 13px;"></i>
+                    <span style="color: rgba(255,255,255,0.6); font-size: 13px;">Cross-component complexity grows exponentially with scale</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stacktic solves this -->
+    <div class="z-10 glass-accent" style="padding: 20px 28px; text-align: center;">
+        <p style="font-size: 1.05rem; font-weight: 700; color: #34d399; margin-bottom: 6px;">
+            <i class="fa-solid fa-bolt" style="margin-right: 6px;"></i>Stacktic makes every company an OpenAI-level operator.
+        </p>
+        <p style="font-size: 14px; color: rgba(255,255,255,0.5); max-width: 800px; margin: 0 auto;">
+            E2E ecosystem automation and versioning of open source &mdash; making it <span style="color: #34d399; font-weight: 600;">easier than managed</span> without the engineering army.
+            Not only saving money and sovereignty &mdash; providing the <span style="color: #60a5fa; font-weight: 600;">latest innovation</span> that only open source can deliver.
+        </p>
+    </div>
+</div>
+
+
+<!-- ============================================ -->
+<!-- PAGE 3: OPEN SOURCE FOUNDATIONS (Enterprise-Setup Style) -->
+<!-- ============================================ -->
+<div class="slide bg-dark">
+    <div class="slide-number">03 / 11</div>
+
+
+    <div class="text-center mb-40 z-10">
+        <h2 class="text-grad-white mb-16">The Open Source Foundations We Unify</h2>
+        <p class="subtitle">Hundreds of open-source components &mdash; Stacktic creates the relationships, versioning, and automation between all of them</p>
+    </div>
+
+    <!-- Enterprise-setup style zones grid -->
+    <div class="z-10" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+        <!-- CNCF Zone -->
+        <div style="background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2); border-radius: 14px; padding: 20px; border-top: 3px solid #7c3aed;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid rgba(124,58,237,0.15);">
+                <span style="font-size: 20px;">☸️</span>
+                <span style="font-size: 14px; font-weight: 700; color: #a78bfa;">CNCF</span>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <div style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">Prometheus</div>
+                <div style="background: linear-gradient(135deg, #ef7b4d, #e55a2b); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">ArgoCD</div>
+                <div style="background: linear-gradient(135deg, #466bb0, #37558c); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">Envoy</div>
+                <div style="background: linear-gradient(135deg, #326ce5, #2857b6); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">Helm</div>
+                <div style="background: linear-gradient(135deg, #f39c12, #e67e22); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">Grafana</div>
+                <div style="background: linear-gradient(135deg, #00897b, #00695c); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">Vault</div>
+            </div>
+        </div>
+
+        <!-- Apache Zone -->
+        <div style="background: rgba(180,83,9,0.08); border: 1px solid rgba(180,83,9,0.2); border-radius: 14px; padding: 20px; border-top: 3px solid #b45309;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid rgba(180,83,9,0.15);">
+                <span style="font-size: 20px;">🪶</span>
+                <span style="font-size: 14px; font-weight: 700; color: #fbbf24;">Apache</span>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <div style="background: linear-gradient(135deg, #000, #333); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">Kafka</div>
+                <div style="background: linear-gradient(135deg, #017cee, #0165be); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">Airflow</div>
+                <div style="background: linear-gradient(135deg, #e25a1c, #c44e18); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">Spark</div>
+                <div style="background: linear-gradient(135deg, #6cb52d, #5a9a26); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">APISIX</div>
+                <div style="background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">Flink</div>
+            </div>
+        </div>
+
+        <!-- Databases Zone -->
+        <div style="background: rgba(37,99,235,0.08); border: 1px solid rgba(37,99,235,0.2); border-radius: 14px; padding: 20px; border-top: 3px solid #2563eb;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid rgba(37,99,235,0.15);">
+                <span style="font-size: 20px;">🗄️</span>
+                <span style="font-size: 14px; font-weight: 700; color: #60a5fa;">Databases</span>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <div style="background: linear-gradient(135deg, #336791, #285578); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">PostgreSQL</div>
+                <div style="background: linear-gradient(135deg, #47a248, #3a863b); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">MongoDB</div>
+                <div style="background: linear-gradient(135deg, #dc382d, #b92e25); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">Redis</div>
+                <div style="background: linear-gradient(135deg, #fed10a, #d4b008); color: #000; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">Elastic</div>
+                <div style="background: linear-gradient(135deg, #00758f, #005f73); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">MySQL</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="z-10" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+        <!-- AI / ML Zone -->
+        <div style="background: rgba(190,24,93,0.08); border: 1px solid rgba(190,24,93,0.2); border-radius: 14px; padding: 20px; border-top: 3px solid #be185d;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid rgba(190,24,93,0.15);">
+                <span style="font-size: 20px;">🧠</span>
+                <span style="font-size: 14px; font-weight: 700; color: #f472b6;">AI / ML</span>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <div style="background: linear-gradient(135deg, #10a37f, #0d8a6a); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">vLLM</div>
+                <div style="background: linear-gradient(135deg, #333, #111); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">Ollama</div>
+                <div style="background: linear-gradient(135deg, #ff6b35, #e55a2b); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">LangFlow</div>
+                <div style="background: linear-gradient(135deg, #7c4dff, #651fff); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">RAG</div>
+                <div style="background: linear-gradient(135deg, #ff5722, #e64a19); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">MLflow</div>
+            </div>
+        </div>
+
+        <!-- Platform Zone -->
+        <div style="background: rgba(14,116,144,0.08); border: 1px solid rgba(14,116,144,0.2); border-radius: 14px; padding: 20px; border-top: 3px solid #0e7490;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid rgba(14,116,144,0.15);">
+                <span style="font-size: 20px;">🔧</span>
+                <span style="font-size: 14px; font-weight: 700; color: #22d3ee;">Platform</span>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <div style="background: linear-gradient(135deg, #000, #333); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">Vault</div>
+                <div style="background: linear-gradient(135deg, #1a73e8, #155ab5); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">Keycloak</div>
+                <div style="background: linear-gradient(135deg, #60b932, #4ea329); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">Harbor</div>
+                <div style="background: linear-gradient(135deg, #009639, #007a2e); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">Nginx</div>
+                <div style="background: linear-gradient(135deg, #7b42bc, #5e329a); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">Terraform</div>
+            </div>
+        </div>
+
+        <!-- Security Zone -->
+        <div style="background: rgba(244,63,94,0.08); border: 1px solid rgba(244,63,94,0.2); border-radius: 14px; padding: 20px; border-top: 3px solid #f43f5e;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid rgba(244,63,94,0.15);">
+                <span style="font-size: 20px;">🛡️</span>
+                <span style="font-size: 14px; font-weight: 700; color: #fb7185;">Security</span>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <div style="background: linear-gradient(135deg, #e53935, #c62828); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">OPA</div>
+                <div style="background: linear-gradient(135deg, #d32f2f, #b71c1c); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">Falco</div>
+                <div style="background: linear-gradient(135deg, #1976d2, #1565c0); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">SOPS</div>
+                <div style="background: linear-gradient(135deg, #6a1b9a, #4a148c); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">Trivy</div>
+                <div style="background: linear-gradient(135deg, #00838f, #006064); color: white; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;">CertMgr</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- What Stacktic does with all this -->
+    <div class="z-10 glass-accent" style="padding: 24px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; text-align: center;">
+            <div>
+                <div style="font-size: 28px; font-weight: 900; color: #60a5fa; margin-bottom: 4px;">&#x2194;</div>
+                <p style="font-size: 13px; font-weight: 700; color: white;">Relationships</p>
+                <p style="font-size: 11px; color: rgba(255,255,255,0.35);">Auto-connect all components</p>
+            </div>
+            <div>
+                <div style="font-size: 28px; font-weight: 900; color: #a78bfa; margin-bottom: 4px;">V</div>
+                <p style="font-size: 13px; font-weight: 700; color: white;">Versioning</p>
+                <p style="font-size: 11px; color: rgba(255,255,255,0.35);">Entire stack as one unit</p>
+            </div>
+            <div>
+                <div style="font-size: 28px; font-weight: 900; color: #34d399; margin-bottom: 4px;">&#x21BB;</div>
+                <p style="font-size: 13px; font-weight: 700; color: white;">Rollback</p>
+                <p style="font-size: 11px; color: rgba(255,255,255,0.35);">Any version, any time</p>
+            </div>
+            <div>
+                <div style="font-size: 28px; font-weight: 900; color: #fbbf24; margin-bottom: 4px;">&#x2192;</div>
+                <p style="font-size: 13px; font-weight: 700; color: white;">Migration</p>
+                <p style="font-size: 11px; color: rgba(255,255,255,0.35);">Automated upgrades &amp; EOL</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================================ -->
+<!-- PAGE 4: CLEAR ROLE SEPARATION                -->
+<!-- ============================================ -->
+<div class="slide bg-dark">
+    <div class="slide-number">04 / 11</div>
+
+    <div class="text-center mb-48 z-10">
+        <h2 class="text-grad-white mb-16">Clear Role Separation</h2>
+        <p class="subtitle">No overlap. No duplication. Clean responsibility boundaries.</p>
+    </div>
+
+    <!-- Two interlocking blocks -->
+    <div class="z-10 mb-48">
+        <svg viewBox="0 0 1000 340" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: auto;">
+            <defs>
+                <linearGradient id="rGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#047857"/><stop offset="100%" style="stop-color:#059669"/></linearGradient>
+                <linearGradient id="sGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#1d4ed8"/><stop offset="100%" style="stop-color:#3b82f6"/></linearGradient>
+                <linearGradient id="combGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#059669"/><stop offset="100%" style="stop-color:#3b82f6"/></linearGradient>
+                <filter id="s1"><feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.3"/></filter>
+            </defs>
+
+            <!-- SUSE Rancher Block -->
+            <g filter="url(#s1)">
+                <rect x="20" y="20" width="460" height="200" rx="16" fill="url(#rGrad)"/>
+                <rect x="20" y="20" width="460" height="200" rx="16" fill="none" stroke="#34d399" stroke-width="1" opacity="0.4"/>
+            </g>
+            <text x="250" y="56" font-family="Inter,sans-serif" font-size="11" fill="rgba(255,255,255,0.5)" text-anchor="middle" font-weight="600" letter-spacing="3">SUSE RANCHER</text>
+            <text x="250" y="82" font-family="Inter,sans-serif" font-size="20" fill="white" text-anchor="middle" font-weight="800">Infrastructure &amp; Kubernetes</text>
+
+            <!-- Rancher features as pills -->
+            <g transform="translate(45, 110)">
+                <rect x="0" y="0" width="180" height="36" rx="18" fill="rgba(255,255,255,0.12)"/>
+                <text x="90" y="23" font-family="Inter,sans-serif" font-size="12" fill="rgba(255,255,255,0.8)" text-anchor="middle" font-weight="500"><tspan>&#xf0c2;</tspan> Multi-Cluster K8s</text>
+                <rect x="195" y="0" width="180" height="36" rx="18" fill="rgba(255,255,255,0.12)"/>
+                <text x="285" y="23" font-family="Inter,sans-serif" font-size="12" fill="rgba(255,255,255,0.8)" text-anchor="middle" font-weight="500">Lifecycle Mgmt</text>
+                <rect x="0" y="48" width="180" height="36" rx="18" fill="rgba(255,255,255,0.12)"/>
+                <text x="90" y="71" font-family="Inter,sans-serif" font-size="12" fill="rgba(255,255,255,0.8)" text-anchor="middle" font-weight="500">Access Control</text>
+                <rect x="195" y="48" width="180" height="36" rx="18" fill="rgba(255,255,255,0.12)"/>
+                <text x="285" y="71" font-family="Inter,sans-serif" font-size="12" fill="rgba(255,255,255,0.8)" text-anchor="middle" font-weight="500">App Catalog</text>
+            </g>
+
+            <!-- Stacktic Block -->
+            <g filter="url(#s1)">
+                <rect x="520" y="20" width="460" height="200" rx="16" fill="url(#sGrad)"/>
+                <rect x="520" y="20" width="460" height="200" rx="16" fill="none" stroke="#60a5fa" stroke-width="1" opacity="0.4"/>
+            </g>
+            <text x="750" y="56" font-family="Inter,sans-serif" font-size="11" fill="rgba(255,255,255,0.5)" text-anchor="middle" font-weight="600" letter-spacing="3">STACKTIC</text>
+            <text x="750" y="82" font-family="Inter,sans-serif" font-size="20" fill="white" text-anchor="middle" font-weight="800">Full-Stack Automation</text>
+
+            <!-- Stacktic features as pills -->
+            <g transform="translate(545, 110)">
+                <rect x="0" y="0" width="180" height="36" rx="18" fill="rgba(255,255,255,0.12)"/>
+                <text x="90" y="23" font-family="Inter,sans-serif" font-size="12" fill="rgba(255,255,255,0.8)" text-anchor="middle" font-weight="500">Relationship Engine</text>
+                <rect x="195" y="0" width="180" height="36" rx="18" fill="rgba(255,255,255,0.12)"/>
+                <text x="285" y="23" font-family="Inter,sans-serif" font-size="12" fill="rgba(255,255,255,0.8)" text-anchor="middle" font-weight="500">Stack Versioning</text>
+                <rect x="0" y="48" width="180" height="36" rx="18" fill="rgba(255,255,255,0.12)"/>
+                <text x="90" y="71" font-family="Inter,sans-serif" font-size="12" fill="rgba(255,255,255,0.8)" text-anchor="middle" font-weight="500">SecOps &amp; Compliance</text>
+                <rect x="195" y="48" width="180" height="36" rx="18" fill="rgba(255,255,255,0.12)"/>
+                <text x="285" y="71" font-family="Inter,sans-serif" font-size="12" fill="rgba(255,255,255,0.8)" text-anchor="middle" font-weight="500">Day-2 Operations</text>
+            </g>
+
+            <!-- Combined bar -->
+            <rect x="20" y="250" width="960" height="70" rx="16" fill="url(#combGrad)" filter="url(#s1)" opacity="0.95"/>
+            <text x="500" y="275" font-family="Inter,sans-serif" font-size="11" fill="rgba(255,255,255,0.5)" text-anchor="middle" font-weight="600" letter-spacing="3">TOGETHER</text>
+            <text x="500" y="302" font-family="Inter,sans-serif" font-size="18" fill="white" text-anchor="middle" font-weight="800">The First Truly Managed Open-Source Platform</text>
+
+            <!-- Connection lines -->
+            <line x1="250" y1="220" x2="250" y2="250" stroke="#34d399" stroke-width="2" opacity="0.4"/>
+            <line x1="750" y1="220" x2="750" y2="250" stroke="#60a5fa" stroke-width="2" opacity="0.4"/>
+            <polygon points="248,248 250,255 252,248" fill="#34d399" opacity="0.6"/>
+            <polygon points="748,248 750,255 752,248" fill="#60a5fa" opacity="0.6"/>
+        </svg>
+    </div>
+
+    <!-- Day 0-2 bar -->
+    <div class="z-10 grid-3" style="gap: 0;">
+        <div class="glass-bright text-center" style="padding: 24px; border-radius: 16px 0 0 16px; border-right: none;">
+            <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(59,130,246,0.2); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 1.2rem; font-weight: 800; color: #60a5fa;">0</div>
+            <p style="font-weight: 700; color: white; font-size: 15px;">Day 0: Architecture</p>
+            <p style="color: rgba(255,255,255,0.4); font-size: 13px;">Hours instead of months</p>
+        </div>
+        <div class="glass-bright text-center" style="padding: 24px; border-radius: 0; border-left: none; border-right: none;">
+            <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(52,211,153,0.2); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 1.2rem; font-weight: 800; color: #34d399;">1</div>
+            <p style="font-weight: 700; color: white; font-size: 15px;">Day 1: Deployment</p>
+            <p style="color: rgba(255,255,255,0.4); font-size: 13px;">One-click to any Kubernetes</p>
+        </div>
+        <div class="glass-bright text-center" style="padding: 24px; border-radius: 0 16px 16px 0; border-left: none;">
+            <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(168,85,246,0.2); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 1.2rem; font-weight: 800; color: #a78bfa;">2</div>
+            <p style="font-weight: 700; color: white; font-size: 15px;">Day 2: Operations</p>
+            <p style="color: rgba(255,255,255,0.4); font-size: 13px;">Automated ops, security, rollback</p>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================================ -->
+<!-- PAGE 5: JOINT PLATFORM STACK (SVG)           -->
+<!-- ============================================ -->
+<div class="slide bg-dark">
+    <div class="slide-number">05 / 11</div>
+
+    <div class="text-center mb-40 z-10">
+        <h2 class="text-grad-white mb-16">The Joint Platform Stack</h2>
+        <p class="subtitle">Rancher owns the infrastructure. Stacktic owns everything on top.</p>
+    </div>
+
+    <!-- Architecture Diagram -->
+    <div class="z-10" style="border-radius: 16px; overflow: hidden;">
+        <svg viewBox="0 0 1000 520" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: auto; display: block;">
+            <defs>
+                <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#1d4ed8"/><stop offset="100%" style="stop-color:#2563eb"/></linearGradient>
+                <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#047857"/><stop offset="100%" style="stop-color:#059669"/></linearGradient>
+                <linearGradient id="ig" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#1e293b"/><stop offset="100%" style="stop-color:#334155"/></linearGradient>
+                <filter id="ds"><feDropShadow dx="0" dy="3" stdDeviation="6" flood-opacity="0.4"/></filter>
+                <linearGradient id="da" x1="0%" y1="0%" x2="100%"><stop offset="0%" style="stop-color:#3b82f6"/><stop offset="100%" style="stop-color:#60a5fa"/></linearGradient>
+                <linearGradient id="sa" x1="0%" y1="0%" x2="100%"><stop offset="0%" style="stop-color:#f43f5e"/><stop offset="100%" style="stop-color:#fb7185"/></linearGradient>
+                <linearGradient id="ra" x1="0%" y1="0%" x2="100%"><stop offset="0%" style="stop-color:#f59e0b"/><stop offset="100%" style="stop-color:#fbbf24"/></linearGradient>
+                <linearGradient id="aa" x1="0%" y1="0%" x2="100%"><stop offset="0%" style="stop-color:#8b5cf6"/><stop offset="100%" style="stop-color:#a78bfa"/></linearGradient>
+                <linearGradient id="ca" x1="0%" y1="0%" x2="100%"><stop offset="0%" style="stop-color:#06b6d4"/><stop offset="100%" style="stop-color:#22d3ee"/></linearGradient>
+                <linearGradient id="ga" x1="0%" y1="0%" x2="100%"><stop offset="0%" style="stop-color:#10b981"/><stop offset="100%" style="stop-color:#34d399"/></linearGradient>
+            </defs>
+
+            <rect width="1000" height="520" fill="#080c16"/>
+
+            <!-- OPEN SOURCE ECOSYSTEM -->
+            <text x="500" y="28" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.3)" text-anchor="middle" font-weight="600" letter-spacing="3">OPEN SOURCE ECOSYSTEM</text>
+            <g transform="translate(40, 38)">
+                <rect x="0" y="0" width="170" height="42" rx="21" fill="#7c3aed" opacity="0.85"/><text x="85" y="18" font-family="Inter,sans-serif" font-size="11" fill="white" text-anchor="middle" font-weight="700">CNCF</text><text x="85" y="32" font-family="Inter,sans-serif" font-size="8" fill="rgba(255,255,255,0.5)" text-anchor="middle">Prometheus, ArgoCD</text>
+                <rect x="185" y="0" width="170" height="42" rx="21" fill="#b45309" opacity="0.85"/><text x="270" y="18" font-family="Inter,sans-serif" font-size="11" fill="white" text-anchor="middle" font-weight="700">Apache</text><text x="270" y="32" font-family="Inter,sans-serif" font-size="8" fill="rgba(255,255,255,0.5)" text-anchor="middle">Kafka, Airflow, Spark</text>
+                <rect x="370" y="0" width="170" height="42" rx="21" fill="#2563eb" opacity="0.85"/><text x="455" y="18" font-family="Inter,sans-serif" font-size="11" fill="white" text-anchor="middle" font-weight="700">Databases</text><text x="455" y="32" font-family="Inter,sans-serif" font-size="8" fill="rgba(255,255,255,0.5)" text-anchor="middle">Postgres, Mongo, Redis</text>
+                <rect x="555" y="0" width="170" height="42" rx="21" fill="#be185d" opacity="0.85"/><text x="640" y="18" font-family="Inter,sans-serif" font-size="11" fill="white" text-anchor="middle" font-weight="700">AI / ML</text><text x="640" y="32" font-family="Inter,sans-serif" font-size="8" fill="rgba(255,255,255,0.5)" text-anchor="middle">vLLM, Ollama, LangFlow</text>
+                <rect x="740" y="0" width="170" height="42" rx="21" fill="#0e7490" opacity="0.85"/><text x="825" y="18" font-family="Inter,sans-serif" font-size="11" fill="white" text-anchor="middle" font-weight="700">Platform</text><text x="825" y="32" font-family="Inter,sans-serif" font-size="8" fill="rgba(255,255,255,0.5)" text-anchor="middle">Vault, Keycloak, Harbor</text>
+            </g>
+
+            <!-- Dashed lines ecosystem → stacktic -->
+            <g opacity="0.25"><line x1="125" y1="80" x2="125" y2="108" stroke="white" stroke-width="1" stroke-dasharray="3,3"/><line x1="310" y1="80" x2="310" y2="108" stroke="white" stroke-width="1" stroke-dasharray="3,3"/><line x1="495" y1="80" x2="495" y2="108" stroke="white" stroke-width="1" stroke-dasharray="3,3"/><line x1="680" y1="80" x2="680" y2="108" stroke="white" stroke-width="1" stroke-dasharray="3,3"/><line x1="865" y1="80" x2="865" y2="108" stroke="white" stroke-width="1" stroke-dasharray="3,3"/></g>
+
+            <!-- STACKTIC LAYER -->
+            <g transform="translate(30, 110)">
+                <rect x="0" y="0" width="940" height="210" rx="14" fill="url(#sg)" filter="url(#ds)"/>
+                <rect x="0" y="0" width="940" height="210" rx="14" fill="none" stroke="#60a5fa" stroke-width="1" opacity="0.3"/>
+                <rect x="14" y="-12" width="96" height="24" rx="5" fill="#3b82f6"/><text x="62" y="3" font-family="Inter,sans-serif" font-size="11" fill="white" text-anchor="middle" font-weight="800" letter-spacing="1">STACKTIC</text>
+                <text x="470" y="26" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.4)" text-anchor="middle" font-weight="500" letter-spacing="2">FULL-STACK AUTOMATION &amp; SOVEREIGNTY</text>
+
+                <!-- 6 Domain boxes -->
+                <g transform="translate(15, 40)">
+                    <rect x="0" y="0" width="145" height="80" rx="8" fill="rgba(0,0,0,0.25)"/><rect x="0" y="0" width="145" height="3" rx="8" fill="url(#da)"/><text x="72" y="36" font-family="Inter,sans-serif" font-size="13" fill="white" text-anchor="middle" font-weight="700">DataOps</text><text x="72" y="54" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,0.4)" text-anchor="middle">Pipelines &amp; ETL</text>
+                    <rect x="155" y="0" width="145" height="80" rx="8" fill="rgba(0,0,0,0.25)"/><rect x="155" y="0" width="145" height="3" rx="8" fill="url(#sa)"/><text x="228" y="36" font-family="Inter,sans-serif" font-size="13" fill="white" text-anchor="middle" font-weight="700">SecOps</text><text x="228" y="54" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,0.4)" text-anchor="middle">RBAC &amp; Policies</text>
+                    <rect x="310" y="0" width="145" height="80" rx="8" fill="rgba(0,0,0,0.25)"/><rect x="310" y="0" width="145" height="3" rx="8" fill="url(#ra)"/><text x="382" y="36" font-family="Inter,sans-serif" font-size="13" fill="white" text-anchor="middle" font-weight="700">SRE</text><text x="382" y="54" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,0.4)" text-anchor="middle">Observability</text>
+                    <rect x="465" y="0" width="145" height="80" rx="8" fill="rgba(0,0,0,0.25)"/><rect x="465" y="0" width="145" height="3" rx="8" fill="url(#aa)"/><text x="538" y="36" font-family="Inter,sans-serif" font-size="13" fill="white" text-anchor="middle" font-weight="700">AIOps</text><text x="538" y="54" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,0.4)" text-anchor="middle">Private AI &amp; RAG</text>
+                    <rect x="620" y="0" width="145" height="80" rx="8" fill="rgba(0,0,0,0.25)"/><rect x="620" y="0" width="145" height="3" rx="8" fill="url(#ca)"/><text x="692" y="36" font-family="Inter,sans-serif" font-size="13" fill="white" text-anchor="middle" font-weight="700">CI/CD</text><text x="692" y="54" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,0.4)" text-anchor="middle">GitOps &amp; ArgoCD</text>
+                    <rect x="775" y="0" width="145" height="80" rx="8" fill="rgba(0,0,0,0.25)"/><rect x="775" y="0" width="145" height="3" rx="8" fill="url(#ga)"/><text x="848" y="36" font-family="Inter,sans-serif" font-size="13" fill="white" text-anchor="middle" font-weight="700">Compliance</text><text x="848" y="54" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,0.4)" text-anchor="middle">ISO &amp; SOC2</text>
+                </g>
+
+                <!-- Core Engine -->
+                <rect x="15" y="132" width="910" height="60" rx="8" fill="rgba(0,0,0,0.3)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+                <text x="470" y="150" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,0.3)" text-anchor="middle" font-weight="600" letter-spacing="3">CORE ENGINE</text>
+                <g transform="translate(30, 160)">
+                    <rect x="0" y="0" width="200" height="22" rx="5" fill="rgba(96,165,250,0.15)" stroke="rgba(96,165,250,0.25)" stroke-width="1"/><text x="100" y="15" font-family="Inter,sans-serif" font-size="10" fill="#93c5fd" text-anchor="middle">Relationship Engine</text>
+                    <rect x="215" y="0" width="200" height="22" rx="5" fill="rgba(168,85,246,0.15)" stroke="rgba(168,85,246,0.25)" stroke-width="1"/><text x="315" y="15" font-family="Inter,sans-serif" font-size="10" fill="#c4b5fd" text-anchor="middle">Stack Versioning</text>
+                    <rect x="430" y="0" width="200" height="22" rx="5" fill="rgba(52,211,153,0.15)" stroke="rgba(52,211,153,0.25)" stroke-width="1"/><text x="530" y="15" font-family="Inter,sans-serif" font-size="10" fill="#6ee7b7" text-anchor="middle">Auto-Migration</text>
+                    <rect x="645" y="0" width="200" height="22" rx="5" fill="rgba(251,191,36,0.15)" stroke="rgba(251,191,36,0.25)" stroke-width="1"/><text x="745" y="15" font-family="Inter,sans-serif" font-size="10" fill="#fcd34d" text-anchor="middle">Rollback &amp; Recovery</text>
+                </g>
+            </g>
+
+            <!-- Arrows Stacktic → Rancher -->
+            <g opacity="0.3"><line x1="200" y1="320" x2="200" y2="345" stroke="white" stroke-width="2"/><line x1="500" y1="320" x2="500" y2="345" stroke="white" stroke-width="2"/><line x1="800" y1="320" x2="800" y2="345" stroke="white" stroke-width="2"/></g>
+            <g fill="rgba(255,255,255,0.2)"><polygon points="198,343 200,350 202,343"/><polygon points="498,343 500,350 502,343"/><polygon points="798,343 800,350 802,343"/></g>
+
+            <!-- RANCHER LAYER -->
+            <g transform="translate(30, 352)">
+                <rect x="0" y="0" width="940" height="70" rx="14" fill="url(#rg)" filter="url(#ds)"/>
+                <rect x="14" y="-12" width="120" height="24" rx="5" fill="#059669"/><text x="74" y="3" font-family="Inter,sans-serif" font-size="11" fill="white" text-anchor="middle" font-weight="800" letter-spacing="1">SUSE RANCHER</text>
+                <text x="470" y="27" font-family="Inter,sans-serif" font-size="13" fill="white" text-anchor="middle" font-weight="700">Kubernetes Management Layer</text>
+                <g transform="translate(70, 40)"><rect x="0" y="0" width="140" height="22" rx="11" fill="rgba(255,255,255,0.12)"/><text x="70" y="15" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.8)" text-anchor="middle">Multi-Cluster</text><rect x="155" y="0" width="140" height="22" rx="11" fill="rgba(255,255,255,0.12)"/><text x="225" y="15" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.8)" text-anchor="middle">Lifecycle Mgmt</text><rect x="310" y="0" width="140" height="22" rx="11" fill="rgba(255,255,255,0.12)"/><text x="380" y="15" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.8)" text-anchor="middle">Access Control</text><rect x="465" y="0" width="140" height="22" rx="11" fill="rgba(255,255,255,0.12)"/><text x="535" y="15" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.8)" text-anchor="middle">App Catalog</text><rect x="620" y="0" width="140" height="22" rx="11" fill="rgba(255,255,255,0.12)"/><text x="690" y="15" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.8)" text-anchor="middle">RKE2 / K3s</text></g>
+            </g>
+
+            <!-- INFRASTRUCTURE -->
+            <g transform="translate(30, 445)">
+                <rect x="0" y="0" width="940" height="50" rx="14" fill="url(#ig)" filter="url(#ds)"/>
+                <text x="470" y="16" font-family="Inter,sans-serif" font-size="9" fill="rgba(255,255,255,0.3)" text-anchor="middle" font-weight="600" letter-spacing="3">INFRASTRUCTURE</text>
+                <g transform="translate(80, 30)"><text x="0" y="12" font-family="Inter,sans-serif" font-size="11" fill="#64748b" text-anchor="middle">AWS</text><text x="130" y="12" font-family="Inter,sans-serif" font-size="11" fill="#64748b" text-anchor="middle">Azure</text><text x="260" y="12" font-family="Inter,sans-serif" font-size="11" fill="#64748b" text-anchor="middle">GCP</text><text x="390" y="12" font-family="Inter,sans-serif" font-size="11" fill="#64748b" text-anchor="middle">On-Prem</text><text x="520" y="12" font-family="Inter,sans-serif" font-size="11" fill="#64748b" text-anchor="middle">Edge</text><text x="650" y="12" font-family="Inter,sans-serif" font-size="11" fill="#64748b" text-anchor="middle">Air-Gap</text></g>
+            </g>
+        </svg>
+    </div>
+</div>
+
+
+<!-- ============================================ -->
+<!-- PAGE 5: POTENTIAL INTEGRATION IDEAS           -->
+<!-- ============================================ -->
+<div class="slide bg-gradient-green">
+    <div class="slide-number">06 / 11</div>
+
+    <div class="text-center mb-48 z-10">
+        <h2 class="text-grad-white mb-16">Potential Integration Ideas</h2>
+        <p class="subtitle">How Stacktic and Rancher create unique value together</p>
+    </div>
+
+    <div class="z-10 grid-2" style="gap: 24px; margin-bottom: 32px;">
+        <!-- Integration 1 -->
+        <div class="glass" style="padding: 28px; display: flex; gap: 20px; align-items: flex-start;">
+            <div style="flex-shrink: 0;">
+                <svg width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="rgba(59,130,246,0.15)"/><g transform="translate(16,16)"><rect x="2" y="8" width="12" height="16" rx="3" fill="none" stroke="#60a5fa" stroke-width="2"/><rect x="18" y="4" width="12" height="20" rx="3" fill="none" stroke="#60a5fa" stroke-width="2"/><path d="M8 28 L8 32 L24 32 L24 28" stroke="#60a5fa" stroke-width="2" fill="none"/><circle cx="16" cy="32" r="2" fill="#60a5fa" opacity="0.6"/></g></svg>
+            </div>
+            <div>
+                <h3 style="color: #60a5fa; font-size: 1.1rem; margin-bottom: 6px;">Visual Infra Management</h3>
+                <p style="color: rgba(255,255,255,0.5); font-size: 14px; line-height: 1.6;">Stacktic drag &amp; drop UI designs cluster infra. Output pushes directly into Rancher for provisioning.</p>
+                <div style="margin-top: 12px; padding: 8px 14px; background: rgba(59,130,246,0.1); border-radius: 8px; border: 1px solid rgba(59,130,246,0.15); display: inline-block;">
+                    <span style="font-size: 13px; color: #60a5fa; font-weight: 600;">Visual design &rarr; Rancher provisioning</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Integration 2 -->
+        <div class="glass" style="padding: 28px; display: flex; gap: 20px; align-items: flex-start;">
+            <div style="flex-shrink: 0;">
+                <svg width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="rgba(52,211,153,0.15)"/><g transform="translate(14,14)"><circle cx="8" cy="8" r="6" fill="none" stroke="#34d399" stroke-width="2"/><circle cx="28" cy="8" r="6" fill="none" stroke="#34d399" stroke-width="2"/><circle cx="18" cy="28" r="6" fill="none" stroke="#34d399" stroke-width="2"/><line x1="13" y1="11" x2="15" y2="23" stroke="#34d399" stroke-width="1.5" opacity="0.5"/><line x1="23" y1="11" x2="21" y2="23" stroke="#34d399" stroke-width="1.5" opacity="0.5"/><line x1="14" y1="8" x2="22" y2="8" stroke="#34d399" stroke-width="1.5" opacity="0.5"/></g></svg>
+            </div>
+            <div>
+                <h3 style="color: #34d399; font-size: 1.1rem; margin-bottom: 6px;">App Catalog + Relationships</h3>
+                <p style="color: rgba(255,255,255,0.5); font-size: 14px; line-height: 1.6;">Rancher deploys catalog apps. Stacktic generates routing, data flows, security, and monitoring between them.</p>
+                <div style="margin-top: 12px; padding: 8px 14px; background: rgba(52,211,153,0.1); border-radius: 8px; border: 1px solid rgba(52,211,153,0.15); display: inline-block;">
+                    <span style="font-size: 13px; color: #34d399; font-weight: 600;">Catalog deploys &rarr; Stacktic connects</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Integration 3 -->
+        <div class="glass" style="padding: 28px; display: flex; gap: 20px; align-items: flex-start;">
+            <div style="flex-shrink: 0;">
+                <svg width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="rgba(168,85,246,0.15)"/><g transform="translate(14,16)"><rect x="0" y="4" width="14" height="10" rx="3" fill="none" stroke="#a78bfa" stroke-width="2"/><path d="M18 9 L25 9" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/><polygon points="25,5 33,9 25,13" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linejoin="round"/><g transform="translate(22,2)"><path d="M0,5 C0,0 14,0 14,5 L14,15 C14,20 0,20 0,15 Z" fill="none" stroke="#a78bfa" stroke-width="2"/><ellipse cx="7" cy="5" rx="7" ry="3" fill="none" stroke="#a78bfa" stroke-width="1" opacity="0.4"/></g></g></svg>
+            </div>
+            <div>
+                <h3 style="color: #a78bfa; font-size: 1.1rem; margin-bottom: 6px;">Automated K8s Migration</h3>
+                <p style="color: rgba(255,255,255,0.5); font-size: 14px; line-height: 1.6;">Stacktic converts Docker, VMs (VMDK/OVA), managed services into K8s manifests. Rancher provides target clusters (RKE2/K3s).</p>
+                <div style="margin-top: 12px; padding: 8px 14px; background: rgba(168,85,246,0.1); border-radius: 8px; border: 1px solid rgba(168,85,246,0.15); display: inline-block;">
+                    <span style="font-size: 13px; color: #a78bfa; font-weight: 600;">Any legacy &rarr; Rancher K8s</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Integration 4 -->
+        <div class="glass" style="padding: 28px; display: flex; gap: 20px; align-items: flex-start;">
+            <div style="flex-shrink: 0;">
+                <svg width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="rgba(251,191,36,0.15)"/><g transform="translate(14,14)"><path d="M18,0 L8,6 L8,18 C8,24 18,30 18,30 C18,30 28,24 28,18 L28,6 Z" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linejoin="round"/><path d="M14,15 L17,18 L23,12" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g></svg>
+            </div>
+            <div>
+                <h3 style="color: #fbbf24; font-size: 1.1rem; margin-bottom: 6px;">Private SaaS Inside Rancher</h3>
+                <p style="color: rgba(255,255,255,0.5); font-size: 14px; line-height: 1.6;">Stacktic deploys inside Rancher as on-prem platform. Full automation, versioning, security. Zero external dependencies.</p>
+                <div style="margin-top: 12px; padding: 8px 14px; background: rgba(251,191,36,0.1); border-radius: 8px; border: 1px solid rgba(251,191,36,0.15); display: inline-block;">
+                    <span style="font-size: 13px; color: #fbbf24; font-weight: 600;">On-prem &rarr; nothing leaves the network</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Unique propositions bar -->
+    <div class="z-10 glass-accent" style="padding: 28px;">
+        <p style="text-align: center; font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.4); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px;">
+            Unique Propositions &mdash; Doesn't Exist on AWS, OpenShift, or Any Platform
+        </p>
+        <div class="grid-6">
+            <div class="text-center">
+                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(248,113,113,0.15); display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;"><i class="fa-solid fa-shield-halved" style="color: #f87171;"></i></div>
+                <p style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.7);">Auto SecOps</p>
+                <p style="font-size: 10px; color: rgba(255,255,255,0.3);">From metadata</p>
+            </div>
+            <div class="text-center">
+                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(96,165,250,0.15); display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;"><i class="fa-solid fa-code-branch" style="color: #60a5fa;"></i></div>
+                <p style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.7);">Stack Versioning</p>
+                <p style="font-size: 10px; color: rgba(255,255,255,0.3);">Rollback everything</p>
+            </div>
+            <div class="text-center">
+                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(168,85,246,0.15); display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;"><i class="fa-solid fa-file-lines" style="color: #a78bfa;"></i></div>
+                <p style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.7);">Auto Docs</p>
+                <p style="font-size: 10px; color: rgba(255,255,255,0.3);">BOMs, audits, reports</p>
+            </div>
+            <div class="text-center">
+                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(52,211,153,0.15); display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;"><i class="fa-solid fa-globe" style="color: #34d399;"></i></div>
+                <p style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.7);">Deploy Anywhere</p>
+                <p style="font-size: 10px; color: rgba(255,255,255,0.3);">Cloud agnostic</p>
+            </div>
+            <div class="text-center">
+                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(251,191,36,0.15); display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;"><i class="fa-solid fa-diagram-project" style="color: #fbbf24;"></i></div>
+                <p style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.7);">Multi-Stack Logic</p>
+                <p style="font-size: 10px; color: rgba(255,255,255,0.3);">Edge + Enterprise</p>
+            </div>
+            <div class="text-center">
+                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(6,182,212,0.15); display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;"><i class="fa-solid fa-crown" style="color: #22d3ee;"></i></div>
+                <p style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.7);">One Platform</p>
+                <p style="font-size: 10px; color: rgba(255,255,255,0.3);">APIs, data, infra, docs</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================================ -->
+<!-- PAGE 6: WHO IS THIS FOR                      -->
+<!-- ============================================ -->
+<div class="slide bg-navy">
+    <div class="slide-number">07 / 11</div>
+
+    <div class="text-center mb-48 z-10">
+        <h2 class="text-grad-white mb-16">Who This Is For</h2>
+        <p class="subtitle">Any organization running stacks on Kubernetes</p>
+    </div>
+
+    <!-- 3 audience segments with visual icons -->
+    <div class="z-10 grid-3 mb-48" style="gap: 28px;">
+        <div class="glass" style="padding: 36px; text-align: center;">
+            <svg width="80" height="80" viewBox="0 0 80 80" style="margin: 0 auto 20px;"><rect width="80" height="80" rx="20" fill="rgba(99,102,241,0.12)"/><g transform="translate(20,18)"><path d="M20,0 L10,6 L10,18 C10,24 20,30 20,30 C20,30 30,24 30,18 L30,6 Z" fill="none" stroke="#818cf8" stroke-width="2.5" stroke-linejoin="round"/><rect x="14" y="12" width="12" height="8" rx="2" fill="none" stroke="#818cf8" stroke-width="1.5"/><circle cx="20" cy="16" r="1.5" fill="#818cf8"/></g></svg>
+            <h3 style="color: #818cf8; margin-bottom: 10px;">Regulated & Sovereign</h3>
+            <p style="color: rgba(255,255,255,0.4); font-size: 13px; margin-bottom: 16px;">Finance, Government, Healthcare, Defense</p>
+            <div style="display: flex; flex-direction: column; gap: 8px; text-align: left;">
+                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(99,102,241,0.06); border-radius: 8px;"><i class="fa-solid fa-check" style="color: #818cf8; font-size: 11px; width: 16px;"></i><span style="color: rgba(255,255,255,0.6); font-size: 13px;">Air-gapped environments</span></div>
+                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(99,102,241,0.06); border-radius: 8px;"><i class="fa-solid fa-check" style="color: #818cf8; font-size: 11px; width: 16px;"></i><span style="color: rgba(255,255,255,0.6); font-size: 13px;">Compliance-ready stacks</span></div>
+                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(99,102,241,0.06); border-radius: 8px;"><i class="fa-solid fa-check" style="color: #818cf8; font-size: 11px; width: 16px;"></i><span style="color: rgba(255,255,255,0.6); font-size: 13px;">Complete data sovereignty</span></div>
+            </div>
+        </div>
+
+        <div class="glass" style="padding: 36px; text-align: center;">
+            <svg width="80" height="80" viewBox="0 0 80 80" style="margin: 0 auto 20px;"><rect width="80" height="80" rx="20" fill="rgba(52,211,153,0.12)"/><g transform="translate(20,20)"><path d="M5,30 L5,18 L15,8 L25,18 L25,30 Z" fill="none" stroke="#34d399" stroke-width="2.5" stroke-linejoin="round"/><rect x="12" y="20" width="6" height="10" fill="none" stroke="#34d399" stroke-width="1.5"/><path d="M28,30 L28,14 L35,6 L42,14 L42,30" fill="none" stroke="#34d399" stroke-width="2" stroke-linejoin="round" opacity="0.5"/></g></svg>
+            <h3 style="color: #34d399; margin-bottom: 10px;">Enterprises & Platform Teams</h3>
+            <p style="color: rgba(255,255,255,0.4); font-size: 13px; margin-bottom: 16px;">Scale-ups, Innovation Labs, App Factories</p>
+            <div style="display: flex; flex-direction: column; gap: 8px; text-align: left;">
+                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(52,211,153,0.06); border-radius: 8px;"><i class="fa-solid fa-check" style="color: #34d399; font-size: 11px; width: 16px;"></i><span style="color: rgba(255,255,255,0.6); font-size: 13px;">Standardized app factories</span></div>
+                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(52,211,153,0.06); border-radius: 8px;"><i class="fa-solid fa-check" style="color: #34d399; font-size: 11px; width: 16px;"></i><span style="color: rgba(255,255,255,0.6); font-size: 13px;">Multi-tenant environments</span></div>
+                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(52,211,153,0.06); border-radius: 8px;"><i class="fa-solid fa-check" style="color: #34d399; font-size: 11px; width: 16px;"></i><span style="color: rgba(255,255,255,0.6); font-size: 13px;">Ship production in hours</span></div>
+            </div>
+        </div>
+
+        <div class="glass" style="padding: 36px; text-align: center; border-color: rgba(251,191,36,0.2);">
+            <svg width="80" height="80" viewBox="0 0 80 80" style="margin: 0 auto 20px;"><rect width="80" height="80" rx="20" fill="rgba(251,191,36,0.12)"/><g transform="translate(18,18)"><rect x="0" y="14" width="44" height="24" rx="4" fill="none" stroke="#fbbf24" stroke-width="2.5"/><line x1="8" y1="22" x2="36" y2="22" stroke="#fbbf24" stroke-width="1.5" opacity="0.4"/><line x1="8" y1="28" x2="28" y2="28" stroke="#fbbf24" stroke-width="1.5" opacity="0.4"/><line x1="8" y1="34" x2="20" y2="34" stroke="#fbbf24" stroke-width="1.5" opacity="0.4"/><circle cx="22" cy="8" r="6" fill="none" stroke="#fbbf24" stroke-width="2"/><path d="M16,6 L22,10 L28,6" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round"/></g></svg>
+            <h3 style="color: #fbbf24; margin-bottom: 10px;">Any Stack Ops Team</h3>
+            <p style="color: rgba(255,255,255,0.4); font-size: 13px; margin-bottom: 16px;">DevOps, SRE, DataOps, MLOps, SecOps</p>
+            <div style="display: flex; flex-direction: column; gap: 8px; text-align: left;">
+                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(251,191,36,0.06); border-radius: 8px;"><i class="fa-solid fa-check" style="color: #fbbf24; font-size: 11px; width: 16px;"></i><span style="color: rgba(255,255,255,0.6); font-size: 13px;">Automated Day-2 operations</span></div>
+                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(251,191,36,0.06); border-radius: 8px;"><i class="fa-solid fa-check" style="color: #fbbf24; font-size: 11px; width: 16px;"></i><span style="color: rgba(255,255,255,0.6); font-size: 13px;">Reduced headcount dependency</span></div>
+                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(251,191,36,0.06); border-radius: 8px;"><i class="fa-solid fa-check" style="color: #fbbf24; font-size: 11px; width: 16px;"></i><span style="color: rgba(255,255,255,0.6); font-size: 13px;">One platform for all stack types</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Entry points -->
+    <div class="z-10 grid-4">
+        <div class="glass-bright text-center" style="padding: 20px;">
+            <i class="fa-solid fa-right-from-bracket" style="font-size: 24px; color: #60a5fa; margin-bottom: 10px;"></i>
+            <p style="font-weight: 700; color: white; font-size: 14px;">Cloud Exit</p>
+            <p style="color: rgba(255,255,255,0.35); font-size: 12px;">Migrate from managed</p>
+        </div>
+        <div class="glass-bright text-center" style="padding: 20px;">
+            <i class="fa-solid fa-brain" style="font-size: 24px; color: #a78bfa; margin-bottom: 10px;"></i>
+            <p style="font-weight: 700; color: white; font-size: 14px;">Private AI</p>
+            <p style="color: rgba(255,255,255,0.35); font-size: 12px;">Sovereign LLM infra</p>
+        </div>
+        <div class="glass-bright text-center" style="padding: 20px;">
+            <i class="fa-solid fa-cubes-stacked" style="font-size: 24px; color: #34d399; margin-bottom: 10px;"></i>
+            <p style="font-weight: 700; color: white; font-size: 14px;">Modernization</p>
+            <p style="color: rgba(255,255,255,0.35); font-size: 12px;">Legacy &rarr; K8s</p>
+        </div>
+        <div class="glass-bright text-center" style="padding: 20px;">
+            <i class="fa-solid fa-file-shield" style="font-size: 24px; color: #fbbf24; margin-bottom: 10px;"></i>
+            <p style="font-weight: 700; color: white; font-size: 14px;">Compliance</p>
+            <p style="color: rgba(255,255,255,0.35); font-size: 12px;">Regulated industries</p>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================================ -->
+<!-- PAGE 7: PLATFORM COMPARISON (RADAR)          -->
+<!-- ============================================ -->
+<div class="slide bg-dark glow-blue" style="padding: 40px 80px;">
+    <div class="slide-number">08 / 11</div>
+
+    <div class="text-center z-10" style="margin-bottom: 24px;">
+        <h2 class="text-grad-white" style="font-size: 2.2rem; margin-bottom: 8px;">The Platform Landscape</h2>
+        <p class="subtitle" style="font-size: 1rem;">Three approaches &mdash; only one delivers speed, control, and sovereignty together</p>
+    </div>
+
+    <div class="z-10" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-bottom: 20px;">
+        <!-- AWS / Azure / GCP -->
+        <div class="glass" style="padding: 20px; border-top: 3px solid #f87171;">
+            <div class="text-center" style="margin-bottom: 12px;">
+                <i class="fa-solid fa-cloud" style="font-size: 28px; color: #f87171; margin-bottom: 6px;"></i>
+                <h3 style="color: white; font-size: 1rem;">AWS / Azure / GCP</h3>
+                <p style="color: #f87171; font-size: 11px; font-weight: 600;">Managed Services</p>
+            </div>
+            <svg viewBox="0 0 200 140" style="width: 100%;">
+                <text x="4" y="16" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.4)">Speed</text><rect x="70" y="7" width="120" height="12" rx="6" fill="rgba(255,255,255,0.06)"/><rect x="70" y="7" width="96" height="12" rx="6" fill="#f87171" opacity="0.6"/>
+                <text x="4" y="42" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.4)">Control</text><rect x="70" y="33" width="120" height="12" rx="6" fill="rgba(255,255,255,0.06)"/><rect x="70" y="33" width="24" height="12" rx="6" fill="#f87171" opacity="0.6"/>
+                <text x="4" y="68" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.4)">Sovereignty</text><rect x="70" y="59" width="120" height="12" rx="6" fill="rgba(255,255,255,0.06)"/><rect x="70" y="59" width="6" height="12" rx="3" fill="#f87171" opacity="0.6"/>
+                <text x="4" y="94" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.4)">Automation</text><rect x="70" y="85" width="120" height="12" rx="6" fill="rgba(255,255,255,0.06)"/><rect x="70" y="85" width="6" height="12" rx="3" fill="#f87171" opacity="0.6"/>
+                <text x="4" y="120" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.4)">Portability</text><rect x="70" y="111" width="120" height="12" rx="6" fill="rgba(255,255,255,0.06)"/><rect x="70" y="111" width="6" height="12" rx="3" fill="#f87171" opacity="0.6"/>
+            </svg>
+            <div class="text-center" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06);"><span style="font-size: 12px; color: #f87171;">30-50% lock-in premium</span></div>
+        </div>
+
+        <!-- OpenShift -->
+        <div class="glass" style="padding: 20px; border-top: 3px solid #f59e0b;">
+            <div class="text-center" style="margin-bottom: 12px;">
+                <i class="fa-brands fa-redhat" style="font-size: 28px; color: #f59e0b; margin-bottom: 6px;"></i>
+                <h3 style="color: white; font-size: 1rem;">Red Hat OpenShift</h3>
+                <p style="color: #f59e0b; font-size: 11px; font-weight: 600;">Enterprise Platform</p>
+            </div>
+            <svg viewBox="0 0 200 140" style="width: 100%;">
+                <text x="4" y="16" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.4)">Speed</text><rect x="70" y="7" width="120" height="12" rx="6" fill="rgba(255,255,255,0.06)"/><rect x="70" y="7" width="66" height="12" rx="6" fill="#f59e0b" opacity="0.6"/>
+                <text x="4" y="42" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.4)">Control</text><rect x="70" y="33" width="120" height="12" rx="6" fill="rgba(255,255,255,0.06)"/><rect x="70" y="33" width="60" height="12" rx="6" fill="#f59e0b" opacity="0.6"/>
+                <text x="4" y="68" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.4)">Sovereignty</text><rect x="70" y="59" width="120" height="12" rx="6" fill="rgba(255,255,255,0.06)"/><rect x="70" y="59" width="54" height="12" rx="6" fill="#f59e0b" opacity="0.6"/>
+                <text x="4" y="94" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.4)">Automation</text><rect x="70" y="85" width="120" height="12" rx="6" fill="rgba(255,255,255,0.06)"/><rect x="70" y="85" width="30" height="12" rx="6" fill="#f59e0b" opacity="0.6"/>
+                <text x="4" y="120" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.4)">Portability</text><rect x="70" y="111" width="120" height="12" rx="6" fill="rgba(255,255,255,0.06)"/><rect x="70" y="111" width="48" height="12" rx="6" fill="#f59e0b" opacity="0.6"/>
+            </svg>
+            <div class="text-center" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06);"><span style="font-size: 12px; color: #f59e0b;">Proprietary runtime, high cost</span></div>
+        </div>
+
+        <!-- Stacktic + Rancher -->
+        <div style="padding: 20px; border-radius: 16px; border-top: 3px solid #34d399; background: linear-gradient(135deg, rgba(52,211,153,0.08), rgba(59,130,246,0.06)); border: 1px solid rgba(52,211,153,0.2); box-shadow: 0 0 60px rgba(52,211,153,0.08); position: relative;">
+            <div style="position: absolute; top: -12px; right: 14px; padding: 3px 12px; background: linear-gradient(135deg, #10b981, #3b82f6); border-radius: 20px; font-size: 10px; font-weight: 800; color: white; letter-spacing: 1px;">BEST FIT</div>
+            <div class="text-center" style="margin-bottom: 12px;">
+                <i class="fa-solid fa-layer-group" style="font-size: 28px; color: #34d399; margin-bottom: 6px;"></i>
+                <h3 style="color: white; font-size: 1rem;">Stacktic + Rancher</h3>
+                <p style="color: #34d399; font-size: 11px; font-weight: 600;">Open Platform</p>
+            </div>
+            <svg viewBox="0 0 200 140" style="width: 100%;">
+                <defs><linearGradient id="barG" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#10b981"/><stop offset="100%" style="stop-color:#3b82f6"/></linearGradient></defs>
+                <text x="4" y="16" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.4)">Speed</text><rect x="70" y="7" width="120" height="12" rx="6" fill="rgba(255,255,255,0.06)"/><rect x="70" y="7" width="114" height="12" rx="6" fill="url(#barG)"/>
+                <text x="4" y="42" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.4)">Control</text><rect x="70" y="33" width="120" height="12" rx="6" fill="rgba(255,255,255,0.06)"/><rect x="70" y="33" width="120" height="12" rx="6" fill="url(#barG)"/>
+                <text x="4" y="68" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.4)">Sovereignty</text><rect x="70" y="59" width="120" height="12" rx="6" fill="rgba(255,255,255,0.06)"/><rect x="70" y="59" width="120" height="12" rx="6" fill="url(#barG)"/>
+                <text x="4" y="94" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.4)">Automation</text><rect x="70" y="85" width="120" height="12" rx="6" fill="rgba(255,255,255,0.06)"/><rect x="70" y="85" width="114" height="12" rx="6" fill="url(#barG)"/>
+                <text x="4" y="120" font-family="Inter,sans-serif" font-size="10" fill="rgba(255,255,255,0.4)">Portability</text><rect x="70" y="111" width="120" height="12" rx="6" fill="rgba(255,255,255,0.06)"/><rect x="70" y="111" width="120" height="12" rx="6" fill="url(#barG)"/>
+            </svg>
+            <div class="text-center" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(52,211,153,0.15);"><span style="font-size: 12px; color: #34d399; font-weight: 600;">Open, sovereign, fully portable</span></div>
+        </div>
+    </div>
+
+    <!-- What Stacktic + Rancher uniquely delivers - compact inline -->
+    <div class="z-10 glass-accent" style="padding: 18px 24px;">
+        <p style="text-align: center; font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.4); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 14px;">
+            <i class="fa-solid fa-star" style="color: #fbbf24; margin-right: 4px;"></i>What Stacktic + Rancher Uniquely Delivers
+        </p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; text-align: center;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-diagram-project" style="color: #60a5fa; font-size: 16px; flex-shrink: 0;"></i>
+                <div style="text-align: left;"><p style="font-size: 12px; font-weight: 700; color: white;">Relationship Automation</p><p style="font-size: 10px; color: rgba(255,255,255,0.35);">Stack logic &amp; data flows</p></div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-code-compare" style="color: #a78bfa; font-size: 16px; flex-shrink: 0;"></i>
+                <div style="text-align: left;"><p style="font-size: 12px; font-weight: 700; color: white;">Stack Version Control</p><p style="font-size: 10px; color: rgba(255,255,255,0.35);">Rollbacks &amp; migrations</p></div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-shield-halved" style="color: #34d399; font-size: 16px; flex-shrink: 0;"></i>
+                <div style="text-align: left;"><p style="font-size: 12px; font-weight: 700; color: white;">Security by Design</p><p style="font-size: 10px; color: rgba(255,255,255,0.35);">7-layer auto-generated</p></div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-globe" style="color: #22d3ee; font-size: 16px; flex-shrink: 0;"></i>
+                <div style="text-align: left;"><p style="font-size: 12px; font-weight: 700; color: white;">Cloud Agnostic</p><p style="font-size: 10px; color: rgba(255,255,255,0.35);">On-prem, air-gap, any cloud</p></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================================ -->
+<!-- PAGE 8: ENTERPRISE SECURITY (CONCENTRIC RINGS) -->
+<!-- ============================================ -->
+<div class="slide bg-gradient-purple">
+    <div class="slide-number">09 / 11</div>
+
+    <div class="text-center z-10" style="margin-bottom: 20px;">
+        <span class="tag" style="background: rgba(248,113,113,0.15); border: 1px solid rgba(248,113,113,0.3); color: #f87171; margin-bottom: 12px; display: inline-flex;">
+            <i class="fa-solid fa-triangle-exclamation"></i> No Other Platform Provides This
+        </span>
+        <h2 class="text-grad-white" style="margin-top: 16px; margin-bottom: 8px;">Enterprise Security &amp; Control</h2>
+        <p class="subtitle">All 7 layers auto-generated from stack metadata &mdash; zero manual configuration</p>
+    </div>
+
+    <div class="z-10" style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center;">
+        <!-- Left: Concentric rings SVG -->
+        <div>
+            <svg viewBox="0 0 440 440" style="width: 100%; max-width: 400px; display: block; margin: 0 auto;">
+                <!-- Ring 7 (outermost) -->
+                <circle cx="220" cy="220" r="210" fill="none" stroke="rgba(248,113,113,0.12)" stroke-width="28"/>
+                <text x="220" y="28" font-family="Inter,sans-serif" font-size="10" fill="#fb7185" text-anchor="middle" font-weight="600">AUDIT &amp; COMPLIANCE</text>
+                <!-- Ring 6 -->
+                <circle cx="220" cy="220" r="182" fill="none" stroke="rgba(251,191,36,0.12)" stroke-width="24"/>
+                <text x="388" y="145" font-family="Inter,sans-serif" font-size="9" fill="#fbbf24" text-anchor="end" font-weight="600">CVE &amp; SBOM</text>
+                <!-- Ring 5 -->
+                <circle cx="220" cy="220" r="156" fill="none" stroke="rgba(6,182,212,0.12)" stroke-width="22"/>
+                <text x="52" y="145" font-family="Inter,sans-serif" font-size="9" fill="#22d3ee" text-anchor="start" font-weight="600">API GATEWAY</text>
+                <!-- Ring 4 -->
+                <circle cx="220" cy="220" r="132" fill="none" stroke="rgba(52,211,153,0.12)" stroke-width="20"/>
+                <text x="380" y="280" font-family="Inter,sans-serif" font-size="9" fill="#34d399" text-anchor="end" font-weight="600">SECRETS (SOPS)</text>
+                <!-- Ring 3 -->
+                <circle cx="220" cy="220" r="110" fill="none" stroke="rgba(168,85,246,0.12)" stroke-width="18"/>
+                <text x="60" y="280" font-family="Inter,sans-serif" font-size="9" fill="#a78bfa" text-anchor="start" font-weight="600">OPA GATEKEEPER</text>
+                <!-- Ring 2 -->
+                <circle cx="220" cy="220" r="90" fill="none" stroke="rgba(99,102,241,0.15)" stroke-width="16"/>
+                <text x="220" y="415" font-family="Inter,sans-serif" font-size="9" fill="#818cf8" text-anchor="middle" font-weight="600">RBAC &amp; ACCESS</text>
+                <!-- Ring 1 (innermost) -->
+                <circle cx="220" cy="220" r="70" fill="none" stroke="rgba(59,130,246,0.2)" stroke-width="14"/>
+                <!-- Center icon -->
+                <circle cx="220" cy="220" r="48" fill="rgba(59,130,246,0.1)"/>
+                <text x="220" y="214" font-family="Inter,sans-serif" font-size="11" fill="rgba(255,255,255,0.3)" text-anchor="middle" font-weight="600">NETWORK</text>
+                <text x="220" y="228" font-family="Inter,sans-serif" font-size="11" fill="rgba(255,255,255,0.3)" text-anchor="middle" font-weight="600">POLICIES</text>
+                <g transform="translate(208,180)">
+                    <path d="M12,0 L4,4 L4,12 C4,16 12,20 12,20 C12,20 20,16 20,12 L20,4 Z" fill="none" stroke="#60a5fa" stroke-width="1.5" opacity="0.6"/>
+                </g>
+            </svg>
+        </div>
+
+        <!-- Right: Key stats -->
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div class="glass-bright" style="padding: 18px 20px; display: flex; align-items: center; gap: 16px;">
+                <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(52,211,153,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <span style="font-size: 1.4rem; font-weight: 900; color: #34d399;">0</span>
+                </div>
+                <div>
+                    <p style="font-weight: 700; color: white; font-size: 14px;">Manual Security Configs</p>
+                    <p style="color: rgba(255,255,255,0.4); font-size: 12px;">Everything generated from metadata</p>
+                </div>
+            </div>
+            <div class="glass-bright" style="padding: 18px 20px; display: flex; align-items: center; gap: 16px;">
+                <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(59,130,246,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <span style="font-size: 1.2rem; font-weight: 900; color: #60a5fa;">100%</span>
+                </div>
+                <div>
+                    <p style="font-weight: 700; color: white; font-size: 14px;">Encryption Coverage</p>
+                    <p style="color: rgba(255,255,255,0.4); font-size: 12px;">mTLS, secrets, transit &mdash; all automated</p>
+                </div>
+            </div>
+            <div class="glass-bright" style="padding: 18px 20px; display: flex; align-items: center; gap: 16px;">
+                <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(168,85,246,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <span style="font-size: 1.1rem; font-weight: 900; color: #a78bfa;">Auto</span>
+                </div>
+                <div>
+                    <p style="font-weight: 700; color: white; font-size: 14px;">CISO Compliance Reports</p>
+                    <p style="color: rgba(255,255,255,0.4); font-size: 12px;">ISO, SOC2, PCI-DSS, HIPAA ready</p>
+                </div>
+            </div>
+            <div class="glass-bright" style="padding: 18px 20px; display: flex; align-items: center; gap: 16px;">
+                <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(251,191,36,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i class="fa-solid fa-bolt" style="font-size: 1.2rem; color: #fbbf24;"></i>
+                </div>
+                <div>
+                    <p style="font-weight: 700; color: white; font-size: 14px;">Real-time CVE &amp; Drift Detection</p>
+                    <p style="color: rgba(255,255,255,0.4); font-size: 12px;">Vulnerability scanning across all components</p>
+                </div>
+            </div>
+            <div class="glass-bright" style="padding: 18px 20px; display: flex; align-items: center; gap: 16px; border: 1px solid rgba(6,182,212,0.2);">
+                <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(6,182,212,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i class="fa-solid fa-plug" style="font-size: 1.2rem; color: #22d3ee;"></i>
+                </div>
+                <div>
+                    <p style="font-weight: 700; color: white; font-size: 14px;">Single API &mdash; 360&deg; Stack Status</p>
+                    <p style="color: rgba(255,255,255,0.4); font-size: 12px;">One API call returns full stack metadata, health, security &amp; compliance state</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================================ -->
+<!-- PAGE 9: EXPANDING RANCHER'S MARKET           -->
+<!-- ============================================ -->
+<div class="slide bg-navy">
+    <div class="slide-number">10 / 11</div>
+
+    <div class="text-center mb-48 z-10">
+        <h2 class="text-grad-white mb-16">Expanding Rancher's Market</h2>
+        <p class="subtitle">From Kubernetes management to full-stack automation</p>
+    </div>
+
+    <!-- Before → After visual -->
+    <div class="z-10 mb-48" style="display: grid; grid-template-columns: 1fr 60px 1fr; gap: 0; align-items: center;">
+        <div class="glass text-center" style="padding: 40px;">
+            <p style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.3); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px;">Rancher Today</p>
+            <svg width="80" height="80" viewBox="0 0 80 80" style="margin: 0 auto 16px;"><rect width="80" height="80" rx="20" fill="rgba(52,211,153,0.12)"/><g transform="translate(20,20)"><rect x="4" y="0" width="32" height="8" rx="3" fill="#34d399" opacity="0.5"/><rect x="4" y="12" width="32" height="8" rx="3" fill="#34d399" opacity="0.5"/><rect x="4" y="24" width="32" height="8" rx="3" fill="#34d399" opacity="0.5"/><rect x="4" y="36" width="14" height="4" rx="2" fill="#34d399" opacity="0.3"/></g></svg>
+            <h3 style="color: white; font-size: 1.2rem; margin-bottom: 6px;">K8s Management</h3>
+            <p style="color: rgba(255,255,255,0.4); font-size: 13px;">Clusters, nodes, access control</p>
+        </div>
+
+        <div class="text-center"><svg width="40" height="40" viewBox="0 0 40 40"><path d="M 8 20 L 26 20" stroke="url(#combGrad)" stroke-width="3" stroke-linecap="round"/><polygon points="26,15 34,20 26,25" fill="#34d399"/></svg></div>
+
+        <div style="padding: 40px; border-radius: 20px; text-align: center; background: linear-gradient(135deg, rgba(52,211,153,0.08), rgba(59,130,246,0.08)); border: 1px solid rgba(52,211,153,0.2); box-shadow: 0 0 80px rgba(52,211,153,0.06);">
+            <p style="font-size: 11px; font-weight: 700; color: #34d399; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px;">Rancher + Stacktic</p>
+            <svg width="80" height="80" viewBox="0 0 80 80" style="margin: 0 auto 16px;"><rect width="80" height="80" rx="20" fill="rgba(52,211,153,0.15)"/><g transform="translate(16,16)"><rect x="0" y="0" width="20" height="20" rx="5" fill="#34d399" opacity="0.4"/><rect x="24" y="0" width="20" height="20" rx="5" fill="#60a5fa" opacity="0.4"/><rect x="0" y="24" width="20" height="20" rx="5" fill="#a78bfa" opacity="0.4"/><rect x="24" y="24" width="20" height="20" rx="5" fill="#fbbf24" opacity="0.4"/><line x1="20" y1="10" x2="24" y2="10" stroke="white" stroke-width="1.5" opacity="0.3"/><line x1="10" y1="20" x2="10" y2="24" stroke="white" stroke-width="1.5" opacity="0.3"/><line x1="34" y1="20" x2="34" y2="24" stroke="white" stroke-width="1.5" opacity="0.3"/><line x1="20" y1="34" x2="24" y2="34" stroke="white" stroke-width="1.5" opacity="0.3"/></g></svg>
+            <h3 style="color: white; font-size: 1.2rem; margin-bottom: 6px;">Complete Platform</h3>
+            <p style="color: rgba(255,255,255,0.4); font-size: 13px;">K8s + Stack + Ops + Security + AI</p>
+        </div>
+    </div>
+
+    <!-- New market domains -->
+    <div class="z-10 grid-2" style="gap: 20px; margin-bottom: 24px;">
+        <div class="glass-bright" style="padding: 24px; display: flex; gap: 20px; align-items: flex-start;">
+            <div style="width: 52px; height: 52px; border-radius: 14px; background: rgba(59,130,246,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><i class="fa-solid fa-database" style="color: #60a5fa; font-size: 22px;"></i></div>
+            <div>
+                <h3 style="color: white; font-size: 1rem; margin-bottom: 6px;">DataOps</h3>
+                <p style="color: rgba(255,255,255,0.4); font-size: 13px; line-height: 1.5;">Automated data pipelines, ETL orchestration, source-to-storage flows &mdash; with versioning, security, and sovereignty built in. Open source data stacks (Kafka, Airflow, Spark) managed as one unit.</p>
+            </div>
+        </div>
+        <div class="glass-bright" style="padding: 24px; display: flex; gap: 20px; align-items: flex-start;">
+            <div style="width: 52px; height: 52px; border-radius: 14px; background: rgba(248,113,113,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><i class="fa-solid fa-shield-halved" style="color: #f87171; font-size: 22px;"></i></div>
+            <div>
+                <h3 style="color: white; font-size: 1rem; margin-bottom: 6px;">SecOps</h3>
+                <p style="color: rgba(255,255,255,0.4); font-size: 13px; line-height: 1.5;">Auto-generated network policies, RBAC, OPA Gatekeeper, secrets management, CVE scanning &mdash; 7-layer security derived from architecture metadata, not manual configuration.</p>
+            </div>
+        </div>
+        <div class="glass-bright" style="padding: 24px; display: flex; gap: 20px; align-items: flex-start;">
+            <div style="width: 52px; height: 52px; border-radius: 14px; background: rgba(251,191,36,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><i class="fa-solid fa-chart-line" style="color: #fbbf24; font-size: 22px;"></i></div>
+            <div>
+                <h3 style="color: white; font-size: 1rem; margin-bottom: 6px;">SRE</h3>
+                <p style="color: rgba(255,255,255,0.4); font-size: 13px; line-height: 1.5;">Stack-level observability across all components &mdash; Prometheus, Grafana, alerting, SLA tracking. Full visibility not just per pod, but per stack version with relationship context.</p>
+            </div>
+        </div>
+        <div class="glass-bright" style="padding: 24px; display: flex; gap: 20px; align-items: flex-start;">
+            <div style="width: 52px; height: 52px; border-radius: 14px; background: rgba(168,85,246,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><i class="fa-solid fa-brain" style="color: #a78bfa; font-size: 22px;"></i></div>
+            <div>
+                <h3 style="color: white; font-size: 1rem; margin-bottom: 6px;">AIOps &amp; Private AI</h3>
+                <p style="color: rgba(255,255,255,0.4); font-size: 13px; line-height: 1.5;">Sovereign AI stacks (vLLM, LangFlow, Ollama) automated end-to-end. Metadata-driven intelligence for cost optimization, anomaly detection, and operational insight.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Private SaaS callout -->
+    <div class="z-10 glass-accent" style="padding: 24px; text-align: center;">
+        <p style="font-size: 15px; color: rgba(255,255,255,0.6);">
+            Available <span style="color: #34d399; font-weight: 700;">inside Rancher as a private SaaS</span> or as external SaaS &mdash;
+            transforming Rancher from K8s manager into a <span style="color: #60a5fa; font-weight: 700;">complete enterprise platform</span>
+        </p>
+    </div>
+</div>
+
+
+<!-- ============================================ -->
+<!-- PAGE 10: BOTTOM LINE + CTA                   -->
+<!-- ============================================ -->
+<div class="slide bg-gradient-hero glow-blue glow-green">
+    <div class="slide-number">11 / 11</div>
+
+    <div class="text-center z-10 mb-64">
+        <h2 style="font-size: 3rem; font-weight: 900; letter-spacing: -0.04em; margin-bottom: 24px;">
+            <span class="text-grad-white">The First Managed</span><br>
+            <span class="text-grad-green">Open-Source Platform</span>
+        </h2>
+    </div>
+
+    <!-- Three pillars -->
+    <div class="z-10 grid-3 mb-64" style="gap: 32px;">
+        <div class="text-center">
+            <svg width="80" height="80" viewBox="0 0 80 80" style="margin: 0 auto 16px;"><circle cx="40" cy="40" r="38" fill="rgba(52,211,153,0.1)" stroke="rgba(52,211,153,0.2)" stroke-width="1"/><g transform="translate(28,26)"><polygon points="12,0 24,18 0,18" fill="none" stroke="#34d399" stroke-width="2.5" stroke-linejoin="round"/><line x1="12" y1="12" x2="12" y2="24" stroke="#34d399" stroke-width="2" stroke-linecap="round"/></g></svg>
+            <h3 style="color: white; font-size: 1.3rem; margin-bottom: 8px;">Managed Speed</h3>
+            <p style="color: rgba(255,255,255,0.4); font-size: 14px;">Faster than hyperscaler services</p>
+        </div>
+        <div class="text-center">
+            <svg width="80" height="80" viewBox="0 0 80 80" style="margin: 0 auto 16px;"><circle cx="40" cy="40" r="38" fill="rgba(59,130,246,0.1)" stroke="rgba(59,130,246,0.2)" stroke-width="1"/><g transform="translate(24,24)"><circle cx="16" cy="16" r="14" fill="none" stroke="#60a5fa" stroke-width="2.5"/><circle cx="16" cy="16" r="6" fill="none" stroke="#60a5fa" stroke-width="1.5" opacity="0.5"/><circle cx="16" cy="16" r="2" fill="#60a5fa"/></g></svg>
+            <h3 style="color: white; font-size: 1.3rem; margin-bottom: 8px;">Open Source Power</h3>
+            <p style="color: rgba(255,255,255,0.4); font-size: 14px;">Latest innovation, no lock-in</p>
+        </div>
+        <div class="text-center">
+            <svg width="80" height="80" viewBox="0 0 80 80" style="margin: 0 auto 16px;"><circle cx="40" cy="40" r="38" fill="rgba(168,85,246,0.1)" stroke="rgba(168,85,246,0.2)" stroke-width="1"/><g transform="translate(26,22)"><path d="M14,0 L4,6 L4,18 C4,24 14,30 14,30 C14,30 24,24 24,18 L24,6 Z" fill="none" stroke="#a78bfa" stroke-width="2.5" stroke-linejoin="round"/></g></svg>
+            <h3 style="color: white; font-size: 1.3rem; margin-bottom: 8px;">Full Sovereignty</h3>
+            <p style="color: rgba(255,255,255,0.4); font-size: 14px;">Your data, your infra, your rules</p>
+        </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="z-10 text-center">
+        <div class="glass" style="display: inline-block; padding: 40px 60px;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 24px;">
+                <span style="font-size: 2rem; font-weight: 900; color: white;">STACK<span style="color: #3b82f6;">TIC</span></span>
+                <span style="color: rgba(255,255,255,0.2); font-size: 1.8rem;">+</span>
+                <span style="font-size: 1.5rem; font-weight: 800; color: #34d399;">SUSE Rancher</span>
+            </div>
+            <div style="display: flex; gap: 16px; justify-content: center;">
+                <div style="padding: 14px 36px; background: linear-gradient(135deg, #10b981, #3b82f6); border-radius: 12px; font-weight: 700; font-size: 15px; color: white; box-shadow: 0 4px 20px rgba(16,185,129,0.3);">Schedule Joint Briefing</div>
+                <div style="padding: 14px 36px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; font-weight: 700; font-size: 15px; color: rgba(255,255,255,0.7);">Request Architecture Review</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

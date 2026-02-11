@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stacktic: Full-Stack Automation Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;500;600;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #0a0a0f;
+            --panel-bg: rgba(255, 255, 255, 0.03);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-rose: #f43f5e;
+            --accent-indigo: #6366f1;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #2A2847;
+            color: #e2e8f0;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.1) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+        .font-mono { font-family: 'Fira Code', monospace; }
+
+        .glass-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(12px);
+            border-radius: 1rem;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+        }
+
+        .glow-text {
+            text-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gradient-accent {
+            background: linear-gradient(135deg, #34d399 0%, #60d5ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gradient-stacktic {
+            background: linear-gradient(90deg, #60d5ff, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .comment { color: #4a5568; }
+
+        /* Premium typography */
+        .headline { font-family: 'Playfair Display', serif; letter-spacing: -0.02em; }
+
+        /* Premium stat boxes */
+        .stat-box-premium {
+            background: rgba(255,255,255,0.03);
+            border-top: 4px solid #4f46e5;
+            padding: 40px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-huge {
+            font-size: 72px;
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+            line-height: 1;
+        }
+
+        /* Geometric background elements */
+        .geo-bg::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background-image:
+                radial-gradient(circle at 10% 10%, rgba(79, 70, 229, 0.08) 0%, transparent 25%),
+                radial-gradient(circle at 90% 90%, rgba(6, 182, 212, 0.08) 0%, transparent 25%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Clean comparison table */
+        .comparison-table { width: 100%; border-collapse: separate; border-spacing: 0 12px; }
+        .comparison-table th { text-align: left; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; padding: 0 16px; font-weight: 500; }
+        .comparison-table td { background: rgba(255,255,255,0.02); padding: 20px 16px; border: 1px solid rgba(255,255,255,0.05); }
+        .comparison-table tr td:first-child { border-radius: 8px 0 0 8px; font-weight: 600; color: #e2e8f0; }
+        .comparison-table tr td:last-child { border-radius: 0 8px 8px 0; }
+        .highlight-cell { color: #10b981; font-weight: 600; }
+
+        /* Factory grid */
+        .factory-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .factory-item {
+            height: 90px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .factory-item:hover { border-color: rgba(245, 158, 11, 0.4); transform: translateY(-2px); }
+        .factory-item.highlight { background: rgba(79, 70, 229, 0.15); border-color: #4f46e5; }
+        .factory-icon { color: #f59e0b; font-size: 22px; margin-bottom: 8px; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .animate-pulse-slow {
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        /* PRINT STYLES - Page Break Control */
+        @media print {
+            body {
+                background: #2A2847 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            @page {
+                size: A4;
+                margin: 0.5cm;
+            }
+
+            header {
+                page-break-after: always;
+            }
+
+            section {
+                page-break-inside: avoid;
+                page-break-before: auto;
+                margin-bottom: 20px !important;
+            }
+
+            .glass-panel {
+                page-break-inside: avoid;
+            }
+
+            /* Force page breaks before major sections */
+            section:nth-of-type(2) { /* Problem section */
+                page-break-before: always;
+            }
+
+            section:nth-of-type(3) { /* Solution section */
+                page-break-before: always;
+            }
+
+            section:nth-of-type(4) { /* ROI section */
+                page-break-before: always;
+            }
+
+            section:nth-of-type(5) { /* Value props */
+                page-break-before: always;
+            }
+
+            section:nth-of-type(6) { /* Who should use */
+                page-break-before: always;
+            }
+
+            section:nth-of-type(7) { /* Pricing */
+                page-break-before: always;
+            }
+
+            footer {
+                page-break-before: always;
+            }
+
+            .chart-container {
+                page-break-inside: avoid;
+                max-height: 250px !important;
+            }
+
+            .grid {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-indigo-500 selection:text-white">
+
+    <!-- HERO HEADER -->
+    <header class="relative pt-20 pb-14 px-6 border-b border-white/5">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 text-xs font-mono mb-6">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                PLATFORM ENGINEERING SOLUTION
+            </div>
+            <h1 class="text-6xl md:text-8xl font-extrabold tracking-tight mb-6 headline">
+                STACK<span class="text-indigo-500">TIC</span>
+            </h1>
+            <p class="text-2xl md:text-3xl font-light text-slate-400 max-w-4xl mx-auto mb-6">
+                <span class="comment">// </span>Automating <span class="gradient-accent font-semibold">Stack Relationships</span> from Day 0 to Day 2
+            </p>
+            <p class="text-lg text-slate-500 max-w-3xl mx-auto font-mono">
+                The "Third Way": Speed of Managed Services + Control of Open Source + Full Sovereignty
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-16 space-y-20">
+
+        <!-- SECTION 1: MARKET SHIFT -->
+        <section>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <div class="lg:col-span-5 space-y-6">
+                    <h2 class="text-3xl font-bold text-white"><span class="comment">// </span>The Market Shift to <span class="text-emerald-400">Open Source</span></h2>
+                    <p class="text-slate-400 text-lg leading-relaxed">
+                        Enterprises are prioritizing <strong class="text-white">Data Sovereignty</strong> and <strong class="text-white">AI Readiness</strong> over vendor loyalty. The market is aggressively moving away from locked-in managed services toward AI-native Open Source.
+                    </p>
+                    <div class="space-y-4">
+                        <div class="glass-panel p-5 border-l-4 border-l-emerald-500">
+                            <div class="text-2xl font-bold text-white mb-1">35%</div>
+                            <div class="text-sm text-emerald-400 font-mono">AI OPEN SOURCE ADOPTION</div>
+                            <p class="text-xs text-slate-500 mt-2">Fastest growing segment in enterprise tech</p>
+                        </div>
+                        <div class="glass-panel p-5 border-l-4 border-l-cyan-500">
+                            <div class="text-2xl font-bold text-white mb-1">22-26%</div>
+                            <div class="text-sm text-cyan-400 font-mono">KUBERNETES / OSS GROWTH</div>
+                            <p class="text-xs text-slate-500 mt-2">Steady enterprise adoption continues</p>
+                        </div>
+                        <div class="glass-panel p-5 border-l-4 border-l-rose-500">
+                            <div class="text-2xl font-bold text-white mb-1">4-6%</div>
+                            <div class="text-sm text-rose-400 font-mono">MANAGED SERVICES</div>
+                            <p class="text-xs text-slate-500 mt-2">Declining as companies seek control</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:col-span-7">
+                    <div class="glass-panel p-6">
+                        <h3 class="text-sm font-mono text-slate-500 mb-6 uppercase tracking-widest">$ stacktic analyze --market</h3>
+                        <div class="chart-container">
+                            <canvas id="marketShiftChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: THE PROBLEM -->
+        <section class="relative">
+            <div class="absolute inset-0 bg-rose-500/5 blur-3xl -z-10 rounded-full"></div>
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-white mb-4"><span class="comment">// </span>The <span class="text-rose-400">Relationship Problem</span></h2>
+                <p class="text-xl text-slate-400 max-w-3xl mx-auto">
+                    Every component connects to <span class="font-bold text-white">everything else</span>. Services, databases, clouds, tools, APIs&mdash;it's all relationships.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Visualizing the Pain -->
+                <div class="glass-panel p-8 flex flex-col justify-center border-rose-500/20">
+                    <div class="space-y-6">
+                        <div class="flex items-start gap-4">
+                            <div class="p-3 rounded-lg bg-rose-500/10 text-rose-400 flex-shrink-0">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-lg">The "Plumbing" Trap</h4>
+                                <p class="text-slate-400 text-sm mt-1">Engineers don't write business logic. They configure Service ↔ Database ↔ Auth ↔ Observability ↔ Cloud.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="p-3 rounded-lg bg-rose-500/10 text-rose-400 flex-shrink-0">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-lg">Complexity = n(n-1)</h4>
+                                <p class="text-slate-400 text-sm mt-1">Every new service creates exponential configuration overhead. Manual config leads to human error.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="p-3 rounded-lg bg-rose-500/10 text-rose-400 flex-shrink-0">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-lg">Trapped by Bad Options</h4>
+                                <p class="text-slate-400 text-sm mt-1">Managed services = lock-in & premium costs. DIY Kubernetes = operational burden & skill gap.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- The 90/10 Chart -->
+                <div class="glass-panel p-8">
+                    <h3 class="text-center text-sm font-mono text-slate-500 mb-4">ENGINEERING RESOURCE ALLOCATION</h3>
+                    <div class="chart-container" style="height: 250px;">
+                        <canvas id="resourceSplitChart"></canvas>
+                    </div>
+                    <p class="text-center text-xs text-rose-400 mt-4 font-mono">TARGET FOR OUT-OF-THE-BOX AUTOMATION</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2.5: THE THREE OPTIONS -->
+        <section>
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-white mb-4"><span class="comment">// </span>The <span class="text-emerald-400">"Third Way"</span></h2>
+                <p class="text-xl text-slate-400 max-w-3xl mx-auto">
+                    Enterprises face a false choice. Stacktic offers a <span class="font-bold text-white">new path</span>.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Option 1: Managed Services -->
+                <div class="glass-panel p-6 border-rose-500/30 relative">
+                    <div class="absolute top-0 left-0 right-0 h-1 bg-rose-500"></div>
+                    <div class="text-center mb-4">
+                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-rose-500/20 text-rose-400 mb-3">
+                            <i class="fa-solid fa-cloud text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white">Managed Services</h3>
+                        <p class="text-xs text-rose-400 font-mono">AWS, Azure, GCP Native</p>
+                    </div>
+                    <ul class="space-y-2 text-sm mb-4">
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400">✓</span>
+                            <span class="text-slate-300">Fast to deploy</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400">✓</span>
+                            <span class="text-slate-300">Managed operations</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-rose-400">✗</span>
+                            <span class="text-slate-400">Vendor lock-in premium (30-50%)</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-rose-400">✗</span>
+                            <span class="text-slate-400">Zero negotiation leverage</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-rose-400">✗</span>
+                            <span class="text-slate-400">Data sovereignty concerns</span>
+                        </li>
+                    </ul>
+                    <div class="text-center pt-3 border-t border-white/10">
+                        <span class="text-xs text-rose-400 font-mono">TRAPPED BY CONVENIENCE</span>
+                    </div>
+                </div>
+
+                <!-- Option 2: DIY Open Source -->
+                <div class="glass-panel p-6 border-amber-500/30 relative">
+                    <div class="absolute top-0 left-0 right-0 h-1 bg-amber-500"></div>
+                    <div class="text-center mb-4">
+                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-500/20 text-amber-400 mb-3">
+                            <i class="fa-brands fa-osi text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white">DIY Open Source</h3>
+                        <p class="text-xs text-amber-400 font-mono">Self-managed K8s + OSS</p>
+                    </div>
+                    <ul class="space-y-2 text-sm mb-4">
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400">✓</span>
+                            <span class="text-slate-300">Full control & sovereignty</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400">✓</span>
+                            <span class="text-slate-300">No licensing costs</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-rose-400">✗</span>
+                            <span class="text-slate-400">Months to production</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-rose-400">✗</span>
+                            <span class="text-slate-400">Requires specialized talent</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-rose-400">✗</span>
+                            <span class="text-slate-400">Operational burden grows</span>
+                        </li>
+                    </ul>
+                    <div class="text-center pt-3 border-t border-white/10">
+                        <span class="text-xs text-amber-400 font-mono">DROWNED IN COMPLEXITY</span>
+                    </div>
+                </div>
+
+                <!-- Option 3: Stacktic - THE THIRD WAY -->
+                <div class="glass-panel p-6 border-emerald-500/50 relative bg-emerald-500/5">
+                    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-cyan-500"></div>
+                    <div class="absolute -top-3 right-4">
+                        <span class="px-2 py-1 bg-emerald-500 text-white text-xs font-bold rounded">RECOMMENDED</span>
+                    </div>
+                    <div class="text-center mb-4">
+                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 mb-3">
+                            <i class="fa-solid fa-layer-group text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white">Stacktic</h3>
+                        <p class="text-xs text-emerald-400 font-mono">The Third Way</p>
+                    </div>
+                    <ul class="space-y-2 text-sm mb-4">
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400">✓</span>
+                            <span class="text-white font-medium">Speed of managed services</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400">✓</span>
+                            <span class="text-white font-medium">Control of open source</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400">✓</span>
+                            <span class="text-white font-medium">Cloud-agnostic portability</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400">✓</span>
+                            <span class="text-white font-medium">Negotiation leverage</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-400">✓</span>
+                            <span class="text-white font-medium">100% data sovereignty</span>
+                        </li>
+                    </ul>
+                    <div class="text-center pt-3 border-t border-emerald-500/30">
+                        <span class="text-xs text-emerald-400 font-mono font-bold">BEST OF BOTH WORLDS</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Differentiator -->
+            <div class="mt-8 p-6 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 border border-emerald-500/30 rounded-xl text-center">
+                <p class="text-lg text-white mb-2">
+                    <span class="text-emerald-400 font-bold">Stacktic</span> = Move to <span class="text-cyan-400">any cloud</span> with a few clicks
+                </p>
+                <p class="text-sm text-slate-400">
+                    Credible exit strategy → <strong class="text-white">15-30% better rates</strong> from cloud vendors who know you can leave
+                </p>
+            </div>
+        </section>
+
+        <!-- SECTION 3: THE SOLUTION -->
+        <section class="glass-panel p-10 md:p-14 border-emerald-500/30 overflow-hidden relative">
+            <!-- Background Glow -->
+            <div class="absolute top-0 right-0 w-96 h-96 bg-emerald-600/10 blur-[100px] rounded-full"></div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
+                <div>
+                    <div class="inline-block mb-4 text-emerald-400 font-mono text-sm tracking-widest">$ stacktic solve --automation</div>
+                    <h2 class="text-4xl font-bold text-white mb-6">Stacktic <span class="text-emerald-400">Automates the Puzzle</span></h2>
+                    <p class="text-slate-300 text-lg mb-8">
+                        Stacktic is a <strong>logic framework</strong> that understands the <strong>topology</strong> of your stack. One connection drawn in our UI creates the entire relationship ecosystem&mdash;Policies, Secrets, Networking, Observability&mdash;automatically.
+                    </p>
+
+                    <ul class="space-y-4">
+                        <li class="flex items-center gap-3 text-slate-300">
+                            <span class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-bold">0</span>
+                            <span><strong class="text-white">Day 0:</strong> Architecture & Dependency Mapping (hours, not months)</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-slate-300">
+                            <span class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-bold">1</span>
+                            <span><strong class="text-white">Day 1:</strong> One-click Deployment to any Kubernetes cluster</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-slate-300">
+                            <span class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-bold">2</span>
+                            <span><strong class="text-white">Day 2:</strong> Upgrades, Rollbacks, Security & Operations automated</span>
+                        </li>
+                    </ul>
+
+                    <div class="mt-8 grid grid-cols-2 gap-4">
+                        <div class="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                            <div class="text-lg font-bold text-emerald-400">Version Everything</div>
+                            <p class="text-xs text-slate-400 mt-1">Save entire stack as snapshot. Rollback instantly.</p>
+                        </div>
+                        <div class="p-4 bg-cyan-500/10 border border-cyan-500/20 rounded-lg">
+                            <div class="text-lg font-bold text-cyan-400">Security Automation</div>
+                            <p class="text-xs text-slate-400 mt-1">Secrets, certs, policies, RBAC&mdash;all generated.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <!-- Radar Chart Container -->
+                    <div class="bg-slate-900/50 rounded-2xl p-6 border border-white/5">
+                        <div class="chart-container">
+                            <canvas id="comparisonRadar"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: ROI & FINANCIALS -->
+        <section>
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-white mb-2"><span class="comment">// </span>A <span class="text-emerald-400">savings</span> story, <span class="text-rose-400">not</span> a spend story</h2>
+                <p class="text-slate-400 font-mono">return calculate_roi(stacktic)</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- Stat Card 1 -->
+                <div class="glass-panel p-8 text-center border-t-4 border-t-emerald-500">
+                    <div class="text-5xl font-bold text-emerald-400 mb-2">70%+</div>
+                    <div class="text-xs text-emerald-400 font-mono mb-4">COST REDUCTION</div>
+                    <p class="text-sm text-slate-500">Deployment costs slashed through automation of Ops, DevOps, SRE.</p>
+                </div>
+
+                <!-- Stat Card 2 -->
+                <div class="glass-panel p-8 text-center border-t-4 border-t-cyan-500">
+                    <div class="text-5xl font-bold text-cyan-400 mb-2">80%</div>
+                    <div class="text-xs text-cyan-400 font-mono mb-4">FASTER TO MARKET</div>
+                    <p class="text-sm text-slate-500">Day-0 planning: from months to hours. Accelerated revenue capture.</p>
+                </div>
+
+                <!-- Stat Card 3 -->
+                <div class="glass-panel p-8 text-center border-t-4 border-t-indigo-500">
+                    <div class="text-5xl font-bold text-indigo-400 mb-2">Zero</div>
+                    <div class="text-xs text-indigo-400 font-mono mb-4">VENDOR LOCK-IN</div>
+                    <p class="text-sm text-slate-500">Full sovereignty. AWS to Azure to On-Prem with zero code changes.</p>
+                </div>
+
+                <!-- Stat Card 4 -->
+                <div class="glass-panel p-8 text-center border-t-4 border-t-purple-500">
+                    <div class="text-5xl font-bold text-purple-400 mb-2">100%</div>
+                    <div class="text-xs text-purple-400 font-mono mb-4">SOVEREIGNTY</div>
+                    <p class="text-sm text-slate-500">Your data, your rules. Air-gapped ready. Full compliance support.</p>
+                </div>
+            </div>
+
+            <!-- ROI Chart -->
+            <div class="mt-10 glass-panel p-8">
+                <h3 class="text-sm font-mono text-slate-500 mb-6 uppercase tracking-widest text-center">Enterprise Cost Comparison (Annual)</h3>
+                <div class="chart-container h-64">
+                    <canvas id="roiBarChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: VALUE PROPS -->
+        <section>
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-white mb-2"><span class="comment">// </span>Significant <span class="text-emerald-400">additional_value</span></h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="glass-panel p-6 border-l-4 border-l-emerald-500">
+                    <h3 class="text-white font-bold text-lg mb-2 font-mono"><span class="text-amber-400">eliminate_legacy</span>()</h3>
+                    <p class="text-slate-400 text-sm">Automated migration + versioning</p>
+                    <span class="inline-block mt-2 px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs rounded font-mono">modernize forever</span>
+                </div>
+
+                <div class="glass-panel p-6 border-l-4 border-l-cyan-500">
+                    <h3 class="text-white font-bold text-lg mb-2 font-mono"><span class="text-amber-400">lower_infrastructure</span>()</h3>
+                    <p class="text-slate-400 text-sm">Cloud-agnostic platform engineering</p>
+                    <span class="inline-block mt-2 px-3 py-1 bg-cyan-500/20 text-cyan-400 text-xs rounded font-mono">reduce spend 30%+</span>
+                </div>
+
+                <div class="glass-panel p-6 border-l-4 border-l-purple-500">
+                    <h3 class="text-white font-bold text-lg mb-2 font-mono"><span class="text-amber-400">true_portability</span>()</h3>
+                    <p class="text-slate-400 text-sm">Move across clouds, on-prem, edge</p>
+                    <span class="inline-block mt-2 px-3 py-1 bg-purple-500/20 text-purple-400 text-xs rounded font-mono">with a few clicks</span>
+                </div>
+
+                <div class="glass-panel p-6 border-l-4 border-l-rose-500">
+                    <h3 class="text-white font-bold text-lg mb-2 font-mono"><span class="text-amber-400">avoid_vendor_costs</span>()</h3>
+                    <p class="text-slate-400 text-sm">Replace commercial tools with OSS</p>
+                    <span class="inline-block mt-2 px-3 py-1 bg-rose-500/20 text-rose-400 text-xs rounded font-mono">no licensing, no lock-in</span>
+                </div>
+
+                <div class="glass-panel p-6 border-l-4 border-l-amber-500">
+                    <h3 class="text-white font-bold text-lg mb-2 font-mono"><span class="text-amber-400">unified_support</span>()</h3>
+                    <p class="text-slate-400 text-sm">Single support for all OSS components</p>
+                    <span class="inline-block mt-2 px-3 py-1 bg-amber-500/20 text-amber-400 text-xs rounded font-mono">one contract, all components</span>
+                </div>
+
+                <div class="glass-panel p-6 border-l-4 border-l-indigo-500">
+                    <h3 class="text-white font-bold text-lg mb-2 font-mono"><span class="text-amber-400">security_compliance</span>()</h3>
+                    <p class="text-slate-400 text-sm">Built-in security scanning & CISO reports</p>
+                    <span class="inline-block mt-2 px-3 py-1 bg-indigo-500/20 text-indigo-400 text-xs rounded font-mono">audit-ready day one</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: WHO SHOULD USE -->
+        <section class="glass-panel p-10 border-cyan-500/20">
+            <h2 class="text-2xl font-bold text-white mb-8 text-center"><span class="comment">// </span>Who Should Use <span class="gradient-stacktic">Stacktic</span>?</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="p-5 bg-white/5 rounded-lg border border-white/10">
+                    <div class="text-cyan-400 font-bold mb-2">Migration-Ready Companies</div>
+                    <p class="text-slate-400 text-sm">Transition managed services to Kubernetes swiftly with minimal effort.</p>
+                </div>
+                <div class="p-5 bg-white/5 rounded-lg border border-white/10">
+                    <div class="text-cyan-400 font-bold mb-2">Kubernetes Veterans</div>
+                    <p class="text-slate-400 text-sm">Enhance your stack and security while streamlining operations.</p>
+                </div>
+                <div class="p-5 bg-white/5 rounded-lg border border-white/10">
+                    <div class="text-cyan-400 font-bold mb-2">B2B Providers</div>
+                    <p class="text-slate-400 text-sm">Containerize applications into enterprise-grade production stacks for clients.</p>
+                </div>
+                <div class="p-5 bg-white/5 rounded-lg border border-white/10">
+                    <div class="text-cyan-400 font-bold mb-2">Resource-Conscious SMBs</div>
+                    <p class="text-slate-400 text-sm">Get enterprise capabilities without the budget for large DevOps teams.</p>
+                </div>
+                <div class="p-5 bg-white/5 rounded-lg border border-white/10">
+                    <div class="text-cyan-400 font-bold mb-2">Large Enterprises</div>
+                    <p class="text-slate-400 text-sm">Application factory platform to optimize costs and boost revenue at scale.</p>
+                </div>
+                <div class="p-5 bg-white/5 rounded-lg border border-white/10">
+                    <div class="text-cyan-400 font-bold mb-2">Sovereignty-First Orgs</div>
+                    <p class="text-slate-400 text-sm">Air-gapped, compliance-ready deployments with full data control.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 7: PRICING -->
+        <section class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- App Factory Text -->
+            <div class="lg:col-span-1 flex flex-col justify-center">
+                <h2 class="text-2xl font-bold text-white mb-4">The "App Factory" Model</h2>
+                <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                    Stacktic scales with you. From a single stack to a centralized engine managing your entire fleet with governance, security policies, and version control baked in.
+                </p>
+                <div class="space-y-3">
+                    <div class="text-xs font-mono text-indigo-300 py-2 border-b border-white/10 flex justify-between">
+                        <span>START POINT</span>
+                        <span class="text-white">$3,300/mo</span>
+                    </div>
+                    <div class="text-xs font-mono text-cyan-300 py-2 border-b border-white/10 flex justify-between">
+                        <span>SCALE</span>
+                        <span class="text-white">$9,600/mo</span>
+                    </div>
+                    <div class="text-xs font-mono text-amber-300 py-2 border-b border-white/10 flex justify-between">
+                        <span>ENTERPRISE</span>
+                        <span class="text-white">CUSTOM</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pricing Cards -->
+            <div class="glass-panel p-6 flex flex-col border-indigo-500/30">
+                <div class="h-1 w-8 bg-indigo-500 mb-4 rounded-full"></div>
+                <h3 class="text-white font-bold mb-1">Start Point</h3>
+                <p class="text-xs text-slate-500 mb-4">MVP Validation</p>
+                <ul class="text-xs text-slate-300 space-y-2 flex-1">
+                    <li>&#8226; 1 Full Stack</li>
+                    <li>&#8226; 5 Users</li>
+                    <li>&#8226; Standard Automation</li>
+                    <li>&#8226; Day 0-2 Operations</li>
+                </ul>
+            </div>
+
+            <div class="glass-panel p-6 flex flex-col border border-cyan-500/30 bg-cyan-500/5">
+                <div class="h-1 w-8 bg-cyan-500 mb-4 rounded-full"></div>
+                <h3 class="text-white font-bold mb-1">Scale</h3>
+                <p class="text-xs text-slate-500 mb-4">Platform Teams</p>
+                <ul class="text-xs text-slate-300 space-y-2 flex-1">
+                    <li>&#8226; <strong>10 Stacks</strong></li>
+                    <li>&#8226; 30 Users</li>
+                    <li>&#8226; Private SaaS Option</li>
+                    <li>&#8226; Advanced Observability</li>
+                </ul>
+            </div>
+
+            <div class="glass-panel p-6 flex flex-col border-amber-500/30">
+                <div class="h-1 w-8 bg-amber-500 mb-4 rounded-full"></div>
+                <h3 class="text-white font-bold mb-1">Enterprise</h3>
+                <p class="text-xs text-slate-500 mb-4">Fleet Management</p>
+                <ul class="text-xs text-slate-300 space-y-2 flex-1">
+                    <li>&#8226; 100+ Stacks</li>
+                    <li>&#8226; Unlimited Users</li>
+                    <li>&#8226; Dedicated Engineer</li>
+                    <li>&#8226; 90% Ops Automation</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- SECTION 8: RISK MITIGATION -->
+        <section class="glass-panel p-10 border-indigo-500/20 relative geo-bg overflow-hidden">
+            <div class="relative z-10">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-white headline mb-4"><span class="comment">// </span>Risk Mitigation: <span class="text-indigo-400">Institutional Memory</span></h2>
+                    <p class="text-xl text-slate-400 max-w-2xl mx-auto">
+                        "What happens if our Lead Architect leaves tomorrow?"
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                    <div class="stat-box-premium" style="border-color: #ef4444;">
+                        <div class="text-rose-400 text-sm font-mono mb-4">CURRENT STATE</div>
+                        <h3 class="text-2xl font-bold text-white mb-4 headline">Tribal Knowledge</h3>
+                        <p class="text-slate-400 text-sm">Runbooks are outdated. Security depends on individuals. <span class="text-rose-400 font-semibold">High Risk.</span></p>
+                    </div>
+                    <div class="stat-box-premium" style="border-color: #f59e0b;">
+                        <div class="text-amber-400 text-sm font-mono mb-4">FUTURE STATE</div>
+                        <h3 class="text-2xl font-bold text-white mb-4 headline">Versioned Asset</h3>
+                        <p class="text-slate-400 text-sm">Stack configuration is code. <span class="text-emerald-400 font-semibold">Auditable, rollback-ready, company-owned.</span></p>
+                    </div>
+                </div>
+
+                <p class="text-center text-slate-500 text-sm">
+                    With Stacktic, <strong class="text-white">Operational Intent</strong> is encoded into platform metadata, not stored in human heads.
+                </p>
+            </div>
+        </section>
+
+        <!-- SECTION 9: APP FACTORY VISUAL -->
+        <section>
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-white headline mb-4"><span class="comment">// </span>Strategic Goal: The <span class="text-amber-400">"App Factory"</span></h2>
+                <p class="text-slate-400">From building "servers" to managing a "Fleet"</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                <div class="factory-grid">
+                    <div class="factory-item">
+                        <i class="factory-icon fa-solid fa-robot"></i>
+                        <span class="text-xs text-slate-400">AI RAG</span>
+                    </div>
+                    <div class="factory-item">
+                        <i class="factory-icon fa-solid fa-wallet"></i>
+                        <span class="text-xs text-slate-400">Fintech</span>
+                    </div>
+                    <div class="factory-item">
+                        <i class="factory-icon fa-solid fa-chart-line"></i>
+                        <span class="text-xs text-slate-400">DataOps</span>
+                    </div>
+                    <div class="factory-item">
+                        <i class="factory-icon fa-solid fa-shield-halved"></i>
+                        <span class="text-xs text-slate-400">SecOps</span>
+                    </div>
+                    <div class="factory-item highlight">
+                        <i class="fa-solid fa-network-wired text-white text-xl mb-2"></i>
+                        <span class="text-xs text-white font-bold">CONTROL</span>
+                    </div>
+                    <div class="factory-item">
+                        <i class="factory-icon fa-solid fa-cloud"></i>
+                        <span class="text-xs text-slate-400">Multi-Cloud</span>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="glass-panel p-6 border-l-4 border-l-indigo-500">
+                        <h4 class="text-white font-bold mb-2">Central Control Plane</h4>
+                        <p class="text-slate-400 text-sm">Enforces security, compliance (HIPAA/PCI), and cost controls across <strong class="text-white">100+ application stacks</strong> simultaneously.</p>
+                    </div>
+                    <div class="glass-panel p-6 border-l-4 border-l-amber-500">
+                        <h4 class="text-white font-bold mb-2">90% Ops Automation</h4>
+                        <p class="text-slate-400 text-sm">Aggressively automates Ops, DevOps, SRE, and DataOps work with full lifecycle visibility.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 10: BOARD RECOMMENDATION -->
+        <section class="glass-panel p-10 border-emerald-500/20">
+            <h2 class="text-3xl font-bold text-white headline mb-8 text-center"><span class="comment">// </span>Board <span class="text-emerald-400">Recommendation</span></h2>
+
+            <table class="comparison-table mb-10">
+                <thead>
+                    <tr>
+                        <th>Objective</th>
+                        <th>Action</th>
+                        <th>Expected Outcome</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><i class="fa-solid fa-trash-can text-rose-400 mr-2"></i> Eliminate Debt</td>
+                        <td>Adopt Stacktic Central Control Plane</td>
+                        <td>Retire Legacy Systems (VMs) & Reduce Tech Debt</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa-solid fa-shield text-indigo-400 mr-2"></i> Mitigate Risk</td>
+                        <td>Encode Operational Intent</td>
+                        <td>Zero Dependency on "Key Person" Knowledge</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa-solid fa-chart-line text-emerald-400 mr-2"></i> Maximize ROI</td>
+                        <td>Automate Day-2 Operations</td>
+                        <td class="highlight-cell">30% Infra Savings / 70% Labor Efficiency</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa-solid fa-cloud text-cyan-400 mr-2"></i> Cloud Agnostic</td>
+                        <td>True Multi-Cloud Portability</td>
+                        <td class="highlight-cell">Negotiate Better Rates / Avoid Lock-in Premium</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa-solid fa-handshake text-amber-400 mr-2"></i> Vendor Leverage</td>
+                        <td>Credible Exit Strategy</td>
+                        <td>15-30% Cloud Cost Reduction via Negotiation Power</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa-solid fa-rocket text-purple-400 mr-2"></i> Accelerate Innovation</td>
+                        <td>90% Plumbing → Business Logic</td>
+                        <td>Engineers Build Features, Not Infrastructure</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa-solid fa-robot text-pink-400 mr-2"></i> AI-Native Ready</td>
+                        <td>Open Source AI Stack Foundation</td>
+                        <td>Deploy AI/ML Workloads Without Vendor Dependencies</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Strategic Benefits Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div class="p-4 bg-cyan-500/10 border border-cyan-500/20 rounded-lg text-center">
+                    <div class="text-2xl font-bold text-cyan-400 mb-1">15-30%</div>
+                    <div class="text-xs text-slate-400">Cloud Savings via Negotiation</div>
+                </div>
+                <div class="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-center">
+                    <div class="text-2xl font-bold text-emerald-400 mb-1">Zero</div>
+                    <div class="text-xs text-slate-400">Migration Lock-in Risk</div>
+                </div>
+                <div class="p-4 bg-purple-500/10 border border-purple-500/20 rounded-lg text-center">
+                    <div class="text-2xl font-bold text-purple-400 mb-1">Any Cloud</div>
+                    <div class="text-xs text-slate-400">AWS → Azure → GCP → On-Prem</div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <p class="text-slate-500 text-sm font-mono mb-4">NEXT STEPS</p>
+                <p class="text-white text-lg">Initiate Pilot Migration for Core AI Stack</p>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="text-center border-t border-white/5 pt-12 pb-8">
+            <div class="mb-6">
+                <span class="text-slate-400 font-mono text-sm">{ speed: <span class="text-emerald-400">"improved"</span>, revenue: <span class="text-emerald-400">"improved"</span>, organization: <span class="text-emerald-400">"transformed"</span> }</span>
+            </div>
+            <p class="text-slate-600 text-xs font-mono">&copy; 2026 STACKTIC. BUILT FOR THE AI-NATIVE ERA.</p>
+            <p class="text-slate-700 text-xs mt-2">Transforming stack complexity into versioned simplicity.</p>
+        </footer>
+
+    </main>
+
+    <script>
+        // --- GLOBAL CONFIG ---
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.scale.grid.color = 'rgba(255, 255, 255, 0.05)';
+
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                    titleColor: '#fff',
+                    bodyColor: '#cbd5e1',
+                    borderColor: 'rgba(255,255,255,0.1)',
+                    borderWidth: 1,
+                    padding: 12,
+                    cornerRadius: 8,
+                }
+            }
+        };
+
+        const colors = {
+            indigo: '#6366f1',
+            cyan: '#06b6d4',
+            emerald: '#10b981',
+            rose: '#f43f5e',
+            slate: '#64748b',
+            amber: '#f59e0b',
+            purple: '#a855f7'
+        };
+
+        // --- CHART 1: MARKET SHIFT (HORIZONTAL) ---
+        new Chart(document.getElementById('marketShiftChart'), {
+            type: 'bar',
+            indexAxis: 'y',
+            data: {
+                labels: ['AI Open Source', 'Kubernetes / OSS', 'DevOps Growth', 'AIOps Growth', 'Managed Services'],
+                datasets: [{
+                    label: 'Market Growth Rate (%)',
+                    data: [35, 24, 25.2, 29.2, 5],
+                    backgroundColor: [colors.emerald, colors.cyan, colors.indigo, colors.purple, colors.slate],
+                    borderRadius: 4,
+                    barThickness: 20
+                }]
+            },
+            options: {
+                ...commonOptions,
+                plugins: { legend: { display: false } },
+                scales: { x: { beginAtZero: true, max: 40, grid: { display: false } } }
+            }
+        });
+
+        // --- CHART 2: RESOURCE ALLOCATION (DOUGHNUT) ---
+        new Chart(document.getElementById('resourceSplitChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Innovation & Business Logic', 'Manual Plumbing & Config'],
+                datasets: [{
+                    data: [10, 90],
+                    backgroundColor: [colors.emerald, colors.rose],
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                ...commonOptions,
+                cutout: '75%',
+                plugins: { legend: { position: 'bottom', labels: { color: '#e2e8f0', padding: 20 } } }
+            }
+        });
+
+        // --- CHART 3: RADAR COMPARISON ---
+        new Chart(document.getElementById('comparisonRadar'), {
+            type: 'radar',
+            data: {
+                labels: ['Speed', 'Cost Efficiency', 'Sovereignty', 'Operations', 'Flexibility'],
+                datasets: [
+                    {
+                        label: 'Stacktic',
+                        data: [5, 5, 5, 5, 5],
+                        borderColor: colors.emerald,
+                        backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                        borderWidth: 3
+                    },
+                    {
+                        label: 'Managed Services',
+                        data: [5, 2, 1, 4, 2],
+                        borderColor: colors.slate,
+                        backgroundColor: 'transparent',
+                        borderWidth: 1,
+                        borderDash: [5, 5]
+                    },
+                    {
+                        label: 'DIY Open Source',
+                        data: [1, 3, 5, 2, 5],
+                        borderColor: colors.cyan,
+                        backgroundColor: 'transparent',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                ...commonOptions,
+                scales: {
+                    r: {
+                        angleLines: { color: 'rgba(255,255,255,0.1)' },
+                        grid: { color: 'rgba(255,255,255,0.1)' },
+                        pointLabels: { color: '#e2e8f0', font: { size: 11 } },
+                        ticks: { display: false, backdropColor: 'transparent' },
+                        min: 0,
+                        max: 5
+                    }
+                }
+            }
+        });
+
+        // --- CHART 4: ROI COST SAVINGS ---
+        new Chart(document.getElementById('roiBarChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Traditional Approach', 'With Stacktic'],
+                datasets: [
+                    { label: 'Legacy Maintenance', data: [4.0, 0.5], backgroundColor: colors.slate },
+                    { label: 'Operations Labor', data: [3.0, 0.6], backgroundColor: colors.rose },
+                    { label: 'Cloud Infrastructure', data: [2.5, 1.2], backgroundColor: colors.indigo },
+                    { label: 'Vendor Licensing', data: [1.5, 0.0], backgroundColor: colors.purple }
+                ]
+            },
+            options: {
+                ...commonOptions,
+                scales: {
+                    y: { stacked: true, title: { display: true, text: '$ Millions', color: '#64748b' } },
+                    x: { stacked: true, grid: { display: false } }
+                },
+                plugins: { legend: { labels: { color: '#e2e8f0' } } }
+            }
+        });
+    </script>
+</body>
+</html>

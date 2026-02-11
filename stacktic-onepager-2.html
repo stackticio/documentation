@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stacktic - Executive Summary</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --accent-primary: #3b82f6;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #1a1a2e 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        /* Premium Card Styles */
+        .card {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+        }
+
+        .card-accent {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-accent::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-success));
+        }
+
+        /* Typography */
+        .headline-xl {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+        }
+
+        .headline-lg {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+
+        .headline-md {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #60a5fa, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Metric Styles */
+        .metric-huge {
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.01em;
+        }
+
+        .metric-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        /* Executive Table */
+        .exec-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .exec-table th {
+            text-align: left;
+            padding: 14px 16px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        .exec-table td {
+            padding: 16px;
+            font-size: 0.875rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            vertical-align: middle;
+        }
+
+        .exec-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .exec-table .highlight {
+            color: var(--accent-success);
+            font-weight: 600;
+        }
+
+        /* Three Options Cards */
+        .option-card {
+            padding: 24px;
+            border-radius: 12px;
+            height: 100%;
+        }
+
+        .option-card.recommended {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(59, 130, 246, 0.1));
+            border: 2px solid rgba(16, 185, 129, 0.4);
+        }
+
+        /* PDF/Print Optimization */
+        @media print {
+            body {
+                background: #0f172a !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                font-size: 90%;
+            }
+
+            @page {
+                size: A4;
+                margin: 1cm;
+            }
+
+            .page-break-after {
+                page-break-after: always;
+            }
+
+            .card, .option-card, table {
+                page-break-inside: avoid;
+            }
+
+            header {
+                padding: 2cm 1cm !important;
+                text-align: center;
+            }
+
+            .section {
+                padding: 1.5cm 0.5cm !important;
+            }
+
+            .section-title {
+                margin-bottom: 0.8cm !important;
+            }
+
+            .metric-huge {
+                font-size: 1.8rem !important;
+            }
+
+            .headline-xl {
+                font-size: 2.5rem !important;
+            }
+
+            .headline-lg {
+                font-size: 1.6rem !important;
+            }
+
+            .container {
+                padding: 0 20px !important;
+            }
+
+            .exec-table td,
+            .exec-table th {
+                padding: 10px 12px !important;
+                font-size: 0.75rem !important;
+            }
+
+            .card {
+                padding: 12px !important;
+            }
+
+            .option-card {
+                padding: 16px !important;
+            }
+
+            .grid.gap-8 {
+                gap: 16px !important;
+            }
+
+            .grid.gap-5 {
+                gap: 12px !important;
+            }
+
+            .grid.gap-4 {
+                gap: 10px !important;
+            }
+
+            .space-y-3 > * + * {
+                margin-top: 8px !important;
+            }
+
+            .mb-6 {
+                margin-bottom: 12px !important;
+            }
+
+            .mb-8 {
+                margin-bottom: 16px !important;
+            }
+
+            .p-8 {
+                padding: 16px !important;
+            }
+
+            .p-6 {
+                padding: 14px !important;
+            }
+
+            .p-5 {
+                padding: 12px !important;
+            }
+        }
+
+        /* Section spacing for PDF */
+        .section {
+            margin-bottom: 40px;
+            page-break-inside: avoid;
+        }
+
+        .section-title {
+            margin-bottom: 24px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PAGE 1: HERO + KEY METRICS -->
+    <header class="pt-20 pb-12 border-b border-white/5 page-break-after">
+        <div class="container text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-medium mb-6">
+                Platform Engineering Solution
+            </div>
+
+            <h1 class="headline-xl mb-5">
+                STACK<span class="text-blue-500">TIC</span>
+            </h1>
+
+            <p class="text-xl text-slate-300 max-w-3xl mx-auto mb-3">
+                Full-Stack Automation from Planning to Production
+            </p>
+
+            <p class="text-base text-slate-500 max-w-2xl mx-auto mb-12">
+                Speed of managed services. Control of open source. Complete sovereignty.
+            </p>
+
+            <!-- KEY METRICS -->
+            <div class="grid grid-cols-4 gap-5 mt-8">
+                <div class="card card-accent p-5 text-center">
+                    <div class="metric-huge text-emerald-400">70%+</div>
+                    <div class="metric-label mt-3">Cost Reduction</div>
+                </div>
+                <div class="card card-accent p-5 text-center">
+                    <div class="metric-huge text-blue-400">80%</div>
+                    <div class="metric-label mt-3">Faster Delivery</div>
+                </div>
+                <div class="card card-accent p-5 text-center">
+                    <div class="metric-huge text-purple-400">Zero</div>
+                    <div class="metric-label mt-3">Vendor Lock-in</div>
+                </div>
+                <div class="card card-accent p-5 text-center">
+                    <div class="metric-huge text-amber-400">100%</div>
+                    <div class="metric-label mt-3">Data Sovereignty</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container py-12">
+
+        <!-- PAGE 2: MARKET SHIFT & DEMAND -->
+        <section class="section page-break-after">
+            <div class="text-center section-title">
+                <h2 class="headline-lg text-white mb-3">The Market Shift</h2>
+                <p class="text-base text-slate-400 max-w-2xl mx-auto">
+                    Enterprises are prioritizing data sovereignty and AI readiness over vendor convenience
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-8 mb-8">
+                <!-- Market Trends -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold text-white mb-5">Growth Trends</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm text-slate-300">AI Open Source Adoption</span>
+                                <span class="text-emerald-400 font-bold">35%</span>
+                            </div>
+                            <div class="h-2 rounded-full bg-slate-700 overflow-hidden">
+                                <div class="h-full w-[87%] rounded-full bg-emerald-500"></div>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-1">Fastest growing segment in enterprise tech</p>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm text-slate-300">Kubernetes / OSS Growth</span>
+                                <span class="text-cyan-400 font-bold">24%</span>
+                            </div>
+                            <div class="h-2 rounded-full bg-slate-700 overflow-hidden">
+                                <div class="h-full w-[60%] rounded-full bg-cyan-500"></div>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-1">Steady enterprise adoption continues</p>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm text-slate-300">Managed Services</span>
+                                <span class="text-slate-400 font-bold">5%</span>
+                            </div>
+                            <div class="h-2 rounded-full bg-slate-700 overflow-hidden">
+                                <div class="h-full w-[12%] rounded-full bg-slate-500"></div>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-1">Declining as companies seek control</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Key Drivers -->
+                <div class="space-y-4">
+                    <div class="card p-5 border-l-4 border-l-emerald-500">
+                        <div class="flex items-center gap-3 mb-2">
+                            <i class="fa-solid fa-shield-halved text-emerald-400"></i>
+                            <h4 class="font-semibold text-white">Data Sovereignty</h4>
+                        </div>
+                        <p class="text-sm text-slate-400">Regulatory pressure and competitive advantage demand full control over data location and access.</p>
+                    </div>
+                    <div class="card p-5 border-l-4 border-l-purple-500">
+                        <div class="flex items-center gap-3 mb-2">
+                            <i class="fa-solid fa-brain text-purple-400"></i>
+                            <h4 class="font-semibold text-white">Private AI Infrastructure</h4>
+                        </div>
+                        <p class="text-sm text-slate-400">Organizations need to deploy LLMs and AI workloads without sending data to third-party APIs.</p>
+                    </div>
+                    <div class="card p-5 border-l-4 border-l-cyan-500">
+                        <div class="flex items-center gap-3 mb-2">
+                            <i class="fa-brands fa-osi text-cyan-400"></i>
+                            <h4 class="font-semibold text-white">Open Source Preference</h4>
+                        </div>
+                        <p class="text-sm text-slate-400">Avoiding vendor lock-in while gaining flexibility, transparency, and community innovation.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom insight -->
+            <div class="p-5 rounded-xl bg-gradient-to-r from-emerald-500/10 to-purple-500/10 border border-emerald-500/20 text-center">
+                <p class="text-white">
+                    <span class="text-emerald-400 font-semibold">The challenge:</span> How to get the speed of managed services while maintaining sovereignty and control?
+                </p>
+            </div>
+        </section>
+
+        <!-- PAGE 3: THE STRATEGIC CHOICE -->
+        <section class="section page-break-after">
+            <div class="text-center section-title">
+                <h2 class="headline-lg text-white mb-3">The Strategic Choice</h2>
+                <p class="text-lg text-slate-400 max-w-2xl mx-auto">
+                    Enterprises face a false dilemma. Stacktic offers a third path.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-3 gap-5">
+                <!-- Managed Services -->
+                <div class="option-card card border-rose-500/20">
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="w-10 h-10 rounded-full bg-rose-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-cloud text-rose-400"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-white">Managed Services</h3>
+                            <p class="text-xs text-rose-400">AWS, Azure, GCP</p>
+                        </div>
+                    </div>
+
+                    <ul class="space-y-2 text-sm mb-5">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-400 text-xs mt-1"></i>
+                            <span class="text-slate-300">Fast initial deployment</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-400 text-xs mt-1"></i>
+                            <span class="text-slate-300">Managed operations</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-xmark text-rose-400 text-xs mt-1"></i>
+                            <span class="text-slate-400">30-50% lock-in premium</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-xmark text-rose-400 text-xs mt-1"></i>
+                            <span class="text-slate-400">Zero negotiation leverage</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-xmark text-rose-400 text-xs mt-1"></i>
+                            <span class="text-slate-400">Data sovereignty concerns</span>
+                        </li>
+                    </ul>
+
+                    <div class="pt-3 border-t border-white/10 text-center">
+                        <span class="text-xs font-medium text-rose-400 uppercase tracking-wider">Trapped by Convenience</span>
+                    </div>
+                </div>
+
+                <!-- DIY Open Source -->
+                <div class="option-card card border-amber-500/20">
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center">
+                            <i class="fa-brands fa-osi text-amber-400"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-white">DIY Open Source</h3>
+                            <p class="text-xs text-amber-400">Self-Managed</p>
+                        </div>
+                    </div>
+
+                    <ul class="space-y-2 text-sm mb-5">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-400 text-xs mt-1"></i>
+                            <span class="text-slate-300">Full control & flexibility</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-400 text-xs mt-1"></i>
+                            <span class="text-slate-300">No licensing costs</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-xmark text-rose-400 text-xs mt-1"></i>
+                            <span class="text-slate-400">Months to production</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-xmark text-rose-400 text-xs mt-1"></i>
+                            <span class="text-slate-400">Requires specialized talent</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-xmark text-rose-400 text-xs mt-1"></i>
+                            <span class="text-slate-400">Growing operational burden</span>
+                        </li>
+                    </ul>
+
+                    <div class="pt-3 border-t border-white/10 text-center">
+                        <span class="text-xs font-medium text-amber-400 uppercase tracking-wider">Drowned in Complexity</span>
+                    </div>
+                </div>
+
+                <!-- Stacktic -->
+                <div class="option-card recommended relative">
+                    <div class="absolute -top-2 right-4">
+                        <span class="px-2 py-1 bg-emerald-500 text-white text-xs font-bold rounded">RECOMMENDED</span>
+                    </div>
+
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-layer-group text-emerald-400"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-white">Stacktic</h3>
+                            <p class="text-xs text-emerald-400">The Third Way</p>
+                        </div>
+                    </div>
+
+                    <ul class="space-y-2 text-sm mb-5">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-400 text-xs mt-1"></i>
+                            <span class="text-white font-medium">Speed of managed services</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-400 text-xs mt-1"></i>
+                            <span class="text-white font-medium">Control of open source</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-400 text-xs mt-1"></i>
+                            <span class="text-white font-medium">True cloud portability</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-400 text-xs mt-1"></i>
+                            <span class="text-white font-medium">Vendor negotiation power</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-400 text-xs mt-1"></i>
+                            <span class="text-white font-medium">Complete data sovereignty</span>
+                        </li>
+                    </ul>
+
+                    <div class="pt-3 border-t border-emerald-500/30 text-center">
+                        <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Best of Both Worlds</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Strategic Insight -->
+            <div class="mt-8 p-6 rounded-xl bg-gradient-to-r from-emerald-500/10 via-blue-500/10 to-purple-500/10 border border-emerald-500/20 text-center">
+                <p class="text-lg text-white mb-1">
+                    <span class="text-emerald-400 font-semibold">Stacktic</span> enables migration to any cloud with minimal effort
+                </p>
+                <p class="text-slate-400">
+                    A credible exit strategy unlocks <strong class="text-white">15-30% better rates</strong> from vendors who know you can leave
+                </p>
+            </div>
+        </section>
+
+        <!-- PAGE 3: VALUE PROPOSITION -->
+        <section class="section page-break-after">
+            <div class="grid grid-cols-2 gap-12 items-start">
+                <div>
+                    <h2 class="headline-lg text-white mb-4">
+                        Automate <span class="text-gradient">90% of Operations</span>
+                    </h2>
+                    <p class="text-base text-slate-400 mb-6">
+                        Engineers spend 90% of their time on infrastructure plumbing instead of building business value. Stacktic automates the entire stack lifecycle.
+                    </p>
+
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-4 p-4 rounded-lg bg-slate-800/50">
+                            <div class="w-9 h-9 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400 font-bold text-sm">0</div>
+                            <div>
+                                <div class="font-semibold text-white text-sm">Day 0: Architecture</div>
+                                <div class="text-xs text-slate-400">Hours instead of months</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 p-4 rounded-lg bg-slate-800/50">
+                            <div class="w-9 h-9 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-sm">1</div>
+                            <div>
+                                <div class="font-semibold text-white text-sm">Day 1: Deployment</div>
+                                <div class="text-xs text-slate-400">One-click to any Kubernetes</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 p-4 rounded-lg bg-slate-800/50">
+                            <div class="w-9 h-9 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400 font-bold text-sm">2</div>
+                            <div>
+                                <div class="font-semibold text-white text-sm">Day 2: Operations</div>
+                                <div class="text-xs text-slate-400">Automated upgrades, security, rollbacks</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-6">
+                    <h3 class="text-base font-semibold text-white mb-5 text-center">Stacktic Capability Advantage</h3>
+                    <div class="space-y-5">
+                        <div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span class="text-slate-400">Speed to Production</span>
+                                <span class="text-emerald-400 font-semibold text-xs">STACKTIC LEADS</span>
+                            </div>
+                            <div class="h-2 rounded-full bg-slate-700 overflow-hidden">
+                                <div class="h-full w-[95%] rounded-full bg-gradient-to-r from-emerald-500 to-blue-500"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span class="text-slate-400">Cost Efficiency</span>
+                                <span class="text-emerald-400 font-semibold text-xs">STACKTIC LEADS</span>
+                            </div>
+                            <div class="h-2 rounded-full bg-slate-700 overflow-hidden">
+                                <div class="h-full w-[90%] rounded-full bg-gradient-to-r from-emerald-500 to-blue-500"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span class="text-slate-400">Data Sovereignty</span>
+                                <span class="text-emerald-400 font-semibold text-xs">STACKTIC LEADS</span>
+                            </div>
+                            <div class="h-2 rounded-full bg-slate-700 overflow-hidden">
+                                <div class="h-full w-[100%] rounded-full bg-gradient-to-r from-emerald-500 to-blue-500"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span class="text-slate-400">Operational Automation</span>
+                                <span class="text-emerald-400 font-semibold text-xs">STACKTIC LEADS</span>
+                            </div>
+                            <div class="h-2 rounded-full bg-slate-700 overflow-hidden">
+                                <div class="h-full w-[92%] rounded-full bg-gradient-to-r from-emerald-500 to-blue-500"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span class="text-slate-400">Cloud Flexibility</span>
+                                <span class="text-emerald-400 font-semibold text-xs">STACKTIC LEADS</span>
+                            </div>
+                            <div class="h-2 rounded-full bg-slate-700 overflow-hidden">
+                                <div class="h-full w-[100%] rounded-full bg-gradient-to-r from-emerald-500 to-blue-500"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE 4: BOARD RECOMMENDATION -->
+        <section class="section page-break-after">
+            <div class="text-center section-title">
+                <h2 class="headline-lg text-white mb-3">Board Recommendation</h2>
+                <p class="text-base text-slate-400">Strategic objectives and expected outcomes</p>
+            </div>
+
+            <div class="card overflow-hidden mb-6">
+                <table class="exec-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 30%">Strategic Objective</th>
+                            <th style="width: 30%">Action</th>
+                            <th style="width: 40%">Expected Outcome</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-7 h-7 rounded bg-rose-500/20 flex items-center justify-center">
+                                        <i class="fa-solid fa-trash-can text-rose-400 text-xs"></i>
+                                    </div>
+                                    <span class="font-medium">Eliminate Technical Debt</span>
+                                </div>
+                            </td>
+                            <td class="text-slate-300">Adopt Central Control Plane</td>
+                            <td>Retire legacy systems, reduce maintenance burden</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-7 h-7 rounded bg-indigo-500/20 flex items-center justify-center">
+                                        <i class="fa-solid fa-shield text-indigo-400 text-xs"></i>
+                                    </div>
+                                    <span class="font-medium">Mitigate Key Person Risk</span>
+                                </div>
+                            </td>
+                            <td class="text-slate-300">Encode operational knowledge</td>
+                            <td>Zero dependency on tribal knowledge</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-7 h-7 rounded bg-emerald-500/20 flex items-center justify-center">
+                                        <i class="fa-solid fa-chart-line text-emerald-400 text-xs"></i>
+                                    </div>
+                                    <span class="font-medium">Maximize ROI</span>
+                                </div>
+                            </td>
+                            <td class="text-slate-300">Automate Day-2 operations</td>
+                            <td class="highlight">30% infra savings, 70% labor efficiency</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-7 h-7 rounded bg-cyan-500/20 flex items-center justify-center">
+                                        <i class="fa-solid fa-cloud text-cyan-400 text-xs"></i>
+                                    </div>
+                                    <span class="font-medium">Enable Cloud Portability</span>
+                                </div>
+                            </td>
+                            <td class="text-slate-300">Multi-cloud architecture</td>
+                            <td class="highlight">Negotiate better rates, avoid lock-in</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-7 h-7 rounded bg-amber-500/20 flex items-center justify-center">
+                                        <i class="fa-solid fa-handshake text-amber-400 text-xs"></i>
+                                    </div>
+                                    <span class="font-medium">Strengthen Vendor Leverage</span>
+                                </div>
+                            </td>
+                            <td class="text-slate-300">Credible exit strategy</td>
+                            <td class="highlight">15-30% cloud cost reduction</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-7 h-7 rounded bg-purple-500/20 flex items-center justify-center">
+                                        <i class="fa-solid fa-rocket text-purple-400 text-xs"></i>
+                                    </div>
+                                    <span class="font-medium">Accelerate Innovation</span>
+                                </div>
+                            </td>
+                            <td class="text-slate-300">Redirect engineering focus</td>
+                            <td>90% time on features, not infrastructure</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-7 h-7 rounded bg-pink-500/20 flex items-center justify-center">
+                                        <i class="fa-solid fa-robot text-pink-400 text-xs"></i>
+                                    </div>
+                                    <span class="font-medium">AI-Native Foundation</span>
+                                </div>
+                            </td>
+                            <td class="text-slate-300">Open source AI stack</td>
+                            <td>Deploy AI/ML without vendor dependencies</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Summary Metrics -->
+            <div class="grid grid-cols-3 gap-4">
+                <div class="card p-5 text-center">
+                    <div class="text-2xl font-bold text-cyan-400 mb-1">15-30%</div>
+                    <div class="text-xs text-slate-400">Cloud Savings via Negotiation</div>
+                </div>
+                <div class="card p-5 text-center">
+                    <div class="text-2xl font-bold text-emerald-400 mb-1">Zero</div>
+                    <div class="text-xs text-slate-400">Migration Lock-in Risk</div>
+                </div>
+                <div class="card p-5 text-center">
+                    <div class="text-2xl font-bold text-purple-400 mb-1">Any Cloud</div>
+                    <div class="text-xs text-slate-400">AWS, Azure, GCP, On-Prem</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE 5: ADDITIONAL VALUE -->
+        <section class="section page-break-after">
+            <div class="section-content">
+                <div class="text-center section-title">
+                    <h2 class="headline-lg text-white mb-3">Additional Value</h2>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                <div class="card p-4 flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-rotate text-emerald-400"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-white text-sm">Eliminate Legacy</h4>
+                        <p class="text-xs text-slate-400">Automated migration + versioning</p>
+                        <span class="text-emerald-400 text-xs font-medium">→ Modernize Forever</span>
+                    </div>
+                </div>
+
+                <div class="card p-4 flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-arrow-down text-cyan-400"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-white text-sm">Lower Infrastructure</h4>
+                        <p class="text-xs text-slate-400">Cloud-agnostic platform</p>
+                        <span class="text-cyan-400 text-xs font-medium">→ Reduce Spend 30%+</span>
+                    </div>
+                </div>
+
+                <div class="card p-4 flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-lg bg-rose-500/20 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-ban text-rose-400"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-white text-sm">Avoid Vendor Costs</h4>
+                        <p class="text-xs text-slate-400">Replace commercial tools with OSS</p>
+                        <span class="text-rose-400 text-xs font-medium">→ No Licensing, No Lock-in</span>
+                    </div>
+                </div>
+
+                <div class="card p-4 flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-shuffle text-purple-400"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-white text-sm">True Portability</h4>
+                        <p class="text-xs text-slate-400">Move across clouds, on-prem, edge</p>
+                        <span class="text-purple-400 text-xs font-medium">→ With a Few Clicks</span>
+                    </div>
+                </div>
+
+                <div class="card p-4 flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-headset text-amber-400"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-white text-sm">Unified Support</h4>
+                        <p class="text-xs text-slate-400">Single support for all OSS components</p>
+                        <span class="text-amber-400 text-xs font-medium">→ One Contract, All Components</span>
+                    </div>
+                </div>
+
+                <div class="card p-4 flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-lg bg-indigo-500/20 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-shield-halved text-indigo-400"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-white text-sm">Security & Compliance</h4>
+                        <p class="text-xs text-slate-400">Built-in scanning & CISO reports</p>
+                        <span class="text-indigo-400 text-xs font-medium">→ Audit-Ready Day One</span>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE 6: WHO SHOULD USE STACKTIC -->
+        <section class="section page-break-after">
+            <div class="text-center section-title">
+                <h2 class="headline-lg text-white mb-3">Who Should Use Stacktic</h2>
+                <p class="text-base text-slate-400">Two primary use cases with exceptional fit</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-8">
+                <!-- High-Security / Regulated -->
+                <div class="card p-8 border-l-4 border-l-indigo-500">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-indigo-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-shield-halved text-indigo-400 text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-white">Regulated & High-Security Organizations</h3>
+                            <p class="text-sm text-indigo-400">Finance, Healthcare, Government, Defense</p>
+                        </div>
+                    </div>
+
+                    <p class="text-slate-400 mb-6">
+                        Organizations with strict compliance requirements that need complete control over their infrastructure and data.
+                    </p>
+
+                    <ul class="space-y-3 mb-6">
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-check-circle text-emerald-400 mt-1"></i>
+                            <div>
+                                <span class="text-white font-medium">Air-Gapped Deployments</span>
+                                <p class="text-xs text-slate-500">Complete network isolation with full functionality</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-check-circle text-emerald-400 mt-1"></i>
+                            <div>
+                                <span class="text-white font-medium">Private AI Infrastructure</span>
+                                <p class="text-xs text-slate-500">Deploy LLMs and AI workloads without external dependencies</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-check-circle text-emerald-400 mt-1"></i>
+                            <div>
+                                <span class="text-white font-medium">Complex Multi-Stack Architectures</span>
+                                <p class="text-xs text-slate-500">Manage interconnected systems with full governance</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-check-circle text-emerald-400 mt-1"></i>
+                            <div>
+                                <span class="text-white font-medium">Compliance Ready</span>
+                                <p class="text-xs text-slate-500">HIPAA, PCI-DSS, SOC2, FedRAMP compatible</p>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <div class="p-4 rounded-lg bg-indigo-500/10 border border-indigo-500/20">
+                        <div class="text-sm text-white font-medium mb-1">Key Benefit</div>
+                        <div class="text-xs text-slate-400">100% data sovereignty with enterprise-grade automation</div>
+                    </div>
+                </div>
+
+                <!-- Startups / Fast-Moving -->
+                <div class="card p-8 border-l-4 border-l-emerald-500">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-rocket text-emerald-400 text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-white">Startups & Fast-Moving Teams</h3>
+                            <p class="text-sm text-emerald-400">Series A-C, Scale-ups, Innovation Labs</p>
+                        </div>
+                    </div>
+
+                    <p class="text-slate-400 mb-6">
+                        Teams that need to ship production-ready infrastructure without hiring large DevOps teams.
+                    </p>
+
+                    <ul class="space-y-3 mb-6">
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-check-circle text-emerald-400 mt-1"></i>
+                            <div>
+                                <span class="text-white font-medium">Fastest Path to Production</span>
+                                <p class="text-xs text-slate-500">Complex stacks deployed in hours, not months</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-check-circle text-emerald-400 mt-1"></i>
+                            <div>
+                                <span class="text-white font-medium">Minimal Ops Overhead</span>
+                                <p class="text-xs text-slate-500">90% automation means lean teams can scale</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-check-circle text-emerald-400 mt-1"></i>
+                            <div>
+                                <span class="text-white font-medium">Enterprise-Grade from Day One</span>
+                                <p class="text-xs text-slate-500">Security, observability, and compliance built-in</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-check-circle text-emerald-400 mt-1"></i>
+                            <div>
+                                <span class="text-white font-medium">No Infrastructure Debt</span>
+                                <p class="text-xs text-slate-500">Start right, scale without rewriting</p>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <div class="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                        <div class="text-sm text-white font-medium mb-1">Key Benefit</div>
+                        <div class="text-xs text-slate-400">Ship faster than competitors at a fraction of the cost</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE 6: PRICING + CTA -->
+        <section class="section">
+            <div class="text-center section-title">
+                <h2 class="headline-lg text-white mb-3">Investment Options</h2>
+                <p class="text-base text-slate-400">Scalable pricing aligned with business growth</p>
+            </div>
+
+            <div class="grid grid-cols-3 gap-5 mb-10">
+                <div class="card p-6">
+                    <div class="w-10 h-1 bg-blue-500 rounded-full mb-5"></div>
+                    <h3 class="text-lg font-semibold text-white mb-1">Start Point</h3>
+                    <p class="text-slate-400 text-xs mb-5">MVP & Validation</p>
+                    <ul class="space-y-2 text-sm text-slate-300">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400 text-xs"></i> 1 Full Stack</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400 text-xs"></i> 5 Users</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400 text-xs"></i> Full Day 0-2 Automation</li>
+                    </ul>
+                </div>
+
+                <div class="card p-6 border-2 border-cyan-500/30 bg-cyan-500/5 relative">
+                    <div class="absolute -top-2 right-4">
+                        <span class="px-2 py-1 bg-cyan-500 text-white text-xs font-bold rounded">POPULAR</span>
+                    </div>
+                    <div class="w-10 h-1 bg-cyan-500 rounded-full mb-5"></div>
+                    <h3 class="text-lg font-semibold text-white mb-1">Scale</h3>
+                    <p class="text-slate-400 text-xs mb-5">Platform Teams</p>
+                    <ul class="space-y-2 text-sm text-slate-300">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400 text-xs"></i> <strong>10 Stacks</strong></li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400 text-xs"></i> 30 Users</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400 text-xs"></i> Private SaaS Option</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400 text-xs"></i> Advanced SecOps Automated</li>
+                    </ul>
+                </div>
+
+                <div class="card p-6">
+                    <div class="w-10 h-1 bg-amber-500 rounded-full mb-5"></div>
+                    <h3 class="text-lg font-semibold text-white mb-1">Enterprise App Factory</h3>
+                    <p class="text-slate-400 text-xs mb-5">Fleet Management</p>
+                    <ul class="space-y-2 text-sm text-slate-300">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400 text-xs"></i> 100+ Stacks</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400 text-xs"></i> Unlimited Users</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400 text-xs"></i> Dedicated Engineer</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400 text-xs"></i> Customized Automation Platform</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="card card-accent p-8 text-center">
+                <h2 class="headline-md text-white mb-3">Next Steps</h2>
+                <p class="text-base text-slate-400 mb-5 max-w-xl mx-auto">
+                    Initiate a pilot migration for your core AI stack and validate the ROI firsthand.
+                </p>
+                <div class="flex items-center justify-center gap-4">
+                    <span class="px-6 py-3 bg-gradient-to-r from-blue-500 to-emerald-500 text-white font-semibold rounded-lg">
+                        Schedule Executive Briefing
+                    </span>
+                    <span class="px-6 py-3 bg-slate-700 text-white font-semibold rounded-lg">
+                        Request ROI Analysis
+                    </span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-white/5 py-8">
+        <div class="container text-center">
+            <p class="text-slate-500 text-sm mb-1">&copy; 2026 Stacktic</p>
+            <p class="text-slate-600 text-xs">Transforming infrastructure complexity into managed simplicity.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

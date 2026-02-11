@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stacktic & SUSE Rancher - Partnership</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-suse: #30ba78;
+            --accent-stacktic: #3b82f6;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #1a1a2e 100%);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+        }
+
+        .card-accent {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-accent::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-suse), var(--accent-stacktic));
+        }
+
+        .headline-xl {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+        }
+
+        .headline-lg {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+
+        .headline-md {
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .text-gradient-suse {
+            background: linear-gradient(135deg, #30ba78, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .metric-huge {
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        .metric-label {
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .exec-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .exec-table th {
+            text-align: left;
+            padding: 10px 14px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        .exec-table td {
+            padding: 10px 14px;
+            font-size: 0.8rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            vertical-align: middle;
+        }
+
+        .exec-table tr:last-child td { border-bottom: none; }
+
+        .section {
+            margin-bottom: 30px;
+            page-break-inside: avoid;
+        }
+
+        .section-title {
+            margin-bottom: 20px;
+        }
+
+        /* Role split diagram */
+        .role-split {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 0;
+            align-items: stretch;
+        }
+
+        .role-divider {
+            width: 3px;
+            background: linear-gradient(180deg, var(--accent-suse), var(--accent-stacktic));
+            position: relative;
+        }
+
+        .role-divider::after {
+            content: '+';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-suse), var(--accent-stacktic));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1rem;
+            color: white;
+        }
+
+        /* Print */
+        @media print {
+            body {
+                background: #0f172a !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                font-size: 88%;
+            }
+
+            @page {
+                size: A4;
+                margin: 1cm;
+            }
+
+            .page-break-after {
+                page-break-after: always;
+            }
+
+            .card, table {
+                page-break-inside: avoid;
+            }
+
+            header {
+                padding: 1.8cm 1cm !important;
+            }
+
+            .section {
+                padding: 1cm 0.5cm !important;
+            }
+
+            .section-title {
+                margin-bottom: 0.6cm !important;
+            }
+
+            .headline-xl {
+                font-size: 2.2rem !important;
+            }
+
+            .headline-lg {
+                font-size: 1.4rem !important;
+            }
+
+            .metric-huge {
+                font-size: 1.6rem !important;
+            }
+
+            .container {
+                padding: 0 20px !important;
+            }
+
+            .card {
+                padding: 10px !important;
+            }
+
+            .p-6 { padding: 12px !important; }
+            .p-5 { padding: 10px !important; }
+            .p-4 { padding: 8px !important; }
+            .mb-6 { margin-bottom: 10px !important; }
+            .mb-8 { margin-bottom: 14px !important; }
+            .gap-8 { gap: 14px !important; }
+            .gap-6 { gap: 12px !important; }
+            .gap-5 { gap: 10px !important; }
+            .gap-4 { gap: 8px !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PAGE 1: HERO -->
+    <header class="pt-16 pb-10 border-b border-white/5 page-break-after">
+        <div class="container text-center">
+            <div class="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium mb-6">
+                <i class="fa-solid fa-handshake"></i>
+                Strategic Partnership
+            </div>
+
+            <div class="flex items-center justify-center gap-6 mb-4">
+                <h1 class="headline-xl">
+                    STACK<span class="text-blue-500">TIC</span>
+                    <span class="text-slate-500 mx-3">&</span>
+                    <span class="text-gradient-suse">SUSE Rancher</span>
+                </h1>
+                <img src="https://www.rancher.com/assets/img/brand-guidelines/assets/logos/png/color/rancher-suse-logo-stacked-color.png" alt="SUSE Rancher" style="height: 60px; object-fit: contain;">
+            </div>
+
+            <p class="text-lg text-slate-300 max-w-3xl mx-auto mb-2">
+                The First Truly Managed Open-Source Platform
+            </p>
+            <p class="text-sm text-slate-500 max-w-2xl mx-auto mb-10">
+                Speed of managed services. Openness of Kubernetes. Sovereignty by design.
+            </p>
+
+            <!-- KEY METRICS -->
+            <div class="grid grid-cols-4 gap-4 mb-10">
+                <div class="card card-accent p-4 text-center">
+                    <div class="metric-huge text-emerald-400">70%+</div>
+                    <div class="metric-label mt-2">Cost Reduction</div>
+                </div>
+                <div class="card card-accent p-4 text-center">
+                    <div class="metric-huge text-blue-400">80%</div>
+                    <div class="metric-label mt-2">Faster Delivery</div>
+                </div>
+                <div class="card card-accent p-4 text-center">
+                    <div class="metric-huge text-purple-400">Zero</div>
+                    <div class="metric-label mt-2">Vendor Lock-in</div>
+                </div>
+                <div class="card card-accent p-4 text-center">
+                    <div class="metric-huge text-amber-400">100%</div>
+                    <div class="metric-label mt-2">Sovereignty</div>
+                </div>
+            </div>
+
+            <!-- Bottom line -->
+            <div class="p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 to-blue-500/10 border border-emerald-500/20 text-center max-w-3xl mx-auto">
+                <p class="text-sm text-white">
+                    Together, Stacktic + SUSE Rancher compete head-to-head with managed hyperscaler platforms
+                    <span class="text-emerald-400 font-semibold">(AWS, Azure, GCP)</span> &mdash; without sacrificing control, transparency, or freedom.
+                </p>
+            </div>
+        </div>
+    </header>
+
+    <main class="container py-8">
+
+        <!-- PAGE 2: THE OPEN SOURCE REALITY -->
+        <section class="section page-break-after">
+            <div class="text-center section-title">
+                <h2 class="headline-lg text-white mb-2">The Open Source Reality</h2>
+                <p class="text-sm text-slate-400">Why the smartest companies run open-source Kubernetes</p>
+            </div>
+
+            <!-- Big statement -->
+            <div class="card p-5 mb-5">
+                <p class="text-base text-white text-center mb-4 leading-relaxed">
+                    <span class="text-emerald-400 font-bold">OpenAI, Netflix, Uber, Spotify</span> &mdash; all run massive open-source Kubernetes.
+                    <br>Why? Because they <strong>can</strong>. They have the engineering talent and resources.
+                </p>
+                <p class="text-sm text-slate-400 text-center mb-5">
+                    Enterprises and SMBs have the <span class="text-white">strategy</span>, but not the <span class="text-white">speed, skills, or someone willing to take responsibility</span> for the full open-source stack.
+                </p>
+
+                <!-- Two columns: Reality vs What's Needed -->
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20">
+                        <h4 class="text-sm text-white font-semibold mb-3"><i class="fa-solid fa-mask text-rose-400 mr-2"></i>What "Managed" Really Means</h4>
+                        <div class="space-y-2">
+                            <div class="flex items-start gap-2">
+                                <i class="fa-solid fa-xmark text-rose-400 text-xs mt-1"></i>
+                                <p class="text-xs text-slate-400"><span class="text-white">Old open source</span> wrapped in proprietary APIs</p>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <i class="fa-solid fa-xmark text-rose-400 text-xs mt-1"></i>
+                                <p class="text-xs text-slate-400"><span class="text-white">30-50% markup</span> for a convenience layer</p>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <i class="fa-solid fa-xmark text-rose-400 text-xs mt-1"></i>
+                                <p class="text-xs text-slate-400"><span class="text-white">Yesterday's versions</span>, permanently locked in</p>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <i class="fa-solid fa-xmark text-rose-400 text-xs mt-1"></i>
+                                <p class="text-xs text-slate-400"><span class="text-white">No innovation</span> &mdash; you get what the vendor allows</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                        <h4 class="text-sm text-white font-semibold mb-3"><i class="fa-solid fa-puzzle-piece text-emerald-400 mr-2"></i>The Real Blocker</h4>
+                        <div class="space-y-2">
+                            <div class="flex items-start gap-2">
+                                <i class="fa-solid fa-exclamation text-amber-400 text-xs mt-1"></i>
+                                <p class="text-xs text-slate-400"><span class="text-white">Dependencies & versioning</span> across services and foundations</p>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <i class="fa-solid fa-exclamation text-amber-400 text-xs mt-1"></i>
+                                <p class="text-xs text-slate-400"><span class="text-white">AI open source</span> is skyrocketing, built for K8s, but extremely hard to manage</p>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <i class="fa-solid fa-exclamation text-amber-400 text-xs mt-1"></i>
+                                <p class="text-xs text-slate-400"><span class="text-white">No one owns</span> the full-stack lifecycle &mdash; gaps everywhere</p>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <i class="fa-solid fa-exclamation text-amber-400 text-xs mt-1"></i>
+                                <p class="text-xs text-slate-400"><span class="text-white">Cross-component complexity</span> grows exponentially with scale</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- The Answer -->
+            <div class="p-5 rounded-xl bg-gradient-to-r from-emerald-500/10 via-blue-500/10 to-purple-500/10 border-2 border-emerald-500/30">
+                <p class="text-sm text-white text-center font-semibold mb-2">
+                    <i class="fa-solid fa-bolt text-emerald-400 mr-1"></i>
+                    Stacktic solves this.
+                </p>
+                <p class="text-xs text-slate-300 text-center leading-relaxed max-w-3xl mx-auto">
+                    E2E stable ecosystem automation and versioning of open source &mdash;
+                    making it <span class="text-emerald-400 font-bold">easier than managed</span> with auto-migration built in.
+                    Not only saving money and sovereignty &mdash; providing the <span class="text-blue-400 font-bold">latest innovation and advanced capabilities</span>
+                    that only open source can deliver.
+                </p>
+            </div>
+        </section>
+
+        <!-- PAGE 3: ROLE SPLIT -->
+        <section class="section page-break-after">
+            <div class="text-center section-title">
+                <h2 class="headline-lg text-white mb-2">Clear Role Separation</h2>
+                <p class="text-sm text-slate-400">No overlap, no duplication &mdash; clean responsibility boundaries</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6 mb-6">
+                <!-- SUSE Rancher -->
+                <div class="card p-5 border-t-4 border-t-emerald-500">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-server text-emerald-400"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-white">SUSE Rancher</h3>
+                            <p class="text-xs text-emerald-400">Infrastructure & Kubernetes Layer</p>
+                        </div>
+                    </div>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-400 text-xs mt-1"></i>
+                            <span class="text-slate-300">Multi-cluster Kubernetes management</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-400 text-xs mt-1"></i>
+                            <span class="text-slate-300">Cluster lifecycle & access control</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-400 text-xs mt-1"></i>
+                            <span class="text-slate-300">Curated app catalogs</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-400 text-xs mt-1"></i>
+                            <span class="text-slate-300">Enterprise Kubernetes foundation</span>
+                        </li>
+                    </ul>
+                    <div class="mt-4 pt-3 border-t border-white/10 text-center">
+                        <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Owns the infrastructure</span>
+                    </div>
+                </div>
+
+                <!-- Stacktic -->
+                <div class="card p-5 border-t-4 border-t-blue-500">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-layer-group text-blue-400"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-white">Stacktic</h3>
+                            <p class="text-xs text-blue-400">Application & Stack Sovereignty Layer</p>
+                        </div>
+                    </div>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-blue-400 text-xs mt-1"></i>
+                            <span class="text-slate-300">Full-stack relationship automation</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-blue-400 text-xs mt-1"></i>
+                            <span class="text-slate-300">Metadata-driven versioning & rollbacks</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-blue-400 text-xs mt-1"></i>
+                            <span class="text-slate-300">Day-2+ ops, migrations, compliance</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-blue-400 text-xs mt-1"></i>
+                            <span class="text-slate-300">Operational logic encoded as metadata</span>
+                        </li>
+                    </ul>
+                    <div class="mt-4 pt-3 border-t border-white/10 text-center">
+                        <span class="text-xs font-semibold text-blue-400 uppercase tracking-wider">Owns the stack sovereignty</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Together -->
+            <div class="p-5 rounded-xl bg-gradient-to-r from-emerald-500/10 via-blue-500/10 to-purple-500/10 border border-emerald-500/20 text-center mb-6">
+                <p class="text-white font-semibold mb-1">Together: The First Truly Managed Open-Source Platform</p>
+                <p class="text-sm text-slate-400">
+                    <span class="text-emerald-400">Managed</span> like AWS &bull;
+                    <span class="text-blue-400">Open</span> like Kubernetes &bull;
+                    <span class="text-purple-400">Sovereign</span> by design
+                </p>
+            </div>
+
+            <!-- End-to-End Capabilities -->
+            <div class="grid grid-cols-3 gap-4">
+                <div class="card p-4 text-center">
+                    <div class="w-9 h-9 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400 font-bold text-sm mx-auto mb-2">0</div>
+                    <div class="font-semibold text-white text-sm">Day 0: Architecture</div>
+                    <div class="text-xs text-slate-400">Hours instead of months</div>
+                </div>
+                <div class="card p-4 text-center">
+                    <div class="w-9 h-9 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-sm mx-auto mb-2">1</div>
+                    <div class="font-semibold text-white text-sm">Day 1: Deployment</div>
+                    <div class="text-xs text-slate-400">One-click to any Kubernetes</div>
+                </div>
+                <div class="card p-4 text-center">
+                    <div class="w-9 h-9 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400 font-bold text-sm mx-auto mb-2">2</div>
+                    <div class="font-semibold text-white text-sm">Day 2: Operations</div>
+                    <div class="text-xs text-slate-400">Automated ops, security, rollback</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE 4: THE JOINT PLATFORM STACK (Visual) -->
+        <section class="section page-break-after">
+            <div class="text-center section-title">
+                <h2 class="headline-lg text-white mb-2">The Joint Platform Stack</h2>
+                <p class="text-sm text-slate-400">Rancher owns the infrastructure. Stacktic owns everything on top.</p>
+            </div>
+
+            <!-- STACK VISUAL - SVG Architecture Diagram -->
+            <div class="mb-5" style="border-radius:12px;overflow:hidden;">
+                <svg viewBox="0 0 1000 580" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;">
+                    <defs>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                            <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                        </filter>
+                        <filter id="svgShadow">
+                            <feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity="0.3"/>
+                        </filter>
+                        <linearGradient id="stackticGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#1d4ed8"/>
+                            <stop offset="100%" style="stop-color:#2563eb"/>
+                        </linearGradient>
+                        <linearGradient id="rancherGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#047857"/>
+                            <stop offset="100%" style="stop-color:#059669"/>
+                        </linearGradient>
+                        <linearGradient id="infraGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#1e293b"/>
+                            <stop offset="100%" style="stop-color:#334155"/>
+                        </linearGradient>
+                        <linearGradient id="connGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" style="stop-color:rgba(255,255,255,0.3)"/>
+                            <stop offset="100%" style="stop-color:rgba(255,255,255,0.05)"/>
+                        </linearGradient>
+                        <linearGradient id="dataAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#3b82f6"/><stop offset="100%" style="stop-color:#60a5fa"/>
+                        </linearGradient>
+                        <linearGradient id="secAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#f43f5e"/><stop offset="100%" style="stop-color:#fb7185"/>
+                        </linearGradient>
+                        <linearGradient id="sreAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#f59e0b"/><stop offset="100%" style="stop-color:#fbbf24"/>
+                        </linearGradient>
+                        <linearGradient id="aiAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#8b5cf6"/><stop offset="100%" style="stop-color:#a78bfa"/>
+                        </linearGradient>
+                        <linearGradient id="ciAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#06b6d4"/><stop offset="100%" style="stop-color:#22d3ee"/>
+                        </linearGradient>
+                        <linearGradient id="compAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#10b981"/><stop offset="100%" style="stop-color:#34d399"/>
+                        </linearGradient>
+                    </defs>
+
+                    <!-- Background -->
+                    <rect width="1000" height="580" rx="12" fill="#0b1120"/>
+
+                    <!-- ====== TOP: OPEN SOURCE ECOSYSTEM ====== -->
+                    <text x="500" y="28" font-family="Inter,system-ui,sans-serif" font-size="10" fill="#64748b" text-anchor="middle" font-weight="600" letter-spacing="3">OPEN SOURCE ECOSYSTEM</text>
+                    <g transform="translate(60, 40)">
+                        <rect x="0" y="0" width="155" height="48" rx="24" fill="#7c3aed" filter="url(#svgShadow)" opacity="0.9"/>
+                        <text x="78" y="22" font-family="Inter,system-ui,sans-serif" font-size="11" fill="white" text-anchor="middle" font-weight="700">CNCF</text>
+                        <text x="78" y="36" font-family="Inter,system-ui,sans-serif" font-size="8" fill="rgba(255,255,255,0.65)" text-anchor="middle">Prometheus, ArgoCD, Envoy</text>
+
+                        <rect x="175" y="0" width="155" height="48" rx="24" fill="#b45309" filter="url(#svgShadow)" opacity="0.9"/>
+                        <text x="253" y="22" font-family="Inter,system-ui,sans-serif" font-size="11" fill="white" text-anchor="middle" font-weight="700">Apache</text>
+                        <text x="253" y="36" font-family="Inter,system-ui,sans-serif" font-size="8" fill="rgba(255,255,255,0.65)" text-anchor="middle">Kafka, Airflow, Spark</text>
+
+                        <rect x="350" y="0" width="155" height="48" rx="24" fill="#2563eb" filter="url(#svgShadow)" opacity="0.9"/>
+                        <text x="428" y="22" font-family="Inter,system-ui,sans-serif" font-size="11" fill="white" text-anchor="middle" font-weight="700">Databases</text>
+                        <text x="428" y="36" font-family="Inter,system-ui,sans-serif" font-size="8" fill="rgba(255,255,255,0.65)" text-anchor="middle">Postgres, Mongo, Redis</text>
+
+                        <rect x="525" y="0" width="155" height="48" rx="24" fill="#be185d" filter="url(#svgShadow)" opacity="0.9"/>
+                        <text x="603" y="22" font-family="Inter,system-ui,sans-serif" font-size="11" fill="white" text-anchor="middle" font-weight="700">AI / ML</text>
+                        <text x="603" y="36" font-family="Inter,system-ui,sans-serif" font-size="8" fill="rgba(255,255,255,0.65)" text-anchor="middle">vLLM, Ollama, LangFlow</text>
+
+                        <rect x="700" y="0" width="155" height="48" rx="24" fill="#0e7490" filter="url(#svgShadow)" opacity="0.9"/>
+                        <text x="778" y="22" font-family="Inter,system-ui,sans-serif" font-size="11" fill="white" text-anchor="middle" font-weight="700">Platform</text>
+                        <text x="778" y="36" font-family="Inter,system-ui,sans-serif" font-size="8" fill="rgba(255,255,255,0.65)" text-anchor="middle">Vault, Keycloak, Harbor</text>
+                    </g>
+
+                    <!-- Connections: Ecosystem to Stacktic -->
+                    <g opacity="0.4">
+                        <line x1="138" y1="88" x2="138" y2="118" stroke="white" stroke-width="1" stroke-dasharray="3,3"/>
+                        <line x1="313" y1="88" x2="313" y2="118" stroke="white" stroke-width="1" stroke-dasharray="3,3"/>
+                        <line x1="488" y1="88" x2="488" y2="118" stroke="white" stroke-width="1" stroke-dasharray="3,3"/>
+                        <line x1="663" y1="88" x2="663" y2="118" stroke="white" stroke-width="1" stroke-dasharray="3,3"/>
+                        <line x1="838" y1="88" x2="838" y2="118" stroke="white" stroke-width="1" stroke-dasharray="3,3"/>
+                    </g>
+
+                    <!-- ====== STACKTIC LAYER ====== -->
+                    <g transform="translate(40, 120)">
+                        <!-- Main container -->
+                        <rect x="0" y="0" width="920" height="220" rx="12" fill="url(#stackticGrad)" filter="url(#svgShadow)"/>
+                        <rect x="0" y="0" width="920" height="55" rx="12" fill="rgba(255,255,255,0.035)"/>
+                        <rect x="0" y="0" width="920" height="220" rx="12" fill="none" stroke="#60a5fa" stroke-width="1" opacity="0.3"/>
+
+                        <!-- Badge -->
+                        <rect x="16" y="-13" width="96" height="26" rx="5" fill="#3b82f6"/>
+                        <text x="64" y="4" font-family="Inter,system-ui,sans-serif" font-size="12" fill="white" text-anchor="middle" font-weight="800" letter-spacing="1">STACKTIC</text>
+
+                        <!-- Subtitle -->
+                        <text x="460" y="28" font-family="Inter,system-ui,sans-serif" font-size="11" fill="rgba(255,255,255,0.6)" text-anchor="middle" font-weight="500" letter-spacing="2">FULL-STACK AUTOMATION &amp; SOVEREIGNTY LAYER</text>
+
+                        <!-- 6 Domain Boxes -->
+                        <g transform="translate(18, 42)">
+                            <!-- DataOps -->
+                            <rect x="0" y="0" width="140" height="85" rx="8" fill="rgba(0,0,0,0.25)"/>
+                            <rect x="0" y="0" width="140" height="3.5" rx="8" fill="url(#dataAccent)"/>
+                            <g transform="translate(62, 12)">
+                                <ellipse cx="8" cy="3" rx="7" ry="2.5" stroke="#93c5fd" stroke-width="1.2" fill="none"/>
+                                <path d="M1,3 L1,11 C1,13.5 15,13.5 15,11 L15,3" stroke="#93c5fd" stroke-width="1.2" fill="none"/>
+                                <line x1="1" y1="7" x2="15" y2="7" stroke="#93c5fd" stroke-width="0.8" opacity="0.5"/>
+                            </g>
+                            <text x="70" y="42" font-family="Inter,system-ui,sans-serif" font-size="12" fill="white" text-anchor="middle" font-weight="700">DataOps</text>
+                            <text x="70" y="57" font-family="Inter,system-ui,sans-serif" font-size="8" fill="rgba(255,255,255,0.5)" text-anchor="middle">Pipelines &amp; ETL</text>
+                            <text x="70" y="70" font-family="Inter,system-ui,sans-serif" font-size="8" fill="rgba(255,255,255,0.5)" text-anchor="middle">Data Flows &amp; Lake</text>
+
+                            <!-- SecOps -->
+                            <rect x="148" y="0" width="140" height="85" rx="8" fill="rgba(0,0,0,0.25)"/>
+                            <rect x="148" y="0" width="140" height="3.5" rx="8" fill="url(#secAccent)"/>
+                            <g transform="translate(210, 11)">
+                                <path d="M8,0 L0,4 L0,10 C0,14 8,17 8,17 C8,17 16,14 16,10 L16,4 Z" stroke="#fda4af" stroke-width="1.2" fill="rgba(244,63,94,0.15)"/>
+                            </g>
+                            <text x="218" y="42" font-family="Inter,system-ui,sans-serif" font-size="12" fill="white" text-anchor="middle" font-weight="700">SecOps</text>
+                            <text x="218" y="57" font-family="Inter,system-ui,sans-serif" font-size="8" fill="rgba(255,255,255,0.5)" text-anchor="middle">RBAC &amp; Policies</text>
+                            <text x="218" y="70" font-family="Inter,system-ui,sans-serif" font-size="8" fill="rgba(255,255,255,0.5)" text-anchor="middle">CVE &amp; Compliance</text>
+
+                            <!-- SRE -->
+                            <rect x="296" y="0" width="140" height="85" rx="8" fill="rgba(0,0,0,0.25)"/>
+                            <rect x="296" y="0" width="140" height="3.5" rx="8" fill="url(#sreAccent)"/>
+                            <g transform="translate(358, 12)">
+                                <rect x="0" y="10" width="4" height="6" rx="1" fill="#fcd34d" opacity="0.7"/>
+                                <rect x="6" y="6" width="4" height="10" rx="1" fill="#fcd34d" opacity="0.85"/>
+                                <rect x="12" y="2" width="4" height="14" rx="1" fill="#fcd34d"/>
+                            </g>
+                            <text x="366" y="42" font-family="Inter,system-ui,sans-serif" font-size="12" fill="white" text-anchor="middle" font-weight="700">SRE</text>
+                            <text x="366" y="57" font-family="Inter,system-ui,sans-serif" font-size="8" fill="rgba(255,255,255,0.5)" text-anchor="middle">Observability</text>
+                            <text x="366" y="70" font-family="Inter,system-ui,sans-serif" font-size="8" fill="rgba(255,255,255,0.5)" text-anchor="middle">SLAs &amp; Alerts</text>
+
+                            <!-- AIOps -->
+                            <rect x="444" y="0" width="140" height="85" rx="8" fill="rgba(0,0,0,0.25)"/>
+                            <rect x="444" y="0" width="140" height="3.5" rx="8" fill="url(#aiAccent)"/>
+                            <g transform="translate(506, 12)">
+                                <circle cx="8" cy="8" r="7.5" stroke="#c4b5fd" stroke-width="1.2" fill="none"/>
+                                <circle cx="8" cy="8" r="3" fill="#c4b5fd" opacity="0.6"/>
+                                <line x1="8" y1="0.5" x2="8" y2="4" stroke="#c4b5fd" stroke-width="0.8"/>
+                                <line x1="8" y1="12" x2="8" y2="15.5" stroke="#c4b5fd" stroke-width="0.8"/>
+                                <line x1="0.5" y1="8" x2="4" y2="8" stroke="#c4b5fd" stroke-width="0.8"/>
+                                <line x1="12" y1="8" x2="15.5" y2="8" stroke="#c4b5fd" stroke-width="0.8"/>
+                            </g>
+                            <text x="514" y="42" font-family="Inter,system-ui,sans-serif" font-size="12" fill="white" text-anchor="middle" font-weight="700">AIOps</text>
+                            <text x="514" y="57" font-family="Inter,system-ui,sans-serif" font-size="8" fill="rgba(255,255,255,0.5)" text-anchor="middle">Intelligence</text>
+                            <text x="514" y="70" font-family="Inter,system-ui,sans-serif" font-size="8" fill="rgba(255,255,255,0.5)" text-anchor="middle">Private AI &amp; RAG</text>
+
+                            <!-- CI/CD -->
+                            <rect x="592" y="0" width="140" height="85" rx="8" fill="rgba(0,0,0,0.25)"/>
+                            <rect x="592" y="0" width="140" height="3.5" rx="8" fill="url(#ciAccent)"/>
+                            <g transform="translate(654, 12)">
+                                <path d="M12,1 A7,7 0 1,1 4,13" stroke="#67e8f9" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+                                <polygon points="2,10 5,14 6,10.5" fill="#67e8f9"/>
+                                <path d="M4,15 A7,7 0 1,1 12,3" stroke="#67e8f9" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+                                <polygon points="14,6 11,2 10,5.5" fill="#67e8f9"/>
+                            </g>
+                            <text x="662" y="42" font-family="Inter,system-ui,sans-serif" font-size="12" fill="white" text-anchor="middle" font-weight="700">CI/CD</text>
+                            <text x="662" y="57" font-family="Inter,system-ui,sans-serif" font-size="8" fill="rgba(255,255,255,0.5)" text-anchor="middle">GitOps &amp; ArgoCD</text>
+                            <text x="662" y="70" font-family="Inter,system-ui,sans-serif" font-size="8" fill="rgba(255,255,255,0.5)" text-anchor="middle">Automation</text>
+
+                            <!-- Compliance -->
+                            <rect x="740" y="0" width="140" height="85" rx="8" fill="rgba(0,0,0,0.25)"/>
+                            <rect x="740" y="0" width="140" height="3.5" rx="8" fill="url(#compAccent)"/>
+                            <g transform="translate(801, 11)">
+                                <rect x="2" y="0" width="12" height="16" rx="2" stroke="#6ee7b7" stroke-width="1.2" fill="none"/>
+                                <path d="M5,8 L7,10.5 L11,5.5" stroke="#6ee7b7" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                            </g>
+                            <text x="810" y="42" font-family="Inter,system-ui,sans-serif" font-size="12" fill="white" text-anchor="middle" font-weight="700">Compliance</text>
+                            <text x="810" y="57" font-family="Inter,system-ui,sans-serif" font-size="8" fill="rgba(255,255,255,0.5)" text-anchor="middle">ISO &amp; SOC2</text>
+                            <text x="810" y="70" font-family="Inter,system-ui,sans-serif" font-size="8" fill="rgba(255,255,255,0.5)" text-anchor="middle">HIPAA &amp; PCI</text>
+                        </g>
+
+                        <!-- Core Engine Bar -->
+                        <rect x="18" y="140" width="884" height="65" rx="8" fill="rgba(0,0,0,0.35)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                        <text x="460" y="158" font-family="Inter,system-ui,sans-serif" font-size="9" fill="rgba(255,255,255,0.4)" text-anchor="middle" font-weight="600" letter-spacing="3">CORE ENGINE</text>
+                        <g transform="translate(38, 168)">
+                            <rect x="0" y="0" width="195" height="24" rx="5" fill="rgba(96,165,250,0.2)" stroke="rgba(96,165,250,0.3)" stroke-width="1"/>
+                            <text x="98" y="16" font-family="Inter,system-ui,sans-serif" font-size="10" fill="#93c5fd" text-anchor="middle" font-weight="500">Relationship Engine</text>
+
+                            <rect x="210" y="0" width="195" height="24" rx="5" fill="rgba(168,85,246,0.2)" stroke="rgba(168,85,246,0.3)" stroke-width="1"/>
+                            <text x="308" y="16" font-family="Inter,system-ui,sans-serif" font-size="10" fill="#c4b5fd" text-anchor="middle" font-weight="500">Stack Versioning</text>
+
+                            <rect x="420" y="0" width="195" height="24" rx="5" fill="rgba(52,211,153,0.2)" stroke="rgba(52,211,153,0.3)" stroke-width="1"/>
+                            <text x="518" y="16" font-family="Inter,system-ui,sans-serif" font-size="10" fill="#6ee7b7" text-anchor="middle" font-weight="500">Auto-Migration</text>
+
+                            <rect x="630" y="0" width="195" height="24" rx="5" fill="rgba(251,191,36,0.2)" stroke="rgba(251,191,36,0.3)" stroke-width="1"/>
+                            <text x="728" y="16" font-family="Inter,system-ui,sans-serif" font-size="10" fill="#fcd34d" text-anchor="middle" font-weight="500">Rollback &amp; Recovery</text>
+                        </g>
+                    </g>
+
+                    <!-- Connections: Stacktic to Rancher -->
+                    <g opacity="0.35">
+                        <line x1="200" y1="340" x2="200" y2="370" stroke="white" stroke-width="2"/>
+                        <line x1="400" y1="340" x2="400" y2="370" stroke="white" stroke-width="2"/>
+                        <line x1="600" y1="340" x2="600" y2="370" stroke="white" stroke-width="2"/>
+                        <line x1="800" y1="340" x2="800" y2="370" stroke="white" stroke-width="2"/>
+                    </g>
+                    <!-- Arrow indicators -->
+                    <g fill="rgba(255,255,255,0.25)">
+                        <polygon points="197,368 200,375 203,368"/>
+                        <polygon points="397,368 400,375 403,368"/>
+                        <polygon points="597,368 600,375 603,368"/>
+                        <polygon points="797,368 800,375 803,368"/>
+                    </g>
+
+                    <!-- ====== RANCHER LAYER ====== -->
+                    <g transform="translate(40, 378)">
+                        <rect x="0" y="0" width="920" height="85" rx="12" fill="url(#rancherGrad)" filter="url(#svgShadow)"/>
+                        <rect x="0" y="0" width="920" height="85" rx="12" fill="none" stroke="#34d399" stroke-width="1.5" opacity="0.6"/>
+
+                        <!-- Badge -->
+                        <rect x="16" y="-13" width="130" height="26" rx="5" fill="#059669"/>
+                        <text x="81" y="4" font-family="Inter,system-ui,sans-serif" font-size="11" fill="white" text-anchor="middle" font-weight="800" letter-spacing="1">SUSE RANCHER</text>
+
+                        <!-- Title -->
+                        <text x="460" y="30" font-family="Inter,system-ui,sans-serif" font-size="13" fill="white" text-anchor="middle" font-weight="700">Kubernetes Management Layer</text>
+
+                        <!-- Feature pills -->
+                        <g transform="translate(55, 44)">
+                            <rect x="0" y="0" width="145" height="26" rx="13" fill="rgba(255,255,255,0.15)"/>
+                            <text x="72" y="17" font-family="Inter,system-ui,sans-serif" font-size="10" fill="rgba(255,255,255,0.9)" text-anchor="middle">Multi-Cluster</text>
+
+                            <rect x="160" y="0" width="145" height="26" rx="13" fill="rgba(255,255,255,0.15)"/>
+                            <text x="232" y="17" font-family="Inter,system-ui,sans-serif" font-size="10" fill="rgba(255,255,255,0.9)" text-anchor="middle">Lifecycle Mgmt</text>
+
+                            <rect x="320" y="0" width="145" height="26" rx="13" fill="rgba(255,255,255,0.15)"/>
+                            <text x="392" y="17" font-family="Inter,system-ui,sans-serif" font-size="10" fill="rgba(255,255,255,0.9)" text-anchor="middle">Access Control</text>
+
+                            <rect x="480" y="0" width="145" height="26" rx="13" fill="rgba(255,255,255,0.15)"/>
+                            <text x="552" y="17" font-family="Inter,system-ui,sans-serif" font-size="10" fill="rgba(255,255,255,0.9)" text-anchor="middle">App Catalog</text>
+
+                            <rect x="640" y="0" width="145" height="26" rx="13" fill="rgba(255,255,255,0.15)"/>
+                            <text x="712" y="17" font-family="Inter,system-ui,sans-serif" font-size="10" fill="rgba(255,255,255,0.9)" text-anchor="middle">RKE2 / K3s</text>
+                        </g>
+                    </g>
+
+                    <!-- Connections: Rancher to Infrastructure -->
+                    <g opacity="0.3">
+                        <line x1="200" y1="463" x2="200" y2="490" stroke="white" stroke-width="1" stroke-dasharray="3,3"/>
+                        <line x1="400" y1="463" x2="400" y2="490" stroke="white" stroke-width="1" stroke-dasharray="3,3"/>
+                        <line x1="600" y1="463" x2="600" y2="490" stroke="white" stroke-width="1" stroke-dasharray="3,3"/>
+                        <line x1="800" y1="463" x2="800" y2="490" stroke="white" stroke-width="1" stroke-dasharray="3,3"/>
+                    </g>
+
+                    <!-- ====== INFRASTRUCTURE LAYER ====== -->
+                    <g transform="translate(40, 493)">
+                        <rect x="0" y="0" width="920" height="60" rx="12" fill="url(#infraGrad)" filter="url(#svgShadow)"/>
+                        <text x="460" y="18" font-family="Inter,system-ui,sans-serif" font-size="9" fill="rgba(255,255,255,0.4)" text-anchor="middle" font-weight="600" letter-spacing="3">INFRASTRUCTURE</text>
+                        <g transform="translate(60, 30)">
+                            <text x="0" y="16" font-family="Inter,system-ui,sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">AWS</text>
+                            <text x="140" y="16" font-family="Inter,system-ui,sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">Azure</text>
+                            <text x="280" y="16" font-family="Inter,system-ui,sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">GCP</text>
+                            <text x="420" y="16" font-family="Inter,system-ui,sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">On-Prem</text>
+                            <text x="560" y="16" font-family="Inter,system-ui,sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">Edge</text>
+                            <text x="700" y="16" font-family="Inter,system-ui,sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">Air-Gap</text>
+                        </g>
+                    </g>
+
+                    <!-- ====== RIGHT SIDE: Day 0-2 Annotation ====== -->
+                    <rect x="972" y="120" width="22" height="220" rx="4" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.3)" stroke-width="1"/>
+                    <text x="983" y="235" font-family="Inter,system-ui,sans-serif" font-size="9" fill="#60a5fa" text-anchor="middle" transform="rotate(-90 983 235)" font-weight="600" letter-spacing="1">DAY 0 &gt; DAY 2 AUTOMATION</text>
+
+                    <rect x="972" y="378" width="22" height="85" rx="4" fill="rgba(16,185,129,0.15)" stroke="rgba(16,185,129,0.3)" stroke-width="1"/>
+                    <text x="983" y="423" font-family="Inter,system-ui,sans-serif" font-size="9" fill="#34d399" text-anchor="middle" transform="rotate(-90 983 423)" font-weight="600" letter-spacing="1">K8s MGMT</text>
+
+                    <rect x="972" y="493" width="22" height="60" rx="4" fill="rgba(100,116,139,0.15)" stroke="rgba(100,116,139,0.3)" stroke-width="1"/>
+                    <text x="983" y="526" font-family="Inter,system-ui,sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle" transform="rotate(-90 983 526)" font-weight="600" letter-spacing="1">INFRA</text>
+                </svg>
+            </div>
+
+            <!-- Key insight -->
+            <div class="p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 via-blue-500/10 to-purple-500/10 border border-emerald-500/20 text-center">
+                <p class="text-sm text-white">
+                    <span class="text-emerald-400 font-bold">Stacktic</span> understands and automates the <strong>relationships between all components</strong> &mdash;
+                    data flows, security, APIs, upgrades &mdash; making open source <span class="text-emerald-400 font-bold">stable, versioned, and production-ready</span>
+                </p>
+            </div>
+        </section>
+
+        <!-- PAGE 5: KEY JOINT USE CASES -->
+        <section class="section page-break-after">
+            <div class="text-center section-title">
+                <h2 class="headline-lg text-white mb-2">Key Joint Use Cases</h2>
+                <p class="text-sm text-slate-400">Sovereignty-driven, real-world scenarios</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <!-- Use Case 1 -->
+                <div class="card p-4 border-l-4 border-l-blue-500">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-7 h-7 rounded bg-blue-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-cubes-stacked text-blue-400 text-xs"></i>
+                        </div>
+                        <h4 class="font-semibold text-white text-sm">Cluster + Stack Automation</h4>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-2">Stacktic automates Rancher-managed clusters as part of the stack definition. Infrastructure decisions are encoded, versioned, and auditable.</p>
+                    <div class="p-2 rounded bg-blue-500/10 border border-blue-500/20">
+                        <p class="text-xs text-blue-300"><strong>Result:</strong> Sovereign Kubernetes + sovereign app stack, generated end-to-end</p>
+                    </div>
+                </div>
+
+                <!-- Use Case 2 -->
+                <div class="card p-4 border-l-4 border-l-emerald-500">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-7 h-7 rounded bg-emerald-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-database text-emerald-400 text-xs"></i>
+                        </div>
+                        <h4 class="font-semibold text-white text-sm">Sovereign Data Pipelines</h4>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-2">Automates data source &rarr; processing &rarr; storage &rarr; access control. Proves data never leaves allowed boundaries.</p>
+                    <div class="p-2 rounded bg-emerald-500/10 border border-emerald-500/20">
+                        <p class="text-xs text-emerald-300"><strong>Result:</strong> Auditable data residency, flow transparency, access boundaries</p>
+                    </div>
+                </div>
+
+                <!-- Use Case 3 -->
+                <div class="card p-4 border-l-4 border-l-purple-500">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-7 h-7 rounded bg-purple-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-lock text-purple-400 text-xs"></i>
+                        </div>
+                        <h4 class="font-semibold text-white text-sm">Air-Gapped Operations</h4>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-2">No SaaS dependency. No external control plane. No runtime internet. Updates via controlled, signed bundles.</p>
+                    <div class="p-2 rounded bg-purple-500/10 border border-purple-500/20">
+                        <p class="text-xs text-purple-300"><strong>Used by:</strong> Defense, government, critical infrastructure</p>
+                    </div>
+                </div>
+
+                <!-- Use Case 4 -->
+                <div class="card p-4 border-l-4 border-l-amber-500">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-7 h-7 rounded bg-amber-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-file-shield text-amber-400 text-xs"></i>
+                        </div>
+                        <h4 class="font-semibold text-white text-sm">Compliance as Code</h4>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-2">Stack-level compliance derived from real architecture. Evidence generated automatically, versioned per environment.</p>
+                    <div class="p-2 rounded bg-amber-500/10 border border-amber-500/20">
+                        <p class="text-xs text-amber-300"><strong>Supports:</strong> ISO, SOC2, PCI-DSS, HIPAA</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Use Case 5 - Full Width -->
+            <div class="card p-4 border-l-4 border-l-cyan-500">
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-right-from-bracket text-cyan-400"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-white text-sm mb-1">Managed-Service Exit Strategy (Board-Level Use Case)</h4>
+                        <p class="text-xs text-slate-400 mb-2">
+                            Stacktic provides a credible, executable exit from hyperscaler managed services.
+                            Migration is technical, repeatable, and governed &mdash; no rewrite, no 6-month planning cycles.
+                        </p>
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="p-2 rounded bg-cyan-500/10 border border-cyan-500/20 text-center">
+                                <div class="text-lg font-bold text-cyan-400">15-30%</div>
+                                <div class="text-xs text-slate-400">Cost Reduction</div>
+                            </div>
+                            <div class="p-2 rounded bg-cyan-500/10 border border-cyan-500/20 text-center">
+                                <div class="text-lg font-bold text-cyan-400">Zero</div>
+                                <div class="text-xs text-slate-400">Rewrite Needed</div>
+                            </div>
+                            <div class="p-2 rounded bg-cyan-500/10 border border-cyan-500/20 text-center">
+                                <div class="text-lg font-bold text-cyan-400">Any Cloud</div>
+                                <div class="text-xs text-slate-400">Target</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE 6: WHO IS THIS FOR -->
+        <section class="section page-break-after">
+            <div class="text-center section-title">
+                <h2 class="headline-lg text-white mb-2">Who This Is For</h2>
+                <p class="text-sm text-slate-400">Two primary audiences with exceptional strategic fit</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6 mb-6">
+                <!-- Regulated -->
+                <div class="card p-5 border-l-4 border-l-indigo-500">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-indigo-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-shield-halved text-indigo-400 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-semibold text-white">Regulated & Sovereign Orgs</h3>
+                            <p class="text-xs text-indigo-400">Finance, Government, Healthcare, Defense</p>
+                        </div>
+                    </div>
+                    <ul class="space-y-2 text-sm mb-4">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-400 text-xs mt-1"></i>
+                            <span class="text-slate-300">Air-gapped & disconnected environments</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-400 text-xs mt-1"></i>
+                            <span class="text-slate-300">Compliance-ready stacks</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-400 text-xs mt-1"></i>
+                            <span class="text-slate-300">Private AI / LLM infrastructure</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-400 text-xs mt-1"></i>
+                            <span class="text-slate-300">Complete data sovereignty</span>
+                        </li>
+                    </ul>
+                    <div class="p-3 rounded-lg bg-indigo-500/10 border border-indigo-500/20">
+                        <p class="text-xs text-white"><strong>Benefit:</strong> Full control with enterprise-grade automation</p>
+                    </div>
+                </div>
+
+                <!-- Fast-Moving -->
+                <div class="card p-5 border-l-4 border-l-emerald-500">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-rocket text-emerald-400 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-semibold text-white">Enterprises & Platform Teams</h3>
+                            <p class="text-xs text-emerald-400">Scale-ups, Innovation Labs, App Factories</p>
+                        </div>
+                    </div>
+                    <ul class="space-y-2 text-sm mb-4">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-400 text-xs mt-1"></i>
+                            <span class="text-slate-300">Standardized internal app factories</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-400 text-xs mt-1"></i>
+                            <span class="text-slate-300">Multi-tenant environments</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-400 text-xs mt-1"></i>
+                            <span class="text-slate-300">Reduced headcount dependency</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-400 text-xs mt-1"></i>
+                            <span class="text-slate-300">Ship production in hours, not months</span>
+                        </li>
+                    </ul>
+                    <div class="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                        <p class="text-xs text-white"><strong>Benefit:</strong> Ship faster at a fraction of the cost</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Typical Entry Points -->
+            <div class="card card-accent p-5">
+                <h3 class="text-sm font-semibold text-white mb-3 text-center">
+                    <i class="fa-solid fa-route text-amber-400 mr-2"></i>
+                    Typical Entry Points
+                </h3>
+                <div class="grid grid-cols-4 gap-3 text-center">
+                    <div>
+                        <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center mx-auto mb-2">
+                            <i class="fa-solid fa-right-from-bracket text-blue-400"></i>
+                        </div>
+                        <p class="text-xs text-white font-medium">Cloud Exit</p>
+                        <p class="text-xs text-slate-400">Migrate from managed services</p>
+                    </div>
+                    <div>
+                        <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center mx-auto mb-2">
+                            <i class="fa-solid fa-brain text-purple-400"></i>
+                        </div>
+                        <p class="text-xs text-white font-medium">Private AI</p>
+                        <p class="text-xs text-slate-400">Sovereign LLM infrastructure</p>
+                    </div>
+                    <div>
+                        <div class="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center mx-auto mb-2">
+                            <i class="fa-solid fa-cubes-stacked text-emerald-400"></i>
+                        </div>
+                        <p class="text-xs text-white font-medium">Modernization</p>
+                        <p class="text-xs text-slate-400">Legacy to open-source K8s</p>
+                    </div>
+                    <div>
+                        <div class="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center mx-auto mb-2">
+                            <i class="fa-solid fa-file-shield text-amber-400"></i>
+                        </div>
+                        <p class="text-xs text-white font-medium">Compliance</p>
+                        <p class="text-xs text-slate-400">Regulated industry needs</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE 7: PLATFORM APPROACH COMPARISON (Visual) -->
+        <section class="section page-break-after">
+            <div class="text-center section-title">
+                <h2 class="headline-lg text-white mb-2">The Platform Landscape</h2>
+                <p class="text-sm text-slate-400">Three approaches &mdash; only one delivers speed, control, and sovereignty together</p>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 mb-5">
+                <!-- Managed Services -->
+                <div class="card p-4" style="border-top: 3px solid #ef4444">
+                    <div class="text-center mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-rose-500/20 flex items-center justify-center mx-auto mb-2">
+                            <i class="fa-solid fa-cloud text-rose-400 text-xl"></i>
+                        </div>
+                        <h3 class="font-semibold text-white text-sm">AWS / Azure / GCP</h3>
+                        <p class="text-xs text-rose-400">Managed Services</p>
+                    </div>
+                    <div class="space-y-2 text-xs mb-4">
+                        <div class="flex justify-between"><span class="text-slate-400">Speed</span><span class="text-emerald-400">Fast</span></div>
+                        <div class="h-1.5 rounded-full bg-slate-700"><div class="h-full w-[80%] rounded-full bg-emerald-500/60"></div></div>
+                        <div class="flex justify-between"><span class="text-slate-400">Control</span><span class="text-rose-400">Low</span></div>
+                        <div class="h-1.5 rounded-full bg-slate-700"><div class="h-full w-[20%] rounded-full bg-rose-500/60"></div></div>
+                        <div class="flex justify-between"><span class="text-slate-400">Sovereignty</span><span class="text-rose-400">None</span></div>
+                        <div class="h-1.5 rounded-full bg-slate-700"><div class="h-full w-[5%] rounded-full bg-rose-500/60"></div></div>
+                        <div class="flex justify-between"><span class="text-slate-400">Stack Automation</span><span class="text-rose-400">None</span></div>
+                        <div class="h-1.5 rounded-full bg-slate-700"><div class="h-full w-[5%] rounded-full bg-rose-500/60"></div></div>
+                        <div class="flex justify-between"><span class="text-slate-400">Portability</span><span class="text-rose-400">Locked</span></div>
+                        <div class="h-1.5 rounded-full bg-slate-700"><div class="h-full w-[5%] rounded-full bg-rose-500/60"></div></div>
+                    </div>
+                    <div class="pt-3 border-t border-white/10 text-center">
+                        <span class="text-xs text-rose-400">30-50% lock-in premium</span>
+                    </div>
+                </div>
+
+                <!-- OpenShift -->
+                <div class="card p-4" style="border-top: 3px solid #f59e0b">
+                    <div class="text-center mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center mx-auto mb-2">
+                            <i class="fa-brands fa-redhat text-amber-400 text-xl"></i>
+                        </div>
+                        <h3 class="font-semibold text-white text-sm">Red Hat OpenShift</h3>
+                        <p class="text-xs text-amber-400">Enterprise Platform</p>
+                    </div>
+                    <div class="space-y-2 text-xs mb-4">
+                        <div class="flex justify-between"><span class="text-slate-400">Speed</span><span class="text-amber-400">Medium</span></div>
+                        <div class="h-1.5 rounded-full bg-slate-700"><div class="h-full w-[55%] rounded-full bg-amber-500/60"></div></div>
+                        <div class="flex justify-between"><span class="text-slate-400">Control</span><span class="text-amber-400">Partial</span></div>
+                        <div class="h-1.5 rounded-full bg-slate-700"><div class="h-full w-[50%] rounded-full bg-amber-500/60"></div></div>
+                        <div class="flex justify-between"><span class="text-slate-400">Sovereignty</span><span class="text-amber-400">Partial</span></div>
+                        <div class="h-1.5 rounded-full bg-slate-700"><div class="h-full w-[45%] rounded-full bg-amber-500/60"></div></div>
+                        <div class="flex justify-between"><span class="text-slate-400">Stack Automation</span><span class="text-rose-400">Cluster Only</span></div>
+                        <div class="h-1.5 rounded-full bg-slate-700"><div class="h-full w-[25%] rounded-full bg-amber-500/60"></div></div>
+                        <div class="flex justify-between"><span class="text-slate-400">Portability</span><span class="text-amber-400">Limited</span></div>
+                        <div class="h-1.5 rounded-full bg-slate-700"><div class="h-full w-[40%] rounded-full bg-amber-500/60"></div></div>
+                    </div>
+                    <div class="pt-3 border-t border-white/10 text-center">
+                        <span class="text-xs text-amber-400">Proprietary runtime, high cost</span>
+                    </div>
+                </div>
+
+                <!-- Stacktic + Rancher -->
+                <div class="p-4 rounded-xl bg-gradient-to-b from-emerald-500/10 to-blue-500/5 border-2 border-emerald-500/40 relative" style="border-top: 3px solid #10b981">
+                    <div class="absolute -top-2 right-3">
+                        <span class="px-2 py-0.5 bg-emerald-500 text-white text-xs font-bold rounded">BEST FIT</span>
+                    </div>
+                    <div class="text-center mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center mx-auto mb-2">
+                            <i class="fa-solid fa-layer-group text-emerald-400 text-xl"></i>
+                        </div>
+                        <h3 class="font-semibold text-white text-sm">Stacktic + Rancher</h3>
+                        <p class="text-xs text-emerald-400">Open Platform</p>
+                    </div>
+                    <div class="space-y-2 text-xs mb-4">
+                        <div class="flex justify-between"><span class="text-slate-400">Speed</span><span class="text-emerald-400">Fastest</span></div>
+                        <div class="h-1.5 rounded-full bg-slate-700"><div class="h-full w-[95%] rounded-full bg-gradient-to-r from-emerald-500 to-blue-500"></div></div>
+                        <div class="flex justify-between"><span class="text-slate-400">Control</span><span class="text-emerald-400">Full</span></div>
+                        <div class="h-1.5 rounded-full bg-slate-700"><div class="h-full w-[100%] rounded-full bg-gradient-to-r from-emerald-500 to-blue-500"></div></div>
+                        <div class="flex justify-between"><span class="text-slate-400">Sovereignty</span><span class="text-emerald-400">100%</span></div>
+                        <div class="h-1.5 rounded-full bg-slate-700"><div class="h-full w-[100%] rounded-full bg-gradient-to-r from-emerald-500 to-blue-500"></div></div>
+                        <div class="flex justify-between"><span class="text-slate-400">Stack Automation</span><span class="text-emerald-400">Full Stack</span></div>
+                        <div class="h-1.5 rounded-full bg-slate-700"><div class="h-full w-[95%] rounded-full bg-gradient-to-r from-emerald-500 to-blue-500"></div></div>
+                        <div class="flex justify-between"><span class="text-slate-400">Portability</span><span class="text-emerald-400">Any Cloud</span></div>
+                        <div class="h-1.5 rounded-full bg-slate-700"><div class="h-full w-[100%] rounded-full bg-gradient-to-r from-emerald-500 to-blue-500"></div></div>
+                    </div>
+                    <div class="pt-3 border-t border-emerald-500/30 text-center">
+                        <span class="text-xs text-emerald-400 font-semibold">Open, sovereign, fully portable</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key differentiator callout -->
+            <div class="p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 via-blue-500/10 to-purple-500/10 border border-emerald-500/20">
+                <p class="text-sm text-white text-center mb-3 font-semibold">What Stacktic + Rancher uniquely delivers</p>
+                <div class="grid grid-cols-4 gap-3 text-center text-xs">
+                    <div>
+                        <i class="fa-solid fa-diagram-project text-blue-400 text-lg mb-1"></i>
+                        <p class="text-white font-medium">Relationship Automation</p>
+                        <p class="text-slate-500">Full stack logic, data flows, and dependencies</p>
+                    </div>
+                    <div>
+                        <i class="fa-solid fa-code-compare text-purple-400 text-lg mb-1"></i>
+                        <p class="text-white font-medium">Stack Version Control</p>
+                        <p class="text-slate-500">Rollbacks, migrations, and environments</p>
+                    </div>
+                    <div>
+                        <i class="fa-solid fa-shield-halved text-emerald-400 text-lg mb-1"></i>
+                        <p class="text-white font-medium">Security by Design</p>
+                        <p class="text-slate-500">10-layer defense &mdash; all auto-generated</p>
+                    </div>
+                    <div>
+                        <i class="fa-solid fa-globe text-cyan-400 text-lg mb-1"></i>
+                        <p class="text-white font-medium">Cloud Agnostic</p>
+                        <p class="text-slate-500">Portable stacks: on-prem, air-gapped, any cloud</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE 8: SECURITY & ENTERPRISE CONTROL -->
+        <section class="section page-break-after">
+            <div class="text-center section-title">
+                <h2 class="headline-lg text-white mb-2">Enterprise Security & Control</h2>
+                <p class="text-sm text-slate-400">Defense in depth &mdash; automated across the entire stack</p>
+            </div>
+
+            <!-- Security Layers Visual -->
+            <div class="card p-5 mb-5">
+                <div class="space-y-2">
+                    <div class="flex items-center gap-3 p-2.5 rounded-lg bg-slate-800/50 border-l-3 border-l-blue-500">
+                        <div class="w-7 h-7 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-xs font-bold flex-shrink-0">1</div>
+                        <div class="flex-1"><span class="text-xs text-white font-medium">Network Policies</span><span class="text-xs text-slate-500 ml-2">Zero-trust, pod-to-pod isolation, microsegmentation</span></div>
+                    </div>
+                    <div class="flex items-center gap-3 p-2.5 rounded-lg bg-slate-800/50 border-l-3 border-l-indigo-500">
+                        <div class="w-7 h-7 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-xs font-bold flex-shrink-0">2</div>
+                        <div class="flex-1"><span class="text-xs text-white font-medium">RBAC & Access Control</span><span class="text-xs text-slate-500 ml-2">Multi-layer permissions, namespace isolation</span></div>
+                    </div>
+                    <div class="flex items-center gap-3 p-2.5 rounded-lg bg-slate-800/50 border-l-3 border-l-purple-500">
+                        <div class="w-7 h-7 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 text-xs font-bold flex-shrink-0">3</div>
+                        <div class="flex-1"><span class="text-xs text-white font-medium">OPA Gatekeeper</span><span class="text-xs text-slate-500 ml-2">Policy enforcement, admission control, governance</span></div>
+                    </div>
+                    <div class="flex items-center gap-3 p-2.5 rounded-lg bg-slate-800/50 border-l-3 border-l-emerald-500">
+                        <div class="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-xs font-bold flex-shrink-0">4</div>
+                        <div class="flex-1"><span class="text-xs text-white font-medium">Secrets Management (SOPS)</span><span class="text-xs text-slate-500 ml-2">Auto-encryption, zero manual handling</span></div>
+                    </div>
+                    <div class="flex items-center gap-3 p-2.5 rounded-lg bg-slate-800/50 border-l-3 border-l-cyan-500">
+                        <div class="w-7 h-7 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-xs font-bold flex-shrink-0">5</div>
+                        <div class="flex-1"><span class="text-xs text-white font-medium">API Gateway & Service Mesh</span><span class="text-xs text-slate-500 ml-2">mTLS, OAuth, rate limiting, traffic control</span></div>
+                    </div>
+                    <div class="flex items-center gap-3 p-2.5 rounded-lg bg-slate-800/50 border-l-3 border-l-amber-500">
+                        <div class="w-7 h-7 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 text-xs font-bold flex-shrink-0">6</div>
+                        <div class="flex-1"><span class="text-xs text-white font-medium">CVE & SBOM Scanning</span><span class="text-xs text-slate-500 ml-2">Vulnerability management, supply chain security</span></div>
+                    </div>
+                    <div class="flex items-center gap-3 p-2.5 rounded-lg bg-slate-800/50 border-l-3 border-l-rose-500">
+                        <div class="w-7 h-7 rounded-full bg-rose-500/20 flex items-center justify-center text-rose-400 text-xs font-bold flex-shrink-0">7</div>
+                        <div class="flex-1"><span class="text-xs text-white font-medium">Audit & Compliance</span><span class="text-xs text-slate-500 ml-2">Auto-generated CISO reports, ISO/SOC2/PCI-DSS/HIPAA</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key difference: auto-generated from metadata -->
+            <div class="p-4 rounded-xl bg-gradient-to-r from-blue-500/10 to-emerald-500/10 border border-blue-500/20">
+                <p class="text-sm text-white text-center mb-3 font-semibold">
+                    <i class="fa-solid fa-wand-magic-sparkles text-blue-400 mr-1"></i>
+                    All 7 layers are auto-generated from stack metadata &mdash; zero manual configuration
+                </p>
+                <div class="grid grid-cols-4 gap-3 text-center text-xs">
+                    <div>
+                        <div class="text-lg font-bold text-emerald-400 mb-1">0</div>
+                        <p class="text-slate-400">Manual security configs needed</p>
+                    </div>
+                    <div>
+                        <div class="text-lg font-bold text-blue-400 mb-1">100%</div>
+                        <p class="text-slate-400">Encryption coverage</p>
+                    </div>
+                    <div>
+                        <div class="text-lg font-bold text-purple-400 mb-1">Auto</div>
+                        <p class="text-slate-400">CISO-level compliance reports</p>
+                    </div>
+                    <div>
+                        <div class="text-lg font-bold text-amber-400 mb-1">Real-time</div>
+                        <p class="text-slate-400">CVE & drift detection</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE 9: NEW MARKETS FOR RANCHER -->
+        <section class="section page-break-after">
+            <div class="text-center section-title">
+                <h2 class="headline-lg text-white mb-2">Expanding Rancher's Market</h2>
+                <p class="text-sm text-slate-400">From Kubernetes management to full-stack automation &mdash; new customers, new revenue</p>
+            </div>
+
+            <!-- The Shift Visual -->
+            <div class="card p-5 mb-5">
+                <div class="grid grid-cols-7 gap-0 items-center">
+                    <!-- Before -->
+                    <div class="col-span-3 p-4 rounded-l-xl bg-slate-700/40 border border-slate-600/30 text-center">
+                        <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-2">Rancher Today</p>
+                        <div class="w-14 h-14 rounded-xl bg-emerald-500/20 flex items-center justify-center mx-auto mb-3">
+                            <i class="fa-solid fa-server text-emerald-400 text-2xl"></i>
+                        </div>
+                        <p class="text-sm text-white font-semibold">K8s Management</p>
+                        <p class="text-xs text-slate-500 mt-1">Clusters, nodes, access control</p>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="text-center">
+                        <i class="fa-solid fa-arrow-right text-emerald-400 text-xl"></i>
+                    </div>
+                    <!-- After -->
+                    <div class="col-span-3 p-4 rounded-r-xl bg-gradient-to-r from-emerald-500/10 to-blue-500/10 border-2 border-emerald-500/30 text-center">
+                        <p class="text-xs text-emerald-400 font-bold uppercase tracking-wider mb-2">Rancher + Stacktic</p>
+                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500/20 to-blue-500/20 flex items-center justify-center mx-auto mb-3">
+                            <i class="fa-solid fa-layer-group text-emerald-400 text-2xl"></i>
+                        </div>
+                        <p class="text-sm text-white font-semibold">Complete Platform</p>
+                        <p class="text-xs text-slate-400 mt-1">K8s + Stack + Ops + Security + AI</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Market Domains - Detailed -->
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div class="card p-4 border-l-4 border-l-blue-500">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-database text-blue-400 text-sm"></i>
+                        </div>
+                        <h4 class="text-sm font-semibold text-white">DataOps</h4>
+                    </div>
+                    <p class="text-xs text-slate-400">Automated data pipelines, ETL orchestration, source-to-storage flows &mdash; with versioning, security, and sovereignty built in. Open source data stacks (Kafka, Airflow, Spark) managed as one unit.</p>
+                </div>
+                <div class="card p-4 border-l-4 border-l-rose-500">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-rose-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-shield-halved text-rose-400 text-sm"></i>
+                        </div>
+                        <h4 class="text-sm font-semibold text-white">SecOps</h4>
+                    </div>
+                    <p class="text-xs text-slate-400">Auto-generated network policies, RBAC, OPA Gatekeeper, secrets management, CVE scanning &mdash; 10-layer security derived from architecture metadata, not manual configuration.</p>
+                </div>
+                <div class="card p-4 border-l-4 border-l-amber-500">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-chart-line text-amber-400 text-sm"></i>
+                        </div>
+                        <h4 class="text-sm font-semibold text-white">SRE</h4>
+                    </div>
+                    <p class="text-xs text-slate-400">Stack-level observability across all components &mdash; Prometheus, Grafana, alerting, SLA tracking. Full visibility not just per pod, but per stack version with relationship context.</p>
+                </div>
+                <div class="card p-4 border-l-4 border-l-purple-500">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-brain text-purple-400 text-sm"></i>
+                        </div>
+                        <h4 class="text-sm font-semibold text-white">AIOps & Private AI</h4>
+                    </div>
+                    <p class="text-xs text-slate-400">Sovereign AI stacks (vLLM, LangFlow, Ollama) automated end-to-end. Metadata-driven intelligence for cost optimization, anomaly detection, and operational insight.</p>
+                </div>
+            </div>
+
+            <!-- Bottom line -->
+            <div class="p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 to-blue-500/10 border border-emerald-500/20 text-center">
+                <p class="text-sm text-white">
+                    Available <span class="text-emerald-400 font-semibold">inside Rancher as a private SaaS</span> or as external SaaS &mdash;
+                    transforming Rancher from K8s manager into a <span class="text-blue-400 font-semibold">complete enterprise platform</span>
+                </p>
+            </div>
+        </section>
+
+        <!-- PAGE 10: BOTTOM LINE + CTA -->
+        <section class="section">
+            <div class="text-center section-title">
+                <h2 class="headline-lg text-white mb-2">The Bottom Line</h2>
+            </div>
+
+            <div class="card p-6 mb-6 text-center">
+                <p class="text-lg text-white font-semibold mb-4">
+                    The First Managed Open-Source Platform
+                </p>
+                <div class="grid grid-cols-3 gap-6 mb-5 max-w-3xl mx-auto">
+                    <div class="text-center">
+                        <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 flex items-center justify-center mx-auto mb-3">
+                            <i class="fa-solid fa-bolt text-emerald-400 text-2xl"></i>
+                        </div>
+                        <p class="text-sm text-white font-semibold">Managed Speed</p>
+                        <p class="text-xs text-slate-400">Faster than hyperscaler services</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-14 h-14 rounded-2xl bg-blue-500/20 flex items-center justify-center mx-auto mb-3">
+                            <i class="fa-brands fa-osi text-blue-400 text-2xl"></i>
+                        </div>
+                        <p class="text-sm text-white font-semibold">Open Source Power</p>
+                        <p class="text-xs text-slate-400">Latest innovation, no lock-in</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-14 h-14 rounded-2xl bg-purple-500/20 flex items-center justify-center mx-auto mb-3">
+                            <i class="fa-solid fa-crown text-purple-400 text-2xl"></i>
+                        </div>
+                        <p class="text-sm text-white font-semibold">Full Sovereignty</p>
+                        <p class="text-xs text-slate-400">Your data, your infra, your rules</p>
+                    </div>
+                </div>
+                <p class="text-sm text-slate-400 max-w-2xl mx-auto">
+                    Compete head-to-head with AWS, Azure, GCP managed services &mdash; without sacrificing control, transparency, or future freedom.
+                </p>
+            </div>
+
+            <!-- CTA -->
+            <div class="card card-accent p-6 text-center">
+                <div class="flex items-center justify-center gap-4 mb-4">
+                    <img src="https://www.rancher.com/assets/img/brand-guidelines/assets/logos/png/color/rancher-suse-logo-stacked-color.png" alt="SUSE Rancher" style="height: 45px; object-fit: contain;">
+                    <span class="text-slate-500 text-xl">+</span>
+                    <span class="text-xl font-bold">STACK<span class="text-blue-500">TIC</span></span>
+                </div>
+                <h2 class="headline-md text-white mb-2">Next Steps</h2>
+                <p class="text-sm text-slate-400 mb-4 max-w-xl mx-auto">
+                    Enterprise-grade open source, fully automated, sovereign by design.
+                </p>
+                <div class="flex items-center justify-center gap-4">
+                    <span class="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-blue-500 text-white font-semibold rounded-lg text-sm">
+                        Schedule Joint Briefing
+                    </span>
+                    <span class="px-5 py-2.5 bg-slate-700 text-white font-semibold rounded-lg text-sm">
+                        Request Architecture Review
+                    </span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-white/5 py-6">
+        <div class="container text-center">
+            <p class="text-slate-500 text-sm mb-1">&copy; 2026 Stacktic & SUSE</p>
+            <p class="text-slate-600 text-xs">Enterprise-grade open source, fully automated, sovereign by design.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

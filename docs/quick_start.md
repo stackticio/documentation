@@ -76,7 +76,7 @@ sidebar_position: 4
         <li>Go to <a href="https://github.com/settings/personal-access-tokens">github.com/settings/personal-access-tokens</a></li>
         <li>Click <strong>Generate new token</strong></li>
         <li>Under <strong>Repository access</strong>, select the repositories Stacktic will manage</li>
-        <li>Under <strong>Permissions</strong>, enable all <strong>Repository</strong> and <strong>Account</strong> permissions</li>
+        <li>Under <strong>Permissions</strong>, enable all <strong>Repository</strong> and <strong>Account</strong> permissions <span style={{background: '#fee2e2', color: '#dc2626', padding: '2px 8px', borderRadius: '4px', fontWeight: 700, fontSize: '0.85rem'}}>Required — must allow all</span></li>
         <li>Generate and copy the token</li>
       </ol>
       <div style={{background: '#e6f7e6', borderLeft: '4px solid #2e7d32', borderRadius: '6px', padding: '12px 16px', marginBottom: '12px'}}>
@@ -120,7 +120,26 @@ sidebar_position: 4
 ## Step 3 — Design & Build
 
 <div style={{background: '#f8f9fb', borderRadius: '12px', padding: '24px', border: '1px solid #e0e4e8', marginBottom: '24px'}}>
-  <h3 style={{marginTop: 0}}>Drag, connect, build</h3>
+  <h3 style={{marginTop: 0}}>How the topology design works</h3>
+  <p>Stacktic's topology design follows a simple principle:</p>
+  <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '16px'}}>
+    <div style={{background: 'white', borderRadius: '8px', padding: '16px', borderTop: '3px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
+      <h4 style={{margin: '0 0 6px 0', color: '#0052cc'}}>Component</h4>
+      <p style={{margin: 0, fontSize: '0.85rem', color: '#555'}}>The service itself and its configuration — a backend, a database, a message broker, etc.</p>
+    </div>
+    <div style={{background: 'white', borderRadius: '8px', padding: '16px', borderTop: '3px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
+      <h4 style={{margin: '0 0 6px 0', color: '#0052cc'}}>Sub-component</h4>
+      <p style={{margin: 0, fontSize: '0.85rem', color: '#555'}}>Units related to a service — a database schema, a Kafka topic, an API endpoint, or any functionality needed to design logic and relations to other components.</p>
+    </div>
+    <div style={{background: 'white', borderRadius: '8px', padding: '16px', borderTop: '3px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
+      <h4 style={{margin: '0 0 6px 0', color: '#0052cc'}}>Link</h4>
+      <p style={{margin: 0, fontSize: '0.85rem', color: '#555'}}>Links define the relationship between components. A link from backend to database creates endpoints, secrets, and APIs. A link from topic to database creates Kafka Connect and its dependencies.</p>
+    </div>
+  </div>
+  <div style={{background: '#fff8e1', borderLeft: '4px solid #f9a825', borderRadius: '6px', padding: '12px 16px', marginBottom: '20px'}}>
+    <strong>There is only one good pattern of configuration.</strong> If you are not following best practices, you are doing something wrong. Stacktic automates based on best practices and security requirements to create a top-quality, secure stack skeleton with all relationships wired correctly.
+  </div>
+  <h3>Drag, connect, build</h3>
   <p>Drag components onto the canvas and connect them. Stacktic maps all relationships automatically.</p>
   <div style={{maxWidth: '100%', marginBottom: '20px'}}>
     <video width="100%" controls style={{maxWidth: '800px', borderRadius: '10px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)'}}>

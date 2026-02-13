@@ -156,6 +156,20 @@ sidebar_position: 4
       <p style={{margin: 0, fontSize: '0.85rem', color: '#555'}}>Links define the relationship between components. A link from backend to database creates endpoints, secrets, and APIs. A link from topic to database creates Kafka Connect and its dependencies.</p>
     </div>
   </div>
+  <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px'}}>
+    <div style={{background: 'white', borderRadius: '8px', padding: '16px', borderTop: '3px solid #f9a825', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
+      <h4 style={{margin: '0 0 6px 0', color: '#e65100'}}>Attributes</h4>
+      <p style={{margin: 0, fontSize: '0.85rem', color: '#555'}}>
+        Components, sub-components, and links have <strong>attributes</strong> that control automation behavior. Check the available attributes when connecting components. <strong>An empty attribute equals false</strong> — no configuration is applied. For example, if <code>storageClass</code> is empty, no StorageClass is defined and the cluster default is used.
+      </p>
+    </div>
+    <div style={{background: 'white', borderRadius: '8px', padding: '16px', borderTop: '3px solid #f9a825', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
+      <h4 style={{margin: '0 0 6px 0', color: '#e65100'}}>Check link attributes</h4>
+      <p style={{margin: 0, fontSize: '0.85rem', color: '#555'}}>
+        When you create a link, always check if <strong>link-level attributes</strong> exist. These attributes fine-tune the automation — for example, enabling TLS, setting replica counts, or configuring connection pooling. If an attribute exists but is left empty, the feature is disabled by design.
+      </p>
+    </div>
+  </div>
   <div style={{background: '#fff8e1', borderLeft: '4px solid #f9a825', borderRadius: '6px', padding: '12px 16px', marginBottom: '20px'}}>
     <strong>There is only one good pattern of configuration.</strong> If you are not following best practices, you are doing something wrong. Stacktic automates based on best practices and security requirements to create a top-quality, secure stack skeleton with all relationships wired correctly.
   </div>

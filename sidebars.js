@@ -47,6 +47,11 @@ module.exports = {
     },
     {
       type: 'doc',
+      id: 'stack_agent',
+      label: 'Validation API',
+    },
+    {
+      type: 'doc',
       id: 'migration',
       label: 'Migration',
     },

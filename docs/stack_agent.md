@@ -342,189 +342,170 @@ sidebar_position: 5
 
 ---
 
-## System Documentation
+## API Examples
 
-<div style={{background: '#f8f9fb', borderRadius: '12px', padding: '24px', border: '1px solid #e0e4e8', marginBottom: '24px'}}>
+<div style={{background: '#f8f9fb', borderRadius: '12px', padding: '24px', border: '1px solid #e0e4e8', marginBottom: '32px'}}>
+  <p style={{fontSize: '0.95rem', color: '#555', marginTop: 0}}>
+    Every test is a single <code>POST</code> to <code>/metadata/q</code>. The API reads your topology, resolves variables like <code>{'{namespace}'}</code> and <code>{'{database}'}</code> automatically, executes the command on the right target, and returns <code>passed</code> or <code>failed</code> with diagnostics.
+  </p>
 
-### Prepare Environment
-
-<div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px'}}>
-  <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
-    <h4 style={{margin: '0 0 8px 0'}}>Environment Variables</h4>
-    <pre style={{background: '#1e1e1e', color: '#d4d4d4', borderRadius: '8px', padding: '14px', fontSize: '0.85rem', overflow: 'auto', margin: 0}}><code>{`# Root directory of your System
-export STACKTIC_OUTPUT=<FILL_ME>
-
-# Configure AGE Key file to decrypt SOPS files
-export SOPS_AGE_KEY_FILE=<FILL_ME>`}</code></pre>
+  <div style={{background: '#1a1a2e', borderRadius: '10px', padding: '16px 20px', marginBottom: '20px'}}>
+    <div style={{color: '#90caf9', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px'}}>Request Structure</div>
+    <pre style={{background: '#0d2137', color: '#e0e0e0', borderRadius: '8px', padding: '16px', fontSize: '0.82rem', overflow: 'auto', margin: 0}}><code>{`curl -s -X POST http://localhost:8080/metadata/q \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "source":      "type:cnpg",           // which component to target
+    "target":      "sub_components",       // component | sub_components | links_to | links_from
+    "command":     "SELECT 1",            // the actual test — exit 0 = passed
+    "description": "Connect {database}",  // label in the report
+    "severity":    "critical",            // critical | warning | info
+    "on_failure":  "kubectl get pods ...",  // runs when command fails
+    "on_success":  "SELECT current_db()"   // runs when command passes
+  }'`}</code></pre>
   </div>
-  <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
-    <h4 style={{margin: '0 0 8px 0'}}>Install SOPS</h4>
-    <pre style={{background: '#1e1e1e', color: '#d4d4d4', borderRadius: '8px', padding: '14px', fontSize: '0.85rem', overflow: 'auto', margin: 0}}><code>{`# Download the binary
-curl -LO https://github.com/getsops/sops/releases/download/v3.8.1/sops-v3.8.1.linux.amd64
 
-# Move into PATH
-mv sops-v3.8.1.linux.amd64 /usr/local/bin/sops
-
-# Make executable
-chmod +x /usr/local/bin/sops`}</code></pre>
-    <p style={{margin: '8px 0 0 0', fontSize: '0.8rem', color: '#999'}}>All SOPS releases: <a href="https://github.com/getsops/sops/releases">github.com/getsops/sops/releases</a></p>
-  </div>
-</div>
-
-### Operations Pipeline
-
-<div style={{display: 'flex', flexDirection: 'column', gap: '12px'}}>
-  <div style={{background: 'white', borderRadius: '10px', padding: '16px 20px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', display: 'flex', gap: '16px', alignItems: 'flex-start'}}>
-    <div style={{background: '#0052cc', color: 'white', borderRadius: '50%', minWidth: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.95rem'}}>1</div>
-    <div style={{flex: 1}}>
-      <h4 style={{margin: '0 0 4px 0'}}>Decrypt secrets</h4>
-      <pre style={{background: '#1e1e1e', color: '#d4d4d4', borderRadius: '6px', padding: '10px 14px', fontSize: '0.85rem', margin: 0}}><code>$STACKTIC_OUTPUT/scripts/stacktic/decrypt-secrets.sh</code></pre>
-    </div>
-  </div>
-  <div style={{background: 'white', borderRadius: '10px', padding: '16px 20px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', display: 'flex', gap: '16px', alignItems: 'flex-start'}}>
-    <div style={{background: '#0052cc', color: 'white', borderRadius: '50%', minWidth: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.95rem'}}>2</div>
-    <div style={{flex: 1}}>
-      <h4 style={{margin: '0 0 4px 0'}}>Build all components</h4>
-      <pre style={{background: '#1e1e1e', color: '#d4d4d4', borderRadius: '6px', padding: '10px 14px', fontSize: '0.85rem', margin: 0}}><code>{`kubectl apply -k $STACKTIC_OUTPUT/k8s/build/overlays/dev/ \\
-  --server-side=true --force-conflicts=true`}</code></pre>
-    </div>
-  </div>
-  <div style={{background: 'white', borderRadius: '10px', padding: '16px 20px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', display: 'flex', gap: '16px', alignItems: 'flex-start'}}>
-    <div style={{background: '#0052cc', color: 'white', borderRadius: '50%', minWidth: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.95rem'}}>3</div>
-    <div style={{flex: 1}}>
-      <h4 style={{margin: '0 0 4px 0'}}>Deploy all components</h4>
-      <pre style={{background: '#1e1e1e', color: '#d4d4d4', borderRadius: '6px', padding: '10px 14px', fontSize: '0.85rem', margin: 0}}><code>{`kubectl apply -k $STACKTIC_OUTPUT/k8s/deploy/overlays/dev/ \\
-  --server-side=true --force-conflicts=true`}</code></pre>
-      <div style={{background: '#fff8e1', borderLeft: '4px solid #f9a825', borderRadius: '6px', padding: '8px 12px', marginTop: '8px', fontSize: '0.8rem'}}>
-        You may encounter <code>no matches for kind "XXX"</code> errors on first apply. Reapply the deployment and the error will resolve — CRDs need a moment to register.
-      </div>
-    </div>
-  </div>
-  <div style={{background: 'white', borderRadius: '10px', padding: '16px 20px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', display: 'flex', gap: '16px', alignItems: 'flex-start'}}>
-    <div style={{background: '#2e7d32', color: 'white', borderRadius: '50%', minWidth: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.95rem'}}>4</div>
-    <div style={{flex: 1}}>
-      <h4 style={{margin: '0 0 4px 0'}}>Validate all components</h4>
-      <pre style={{background: '#1e1e1e', color: '#d4d4d4', borderRadius: '6px', padding: '10px 14px', fontSize: '0.85rem', margin: 0}}><code>$STACKTIC_OUTPUT/scripts/stacktic/validate-all.sh</code></pre>
-    </div>
-  </div>
-</div>
-
-<div style={{background: '#e3f2fd', borderLeft: '4px solid #1976d2', borderRadius: '6px', padding: '12px 16px', marginTop: '16px'}}>
-  <strong>Cluster requirement:</strong> Make sure your cluster allows metrics and cloud monitoring for HPA (Horizontal Pod Autoscaler).
-</div>
 
 </div>
 
 ---
 
-## Migration Guide
+## Example: Kafka Version Upgrade — Validate All Topics & Sinks
 
-<div style={{background: '#f8f9fb', borderRadius: '12px', padding: '24px', border: '1px solid #e0e4e8', marginBottom: '24px'}}>
+<div style={{background: '#1a1a2e', borderRadius: '12px', padding: '24px', marginBottom: '32px', border: '1px solid #1976d2'}}>
+  <p style={{color: '#b0bec5', fontSize: '0.95rem', marginTop: 0}}>
+    You just upgraded Kafka from 3.6 to 3.7. Before calling it done, run these 4 calls and know in seconds if everything survived the upgrade.
+  </p>
 
-<div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
+  <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
 
-  {/* STEP 1 */}
-  <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
-    <div style={{display: 'flex', gap: '12px', alignItems: 'flex-start'}}>
-      <div style={{background: '#0052cc', color: 'white', borderRadius: '50%', minWidth: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700}}>1</div>
-      <div>
-        <h4 style={{margin: '0 0 8px 0'}}>Design Your Topology</h4>
-        <p style={{margin: '0 0 12px 0', fontSize: '0.9rem', color: '#555'}}>
-          No matter if the migration is from a legacy app or a managed service, design your topology — backend, frontend, and data — exactly as it exists today. Start with the basic skeleton, without observability, security, or testing.
-        </p>
-        <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px'}}>
-          <div style={{background: '#f0f4f8', borderRadius: '6px', padding: '10px 14px', fontSize: '0.85rem'}}>
-            <strong>DocumentDB</strong> is MongoDB — same open-source engine, managed wrapper.
-          </div>
-          <div style={{background: '#f0f4f8', borderRadius: '6px', padding: '10px 14px', fontSize: '0.85rem'}}>
-            <strong>RDS</strong> is PostgreSQL — same open-source engine, managed wrapper.
-          </div>
-        </div>
+    {/* STEP 1 */}
+    <div style={{background: '#0d2137', borderRadius: '10px', padding: '16px', borderLeft: '3px solid #4caf50'}}>
+      <div style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px'}}>
+        <div style={{background: '#4caf50', color: 'white', borderRadius: '50%', minWidth: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem'}}>1</div>
+        <span style={{color: 'white', fontWeight: 600}}>Cluster Ready after upgrade</span>
       </div>
+      <pre style={{background: '#162032', color: '#e0e0e0', borderRadius: '6px', padding: '12px', fontSize: '0.78rem', overflow: 'auto', margin: 0}}><code>{`curl -s -X POST http://localhost:8080/metadata/q -H 'Content-Type: application/json' \\
+  -d '{
+    "source": "type:kafka", "target": "component",
+    "command": "kubectl get kafka -n {namespace} -o jsonpath=\\"{.items[0].status.conditions[?(@.type==\\\\\\"Ready\\\\\\")].status}\\" | grep -q True",
+    "description": "Kafka cluster ready",
+    "severity": "critical",
+    "on_success": "kubectl get kafka -n {namespace} -o jsonpath=\\"{.items[0].metadata.name}: replicas={.items[0].spec.kafka.replicas}, version={.items[0].spec.kafka.version}\\""
+  }' | jq`}</code></pre>
     </div>
+
+    {/* STEP 2 */}
+    <div style={{background: '#0d2137', borderRadius: '10px', padding: '16px', borderLeft: '3px solid #f9a825'}}>
+      <div style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px'}}>
+        <div style={{background: '#f9a825', color: 'white', borderRadius: '50%', minWidth: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem'}}>2</div>
+        <span style={{color: 'white', fontWeight: 600}}>All Topics still ready</span>
+      </div>
+      <pre style={{background: '#162032', color: '#e0e0e0', borderRadius: '6px', padding: '12px', fontSize: '0.78rem', overflow: 'auto', margin: 0}}><code>{`curl -s -X POST http://localhost:8080/metadata/q -H 'Content-Type: application/json' \\
+  -d '{
+    "source": "type:kafka", "target": "component",
+    "command": "not_ready=$(kubectl get kafkatopic -n {namespace} -o jsonpath=\\"{range .items[*]}{.metadata.name}:{.status.conditions[?(@.type==\\\\\\"Ready\\\\\\")].status}{\\\\\\"\\\\\\\\n\\\\\\"}{end}\\" | grep -v True | grep -v \\"^$\\"); if [ -n \\"$not_ready\\" ]; then echo NOT READY: $not_ready; exit 1; else echo All topics ready; fi",
+    "description": "All topics ready",
+    "severity": "critical",
+    "on_failure": "kubectl get kafkatopic -n {namespace}"
+  }' | jq`}</code></pre>
+    </div>
+
+    {/* STEP 3 */}
+    <div style={{background: '#0d2137', borderRadius: '10px', padding: '16px', borderLeft: '3px solid #0052cc'}}>
+      <div style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px'}}>
+        <div style={{background: '#0052cc', color: 'white', borderRadius: '50%', minWidth: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem'}}>3</div>
+        <span style={{color: 'white', fontWeight: 600}}>All Sink Connectors running</span>
+      </div>
+      <pre style={{background: '#162032', color: '#e0e0e0', borderRadius: '6px', padding: '12px', fontSize: '0.78rem', overflow: 'auto', margin: 0}}><code>{`curl -s -X POST http://localhost:8080/metadata/q -H 'Content-Type: application/json' \\
+  -d '{
+    "source": "type:kafka", "target": "component",
+    "command": "echo \\"=== Sink Connectors ===\\"; for connector in $(kubectl get kafkaconnector -n {namespace} -o jsonpath=\\"{.items[*].metadata.name}\\"); do state=$(kubectl get kafkaconnector $connector -n {namespace} -o jsonpath=\\"{.status.connectorStatus.connector.state}\\"); task=$(kubectl get kafkaconnector $connector -n {namespace} -o jsonpath=\\"{.status.connectorStatus.tasks[0].state}\\"); topic=$(kubectl get kafkaconnector $connector -n {namespace} -o jsonpath=\\"{.spec.config.topics}\\"); echo \\"$connector: state=$state task=$task topic=$topic\\"; done",
+    "description": "All sinks summary",
+    "severity": "info"
+  }' | jq`}</code></pre>
+    </div>
+
+    {/* STEP 4 */}
+    <div style={{background: '#0d2137', borderRadius: '10px', padding: '16px', borderLeft: '3px solid #e65100'}}>
+      <div style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px'}}>
+        <div style={{background: '#e65100', color: 'white', borderRadius: '50%', minWidth: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem'}}>4</div>
+        <span style={{color: 'white', fontWeight: 600}}>E2E — Produce message, verify it lands in PostgreSQL sink</span>
+      </div>
+      <pre style={{background: '#162032', color: '#e0e0e0', borderRadius: '6px', padding: '12px', fontSize: '0.78rem', overflow: 'auto', margin: 0}}><code>{`curl -s -X POST http://localhost:8080/metadata/q -H 'Content-Type: application/json' \\
+  -d '{
+    "source": "type:kafka", "target": "component",
+    "command": "broker=$(kubectl get pods -n {namespace} -l strimzi.io/component-type=kafka -o jsonpath=\\"{.items[0].metadata.name}\\"); bootstrap=$(kubectl get kafka -n {namespace} -o jsonpath=\\"{.items[0].status.listeners[0].bootstrapServers}\\"); connector=$(kubectl get kafkaconnector -n {namespace} --no-headers -o custom-columns=NAME:.metadata.name,CLASS:.spec.class | grep -i postgresql | head -1 | awk \\"{print \\\\$1}\\"); topic=$(kubectl get kafkaconnector $connector -n {namespace} -o jsonpath=\\"{.spec.config.topics}\\"); test_id=\\"e2e-$(date +%s)\\"; echo \\"{\\\\\\"username\\\\\\":\\\\\\"$test_id\\\\\\",\\\\\\"city\\\\\\":\\\\\\"test\\\\\\"}\\" | kubectl exec -n {namespace} -i $broker -- /opt/kafka/bin/kafka-console-producer.sh --bootstrap-server $bootstrap --topic $topic 2>/dev/null && echo Produced: $test_id to $topic",
+    "verify_delay": 5,
+    "on_success": "pg_pod=$(kubectl get pods -n cnpg -l cnpg.io/cluster -o jsonpath=\\"{.items[0].metadata.name}\\"); kubectl exec -n cnpg $pg_pod -- psql -c \\"SELECT count(*) FROM pg_stat_activity\\" 2>/dev/null || echo PostgreSQL query executed",
+    "on_failure": "kubectl logs -n {namespace} -l strimzi.io/name=kafka-connect --tail=30",
+    "description": "PostgreSQL sink E2E",
+    "severity": "warning"
+  }' | jq`}</code></pre>
+    </div>
+
   </div>
 
-  {/* STEP 2 */}
-  <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
-    <div style={{display: 'flex', gap: '12px', alignItems: 'flex-start'}}>
-      <div style={{background: '#0052cc', color: 'white', borderRadius: '50%', minWidth: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700}}>2</div>
-      <div>
-        <h4 style={{margin: '0 0 8px 0'}}>Source Code</h4>
-        <p style={{margin: '0 0 12px 0', fontSize: '0.9rem', color: '#555'}}>Decide how to manage your source code:</p>
-        <table style={{fontSize: '0.85rem', width: '100%', borderCollapse: 'collapse'}}>
-          <thead>
-            <tr style={{background: '#f0f4f8'}}>
-              <th style={{textAlign: 'left', padding: '8px', borderBottom: '2px solid #e0e4e8'}}>Option</th>
-              <th style={{textAlign: 'left', padding: '8px', borderBottom: '2px solid #e0e4e8'}}>How it works</th>
-              <th style={{textAlign: 'left', padding: '8px', borderBottom: '2px solid #e0e4e8'}}>Watch out</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td style={{padding: '8px', borderBottom: '1px solid #eee'}}><strong>External source code</strong></td>
-              <td style={{padding: '8px', borderBottom: '1px solid #eee'}}>Point to your repo & Dockerfile. Define path, branch, ConfigMap params.</td>
-              <td style={{padding: '8px', borderBottom: '1px solid #eee'}}>UID/GID defaults to 1001. Set port correctly. Avoid PVC if using HPA.</td>
-            </tr>
-            <tr>
-              <td style={{padding: '8px', borderBottom: '1px solid #eee'}}><strong>Pre-defined templates</strong></td>
-              <td style={{padding: '8px', borderBottom: '1px solid #eee'}}>Use Stacktic's automated source code templates — more efficient long-term.</td>
-              <td style={{padding: '8px', borderBottom: '1px solid #eee'}}>Requires code mods to meet API and version requirements.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+  <div style={{background: '#162032', borderLeft: '3px solid #90caf9', borderRadius: '6px', padding: '12px 16px', marginTop: '16px'}}>
+    <p style={{color: '#b0bec5', fontSize: '0.85rem', margin: 0}}>
+      <strong style={{color: 'white'}}>4 calls. Full Kafka validation.</strong> Cluster health, all topics, all connectors, end-to-end data flow — zero hardcoded names. Same calls work on any stack, any environment.
+    </p>
   </div>
-
-  {/* STEP 3 */}
-  <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
-    <div style={{display: 'flex', gap: '12px', alignItems: 'flex-start'}}>
-      <div style={{background: '#0052cc', color: 'white', borderRadius: '50%', minWidth: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700}}>3</div>
-      <div>
-        <h4 style={{margin: '0 0 8px 0'}}>Data Migration</h4>
-        <p style={{margin: '0 0 8px 0', fontSize: '0.9rem', color: '#555'}}>
-          Use <strong>MinIO</strong> for fast backup and restore. Click "+" on the data component to add your database, upload data to MinIO, and attach the link — this creates a restore job in your base folder automatically.
-        </p>
-        <div style={{background: '#e6f7e6', borderLeft: '4px solid #2e7d32', borderRadius: '6px', padding: '8px 12px', fontSize: '0.85rem'}}>
-          Manual backups are possible but MinIO-based jobs are recommended for speed and repeatability.
-        </div>
-      </div>
-    </div>
-  </div>
-
-  {/* STEP 4 */}
-  <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
-    <div style={{display: 'flex', gap: '12px', alignItems: 'flex-start'}}>
-      <div style={{background: '#0052cc', color: 'white', borderRadius: '50%', minWidth: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700}}>4</div>
-      <div>
-        <h4 style={{margin: '0 0 8px 0'}}>Test the Setup</h4>
-        <pre style={{background: '#1e1e1e', color: '#d4d4d4', borderRadius: '6px', padding: '12px 14px', fontSize: '0.85rem', margin: '0 0 8px 0', overflow: 'auto'}}><code>{`# Build and deploy
-kubectl apply -k k8s/build/overlay/dev
-kubectl apply -k k8s/deploy/overlay/dev
-
-# Run database restore (e.g. MongoDB)
-kubectl apply -f k8s/deploybase/mongodb/mongo-restore.yaml`}</code></pre>
-      </div>
-    </div>
-  </div>
-
-  {/* STEP 5 */}
-  <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #2e7d32', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
-    <div style={{display: 'flex', gap: '12px', alignItems: 'flex-start'}}>
-      <div style={{background: '#2e7d32', color: 'white', borderRadius: '50%', minWidth: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700}}>5</div>
-      <div>
-        <h4 style={{margin: '0 0 8px 0'}}>Build Around the Skeleton</h4>
-        <p style={{margin: '0 0 8px 0', fontSize: '0.9rem', color: '#555'}}>Once the basic app is deployed, enhance it:</p>
-        <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '8px'}}>
-          <div style={{background: '#f0f4f8', borderRadius: '6px', padding: '10px', textAlign: 'center', fontSize: '0.85rem'}}><strong>Observability</strong><br/><span style={{color: '#555', fontSize: '0.75rem'}}>Monitoring & logging</span></div>
-          <div style={{background: '#f0f4f8', borderRadius: '6px', padding: '10px', textAlign: 'center', fontSize: '0.85rem'}}><strong>Testing</strong><br/><span style={{color: '#555', fontSize: '0.75rem'}}>Automated frameworks</span></div>
-          <div style={{background: '#f0f4f8', borderRadius: '6px', padding: '10px', textAlign: 'center', fontSize: '0.85rem'}}><strong>Security</strong><br/><span style={{color: '#555', fontSize: '0.75rem'}}>IAM, policies, scanning</span></div>
-          <div style={{background: '#f0f4f8', borderRadius: '6px', padding: '10px', textAlign: 'center', fontSize: '0.85rem'}}><strong>Services</strong><br/><span style={{color: '#555', fontSize: '0.75rem'}}>Expand & refine</span></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
 </div>
 
+---
+
+## Query Reference
+
+<div style={{background: '#f8f9fb', borderRadius: '12px', padding: '24px', border: '1px solid #e0e4e8', marginBottom: '24px'}}>
+  <p style={{fontSize: '0.95rem', color: '#555', marginTop: 0}}>
+    Beyond running tests, you can query your stack metadata directly — list components, inspect links, dry-run commands before executing.
+  </p>
+
+  <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px'}}>
+    <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
+      <h4 style={{margin: '0 0 10px 0', color: '#0052cc'}}>List all databases</h4>
+      <pre style={{background: '#1e1e1e', color: '#d4d4d4', borderRadius: '6px', padding: '12px', fontSize: '0.8rem', overflow: 'auto', margin: 0}}><code>{`curl -s -X POST http://localhost:8080/metadata/q \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "source": "type:cnpg",
+    "target": "sub_components",
+    "select": ["database", "username", "consumers"]
+  }' | jq`}</code></pre>
+    </div>
+    <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
+      <h4 style={{margin: '0 0 10px 0', color: '#0052cc'}}>List all APISIX routes</h4>
+      <pre style={{background: '#1e1e1e', color: '#d4d4d4', borderRadius: '6px', padding: '12px', fontSize: '0.8rem', overflow: 'auto', margin: 0}}><code>{`curl -s -X POST http://localhost:8080/metadata/q \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "source": "apisix",
+    "target": "links_to",
+    "select": ["subdomain", "domain", "cors", "websocket"]
+  }' | jq`}</code></pre>
+    </div>
+    <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
+      <h4 style={{margin: '0 0 10px 0', color: '#0052cc'}}>Dry run — preview without executing</h4>
+      <pre style={{background: '#1e1e1e', color: '#d4d4d4', borderRadius: '6px', padding: '12px', fontSize: '0.8rem', overflow: 'auto', margin: 0}}><code>{`curl -s -X POST http://localhost:8080/metadata/q \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "source": "apisix",
+    "target": "links_to",
+    "command": "curl -sk https://{subdomain}.{domain}",
+    "dry_run": true
+  }' | jq '.results[] | {name, command}'`}</code></pre>
+    </div>
+    <div style={{background: 'white', borderRadius: '10px', padding: '20px', borderLeft: '4px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
+      <h4 style={{margin: '0 0 10px 0', color: '#0052cc'}}>Who connects to Valkey?</h4>
+      <pre style={{background: '#1e1e1e', color: '#d4d4d4', borderRadius: '6px', padding: '12px', fontSize: '0.8rem', overflow: 'auto', margin: 0}}><code>{`curl -s -X POST http://localhost:8080/metadata/q \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "source": "valkey",
+    "target": "links_from",
+    "select": ["link_name", "link_type"]
+  }' | jq`}</code></pre>
+    </div>
+  </div>
+
+  <div style={{background: '#e3f2fd', borderLeft: '4px solid #1976d2', borderRadius: '6px', padding: '12px 16px', marginTop: '16px'}}>
+    <strong>Available for every component:</strong> PostgreSQL, Kafka, APISIX, Valkey, Grafana, ClickHouse, SeaweedFS, Qdrant, OpenTelemetry, Cert-Manager — and any component you add to your topology.
+  </div>
 </div>

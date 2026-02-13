@@ -16,4 +16,12 @@ npm run start
 
 
 
+# 1. Build to verify no errors
+npm run build
+
+# 2. Deploy to GitHub Pages
+GIT_USER=stackticio npm run deploy
+
+
+
 

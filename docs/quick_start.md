@@ -113,6 +113,26 @@ sidebar_position: 4
       <p style={{margin: '6px 0 0 0', fontSize: '0.75rem', color: '#999'}}>Click image to enlarge</p>
     </div>
   </div>
+  <div style={{background: '#e3f2fd', border: '2px solid #1976d2', borderRadius: '10px', padding: '20px', marginTop: '20px'}}>
+    <h4 style={{margin: '0 0 12px 0', color: '#0d47a1'}}>Understanding Git Branch and Build Branch</h4>
+    <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '12px'}}>
+      <div style={{background: 'white', borderRadius: '8px', padding: '14px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
+        <p style={{margin: 0, fontSize: '0.9rem'}}>
+          <span style={{background: '#0052cc', color: 'white', padding: '2px 10px', borderRadius: '4px', fontWeight: 700, fontSize: '0.8rem', marginRight: '8px'}}>Git Branch</span>
+          The <strong>source of truth</strong>. Stacktic automatically pushes the stack version and configuration to this branch. This is where the generated stack skeleton lives.
+        </p>
+      </div>
+      <div style={{background: 'white', borderRadius: '8px', padding: '14px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
+        <p style={{margin: 0, fontSize: '0.9rem'}}>
+          <span style={{background: '#2e7d32', color: 'white', padding: '2px 10px', borderRadius: '4px', fontWeight: 700, fontSize: '0.8rem', marginRight: '8px'}}>Build Branch</span>
+          Where your <strong>code and customizations</strong> live. Stacktic uses a merge strategy to sync changes from the Git branch into the Build branch, respecting your edits.
+        </p>
+      </div>
+    </div>
+    <p style={{margin: 0, fontSize: '0.85rem', color: '#555'}}>
+      Most of the time these are the same branch. The merge strategy ensures Stacktic's generated updates never overwrite your custom code.
+    </p>
+  </div>
 </div>
 
 ---

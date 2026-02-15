@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OTEL (OpenTelemetry) Component</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 900px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #1e293b; font-size: 24px; margin: 0 0 24px 0; font-weight: 700; border-bottom: 3px solid #7c3aed; padding-bottom: 12px;">OTEL (OpenTelemetry)</h1>
+        <p style="color: #64748b; margin-bottom: 24px;">Deploys the OpenTelemetry Operator + Collector. Link an app to OTEL to auto-instrument it. Link OTEL to ClickHouse to store all telemetry.</p>
+
+        <!-- How It Works -->
+        <div style="background-color: #0f172a; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">How It Works</h3>
+            <div style="font-family: monospace; font-size: 12px; line-height: 2.2; color: #e2e8f0;">
+                <span style="color: #22d3ee;">App Pod</span> <span style="color: #64748b;">───OTLP(:4317/4318)───&gt;</span> <span style="color: #7c3aed;">Collector</span> <span style="color: #64748b;">───&gt;</span> <span style="color: #fbbf24;">ClickHouse</span> <span style="color: #64748b;">(if linked)</span><br>
+                <br>
+                <span style="color: #94a3b8;">1. You link an app (image_base / external_source_code) to OTEL</span><br>
+                <span style="color: #94a3b8;">2. The app automatically gets a pod annotation + OTEL env vars</span><br>
+                <span style="color: #94a3b8;">3. OTEL Operator detects the annotation and injects instrumentation sidecar</span><br>
+                <span style="color: #94a3b8;">4. Instrumented app sends traces/metrics/logs to the Collector</span><br>
+                <span style="color: #94a3b8;">5. Collector processes and exports to ClickHouse (if linked)</span>
+            </div>
+        </div>
+
+        <!-- Component Attributes -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Component Attributes</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Description</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>namespace</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>otel</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Kubernetes namespace for operator, collector, and instrumentation</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>replicas</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>1</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Number of collector pod replicas</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>cpu_request</code> / <code>cpu_limit</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>250m</code> / <code>500m</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Collector pod CPU resources</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>mem_request</code> / <code>mem_limit</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>512Mi</code> / <code>1Gi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Collector pod memory resources</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>batch_timeout</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>5s</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">How long the collector waits before flushing a batch</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>batch_size</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>10000</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Max items per batch before the collector flushes</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>memory_limit_mib</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>400</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Hard memory limit in MiB - collector starts dropping data above this</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>memory_spike_limit_mib</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>100</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Spike allowance above the hard limit before OOM protection kicks in</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Links Overview -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Links</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Link Type</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Direction</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">What Gets Automated</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>image_base-otel</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">App &rarr; OTEL</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Auto-instruments the app: generates pod annotation + OTEL env vars on the app</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>external_source_code-otel</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">App &rarr; OTEL</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Same as above, for external_source_code apps</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>otel-clickhouse_db</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">OTEL &rarr; ClickHouse</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Configures collector to export traces/metrics/logs to ClickHouse</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>prometheus-otel</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Prometheus &rarr; OTEL</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Prometheus scrapes OTEL operator metrics</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- App Instrumentation Link -->
+        <div style="background-color: #fee2e2; border: 2px solid #ef4444; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #991b1b; font-size: 16px; margin: 0 0 4px 0; font-weight: 600;">App &rarr; OTEL Link (Auto-Instrumentation)</h3>
+            <p style="color: #991b1b; font-size: 12px; margin: 0 0 16px 0;">When you link an app (image_base or external_source_code) to OTEL, the automation happens on the <strong>app side</strong> - the app's deployment manifest and environment are automatically configured to send telemetry to the collector.</p>
+
+            <div style="background-color: #fecaca; padding: 16px; border-radius: 6px; margin-bottom: 12px;">
+                <h4 style="color: #991b1b; margin: 0 0 8px 0; font-size: 13px;">Link Attributes (you set these on the link)</h4>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #ef4444; color: white;">
+                            <th style="padding: 6px; border: 1px solid #dc2626; text-align: left;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #dc2626; text-align: left;">Values</th>
+                            <th style="padding: 6px; border: 1px solid #dc2626; text-align: left;">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #991b1b;">
+                        <tr style="background-color: #fef2f2; border-left: 4px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;"><code>otel_language</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;"><code>java</code>, <code>python</code>, <code>nodejs</code>, <code>dotnet</code>, <code>go</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">The programming language of the app. Determines which auto-instrumentation is injected.</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;"><code>pythonpath</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;"><code>/usr/src/app</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">Only needed for Python apps. Must match the Dockerfile WORKDIR.</td>
+                        </tr>
+                        <tr style="background-color: #fef2f2;">
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;"><code>otel_language_custom</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">custom annotation key</td>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">Overrides the standard instrumentation annotation. Use when a custom annotation key is needed instead of the default.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="background-color: #fecaca; padding: 16px; border-radius: 6px;">
+                <h4 style="color: #991b1b; margin: 0 0 8px 0; font-size: 13px;">What Gets Auto-Generated on the App</h4>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #ef4444; color: white;">
+                            <th style="padding: 6px; border: 1px solid #dc2626; text-align: left;">Generated Item</th>
+                            <th style="padding: 6px; border: 1px solid #dc2626; text-align: left;">Where</th>
+                            <th style="padding: 6px; border: 1px solid #dc2626; text-align: left;">Example</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #991b1b;">
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">Pod annotation</td>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">App deployment manifest</td>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;"><code>instrumentation.opentelemetry.io/inject-python: "otel/otel-instrumentation"</code></td>
+                        </tr>
+                        <tr style="background-color: #fef2f2;">
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">OTEL_EXPORTER_OTLP_ENDPOINT</td>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">App environment (cloud.env)</td>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">Collector HTTP endpoint on port 4318</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">OTEL_EXPORTER_OTLP_TRACES_ENDPOINT</td>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">App environment (cloud.env)</td>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">Collector traces endpoint (/v1/traces)</td>
+                        </tr>
+                        <tr style="background-color: #fef2f2;">
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">OTEL_EXPORTER_OTLP_METRICS_ENDPOINT</td>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">App environment (cloud.env)</td>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">Collector metrics endpoint (/v1/metrics)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">OTEL_SERVICE_NAME</td>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">App environment (cloud.env)</td>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">Set to the app's component name</td>
+                        </tr>
+                        <tr style="background-color: #fef2f2;">
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">PYTHONPATH</td>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">App environment + deployment</td>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">Only if language=python and pythonpath is set</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ClickHouse Link -->
+        <div style="background-color: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #92400e; font-size: 16px; margin: 0 0 4px 0; font-weight: 600;">OTEL &rarr; ClickHouse Link (Telemetry Storage)</h3>
+            <p style="color: #92400e; font-size: 12px; margin: 0 0 16px 0;">Links to a <strong>clickhouse_db</strong> sub-component. When linked, the collector image automatically switches to the <code>contrib</code> variant which includes the ClickHouse exporter. Auto-creates tables: <code>otel_traces</code>, <code>otel_metrics</code>, <code>otel_logs</code>.</p>
+
+            <div style="background-color: #fde68a; padding: 16px; border-radius: 6px; margin-bottom: 12px;">
+                <h4 style="color: #78350f; margin: 0 0 8px 0; font-size: 13px;">Connection Logic (automatic)</h4>
+                <div style="font-family: monospace; font-size: 12px; color: #78350f; line-height: 2;">
+                    <strong>if</strong> <code>public_host</code> is empty &rarr; <span style="color: #065f46; font-weight: bold;">Internal: TCP :9000 via svc.cluster.local</span><br>
+                    <strong>if</strong> <code>public_host</code> exists &rarr; <span style="color: #b91c1c; font-weight: bold;">External: HTTPS :443 + TLS skip verify</span>
+                </div>
+            </div>
+
+            <div style="background-color: #fde68a; padding: 16px; border-radius: 6px; margin-bottom: 12px;">
+                <h4 style="color: #78350f; margin: 0 0 8px 0; font-size: 13px;">What Gets Configured from ClickHouse</h4>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #fbbf24;">
+                            <th style="padding: 6px; border: 1px solid #f59e0b; text-align: left; color: #78350f;">From</th>
+                            <th style="padding: 6px; border: 1px solid #f59e0b; text-align: left; color: #78350f;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #f59e0b; text-align: left; color: #78350f;">Used For</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #78350f;">
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">clickhouse_db sub-component</td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;"><code>database</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">Target database name for telemetry tables</td>
+                        </tr>
+                        <tr style="background-color: #fef3c7;">
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">clickhouse_db sub-component</td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;"><code>ttl</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">Data retention period for tables</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">ClickHouse parent component</td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;"><code>admin_user</code> / <code>admin_password</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">Authentication credentials</td>
+                        </tr>
+                        <tr style="background-color: #fef3c7;">
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">Link attribute (external only)</td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;"><code>public_host</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">External hostname for cross-cluster connection</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Generated Files -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Generated Files</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">File</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Condition</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Contains</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/collector.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">OpenTelemetryCollector CR — receivers, processors, exporters (ClickHouse exporter added if linked)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/instrumentation.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Instrumentation CR — defines auto-instrumentation images per language</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/namespace.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Namespace for OTEL resources</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/kustomization.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Kustomize config — resources, labels, registry secret</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>helm/operator-values.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Helm values for the OTEL Operator chart</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Supported Languages -->
+        <div style="background-color: #ecfdf5; border: 2px solid #10b981; border-radius: 8px; padding: 20px;">
+            <h3 style="color: #065f46; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Supported Auto-Instrumentation Languages</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                <thead>
+                    <tr style="background-color: #a7f3d0;">
+                        <th style="padding: 6px; border: 1px solid #6ee7b7; text-align: left; color: #065f46;">Language</th>
+                        <th style="padding: 6px; border: 1px solid #6ee7b7; text-align: left; color: #065f46;">Pod Annotation</th>
+                        <th style="padding: 6px; border: 1px solid #6ee7b7; text-align: left; color: #065f46;">Notes</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #065f46;">
+                    <tr>
+                        <td style="padding: 4px 6px; border: 1px solid #6ee7b7; font-weight: bold;">java</td>
+                        <td style="padding: 4px 6px; border: 1px solid #6ee7b7;"><code>inject-java</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #6ee7b7;">Full support</td>
+                    </tr>
+                    <tr style="background-color: #ecfdf5;">
+                        <td style="padding: 4px 6px; border: 1px solid #6ee7b7; font-weight: bold;">python</td>
+                        <td style="padding: 4px 6px; border: 1px solid #6ee7b7;"><code>inject-python</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #6ee7b7;">Set <code>pythonpath</code> link attribute to match Dockerfile WORKDIR</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px 6px; border: 1px solid #6ee7b7; font-weight: bold;">nodejs</td>
+                        <td style="padding: 4px 6px; border: 1px solid #6ee7b7;"><code>inject-nodejs</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #6ee7b7;">Full support</td>
+                    </tr>
+                    <tr style="background-color: #ecfdf5;">
+                        <td style="padding: 4px 6px; border: 1px solid #6ee7b7; font-weight: bold;">dotnet</td>
+                        <td style="padding: 4px 6px; border: 1px solid #6ee7b7;"><code>inject-dotnet</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #6ee7b7;">Full support</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px 6px; border: 1px solid #6ee7b7; font-weight: bold;">go</td>
+                        <td style="padding: 4px 6px; border: 1px solid #6ee7b7;"><code>inject-go</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #6ee7b7;">Annotation generated, but no auto-instrumentation image defined - requires manual setup</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kafka Component</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 900px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #1e293b; font-size: 24px; margin: 0 0 24px 0; font-weight: 700; border-bottom: 3px solid #000000; padding-bottom: 12px;">Kafka</h1>
+        <p style="color: #64748b; margin-bottom: 24px;">Strimzi-managed Kafka cluster with KRaft mode. Topics are sub-components. Link a topic to a sink (MongoDB, PostgreSQL, ClickHouse, MinIO, SeaweedFS) and Kafka Connect + the connector are auto-configured.</p>
+
+        <!-- Architecture -->
+        <div style="background-color: #1e293b; color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">Architecture</h2>
+            <div style="font-family: monospace; font-size: 13px; line-height: 1.8;">
+                <span style="color: #ef4444;">Kafka Brokers</span> - KafkaNodePool (broker role) with persistent storage<br>
+                <span style="color: #22d3ee;">KRaft Controllers</span> - KafkaNodePool (controller role), ZooKeeper-less<br>
+                <span style="color: #a78bfa;">Kafka Connect</span> - Auto-generated when any topic links to a sink. Builds custom image with connector JARs.<br>
+                <span style="color: #4ade80;">Topics</span> - Sub-components, each generates a KafkaTopic CR<br>
+                <span style="color: #fbbf24;">Bridge</span> - Sub-component, HTTP REST interface to Kafka (KafkaBridge CR)
+            </div>
+        </div>
+
+        <!-- Attributes -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Attributes</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Description</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">namespace</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>kafka</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Kubernetes namespace for all Kafka resources</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>replicas</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>3</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Broker + controller count (both node pools)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>kafka_version</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>4.1.1</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Kafka version in Strimzi CR</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>broker_storage</code> / <code>controller_storage</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>100Gi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">PVC size per broker / controller node</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>broker_cpu_request</code> / <code>broker_mem_request</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>500m</code> / <code>1Gi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Broker node pool resources</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>controller_cpu_request</code> / <code>controller_mem_request</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>250m</code> / <code>512Mi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Controller node pool resources</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>kafka_connector_additional_artifacts</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">url: ...<br>sha512sum: ...</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Extra connector JARs to include in the KafkaConnect build image (textarea, one artifact per url+sha512sum pair)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sub-Components -->
+        <div style="background-color: #f3e8ff; border: 2px solid #8b5cf6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #5b21b6; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Sub-Components</h3>
+
+            <!-- topic -->
+            <div style="background-color: #e9d5ff; padding: 16px; border-radius: 6px; margin-bottom: 12px;">
+                <h4 style="color: #5b21b6; margin: 0 0 8px 0; font-size: 14px;">topic - KafkaTopic</h4>
+                <p style="color: #6b21a8; font-size: 12px; margin-bottom: 8px;">Each topic generates a KafkaTopic CR. Topics can link to sink destinations (MongoDB, PostgreSQL, ClickHouse, MinIO, SeaweedFS) to auto-configure Kafka Connect connectors.</p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #c4b5fd;">
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e1b4b;">
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>kafka_partition_size</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>3</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Number of partitions in the KafkaTopic spec</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>kafka_replication_factor</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>2</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Replication factor in the KafkaTopic spec</td>
+                        </tr>
+                        <tr style="background-color: #faf5ff;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>errors_handling</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>true</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Enables <code>errors.tolerance: all</code> + logging on connectors linked to this topic</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- bridge -->
+            <div style="background-color: #e9d5ff; padding: 16px; border-radius: 6px;">
+                <h4 style="color: #5b21b6; margin: 0 0 8px 0; font-size: 14px;">bridge - KafkaBridge (HTTP REST)</h4>
+                <p style="color: #6b21a8; font-size: 12px; margin-bottom: 0;">Generates a KafkaBridge CR + KafkaUser with TLS auth. Exposes Kafka via HTTP REST on port 8080. If Prometheus is linked, enables bridge metrics. If gateway is linked, generates an Ingress for external access.</p>
+            </div>
+        </div>
+
+        <!-- Links Overview -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Links</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Link Type</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Direction</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">What Gets Automated</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>topic-mongo_db</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Topic &rarr; MongoDB</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">KafkaConnect + MongoSinkConnector auto-configured</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>topic-db</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Topic &rarr; CNPG (PostgreSQL)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">KafkaConnect + CamelPostgresqlSink auto-configured</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>topic-clickhouse_db</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Topic &rarr; ClickHouse</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">KafkaConnect + ClickHouseSinkConnector auto-configured</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>topic-bucket</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Topic &rarr; MinIO</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">KafkaConnect + CamelMinioSink auto-configured</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>topic-swbucket</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Topic &rarr; SeaweedFS</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">KafkaConnect + CamelMinioSink (S3-compatible) auto-configured</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>mongo_db-topic</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MongoDB &rarr; Topic</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MongoDB CDC source (change data capture into topic)</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>prometheus-kafka</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Prometheus &rarr; Kafka</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">JMX metrics on Kafka + KafkaExporter + Connect metrics (if connectors exist)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>gateway-kafka</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Gateway &rarr; Kafka</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Ingress for bridge sub-component (external HTTP access)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Topic Sink Connectors -->
+        <div style="background-color: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #166534; font-size: 16px; margin: 0 0 4px 0; font-weight: 600;">Topic &rarr; Sink Links (Kafka Connect)</h3>
+            <p style="color: #166534; font-size: 12px; margin: 0 0 16px 0;">When any topic links to a sink, <strong>KafkaConnect is auto-generated</strong> with a custom-built image containing the required connector JARs. Each link also generates a KafkaConnector CR. Connector JARs are pulled from the link's <code>kafka_connector_image</code> + <code>sha512sum</code> attributes.</p>
+
+            <div style="background-color: #bbf7d0; padding: 16px; border-radius: 6px; margin-bottom: 12px;">
+                <h4 style="color: #166534; margin: 0 0 8px 0; font-size: 13px;">Auto-Configured per Sink Type</h4>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #86efac;">
+                            <th style="padding: 6px; border: 1px solid #4ade80; text-align: left; color: #166534;">Sink</th>
+                            <th style="padding: 6px; border: 1px solid #4ade80; text-align: left; color: #166534;">Connector Class</th>
+                            <th style="padding: 6px; border: 1px solid #4ade80; text-align: left; color: #166534;">Auto-Pulled from Target</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #166534;">
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac; font-weight: bold;">MongoDB</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">MongoSinkConnector</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">connection.uri, database, collection from mongo_db sub-component</td>
+                        </tr>
+                        <tr style="background-color: #ecfdf5;">
+                            <td style="padding: 4px 6px; border: 1px solid #86efac; font-weight: bold;">PostgreSQL (CNPG)</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">CamelPostgresqlSink</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">serverName, port, databaseName, username, password from db sub-component</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac; font-weight: bold;">ClickHouse</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">ClickHouseSinkConnector</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">hostname, port (8123), database, username, password from clickhouse_db sub-component</td>
+                        </tr>
+                        <tr style="background-color: #ecfdf5;">
+                            <td style="padding: 4px 6px; border: 1px solid #86efac; font-weight: bold;">MinIO</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">CamelMinioSink</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">accessKey, secretKey, endpoint, bucketName from bucket sub-component</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac; font-weight: bold;">SeaweedFS</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">CamelMinioSink (S3-compatible)</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">accessKey, secretKey, endpoint, bucketName from swbucket sub-component</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="background-color: #bbf7d0; padding: 16px; border-radius: 6px;">
+                <h4 style="color: #166534; margin: 0 0 8px 0; font-size: 13px;">What Gets Generated per Sink Link</h4>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #86efac;">
+                            <th style="padding: 6px; border: 1px solid #4ade80; text-align: left; color: #166534;">Generated</th>
+                            <th style="padding: 6px; border: 1px solid #4ade80; text-align: left; color: #166534;">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #166534;">
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">KafkaConnect CR</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">Generated once (shared by all connectors). Builds custom image with all required JARs. TLS auth to Kafka cluster.</td>
+                        </tr>
+                        <tr style="background-color: #ecfdf5;">
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">KafkaConnector CR</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">One per sink link. Topic name set to the source topic's name. Connection details auto-pulled from target sub-component.</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">Connect internal topics</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">KafkaTopics for offsets, configs, status (auto-created when any connector exists)</td>
+                        </tr>
+                        <tr style="background-color: #ecfdf5;">
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">Sink credentials in cloud.env</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">Database/bucket credentials and host endpoints stored in cloud.env (SOPS encrypted)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Topic Link Attributes (for sink connectors) -->
+        <div style="background-color: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #92400e; font-size: 16px; margin: 0 0 4px 0; font-weight: 600;">Connector Link Attributes</h3>
+            <p style="color: #92400e; font-size: 12px; margin: 0 0 16px 0;">These attributes on the topic sink link control the KafkaConnect build and connector behavior.</p>
+
+            <div style="background-color: #fde68a; padding: 16px; border-radius: 6px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #fbbf24;">
+                            <th style="padding: 6px; border: 1px solid #f59e0b; text-align: left; color: #78350f;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #f59e0b; text-align: left; color: #78350f;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #f59e0b; text-align: left; color: #78350f;">Effect</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #78350f;">
+                        <tr style="background-color: #fef3c7; border-left: 4px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;"><code>kafka_connector_image</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">Maven JAR/TGZ URL</td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">Connector artifact URL, included in KafkaConnect build image</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b; border-left: 4px solid #f59e0b;"><code>sha512sum</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">SHA-512 hash</td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">Integrity verification for the connector artifact</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Generated Files -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Generated Files</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">File</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Condition</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Contains</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/kafka-cluster.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">KafkaNodePool (broker + controller) + Kafka CR</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/strimzi-control.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Strimzi feature gates and operator config</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/topic.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">If topic sub-components exist</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">KafkaTopic CRs + Connect internal topics (offsets, configs, status) if any connector exists</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/bridge.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">If bridge sub-component</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">KafkaBridge CR + KafkaUser with TLS auth</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/bridge-ingress.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">If gateway linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Ingress for bridge HTTP access with TLS</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/connectors/kafka-connect.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">If any sink link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">KafkaConnect CR — builds custom image with connector JARs from link attributes</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/connectors/mongodb-sink.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">If topic-mongo_db link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MongoSinkConnector KafkaConnector CR</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/connectors/db-sink.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">If topic-db link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">CamelPostgresqlSink KafkaConnector CR</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/connectors/clickhouse-sink.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">If topic-clickhouse_db link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">ClickHouseSinkConnector KafkaConnector CR</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/connectors/minio-sink.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">If topic-bucket link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">CamelMinioSink KafkaConnector CR</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/connectors/swbucket-sink.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">If topic-swbucket link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">CamelMinioSink (S3-compatible) KafkaConnector CR</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/monitor/cm-kafka-metrics.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">If prometheus linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Kafka JMX metrics ConfigMap</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/monitor/pod-monitor.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">If prometheus linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">PodMonitor CR for Prometheus scraping</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/monitor/cm-connect-metrics.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">If prometheus + any connector</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">KafkaConnect JMX metrics ConfigMap</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/secret/cloud.env</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Sink credentials — accessKey, secretKey, host, port, connection URIs per linked sink</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Prometheus Link -->
+        <div style="background-color: #fee2e2; border: 2px solid #ef4444; border-radius: 8px; padding: 20px;">
+            <h3 style="color: #991b1b; font-size: 16px; margin: 0 0 4px 0; font-weight: 600;">Prometheus &rarr; Kafka Link</h3>
+            <p style="color: #991b1b; font-size: 12px; margin: 0 0 12px 0;">When Prometheus links to Kafka, the following are auto-enabled:</p>
+            <div style="background-color: #fecaca; padding: 16px; border-radius: 6px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #ef4444; color: white;">
+                            <th style="padding: 6px; border: 1px solid #dc2626; text-align: left;">What</th>
+                            <th style="padding: 6px; border: 1px solid #dc2626; text-align: left;">Effect</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #991b1b;">
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">JMX Prometheus Exporter on Kafka</td>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">metricsConfig added to Kafka CR + kafka-metrics ConfigMap</td>
+                        </tr>
+                        <tr style="background-color: #fef2f2;">
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">KafkaExporter</td>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">Consumer lag, topic/partition metrics exported for all topics and groups</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">PodMonitor</td>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">Prometheus scraping configured via PodMonitor CR</td>
+                        </tr>
+                        <tr style="background-color: #fef2f2;">
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">Connect metrics (if connectors exist)</td>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">JMX Prometheus Exporter on KafkaConnect + connect-metrics ConfigMap</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;">Bridge metrics (if bridge exists)</td>
+                            <td style="padding: 4px 6px; border: 1px solid #fca5a5;"><code>enableMetrics: true</code> on KafkaBridge CR</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

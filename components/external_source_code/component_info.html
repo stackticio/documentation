@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>External Source Code Component</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 900px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #1e293b; font-size: 24px; margin: 0 0 24px 0; font-weight: 700; border-bottom: 3px solid #3b82f6; padding-bottom: 12px;">External Source Code</h1>
+        <p style="color: #64748b; margin-bottom: 24px;">Deploys external Git repositories as Kubernetes applications. Kaniko/BuildKit builds from source. Framework-aware environment variables. Dynamic storage, networking, and security context.</p>
+
+        <!-- Architecture -->
+        <div style="background-color: #1e293b; color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">Architecture</h2>
+            <div style="font-family: monospace; font-size: 13px; line-height: 1.8;">
+                <span style="color: #3b82f6;">Git Clone</span> - Fetches source from external repo (GitHub/GitLab/Bitbucket)<br>
+                <span style="color: #22c55e;">Kaniko</span> - In-cluster container image build (K8s Job, no Docker daemon)<br>
+                <span style="color: #22d3ee;">BuildKit</span> - Alternative build engine (HTTPS clone, git_token support)<br>
+                <span style="color: #a78bfa;">Deployment</span> - K8s Deployment with security context, probes, HPA<br>
+                <span style="color: #fbbf24;">cloud.env</span> - Framework-specific ENV injection (SOPS encrypted)<br>
+                <span style="color: #f97316;">RBAC</span> - 4-level cross-namespace role system per linked component
+            </div>
+        </div>
+
+        <!-- Attributes -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Attributes</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Description</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <!-- Required -->
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">namespace</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>my-app</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Kubernetes namespace - all generated manifests and service DNS</td>
+                    </tr>
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">port</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>8080</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Container port (containerPort). Service always exposes :80</td>
+                    </tr>
+                    <!-- Optional: Core -->
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>version</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>v1.2.3</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Image tag for build destination and deployment. Ignored if <code>imageupdater_update_enable</code> is set.</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>service_type</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>ClusterIP</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Kubernetes Service type</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>command</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>npm start</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Override container command. Runs as <code>["/bin/sh", "-c", "command"]</code>. If empty, uses Dockerfile CMD.</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>replicas</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>3</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Deployment replica count. Defaults to 1 if not set.</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>imageupdater_update_enable</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">When enabled, image tag is omitted from Deployment (Flux/ArgoCD Image Updater manages it). Also adds <code>newTag: latest</code> in dev overlay.</td>
+                    </tr>
+                    <!-- Security -->
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>user_id</code> / <code>group_id</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>10001</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">runAsUser / runAsGroup + fsGroup. Only applied when <code>pod_security</code> is in <code>security_features</code>. Must match Dockerfile USER.</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>security_features</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>[pod_security, read_only_fs, ...]</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">List of security policies. See Security Matrix below for each option.</td>
+                    </tr>
+                    <!-- Storage -->
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>pvc</code> / <code>pvc_name</code> / <code>mount_path</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>true</code> / <code>data</code> / <code>/data</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Generates pvc.yaml. Creates PVC named <code>pvc_name</code> mounted at <code>mount_path</code>. All three must be set together.</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>writable_directory</code> / <code>directory</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>true</code> / <code>/app/tmp</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Adds emptyDir volume at <code>directory</code> path. Use when <code>read_only_fs</code> is enabled and app needs writable space beyond /tmp. Both must be set together.</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>files_mount_path</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>/app/static</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Mounts the static-files ConfigMap (from files/ directory) at this path as readOnly.</td>
+                    </tr>
+                    <!-- Autoscaling -->
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>hpa</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Enables HorizontalPodAutoscaler. When enabled, set the attributes below.</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>hpa_min_replicas</code> / <code>hpa_max_replicas</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>2</code> / <code>10</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">HPA scaling bounds. Only used when <code>hpa</code> is enabled.</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>hpa_cpu_target</code> / <code>hpa_memory_target</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>80</code> / <code>80</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">HPA target utilization percentage. Only used when <code>hpa</code> is enabled.</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>hpa_scale_up_stabilization</code> / <code>hpa_scale_down_stabilization</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>0</code> / <code>300</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Stabilization window in seconds before scaling up/down. Only used when <code>hpa</code> is enabled.</td>
+                    </tr>
+                    <!-- Probes -->
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>probes</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Enables liveness + readiness probes via probes-patch.yaml. Probe type depends on <code>probe_path</code>.</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>probe_path</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>/health</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">If set: HTTP GET probe at this path. If empty: TCP socket probe on container port. Only used when <code>probes</code> is enabled.</td>
+                    </tr>
+                    <!-- RBAC -->
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>rbac</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Creates ServiceAccount + Role + RoleBinding. If false, only bare ServiceAccount is created.</td>
+                    </tr>
+                    <!-- Resources -->
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>cpu_request</code> / <code>mem_request</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>100m</code> / <code>128Mi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Resource requests in resource-patch.yaml</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>cpu_limit</code> / <code>mem_limit</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>500m</code> / <code>512Mi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Resource limits in resource-patch.yaml</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>ephemeral_storage</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>1Gi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Ephemeral storage limit in resource-patch.yaml</td>
+                    </tr>
+                    <!-- Startup / Configmap -->
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>startup_commands</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>migrate db</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Generates files/startup.sh init script with specified commands</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>configmap</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>KEY=value</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Custom ENV vars appended to config/cloud.env (non-secret)</td>
+                    </tr>
+                    <!-- Framework -->
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>framework_type</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>python</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Controls ENV variable naming in cloud.env for each linked service. Options: spring, nodejs, python, django, flask, fastapi, rails, laravel, generic</td>
+                    </tr>
+                    <!-- Git / Build -->
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>git_host</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>github.com</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Git server hostname for clone URL</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>git_owner</code> / <code>project</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>my-org</code> / <code>my-repo</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Repository owner and name for build jobs</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>branch</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>main</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Git branch to build from</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>git_folder</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>/app</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Subdirectory in repo (context-sub-path for Kaniko, contextsubdir for BuildKit). If empty or "/", uses repo root.</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>dockerfile</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>Dockerfile.prod</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Custom Dockerfile path. If empty, defaults to "Dockerfile".</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>git_token</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>ghp_xxx</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Access token for private repos. BuildKit uses it in HTTPS clone URL. Stored in secret/git.env.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Attribute Dependencies -->
+        <div style="background-color: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #92400e; font-size: 16px; margin: 0 0 16px 0; font-weight: 600;">Attribute Dependencies &amp; Conditional Behavior</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #fde68a;">
+                        <th style="padding: 8px; border: 1px solid #f59e0b; text-align: left;">Toggle</th>
+                        <th style="padding: 8px; border: 1px solid #f59e0b; text-align: left;">Requires</th>
+                        <th style="padding: 8px; border: 1px solid #f59e0b; text-align: left;">Behavior</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>pvc = true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>pvc_name</code> + <code>mount_path</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">Generates pvc.yaml, adds PVC volumeMount in Deployment</td>
+                    </tr>
+                    <tr style="background-color: #fffbeb;">
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>writable_directory = true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>directory</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">Adds emptyDir volume at directory path. Common with <code>read_only_fs</code> for writable dirs.</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>read_only_fs</code> in security_features</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">(none)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">Auto-adds writable /tmp emptyDir volume. Use <code>writable_directory</code> for additional writable paths.</td>
+                    </tr>
+                    <tr style="background-color: #fffbeb;">
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>pod_security</code> in security_features</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>user_id</code> + <code>group_id</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">Sets runAsUser/runAsGroup/fsGroup + pod-security.kubernetes.io labels</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>hpa = true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>hpa_min_replicas</code>, <code>hpa_max_replicas</code>, <code>hpa_cpu_target</code>, <code>hpa_memory_target</code>, <code>hpa_scale_up_stabilization</code>, <code>hpa_scale_down_stabilization</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">Generates hpa.yaml with all scaling params</td>
+                    </tr>
+                    <tr style="background-color: #fffbeb;">
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>probes = true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>probe_path</code> (optional)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">If <code>probe_path</code> set: HTTP GET probe. If empty: TCP socket probe on container port.</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>imageupdater_update_enable = true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">(none)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">Omits <code>version</code> tag from image reference. Adds <code>newTag: latest</code> in dev overlay for image updater.</td>
+                    </tr>
+                    <tr style="background-color: #fffbeb;">
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>rbac = true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">Link attribute <code>rbac_link_roles</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">SA + Role + RoleBinding. Cross-namespace RBAC generated per outbound link that has <code>rbac_link_roles</code> set (observer/operator/developer/admin).</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Configuration (stack-level) -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Configuration (Stack-Level)</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Config</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Options</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Effect</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>build_type</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>kaniko</code> or <code>buildkit</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><strong>kaniko</strong>: git:// protocol clone, no token needed for public repos.<br><strong>buildkit</strong>: HTTPS clone, supports <code>git_token</code> for private repos.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Security Features Matrix -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Security Features Matrix</h3>
+            <p style="color: #94a3b8; font-size: 11px; margin-bottom: 12px;">Each item in <code>security_features</code> list enables specific fields in source_code.yaml Deployment spec.</p>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Feature</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">K8s Field</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Value</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>pod_security</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: monospace; font-size: 11px;">runAsNonRoot, runAsUser, runAsGroup, fsGroup + pod-security.kubernetes.io labels</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Uses <code>user_id</code> / <code>group_id</code> values</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>no_host_access</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: monospace; font-size: 11px;">hostNetwork, hostPID, hostIPC</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">false</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>no_privilege_escalation</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: monospace; font-size: 11px;">allowPrivilegeEscalation, privileged</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">false</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>read_only_fs</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: monospace; font-size: 11px;">readOnlyRootFilesystem</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">true + auto-adds writable /tmp emptyDir volume</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>drop_capabilities</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: monospace; font-size: 11px;">capabilities.drop</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">[ALL]</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>seccomp</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: monospace; font-size: 11px;">seccompProfile.type</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">RuntimeDefault (applied at both pod and container level when combined with pod_security)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Framework ENV Matrix -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 10px;">Framework ENV Variable Matrix</h3>
+            <p style="color: #94a3b8; font-size: 11px; margin-bottom: 15px;"><code>framework_type</code> controls ENV variable naming in secret/cloud.env per linked service. All values are auto-generated from linked component metadata.</p>
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Link</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">spring</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">nodejs</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">python/django/flask/fastapi</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">rails</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">laravel</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1; font-family: monospace;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: Arial; font-weight: bold;">PostgreSQL / CNPG</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">SPRING_DATASOURCE_URL<br>SPRING_DATASOURCE_USERNAME<br>SPRING_DATASOURCE_PASSWORD</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">DATABASE_URL<br>PGHOST, PGPORT<br>PGUSER, PGPASSWORD<br>PGDATABASE</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">DATABASE_URL</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">DATABASE_URL</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">DB_CONNECTION<br>DB_HOST, DB_PORT<br>DB_DATABASE<br>DB_USERNAME<br>DB_PASSWORD</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: Arial; font-weight: bold;">MongoDB</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">SPRING_DATA_MONGODB_URI<br>SPRING_DATA_MONGODB_DATABASE</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MONGODB_URI</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MONGODB_URI</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MONGODB_URI</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">-</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: Arial; font-weight: bold;">RabbitMQ</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">SPRING_RABBITMQ_HOST<br>SPRING_RABBITMQ_PORT<br>SPRING_RABBITMQ_USERNAME<br>SPRING_RABBITMQ_PASSWORD<br>SPRING_RABBITMQ_VIRTUAL_HOST</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">AMQP_URL</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">AMQP_URL</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">RABBITMQ_URL</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">RABBITMQ_HOST<br>RABBITMQ_PORT<br>RABBITMQ_USER<br>RABBITMQ_PASSWORD<br>RABBITMQ_VHOST</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: Arial; font-weight: bold;">Valkey / Redis</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">SPRING_DATA_REDIS_HOST<br>SPRING_DATA_REDIS_PORT<br>SPRING_DATA_REDIS_PASSWORD</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">REDIS_URL</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">REDIS_URL</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">REDIS_URL</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">REDIS_HOST<br>REDIS_PASSWORD<br>REDIS_PORT</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: Arial; font-weight: bold;">MinIO Bucket</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;" colspan="5" style="font-family: monospace;">MINIO_HOST, MINIO_BUCKET, MINIO_ACCESS_KEY, MINIO_SECRET_KEY (same for all frameworks)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: Arial; font-weight: bold;">SeaweedFS (S3)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">AWS_S3_ENDPOINT<br>AWS_S3_BUCKET<br>AWS_ACCESS_KEY_ID<br>AWS_SECRET_ACCESS_KEY<br>AWS_REGION</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">S3_ENDPOINT<br>S3_BUCKET<br>AWS_ACCESS_KEY_ID<br>AWS_SECRET_ACCESS_KEY<br>AWS_REGION</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">S3_ENDPOINT_URL<br>S3_BUCKET<br>AWS_ACCESS_KEY_ID<br>AWS_SECRET_ACCESS_KEY<br>AWS_DEFAULT_REGION</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">S3_ENDPOINT<br>S3_BUCKET<br>AWS_ACCESS_KEY_ID<br>AWS_SECRET_ACCESS_KEY<br>AWS_REGION</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">AWS_ENDPOINT<br>AWS_BUCKET<br>AWS_ACCESS_KEY_ID<br>AWS_SECRET_ACCESS_KEY<br>AWS_DEFAULT_REGION<br>AWS_USE_PATH_STYLE_ENDPOINT</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: Arial; font-weight: bold;">OTEL</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;" colspan="5">OTEL_EXPORTER_OTLP_ENDPOINT, OTEL_EXPORTER_OTLP_TRACES_ENDPOINT, OTEL_EXPORTER_OTLP_METRICS_ENDPOINT, OTEL_SERVICE_NAME + pod annotation. Python also adds PYTHONPATH (requires <code style="color: #fbbf24;">pythonpath</code> link attribute). See <a href="external_source_code-otel.html" style="color: #38bdf8;">OTEL link docs</a>.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Outbound Links -->
+        <div style="background-color: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #166534; font-size: 16px; margin: 0 0 16px 0; font-weight: 600;">Outbound Links (this component &rarr; target)</h3>
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Link Type</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Target</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Generated Output</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>external_source_code-prometheus</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Prometheus</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">ServiceMonitor in source_code.yaml scraping /actuator/prometheus every 15s</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>external_source_code-rabbitmq</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">RabbitMQ (direct)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">RabbitMQ connection ENVs in secret/cloud.env</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>external_source_code-exchange</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">RabbitMQ exchange sub-component</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Framework-specific RabbitMQ connection ENVs</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>external_source_code-bucket</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">MinIO bucket sub-component</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">MINIO_HOST, MINIO_BUCKET, MINIO_ACCESS_KEY, MINIO_SECRET_KEY</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>external_source_code-swbucket</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">SeaweedFS bucket sub-component</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Framework-specific S3-compatible ENVs</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>external_source_code-database</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">PostgreSQL database sub-component</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Framework-specific DB connection ENVs</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>external_source_code-mongo_db</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">MongoDB database sub-component</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Framework-specific MongoDB connection ENVs</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>external_source_code-db</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">CNPG database sub-component</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Framework-specific DB connection ENVs (uses cluster-cnpg-rw service)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>external_source_code-valkey</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Valkey / Redis</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Framework-specific Redis connection ENVs</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>external_source_code-otel</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">OTEL Collector</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">OTEL_* ENVs in cloud.env + pod auto-instrumentation annotation. Link attributes: <code>otel_language</code> (req), <code>pythonpath</code> (python only). <a href="external_source_code-otel.html" style="color: #166534;">Details</a></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>external_source_code-pv</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">SeaweedFS PV sub-component</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">seaweedfs-pvc.yaml + CSI volumeMount in Deployment. Link attribute <code>mount_path</code> controls mount location.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Inbound Links -->
+        <div style="background-color: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #166534; font-size: 16px; margin: 0 0 16px 0; font-weight: 600;">Inbound Links (source &rarr; this component)</h3>
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Link Type</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Source</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Generated Output</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>kong-external_source_code</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Kong Ingress</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">ingress.yaml with Kong ingressClassName + optional CORS/rate-limit plugins</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>apisix-external_source_code</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">APISIX (direct)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Route generated on APISIX side (not in this component)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>gateway-external_source_code</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">APISIX Gateway sub-component</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Custom gateway routing via APISIX gateway sub-component</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>istio-external_source_code</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Istio</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Adds <code>istio-injection: enabled</code> label to namespace.yaml</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>sonarqube-external_source_code</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">SonarQube</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">solarqube-scan.yaml Job in build pipeline (code quality scan after build)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Cross-namespace RBAC -->
+            <div style="margin-top: 16px; padding: 12px; background-color: #bbf7d0; border-radius: 6px; font-size: 12px;">
+                <strong style="color: #166534;">Cross-namespace RBAC (via outbound link <code>rbac_link_roles</code> attribute):</strong><br>
+                <span style="color: #14532d;"><strong>observer</strong></span> - get, list, watch<br>
+                <span style="color: #14532d;"><strong>operator</strong></span> - get, list, watch, update, patch<br>
+                <span style="color: #14532d;"><strong>developer</strong></span> - get, list, watch, create, update, patch, delete<br>
+                <span style="color: #14532d;"><strong>admin</strong></span> - full access (all verbs)<br>
+                <span style="color: #166534; font-size: 11px;">Resources auto-selected based on target parent type (cnpg, mongodb, rabbitmq, redis, elasticsearch, kafka).</span>
+            </div>
+        </div>
+
+        <!-- Generated Files -->
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #0369a1; margin-top: 0; margin-bottom: 15px;">Generated Files</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bae6fd;">
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">File</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Condition</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Content</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Deployment Files -->
+                    <tr><td colspan="3" style="padding: 8px; border: 1px solid #bae6fd; background-color: #e0f2fe; font-weight: bold; color: #0369a1;">Deploy (k8s/deploy/base/)</td></tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">source_code.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Deployment (containerPort:{port}, image, security, volumes) + Service (port:80 &rarr; targetPort:{port}) + ServiceMonitor (if Prometheus linked)</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">namespace.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Namespace. Adds <code>istio-injection: enabled</code> label if Istio linked.</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">kustomization.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Kustomize: resources, secretGenerator (registry + cloud.env), configMapGenerator (static-files), patches, stacktic labels</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">rbac.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">If <code>rbac=true</code>: SA + Role + RoleBinding + cross-namespace roles. If <code>rbac=false</code>: bare ServiceAccount only.</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">secret/cloud.env</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always (SOPS)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Secret connection ENVs (DB, MQ, S3, Redis, OTEL) - populated per linked service &amp; framework_type</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">config/cloud.env</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Non-secret ENVs + custom <code>configmap</code> attribute values</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">secret/registry.json</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always (SOPS)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Docker registry credentials (.dockerconfigjson)</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">jobs/clean-job.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Cleanup Job</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">files/test_file.text</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Placeholder for ConfigMap mount (add real files here)</td>
+                    </tr>
+                    <!-- Conditional Deploy -->
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">ingress.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">Kong linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Ingress with Kong ingressClassName. Optional CORS plugin (if <code>cors</code> link attr), rate-limit plugin (if <code>rate_limiting</code> link attr).</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">pvc.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">pvc = true</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">PersistentVolumeClaim named <code>pvc_name</code></td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">seaweedfs-pvc.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">SeaweedFS PV linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">One PVC per linked SeaweedFS PV sub-component (CSI driver)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">hpa.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">hpa = true</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">HPA with CPU + memory targets, scaleUp/scaleDown stabilization windows</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">files/startup.sh</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">startup_commands set</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Init script from startup_commands attribute</td>
+                    </tr>
+                    <!-- Patches -->
+                    <tr><td colspan="3" style="padding: 8px; border: 1px solid #bae6fd; background-color: #e0f2fe; font-weight: bold; color: #0369a1;">Patches (k8s/deploy/base/patch/)</td></tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">resource-patch.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">CPU/memory requests+limits + ephemeral storage</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">probes-patch.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">probes = true</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Liveness (delay:5s, period:10s) + readiness (delay:2s, period:5s). HTTP GET if <code>probe_path</code> set, TCP socket otherwise.</td>
+                    </tr>
+                    <!-- Build Pipeline -->
+                    <tr><td colspan="3" style="padding: 8px; border: 1px solid #bae6fd; background-color: #e0f2fe; font-weight: bold; color: #0369a1;">Build Pipeline (k8s/build/base/)</td></tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">kaniko.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">build_type = kaniko</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Kaniko build Job: git:// clone, context-sub-path from <code>git_folder</code>, custom <code>dockerfile</code> support</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">buildkit.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">build_type = buildkit</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">BuildKit build Job: HTTPS clone with <code>git_token</code>, contextsubdir from <code>git_folder</code>, custom <code>dockerfile</code></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">solarqube-scan.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">SonarQube linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Code quality scan Job (runs after build). Detects Java/Maven projects automatically.</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">secret/git.env</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Git credentials: username=<code>git_owner</code>, password=<code>git_token</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Ports -->
+        <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #166534; margin-top: 0; margin-bottom: 15px;">Ports</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Layer</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Port</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Source</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">Container</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">{port attribute}</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">containerPort from port attribute</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">Service</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">80</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Fixed service port, targetPort maps to container port</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Internal Endpoint -->
+        <div style="background-color: #f0f9ff; border: 2px solid #0ea5e9; border-radius: 8px; padding: 20px;">
+            <h3 style="color: #0369a1; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Internal Endpoint</h3>
+            <div style="font-family: monospace; background-color: #e0f2fe; padding: 12px; border-radius: 6px; font-size: 13px; line-height: 1.8;">
+                http://{component-name}.{namespace}.svc.cluster.local:80
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

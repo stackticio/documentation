@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>keda-mongo_db Link</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 800px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #1e293b; font-size: 24px; margin: 0 0 24px 0; font-weight: 700; border-bottom: 3px solid #22c55e; padding-bottom: 12px;">keda-mongo_db Link</h1>
+        <p style="color: #64748b; margin: 0 0 20px 0;">KEDA → MongoDB Database (sub-component)</p>
+
+        <!-- Generated File -->
+        <div style="background-color: #1e293b; color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">Generated File</h2>
+            <div style="font-family: monospace; font-size: 13px; line-height: 1.8;">
+                <span style="color: #fbbf24;">k8s/deploy/base/scaleup/mongodb.yaml</span>
+            </div>
+        </div>
+
+        <!-- Link Attributes -->
+        <div style="background-color: #f3e8ff; border: 2px solid #8b5cf6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #5b21b6; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Link Attributes</h3>
+            <div style="font-family: monospace; background-color: #e9d5ff; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.8;">
+                <strong>keda_query</strong> → MongoDB query (JSON format)<br>
+                <strong>keda_target_query</strong> → Target value for scaling<br>
+                <strong>keda_activation_query_value</strong> → Activation threshold<br>
+                <strong>keda_pollinginterval</strong> → Polling interval (seconds)<br>
+                <strong>keda_cooldownperiod</strong> → Cooldown period (seconds)<br>
+                <strong>keda_minreplicacount</strong> → Minimum replicas<br>
+                <strong>keda_maxreplicacount</strong> → Maximum replicas
+            </div>
+        </div>
+
+        <!-- What Gets Created -->
+        <div style="background-color: #f0fff4; border-radius: 8px; padding: 20px; border: 1px solid #9ae6b4;">
+            <h3 style="color: #1e293b; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">What Gets Created</h3>
+            <div style="font-family: monospace; background-color: #dcfce7; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.8;">
+                • Secret: keda-mongodb-secret (connection string)<br>
+                • TriggerAuthentication: keda-trigger-auth-mongodb-conn<br>
+                • ScaledObject: mongodb-scaledobject-[db-name]<br>
+                <em style="color: #166534;">Uses collection from db sub-component</em>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

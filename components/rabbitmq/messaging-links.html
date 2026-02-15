@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RabbitMQ Messaging Links (*-exchange, *-queue)</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #0f172a;">
+
+    <div style="max-width: 1000px; margin: 0 auto;">
+
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #78350f 0%, #b45309 100%); border-radius: 16px; padding: 32px; margin-bottom: 24px; border: 1px solid #f59e0b;">
+            <h1 style="color: #f8fafc; font-size: 28px; margin: 0 0 12px 0; font-weight: 700;">RabbitMQ Messaging Links</h1>
+            <p style="color: #fef3c7; margin: 0; font-size: 14px;">Links to RabbitMQ exchange and queue sub-components enable message publishing and consumption</p>
+        </div>
+
+        <!-- Link Type Distinction -->
+        <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #475569;">
+            <h2 style="color: #fbbf24; margin: 0 0 16px 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">🔀</span> Link Type Distinction
+            </h2>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                <div style="background-color: #0f172a; padding: 16px; border-radius: 12px; border: 2px solid #f59e0b;">
+                    <div style="color: #fbbf24; font-size: 14px; font-weight: 600; margin-bottom: 8px;">*-exchange (Publish)</div>
+                    <div style="color: #e2e8f0; font-size: 12px; margin-bottom: 4px;">Publish messages to exchange</div>
+                    <div style="color: #94a3b8; font-size: 11px;">Direction: Producer → RabbitMQ</div>
+                </div>
+                <div style="background-color: #0f172a; padding: 16px; border-radius: 12px; border: 2px solid #8b5cf6;">
+                    <div style="color: #a78bfa; font-size: 14px; font-weight: 600; margin-bottom: 8px;">*-queue (Consume)</div>
+                    <div style="color: #e2e8f0; font-size: 12px; margin-bottom: 4px;">Consume messages from queue</div>
+                    <div style="color: #94a3b8; font-size: 11px;">Direction: RabbitMQ → Consumer</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Supported Link Types -->
+        <div style="background: linear-gradient(135deg, #78350f 0%, #92400e 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #f59e0b;">
+            <h2 style="color: #fef3c7; margin: 0 0 20px 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">🔗</span> Supported Link Types
+            </h2>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                <!-- Exchange Links -->
+                <div style="background-color: #0f172a; padding: 16px; border-radius: 12px;">
+                    <h3 style="color: #fbbf24; margin: 0 0 12px 0; font-size: 14px;">Exchange Links (Publish)</h3>
+                    <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
+                        <tbody>
+                            <tr>
+                                <td style="padding: 8px 0;"><code style="background-color: #92400e; color: #fef3c7; padding: 3px 8px; border-radius: 4px; font-size: 11px;">image_base-exchange</code></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0;"><code style="background-color: #92400e; color: #fef3c7; padding: 3px 8px; border-radius: 4px; font-size: 11px;">fastapi-exchange</code></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0;"><code style="background-color: #92400e; color: #fef3c7; padding: 3px 8px; border-radius: 4px; font-size: 11px;">nodejs-exchange</code></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0;"><code style="background-color: #92400e; color: #fef3c7; padding: 3px 8px; border-radius: 4px; font-size: 11px;">airflow-exchange</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Queue Links -->
+                <div style="background-color: #0f172a; padding: 16px; border-radius: 12px;">
+                    <h3 style="color: #a78bfa; margin: 0 0 12px 0; font-size: 14px;">Queue Links (Consume)</h3>
+                    <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
+                        <tbody>
+                            <tr>
+                                <td style="padding: 8px 0;"><code style="background-color: #5b21b6; color: #e9d5ff; padding: 3px 8px; border-radius: 4px; font-size: 11px;">image_base-queue</code></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0;"><code style="background-color: #5b21b6; color: #e9d5ff; padding: 3px 8px; border-radius: 4px; font-size: 11px;">fastapi-queue</code></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0;"><code style="background-color: #5b21b6; color: #e9d5ff; padding: 3px 8px; border-radius: 4px; font-size: 11px;">nodejs-queue</code></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0;"><code style="background-color: #5b21b6; color: #e9d5ff; padding: 3px 8px; border-radius: 4px; font-size: 11px;">keda-queue</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Environment Variables -->
+        <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #475569;">
+            <h2 style="color: #fbbf24; margin: 0 0 16px 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">⚙️</span> Generated Environment Variables
+            </h2>
+            <div style="background-color: #0f172a; padding: 20px; border-radius: 12px; font-family: monospace; font-size: 12px; line-height: 2; border: 1px solid #334155;">
+                <div style="color: #64748b;"># Automatically configured when you create a RabbitMQ link</div>
+                <div><span style="color: #fcd34d;">RABBITMQ_HOST</span><span style="color: #94a3b8;">=</span><span style="color: #fbbf24;">auto-configured</span></div>
+                <div><span style="color: #fcd34d;">RABBITMQ_PORT</span><span style="color: #94a3b8;">=</span><span style="color: #fbbf24;">5672</span></div>
+                <div><span style="color: #fcd34d;">RABBITMQ_USER</span><span style="color: #94a3b8;">=</span><span style="color: #c4b5fd;">{exchange_user or queue_user}</span></div>
+                <div><span style="color: #fcd34d;">RABBITMQ_PASSWORD</span><span style="color: #94a3b8;">=</span><span style="color: #c4b5fd;">{exchange_password or queue_password}</span></div>
+                <div><span style="color: #fcd34d;">RABBITMQ_VHOST</span><span style="color: #94a3b8;">=</span><span style="color: #c4b5fd;">{vhost}</span></div>
+                <div><span style="color: #fcd34d;">AMQP_URL</span><span style="color: #94a3b8;">=</span><span style="color: #fbbf24;">amqp://{user}:{password}@{host}:{port}/{vhost}</span></div>
+                <div style="color: #64748b; margin-top: 8px;"># For exchange links</div>
+                <div><span style="color: #fcd34d;">RABBITMQ_EXCHANGE</span><span style="color: #94a3b8;">=</span><span style="color: #c4b5fd;">{exchange_name}</span></div>
+                <div><span style="color: #fcd34d;">RABBITMQ_EXCHANGE_TYPE</span><span style="color: #94a3b8;">=</span><span style="color: #c4b5fd;">{exchange_type}</span></div>
+                <div style="color: #64748b; margin-top: 8px;"># For queue links</div>
+                <div><span style="color: #fcd34d;">RABBITMQ_QUEUE</span><span style="color: #94a3b8;">=</span><span style="color: #c4b5fd;">{queue_name}</span></div>
+            </div>
+        </div>
+
+        <!-- Generated Files -->
+        <div style="background: linear-gradient(135deg, #78350f 0%, #92400e 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #f59e0b;">
+            <h2 style="color: #fef3c7; margin: 0 0 20px 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">📄</span> Generated Files
+            </h2>
+
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0; background-color: #0f172a; border-radius: 12px; overflow: hidden;">
+                <thead>
+                    <tr>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #fbbf24; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #f59e0b;">Link Type</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #fbbf24; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #f59e0b;">Generated Files</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #fbbf24; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #f59e0b;">Contents</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #92400e; color: #fef3c7; padding: 4px 8px; border-radius: 4px; font-size: 11px;">*-exchange</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #fbbf24; font-size: 11px; border-bottom: 1px solid #334155;">📁 src/rabbitmq_module/</td>
+                        <td style="padding: 12px 16px; color: #94a3b8; font-size: 11px; border-bottom: 1px solid #334155;">Publisher helpers, connection utils</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #5b21b6; color: #e9d5ff; padding: 4px 8px; border-radius: 4px; font-size: 11px;">*-queue</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #fbbf24; font-size: 11px; border-bottom: 1px solid #334155;">📁 src/rabbitmq_module/</td>
+                        <td style="padding: 12px 16px; color: #94a3b8; font-size: 11px; border-bottom: 1px solid #334155;">Consumer helpers, connection utils</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px;">
+                            <code style="background-color: #166534; color: #bbf7d0; padding: 4px 8px; border-radius: 4px; font-size: 11px;">exchange-queue</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #fbbf24; font-size: 11px;">📄 binding.yaml</td>
+                        <td style="padding: 12px 16px; color: #94a3b8; font-size: 11px;">Binding from exchange to queue with routing key</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- KEDA Integration -->
+        <div style="background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%); border-radius: 16px; padding: 24px; border: 1px solid #3b82f6;">
+            <h2 style="color: #bfdbfe; margin: 0 0 16px 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">📈</span> KEDA Queue Scaling (keda-queue)
+            </h2>
+            <p style="color: #93c5fd; font-size: 12px; margin-bottom: 16px;">When KEDA links to a queue, it creates a ScaledObject for auto-scaling based on queue depth</p>
+
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0; background-color: #0f172a; border-radius: 12px; overflow: hidden;">
+                <thead>
+                    <tr>
+                        <th style="padding: 12px 16px; background-color: #1e293b; color: #60a5fa; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #3b82f6;">Attribute</th>
+                        <th style="padding: 12px 16px; background-color: #1e293b; color: #60a5fa; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #3b82f6;">Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 10px 16px; border-bottom: 1px solid #334155;"><code style="color: #93c5fd;">keda_queue_mode</code></td>
+                        <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">QueueLength | MessageRate</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 10px 16px;"><code style="color: #93c5fd;">keda_queue_value</code></td>
+                        <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px;">Threshold value (e.g., "10")</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</body>
+</html>

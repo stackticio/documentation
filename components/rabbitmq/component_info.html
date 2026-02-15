@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RabbitMQ Component</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 900px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #1e293b; font-size: 24px; margin: 0 0 24px 0; font-weight: 700; border-bottom: 3px solid #f97316; padding-bottom: 12px;">RabbitMQ Component</h1>
+        <p style="color: #64748b; margin-bottom: 24px;">Message broker using RabbitMQ Operator. Auto-generates complete topology (exchanges, queues, bindings) via definitions.json loaded at cluster boot.</p>
+
+        <!-- Architecture -->
+        <div style="background-color: #1e293b; color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">Architecture</h2>
+            <div style="font-family: monospace; font-size: 13px; line-height: 1.8;">
+                <span style="color: #f97316;">RabbitmqCluster</span> - Operator-managed cluster<br>
+                <span style="color: #22d3ee;">definitions.json</span> - Topology loaded at boot<br>
+                <span style="color: #a78bfa;">Exchanges</span> - Message routers (sub-component)<br>
+                <span style="color: #4ade80;">Queues</span> - Message stores (sub-component)<br>
+                <span style="color: #fbbf24;">Bindings</span> - Exchange-to-Queue routing
+            </div>
+        </div>
+
+        <!-- Quick Reference -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Quick Reference</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Default</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Effect</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">namespace</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>rabbitmq</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">-</td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Kubernetes namespace</td>
+                    </tr>
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">username</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>appuser</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">-</td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Application username</td>
+                    </tr>
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">password</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>secret123</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">-</td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Application password (auto-hashed)</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>vhost</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>/</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">/</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Virtual host for isolation</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>admin_username</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>admin</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">admin</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Admin console user</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>admin_password</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>adminpass</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">-</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Admin password (auto-hashed)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>replicas</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>3</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">1</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Cluster node count</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>storage_size</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>10Gi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">10Gi</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">PVC storage per node</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Link Variables -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Link Variables</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Variable</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Link Type</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Purpose</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__prometheus</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">prometheus-rabbitmq</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Metrics scraping via ServiceMonitor</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__exchange</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">(sub-component)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Exchange definitions for definitions.json</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__queue</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">(sub-component)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Queue definitions for definitions.json</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__binding</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">exchange-queue</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Bindings from exchange-to-queue links</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sub-Components -->
+        <div style="background-color: #f3e8ff; border: 2px solid #8b5cf6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #5b21b6; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Sub-Components</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #e9d5ff;">
+                        <th style="padding: 8px; border: 1px solid #c4b5fd; text-align: left;">Type</th>
+                        <th style="padding: 8px; border: 1px solid #c4b5fd; text-align: left;">Purpose</th>
+                        <th style="padding: 8px; border: 1px solid #c4b5fd; text-align: left;">Key Attributes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd; font-weight: bold;">exchange</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">Message router</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">name, exchange_type, durable, routing_key</td>
+                    </tr>
+                    <tr style="background-color: #faf5ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd; font-weight: bold;">queue</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">Message store</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">name, durable, auto_delete</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Exchange Types -->
+        <div style="background-color: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #166534; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Exchange Types</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Type</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Routing Behavior</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">topic</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Pattern matching (order.*)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Flexible routing with wildcards</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">direct</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Exact match routing</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Specific queue targeting</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">fanout</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Broadcast to all queues</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Pub/sub notifications</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">headers</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Route by message headers</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Complex routing rules</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- definitions.json Auto-Generation -->
+        <div style="background-color: #fef2f2; border: 2px solid #ef4444; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #991b1b; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">definitions.json Auto-Generation</h3>
+            <div style="font-family: monospace; background-color: #fecaca; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.8;">
+                <strong>Generated from component + sub-components:</strong><br><br>
+                <span style="color: #dc2626;">users[]</span> - From username/password + admin_username/admin_password<br>
+                <span style="color: #dc2626;">vhosts[]</span> - From vhost attribute<br>
+                <span style="color: #dc2626;">exchanges[]</span> - From all exchange sub-components<br>
+                <span style="color: #dc2626;">queues[]</span> - From all queue sub-components<br>
+                <span style="color: #dc2626;">bindings[]</span> - From exchange-to-queue links<br>
+                <span style="color: #dc2626;">permissions[]</span> - Auto-generated for users<br><br>
+                <strong>Passwords auto-hashed using:</strong> local_extensions.password_hash
+            </div>
+        </div>
+
+        <!-- Generated Files -->
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #0369a1; margin-top: 0; margin-bottom: 15px;">Generated Files</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bae6fd;">
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">File</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Condition</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Contains</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">cluster.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">RabbitmqCluster CRD with definitions mount</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">rabbitmq.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">RabbitMQ Operator deployment</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">secret/definitions.json</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Complete topology (users, vhosts, exchanges, queues, bindings)</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">secret/rabbitmq.env</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Connection credentials</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">service-monitor.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">__prometheus</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Prometheus ServiceMonitor</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Ports -->
+        <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #166534; margin-top: 0; margin-bottom: 15px;">Ports</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Port</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Purpose</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Protocol</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">5672</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">AMQP messaging</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">AMQP</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">15672</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Management UI</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTP</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">15692</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Prometheus metrics</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTP</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">4369</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">EPMD (peer discovery)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">TCP</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">25672</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Inter-node clustering</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Erlang</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Connection String Format -->
+        <div style="background-color: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #92400e; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Connection String Format</h3>
+            <div style="font-family: monospace; background-color: #fde68a; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.8;">
+                <strong>AMQP URI:</strong><br>
+                amqp://{username}:{password}@{service}.{namespace}.svc.cluster.local:5672/{vhost}<br><br>
+                <strong>Example:</strong><br>
+                amqp://appuser:secret@rabbitmq.rabbitmq.svc.cluster.local:5672/
+            </div>
+        </div>
+
+        <!-- Technical Info -->
+        <div style="background-color: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 20px;">
+            <h3 style="color: #92400e; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Technical Info</h3>
+            <div style="font-family: monospace; background-color: #fde68a; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.8;">
+                <strong>Chart Version:</strong> 14.3.1<br>
+                <strong>Ports:</strong> 5672 (AMQP), 15672 (UI), 15692 (metrics)<br>
+                <strong>Extensions:</strong> local_extensions.password_hash<br>
+                <strong>CRD:</strong> RabbitmqCluster (rabbitmq.com/v1beta1)
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

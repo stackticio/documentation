@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SeaweedFS Component</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 900px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #1e293b; font-size: 24px; margin: 0 0 24px 0; font-weight: 700; border-bottom: 3px solid #22c55e; padding-bottom: 12px;">SeaweedFS</h1>
+        <p style="color: #64748b; margin-bottom: 24px;">Distributed file system with S3-compatible API and CSI driver for Kubernetes PersistentVolumes. Buckets (swbucket) and PVs (pv) are sub-components.</p>
+
+        <!-- Architecture -->
+        <div style="background-color: #1e293b; color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">Architecture</h2>
+            <div style="font-family: monospace; font-size: 13px; line-height: 1.8;">
+                <span style="color: #22c55e;">Master</span> - Metadata management + volume assignment (StatefulSet)<br>
+                <span style="color: #22d3ee;">Volume</span> - Data storage nodes with persistent storage (StatefulSet)<br>
+                <span style="color: #a78bfa;">Filer</span> - POSIX-like filesystem layer (StatefulSet)<br>
+                <span style="color: #fbbf24;">S3 API</span> - AWS S3-compatible endpoint on Filer (:{port} attribute)<br>
+                <span style="color: #f97316;">CSI Driver</span> - K8s PV provisioner (optional, <code>seaweed_csi = true</code>)
+            </div>
+        </div>
+
+        <!-- Attributes -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Attributes</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Description</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">namespace</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>seaweedfs</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Kubernetes namespace for all SeaweedFS resources</td>
+                    </tr>
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">access_key</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>admin</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Root S3 API access key (admin identity with Admin+Read+Write actions)</td>
+                    </tr>
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">secret_key</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>changeme123</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Root S3 API secret key</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>port</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>8333</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">S3 API port — used in Service and all S3 endpoint URLs</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>replicas</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>3</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Replica count for ALL StatefulSets (master, volume, filer)</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>pvc_size</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>100Gi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">PVC storage per Volume node. Master=10Gi, Filer=25Gi (fixed).</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>resource_profile</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>medium</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Selects resource sizing (small/medium/large/x-large). Sets CPU+memory for master, volume, filer. See Resource Profiles.</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>global_version</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>3.71</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">SeaweedFS Helm chart version</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>seaweed_csi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Enables CSI driver (controller + node DaemonSet + StorageClass). Required for <code>pv</code> sub-components.</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>seaweed_csi_version</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>0.2.2</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">CSI driver Helm chart version. Only relevant when <code>seaweed_csi = true</code>.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sub-Components -->
+        <div style="background-color: #f3e8ff; border: 2px solid #8b5cf6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #5b21b6; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Sub-Components</h3>
+
+            <!-- swbucket -->
+            <div style="background-color: #e9d5ff; padding: 16px; border-radius: 6px; margin-bottom: 12px;">
+                <h4 style="color: #5b21b6; margin: 0 0 8px 0; font-size: 14px;">swbucket - S3 Bucket</h4>
+                <p style="color: #6b21a8; font-size: 12px; margin-bottom: 8px;">Each swbucket creates an S3 bucket via init Job, a per-bucket K8s Secret with credentials, and an S3 identity entry with scoped IAM permissions.</p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #c4b5fd;">
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e1b4b;">
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>bucket</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>loki-chunks</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">S3 bucket name — created by init Job, used for IAM action scoping</td>
+                        </tr>
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>access_key</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>loki-user</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Per-bucket access key &rarr; stored in <code>{name}-credentials</code> Secret. <span style="color: #dc2626; font-weight: bold;">Must be unique across all swbuckets.</span></td>
+                        </tr>
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>secret_key</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>secret123</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Per-bucket secret key &rarr; stored in <code>{name}-credentials</code> Secret. <span style="color: #dc2626; font-weight: bold;">Must be unique across all swbuckets.</span></td>
+                        </tr>
+                        <tr style="background-color: #ede9fe;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>bucket_actions</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>[read, write]</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">S3 IAM permissions. If empty: defaults to Read, Write, List, Tagging. Each action scoped as <code>Action:bucket_name</code>.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- pv -->
+            <div style="background-color: #e9d5ff; padding: 16px; border-radius: 6px;">
+                <h4 style="color: #5b21b6; margin: 0 0 8px 0; font-size: 14px;">pv - PersistentVolume (CSI)</h4>
+                <p style="color: #6b21a8; font-size: 12px; margin-bottom: 8px;">Shared filesystem storage via CSI driver. Default <strong>ReadWriteMany</strong> — multiple pods can read/write simultaneously. Requires <code>seaweed_csi = true</code>. Apps link to pv and get a PVC + volumeMount auto-generated.</p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #c4b5fd;">
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Default</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e1b4b;">
+                        <tr style="background-color: #ede9fe;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>pvc_size</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>5Gi</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">PV capacity storage</td>
+                        </tr>
+                        <tr style="background-color: #f3e8ff;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>accessMode</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>ReadWriteMany</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">ReadWriteMany for shared access (HPA/replicas). ReadWriteOnce for single-pod.</td>
+                        </tr>
+                        <tr style="background-color: #ede9fe;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>path</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">(empty)</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Filer path prefix for the volume</td>
+                        </tr>
+                        <tr style="background-color: #f3e8ff;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>collection_name</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">{pv name}</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">SeaweedFS collection name. Defaults to pv sub-component name.</td>
+                        </tr>
+                        <tr style="background-color: #ede9fe;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>seaweed_replication</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">(empty)</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Data replication strategy (e.g., "001" = one replica on different rack)</td>
+                        </tr>
+                        <tr style="background-color: #f3e8ff;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>disk_type</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">(empty)</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Storage tier (e.g., "ssd", "hdd")</td>
+                        </tr>
+                        <tr style="background-color: #ede9fe;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>data_locality</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">(empty)</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Data placement (e.g., "write_preferlocaldc")</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Links -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Links</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Link Type</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Direction</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">What Gets Automated</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>prometheus-seaweedfs</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Prometheus &rarr; SeaweedFS</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">3 ServiceMonitor CRs (master, volume, filer) scraping /metrics every 30s</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>loki-seaweedfs</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Loki &rarr; SeaweedFS</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">SeaweedFS becomes Loki's S3 chunk storage backend</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>velero-seaweedfs</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Velero &rarr; SeaweedFS</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">SeaweedFS S3 as Velero BackupStorageLocation</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>istio-seaweedfs</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Istio &rarr; SeaweedFS</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Sidecar injection + mTLS on all SeaweedFS pods</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>kong-seaweedfs</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Kong &rarr; SeaweedFS</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Kong Ingress route exposing S3 API</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>react-seaweedfs</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">React &rarr; SeaweedFS</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">S3 storage env vars injected into React app</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>topic-swbucket</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Kafka Topic &rarr; swbucket</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Kafka Connect CamelMinioSink auto-configured to write topic data to S3 bucket</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>apisix-seaweedfs</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">SeaweedFS &rarr; APISIX</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">APISIX route for S3 API external access</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>backend-storage</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Backend App &rarr; swbucket</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">S3 credentials + endpoint injected as ENV vars (S3_ENDPOINT, AWS_ACCESS_KEY_ID, etc.)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>database-swbucket</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">PostgreSQL db &rarr; swbucket</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Filer metadata on PostgreSQL + database backup to S3 bucket</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>external_source_code-pv</code><br><code>image_base-pv</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">App &rarr; pv</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">PVC + volumeMount auto-generated on the app. Link attribute: <code>mount_path</code> (e.g. <code>/data</code>)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Generated Files -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Generated Files</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">File</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Condition</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Contains</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/seaweedfs.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">ServiceAccount, Service (S3:{port}, Filer:8888), Master/Volume/Filer StatefulSets</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/namespace.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Namespace definition</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/kustomization.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Kustomize resources, secretGenerator, labels, resource patches</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/service-monitor.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">If prometheus linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">3 ServiceMonitor CRs (master, volume, filer) scraping /metrics every 30s</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/swbucket.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">If swbucket sub-components</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">K8s Job that creates each S3 bucket via <code>mc mb</code></td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/seaweedfs-csi.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">If seaweed_csi = true</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">CSI controller Deployment, node DaemonSet, mount service DaemonSet, StorageClass</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/pv.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">If pv sub-components</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">One PersistentVolume per pv sub-component (CSI driver, Retain reclaim policy)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/patch/resource-{size}.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">ONE selected by resource_profile</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">CPU+memory requests+limits for master, volume, filer</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/patch/csi-priority.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">If seaweed_csi = true</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Removes hardcoded priorityClassName from CSI components</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/secret/s3-secret.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">K8s Secret: admin credentials + S3 config JSON with per-bucket identities and IAM actions</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/secret/seaweedfs.env</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Always (SOPS)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Root S3 credentials (accessKey + secretKey)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/secret/cloud.env</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Always (SOPS)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">S3_ENDPOINT + S3_REGION</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/secret/swbucket-secret.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">If swbucket sub-components (SOPS)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">One Secret per swbucket: <code>{name}-credentials</code> with access-key, secret-key, endpoint, bucket name</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>docker/swbucket-job/Dockerfile</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Docker image for bucket creation Job (mc client)</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>helm/helm-values.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">SeaweedFS Helm chart values</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>helm/csi-values.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">If seaweed_csi = true</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">CSI driver Helm chart values</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Resource Profiles -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Resource Profiles</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 6px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Profile</th>
+                        <th style="padding: 6px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Master (req/limit)</th>
+                        <th style="padding: 6px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Volume (req/limit)</th>
+                        <th style="padding: 6px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Filer (req/limit)</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1; font-family: monospace; font-size: 10px;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 4px 6px; border: 1px solid #475569; font-family: Arial; font-weight: bold;">small</td>
+                        <td style="padding: 4px 6px; border: 1px solid #475569;">100m/256Mi &rarr; 200m/512Mi</td>
+                        <td style="padding: 4px 6px; border: 1px solid #475569;">200m/1Gi &rarr; 500m/2Gi</td>
+                        <td style="padding: 4px 6px; border: 1px solid #475569;">100m/512Mi &rarr; 300m/1Gi</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 4px 6px; border: 1px solid #475569; font-family: Arial; font-weight: bold;">medium</td>
+                        <td style="padding: 4px 6px; border: 1px solid #475569;">250m/512Mi &rarr; 500m/1Gi</td>
+                        <td style="padding: 4px 6px; border: 1px solid #475569;">500m/2Gi &rarr; 1/4Gi</td>
+                        <td style="padding: 4px 6px; border: 1px solid #475569;">250m/1Gi &rarr; 500m/2Gi</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 4px 6px; border: 1px solid #475569; font-family: Arial; font-weight: bold;">large</td>
+                        <td style="padding: 4px 6px; border: 1px solid #475569;">500m/1Gi &rarr; 1/2Gi</td>
+                        <td style="padding: 4px 6px; border: 1px solid #475569;">1/4Gi &rarr; 2/8Gi</td>
+                        <td style="padding: 4px 6px; border: 1px solid #475569;">500m/2Gi &rarr; 1/4Gi</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 4px 6px; border: 1px solid #475569; font-family: Arial; font-weight: bold;">x-large</td>
+                        <td style="padding: 4px 6px; border: 1px solid #475569;">1/2Gi &rarr; 2/4Gi</td>
+                        <td style="padding: 4px 6px; border: 1px solid #475569;">2/8Gi &rarr; 4/16Gi</td>
+                        <td style="padding: 4px 6px; border: 1px solid #475569;">1/4Gi &rarr; 2/8Gi</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</body>
+</html>

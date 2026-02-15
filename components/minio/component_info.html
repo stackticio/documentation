@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MinIO Component</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 900px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #1e293b; font-size: 24px; margin: 0 0 24px 0; font-weight: 700; border-bottom: 3px solid #ef4444; padding-bottom: 12px;">MinIO Component</h1>
+        <p style="color: #64748b; margin-bottom: 24px;">S3-compatible object storage with multi-tenancy via bucket sub-components. Auto-creates buckets with policies and generates connection secrets for linked applications.</p>
+
+        <!-- Architecture -->
+        <div style="background-color: #1e293b; color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">Architecture</h2>
+            <div style="font-family: monospace; font-size: 13px; line-height: 1.8;">
+                <span style="color: #ef4444;">MinIO Server</span> - S3-compatible object storage<br>
+                <span style="color: #22d3ee;">Bucket</span> - Sub-component for storage isolation<br>
+                <span style="color: #a78bfa;">mc Client</span> - Bucket provisioning via Jobs<br>
+                <span style="color: #4ade80;">S3 API</span> - AWS S3-compatible interface<br>
+                <span style="color: #fbbf24;">Console</span> - Web UI for management
+            </div>
+        </div>
+
+        <!-- Quick Reference -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Quick Reference</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Default</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Effect</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">namespace</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>minio</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">-</td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Kubernetes namespace</td>
+                    </tr>
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">root_user</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>admin</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">-</td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Root admin username</td>
+                    </tr>
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">root_password</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>secretpass</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">-</td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Root admin password</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>replicas</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>1</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">1</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Server replicas (4 for distributed)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>storage_size</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>50Gi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">10Gi</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">PVC storage size</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>storageclass</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>standard</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">default</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Storage class name</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sub-Components -->
+        <div style="background-color: #fee2e2; border: 2px solid #ef4444; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #991b1b; font-size: 18px; margin: 0 0 16px 0; font-weight: 700;">Sub-Components</h3>
+
+            <!-- bucket sub-component -->
+            <div style="background-color: #fecaca; padding: 16px; border-radius: 6px;">
+                <h4 style="color: #991b1b; margin: 0 0 12px 0; font-size: 14px;">bucket <span style="background-color: #ef4444; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">SUB</span></h4>
+                <p style="color: #7f1d1d; margin: 0 0 12px 0; font-size: 13px;">Defines an S3 bucket with its own access credentials. Creates bucket via mc client Job and generates connection secrets.</p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #fca5a5;">
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody style="background-color: #fee2e2;">
+                        <tr style="background-color: #78350f;">
+                            <td style="padding: 5px 6px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">bucket_name</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 3px; border-radius: 2px; font-size: 8px;">REQ</span></td>
+                            <td style="padding: 5px 6px; border: 1px solid #f59e0b;"><code>app-data</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #f59e0b;">Bucket name</td>
+                        </tr>
+                        <tr style="background-color: #78350f;">
+                            <td style="padding: 5px 6px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">bucket_access_key</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 3px; border-radius: 2px; font-size: 8px;">REQ</span></td>
+                            <td style="padding: 5px 6px; border: 1px solid #f59e0b;"><code>AKIAEXAMPLE</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #f59e0b;">S3 access key ID</td>
+                        </tr>
+                        <tr style="background-color: #78350f;">
+                            <td style="padding: 5px 6px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">bucket_secret_key</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 3px; border-radius: 2px; font-size: 8px;">REQ</span></td>
+                            <td style="padding: 5px 6px; border: 1px solid #f59e0b;"><code>secretkey123</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #f59e0b;">S3 secret access key</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>versioning</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>true</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">Enable object versioning</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>quota</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>10Gi</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">Bucket quota limit</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>retention_days</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>30</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">Object retention in days</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="font-family: monospace; background-color: #fef2f2; padding: 10px; border-radius: 4px; margin-top: 12px; font-size: 11px; color: #7f1d1d;">
+                    <strong>Creates:</strong><br>
+                    - Job: mc mb (bucket creation)<br>
+                    - Job: mc admin user add (user creation)<br>
+                    - Job: mc admin policy attach (policy assignment)<br>
+                    - Secret: bucket-secret.yaml (credentials)
+                </div>
+            </div>
+        </div>
+
+        <!-- Link Variables -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Link Variables</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Variable</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Link Type</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Effect</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__prometheus</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">prometheus-minio</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">ServiceMonitor for metrics</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__loki</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">loki-minio</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Loki bucket storage</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__apisix</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">apisix-minio</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Gateway route exposure</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__velero</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">velero-minio</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Velero backup storage</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__istio</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">istio-minio</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Service mesh integration</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__kafka</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">topic-minio</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Kafka S3 sink connector</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Bucket Link Consumers -->
+        <div style="background-color: #f3e8ff; border: 2px solid #8b5cf6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #5b21b6; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Components that Link to bucket Sub-Component</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                <thead>
+                    <tr style="background-color: #e9d5ff;">
+                        <th style="padding: 8px; border: 1px solid #c4b5fd; text-align: left;">Link Type</th>
+                        <th style="padding: 8px; border: 1px solid #c4b5fd; text-align: left;">Consumer</th>
+                        <th style="padding: 8px; border: 1px solid #c4b5fd; text-align: left;">Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #faf5ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>backend-bucket</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">fastapi, nodejs, etc.</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">Injects S3 credentials (AWS_ACCESS_KEY_ID, etc.)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>cnpg-bucket</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">CNPG</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">PostgreSQL backup storage</td>
+                    </tr>
+                    <tr style="background-color: #faf5ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>mongodb-bucket</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">MongoDB</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">MongoDB backup storage</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>loki-bucket</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">Loki</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">Log storage backend</td>
+                    </tr>
+                    <tr style="background-color: #faf5ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>velero-bucket</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">Velero</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">Cluster backup storage</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>k6-bucket</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">K6</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">Load test S3 operations</td>
+                    </tr>
+                    <tr style="background-color: #faf5ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>kafka-bucket</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">Kafka Connect</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">S3 sink connector destination</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>airflow-bucket</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">Airflow</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">DAG ETL S3 operations</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Generated Files -->
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #0369a1; margin-top: 0; margin-bottom: 15px;">Generated Files</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bae6fd;">
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">File</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Condition</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Contains</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">helm/helm-values.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">MinIO Helm values</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">bucket-job.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">__bucket exists</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">mc client bucket creation jobs</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">secret/minio.env</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Root credentials</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">secret/bucket-secret.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">__bucket exists</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Per-bucket credentials</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">service-monitor.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">__prometheus</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Prometheus ServiceMonitor</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Ports -->
+        <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #166534; margin-top: 0; margin-bottom: 15px;">Ports</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Port</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Purpose</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Protocol</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">9000</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">S3 API endpoint</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTP/HTTPS</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">9001</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Console UI</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTP</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- S3 Connection -->
+        <div style="background-color: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #92400e; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">S3 Connection Format</h3>
+            <div style="font-family: monospace; background-color: #fde68a; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.8;">
+                <strong>Endpoint:</strong> http://minio.{namespace}.svc.cluster.local:9000<br>
+                <strong>Region:</strong> us-east-1 (default)<br><br>
+                <strong>ENV Variables (per bucket):</strong><br>
+                AWS_ACCESS_KEY_ID={bucket_access_key}<br>
+                AWS_SECRET_ACCESS_KEY={bucket_secret_key}<br>
+                AWS_ENDPOINT_URL=http://minio.{namespace}:9000<br>
+                S3_BUCKET={bucket_name}
+            </div>
+        </div>
+
+        <!-- Technical Info -->
+        <div style="background-color: #1e293b; color: white; padding: 20px; border-radius: 8px;">
+            <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600;">Technical Info</h3>
+            <div style="font-family: monospace; font-size: 12px; line-height: 1.8;">
+                <strong>Chart Version:</strong> 14.6.0<br>
+                <strong>mc Client:</strong> RELEASE.2024-08-26T10-49-58Z<br>
+                <strong>Ports:</strong> 9000 (API), 9001 (Console)<br>
+                <strong>Kaniko Version:</strong> v1.21.0 (for custom builds)
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

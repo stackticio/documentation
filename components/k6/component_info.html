@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>K6 Component</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 900px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #1e293b; font-size: 24px; margin: 0 0 24px 0; font-weight: 700; border-bottom: 3px solid #7c3aed; padding-bottom: 12px;">K6 Component</h1>
+        <p style="color: #64748b; margin-bottom: 24px;">Load testing framework from Grafana. Auto-generates test scripts for linked infrastructure with custom scenarios and Prometheus metrics output.</p>
+
+        <!-- Architecture -->
+        <div style="background-color: #1e293b; color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">Architecture</h2>
+            <div style="font-family: monospace; font-size: 13px; line-height: 1.8;">
+                <span style="color: #7c3aed;">K6 Operator</span> - Distributed test execution<br>
+                <span style="color: #22d3ee;">Test Scripts</span> - Auto-generated from links<br>
+                <span style="color: #a78bfa;">TestRun CRD</span> - K8s-native test orchestration<br>
+                <span style="color: #4ade80;">Prometheus</span> - Metrics export<br>
+                <span style="color: #fbbf24;">Grafana</span> - Real-time dashboards
+            </div>
+        </div>
+
+        <!-- Quick Reference -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Quick Reference</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Default</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Effect</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">namespace</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>k6</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">-</td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Kubernetes namespace</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>vus</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>10</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">10</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Virtual users count</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>duration</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>30s</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">30s</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Test duration</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>parallelism</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>4</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">1</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Distributed runner pods</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sub-Components -->
+        <div style="background-color: #fee2e2; border: 2px solid #ef4444; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #991b1b; font-size: 18px; margin: 0 0 16px 0; font-weight: 700;">Sub-Components</h3>
+
+            <!-- endpoints sub-component -->
+            <div style="background-color: #fecaca; padding: 16px; border-radius: 6px; margin-bottom: 16px;">
+                <h4 style="color: #991b1b; margin: 0 0 12px 0; font-size: 14px;">endpoints <span style="background-color: #ef4444; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">SUB</span></h4>
+                <p style="color: #7f1d1d; margin: 0 0 12px 0; font-size: 13px;">Defines HTTP endpoints for API load testing. Creates endpoints.json and generic-test.js.</p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #fca5a5;">
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody style="background-color: #fee2e2;">
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>url</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>http://api.svc:8080</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">Base URL for the endpoint</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>path</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>/api/users</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">API path to test</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>method</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>GET</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">HTTP method (GET/POST/PUT/DELETE)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>body</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>{"name":"test"}</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">Request body for POST/PUT</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>headers</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>Content-Type: application/json</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">Custom HTTP headers</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>auth</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>bearer</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">Auth type (bearer/basic)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="font-family: monospace; background-color: #fef2f2; padding: 10px; border-radius: 4px; margin-top: 12px; font-size: 11px; color: #7f1d1d;">
+                    <strong>Generates:</strong> k8s/deploy/base/k6/secret/endpoints.json<br>
+                    <strong>Test file:</strong> k8s/deploy/base/k6/tests/generic-test.js<br>
+                    <strong>TestRun:</strong> endpoint-test in test-run.yaml
+                </div>
+            </div>
+
+            <!-- custom_api sub-component -->
+            <div style="background-color: #fecaca; padding: 16px; border-radius: 6px;">
+                <h4 style="color: #991b1b; margin: 0 0 12px 0; font-size: 14px;">custom_api <span style="background-color: #ef4444; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">SUB</span></h4>
+                <p style="color: #7f1d1d; margin: 0 0 12px 0; font-size: 13px;">User-defined custom API test configurations with advanced scenarios.</p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #fca5a5;">
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody style="background-color: #fee2e2;">
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>name</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>payment-api</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">Custom API test name</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>script</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>custom-payment.js</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">Custom test script file</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>vus</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>50</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">Override default VUs</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>duration</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>5m</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">Override default duration</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Link to Sub-Components -->
+        <div style="background-color: #f3e8ff; border: 2px solid #8b5cf6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #5b21b6; font-size: 18px; margin: 0 0 16px 0; font-weight: 700;">Link to Sub-Components (Test Generation)</h3>
+            <p style="color: #6b21a8; margin: 0 0 16px 0; font-size: 13px;">K6 can link to sub-components of other infrastructure to auto-generate specialized test scripts.</p>
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                <thead>
+                    <tr style="background-color: #e9d5ff;">
+                        <th style="padding: 8px; border: 1px solid #c4b5fd; text-align: left;">Link Type</th>
+                        <th style="padding: 8px; border: 1px solid #c4b5fd; text-align: left;">Target Sub-Component</th>
+                        <th style="padding: 8px; border: 1px solid #c4b5fd; text-align: left;">Variable</th>
+                        <th style="padding: 8px; border: 1px solid #c4b5fd; text-align: left;">Test Generated</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #faf5ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>k6-exchange</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">rabbitmq &rarr; exchange</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>__exchange</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">RabbitMQ publish tests (rabbitmq.js)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>k6-queue</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">rabbitmq &rarr; queue</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>__queue</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">RabbitMQ consume tests</td>
+                    </tr>
+                    <tr style="background-color: #faf5ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>k6-database</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">postgresql &rarr; database</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>__reldb</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">PostgreSQL query tests (psql.js)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>k6-db</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">cnpg &rarr; db</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>__cnpg</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">CloudNativePG tests (cnpg.js)</td>
+                    </tr>
+                    <tr style="background-color: #faf5ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>k6-mongo_db</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">mongodb &rarr; mongo_db</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>__mongodb</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">MongoDB operation tests (mongo.js)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>k6-topic</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">kafka &rarr; topic</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>__topic</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">Kafka produce/consume tests (kafka.js)</td>
+                    </tr>
+                    <tr style="background-color: #faf5ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>k6-bucket</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">minio &rarr; bucket</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>__bucket</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">S3 PUT/GET tests</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>gateway-k6</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">apisix &rarr; gateway</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>__gateway</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">Gateway route tests</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Link Variables -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Component Link Variables</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Variable</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Link Type</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Effect</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__prometheus</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">prometheus-k6</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Enables Prometheus metrics output</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__ingress</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">gateway-backend</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Gateway for test endpoints</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__apisix</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">apisix-k6</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">APISIX route exposure</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__istio</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">istio-k6</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Service mesh integration</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__postgresql</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">k6-postgresql</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">PostgreSQL connection</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__rabbitmq</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">k6-rabbitmq</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">RabbitMQ connection</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__celery</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">k6-celery</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Celery task tests</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Test Types -->
+        <div style="background-color: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #166534; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Auto-Generated Test Types & Metrics</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Test File</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Trigger</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Metrics</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #86efac; font-family: monospace;">generic-test.js</td>
+                        <td style="padding: 6px 8px; border: 1px solid #86efac;">endpoints sub-component</td>
+                        <td style="padding: 6px 8px; border: 1px solid #86efac;">http_req_duration, http_req_failed, http_reqs</td>
+                    </tr>
+                    <tr style="background-color: #dcfce7;">
+                        <td style="padding: 6px 8px; border: 1px solid #86efac; font-family: monospace;">mongo.js</td>
+                        <td style="padding: 6px 8px; border: 1px solid #86efac;">k6-mongo_db link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #86efac;">mongo_writes, mongo_reads, mongo_write_ms</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #86efac; font-family: monospace;">kafka.js</td>
+                        <td style="padding: 6px 8px; border: 1px solid #86efac;">k6-topic link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #86efac;">kafka_produces, kafka_consumes, kafka_produce_ms</td>
+                    </tr>
+                    <tr style="background-color: #dcfce7;">
+                        <td style="padding: 6px 8px; border: 1px solid #86efac; font-family: monospace;">rabbitmq.js</td>
+                        <td style="padding: 6px 8px; border: 1px solid #86efac;">k6-exchange/queue link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #86efac;">rabbitmq_publishes, rabbitmq_publish_ms</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #86efac; font-family: monospace;">cnpg.js</td>
+                        <td style="padding: 6px 8px; border: 1px solid #86efac;">k6-db link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #86efac;">pg_query_time, pg_connections</td>
+                    </tr>
+                    <tr style="background-color: #dcfce7;">
+                        <td style="padding: 6px 8px; border: 1px solid #86efac; font-family: monospace;">psql.js</td>
+                        <td style="padding: 6px 8px; border: 1px solid #86efac;">k6-database link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #86efac;">pg_query_time, pg_connections</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Generated Files -->
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #0369a1; margin-top: 0; margin-bottom: 15px;">Generated Files</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bae6fd;">
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">File</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Condition</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Contains</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">tests/*.js</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Per linked target</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">K6 test scripts</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">test-run.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">TestRun CRDs per test type</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">secret/cloud.env</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Connection credentials</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">secret/endpoints.json</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">endpoints sub-component</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">HTTP endpoint configs</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Prometheus Output -->
+        <div style="background-color: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #92400e; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Prometheus Metrics Output</h3>
+            <div style="font-family: monospace; background-color: #fde68a; padding: 12px; border-radius: 6px; font-size: 11px; line-height: 1.8;">
+                <strong>When __prometheus is linked:</strong><br>
+                - k6_http_req_duration (histogram)<br>
+                - k6_http_req_failed (counter)<br>
+                - k6_http_reqs (counter)<br>
+                - k6_vus (gauge)<br>
+                - k6_iterations (counter)<br><br>
+                <strong>Output config:</strong> K6_PROMETHEUS_RW_SERVER_URL
+            </div>
+        </div>
+
+        <!-- Technical Info -->
+        <div style="background-color: #1e293b; color: white; padding: 20px; border-radius: 8px;">
+            <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600;">Technical Info</h3>
+            <div style="font-family: monospace; font-size: 12px; line-height: 1.8;">
+                <strong>Kaniko Version:</strong> v1.21.0 (for custom builds)<br>
+                <strong>CRDs:</strong> TestRun (k6.io/v1alpha1)<br>
+                <strong>Extensions:</strong> xk6-sql, xk6-kafka, xk6-amqp, xk6-mongo<br>
+                <strong>Ports:</strong> 6565 (gRPC), 5656 (REST API)
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

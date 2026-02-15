@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>KEDA Component</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 900px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #1e293b; font-size: 24px; margin: 0 0 24px 0; font-weight: 700; border-bottom: 3px solid #3b82f6; padding-bottom: 12px;">KEDA Component</h1>
+        <p style="color: #64748b; margin-bottom: 24px;">Kubernetes Event-driven Autoscaler. Scales workloads based on external metrics from queues, databases, Prometheus, Loki, and more.</p>
+
+        <!-- Architecture -->
+        <div style="background-color: #1e293b; color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">Architecture</h2>
+            <div style="font-family: monospace; font-size: 13px; line-height: 1.8;">
+                <span style="color: #3b82f6;">KEDA Operator</span> - ScaledObject controller<br>
+                <span style="color: #22d3ee;">Metrics Server</span> - External metrics adapter<br>
+                <span style="color: #a78bfa;">ScaledObject</span> - Autoscaling configuration<br>
+                <span style="color: #4ade80;">Triggers</span> - Event sources (60+ scalers)<br>
+                <span style="color: #fbbf24;">TriggerAuth</span> - Scaler credentials
+            </div>
+        </div>
+
+        <!-- Quick Reference -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Quick Reference</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Default</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Effect</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">namespace</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>keda</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">-</td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">KEDA operator namespace</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>log_level</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>info</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">info</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">debug, info, error</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Link to Sub-Components -->
+        <div style="background-color: #fee2e2; border: 2px solid #ef4444; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #991b1b; font-size: 18px; margin: 0 0 16px 0; font-weight: 700;">Link to Sub-Components (ScaledObject Generation)</h3>
+            <p style="color: #7f1d1d; margin: 0 0 16px 0; font-size: 13px;">KEDA links to sub-components of other infrastructure to auto-generate ScaledObjects with appropriate triggers.</p>
+
+            <!-- keda-queue -->
+            <div style="background-color: #fecaca; padding: 16px; border-radius: 6px; margin-bottom: 16px;">
+                <h4 style="color: #991b1b; margin: 0 0 12px 0; font-size: 14px;">keda-queue <span style="background-color: #f97316; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">LINK</span></h4>
+                <p style="color: #7f1d1d; margin: 0 0 10px 0; font-size: 12px;">KEDA &rarr; RabbitMQ queue sub-component. Generates: <code>k8s/deploy/base/scaleup/rabbitmq.yaml</code></p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #fca5a5;">
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Link Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody style="background-color: #fee2e2;">
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>keda_queue_mode</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>QueueLength</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">QueueLength | MessageRate</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>keda_queue_value</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>10</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">Threshold value to trigger scaling</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="font-family: monospace; background-color: #fef2f2; padding: 8px; border-radius: 4px; margin-top: 10px; font-size: 10px; color: #7f1d1d;">
+                    <strong>Creates:</strong> Secret (AMQP connection), TriggerAuthentication, ScaledObject
+                </div>
+            </div>
+
+            <!-- keda-topic -->
+            <div style="background-color: #fecaca; padding: 16px; border-radius: 6px; margin-bottom: 16px;">
+                <h4 style="color: #991b1b; margin: 0 0 12px 0; font-size: 14px;">keda-topic <span style="background-color: #8b5cf6; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">LINK</span></h4>
+                <p style="color: #7f1d1d; margin: 0 0 10px 0; font-size: 12px;">KEDA &rarr; Kafka topic sub-component. Generates: <code>k8s/deploy/base/scaleup/kafka.yaml</code></p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #fca5a5;">
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Link Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody style="background-color: #fee2e2;">
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>keda_lagthreshold</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>100</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">Consumer lag threshold</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>keda_pollinginterval</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>30</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">Polling interval (seconds)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>keda_cooldownperiod</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>300</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">Cooldown period (seconds)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>keda_minreplicacount</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>0</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">Minimum replicas (0 = scale-to-zero)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>keda_maxreplicacount</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>10</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">Maximum replicas</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- keda-db (CNPG) -->
+            <div style="background-color: #fecaca; padding: 16px; border-radius: 6px; margin-bottom: 16px;">
+                <h4 style="color: #991b1b; margin: 0 0 12px 0; font-size: 14px;">keda-db <span style="background-color: #3b82f6; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">LINK</span></h4>
+                <p style="color: #7f1d1d; margin: 0 0 10px 0; font-size: 12px;">KEDA &rarr; CNPG db sub-component. Generates: <code>k8s/deploy/base/scaleup/cnpg.yaml</code></p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #fca5a5;">
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Link Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody style="background-color: #fee2e2;">
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>keda_query</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>SELECT COUNT(*) FROM jobs WHERE status='pending'</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">SQL query returning numeric</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>keda_activation_query_value</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>1</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">Activation threshold</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="font-family: monospace; background-color: #fef2f2; padding: 8px; border-radius: 4px; margin-top: 10px; font-size: 10px; color: #7f1d1d;">
+                    <strong>Creates:</strong> Secret (PostgreSQL creds), TriggerAuthentication, ScaledObject
+                </div>
+            </div>
+
+            <!-- keda-database (PostgreSQL) -->
+            <div style="background-color: #fecaca; padding: 16px; border-radius: 6px; margin-bottom: 16px;">
+                <h4 style="color: #991b1b; margin: 0 0 12px 0; font-size: 14px;">keda-database <span style="background-color: #22c55e; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">LINK</span></h4>
+                <p style="color: #7f1d1d; margin: 0 0 10px 0; font-size: 12px;">KEDA &rarr; PostgreSQL database sub-component. Generates: <code>k8s/deploy/base/scaleup/psql.yaml</code></p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #fca5a5;">
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Link Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody style="background-color: #fee2e2;">
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>keda_query</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>SELECT COUNT(*) FROM tasks</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">SQL query returning numeric</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>keda_activation_query_value</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>5</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">Activation threshold</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- keda-mongo_db -->
+            <div style="background-color: #fecaca; padding: 16px; border-radius: 6px; margin-bottom: 16px;">
+                <h4 style="color: #991b1b; margin: 0 0 12px 0; font-size: 14px;">keda-mongo_db <span style="background-color: #10b981; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">LINK</span></h4>
+                <p style="color: #7f1d1d; margin: 0 0 10px 0; font-size: 12px;">KEDA &rarr; MongoDB mongo_db sub-component. Generates: <code>k8s/deploy/base/scaleup/mongodb.yaml</code></p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #fca5a5;">
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Link Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody style="background-color: #fee2e2;">
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>keda_query</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>{"status":"pending"}</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">MongoDB query filter</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>keda_collection</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>jobs</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">Collection to query</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- keda-model (vLLM) -->
+            <div style="background-color: #fecaca; padding: 16px; border-radius: 6px;">
+                <h4 style="color: #991b1b; margin: 0 0 12px 0; font-size: 14px;">keda-model <span style="background-color: #ec4899; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">LINK</span></h4>
+                <p style="color: #7f1d1d; margin: 0 0 10px 0; font-size: 12px;">KEDA &rarr; vLLM model sub-component. Generates Prometheus-based ScaledObject for LLM inference scaling.</p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #fca5a5;">
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Link Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #f87171; text-align: left;">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody style="background-color: #fee2e2;">
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>keda_query</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>vllm:num_requests_running</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">Prometheus query for vLLM metrics</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>keda_threshold</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;"><code>10</code></td>
+                            <td style="padding: 5px 6px; border: 1px solid #fca5a5;">Request threshold for scaling</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Query-Based Scalers -->
+        <div style="background-color: #f3e8ff; border: 2px solid #8b5cf6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #5b21b6; font-size: 18px; margin: 0 0 16px 0; font-weight: 700;">Query-Based Scalers (prometheus_query / loki_query)</h3>
+            <p style="color: #6b21a8; margin: 0 0 16px 0; font-size: 13px;">Special sub-component types that can target any component for scaling based on custom queries.</p>
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                <thead>
+                    <tr style="background-color: #e9d5ff;">
+                        <th style="padding: 8px; border: 1px solid #c4b5fd; text-align: left;">Sub-Component Type</th>
+                        <th style="padding: 8px; border: 1px solid #c4b5fd; text-align: left;">Variable</th>
+                        <th style="padding: 8px; border: 1px solid #c4b5fd; text-align: left;">Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #faf5ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>prometheus_query</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>__prometheus_query</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">Scale any workload based on PromQL query result</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>loki_query</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;"><code>__loki_query</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">Scale any workload based on LogQL query result</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="font-family: monospace; background-color: #e9d5ff; padding: 12px; border-radius: 6px; margin-top: 16px; font-size: 11px; line-height: 1.8;">
+                <strong>prometheus_query attributes:</strong><br>
+                - query: PromQL query (e.g., sum(rate(http_requests_total[5m])))<br>
+                - threshold: Scaling threshold value<br>
+                - serverAddress: Prometheus server URL (auto-populated from link)<br><br>
+                <strong>loki_query attributes:</strong><br>
+                - query: LogQL query (e.g., sum(rate({app="myapp"} |= "error" [5m])))<br>
+                - threshold: Scaling threshold value<br>
+                - serverAddress: Loki server URL (auto-populated from link)
+            </div>
+        </div>
+
+        <!-- Component Link Variables -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Component Link Variables</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Variable</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Link Type</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Effect</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__prometheus</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">prometheus-keda</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">ServiceMonitor for KEDA metrics</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__prometheus_scale</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">keda-prometheus</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Prometheus server for query scaler</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__loki_scale</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">keda-loki</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Loki server for log-based scaler</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__rabbitmq</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">keda-rabbitmq</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">RabbitMQ connection for scaler</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__kafka</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">keda-kafka</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Kafka connection for scaler</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__postgresql</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">keda-postgresql</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">PostgreSQL connection for scaler</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__mongodb</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">keda-mongodb</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MongoDB connection for scaler</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Generated Files -->
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #0369a1; margin-top: 0; margin-bottom: 15px;">Generated Files</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bae6fd;">
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">File</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Condition</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Contains</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">scaleup/rabbitmq.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">keda-queue link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Secret, TriggerAuth, ScaledObject</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">scaleup/kafka.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">keda-topic link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ScaledObject for Kafka</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">scaleup/cnpg.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">keda-db link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Secret, TriggerAuth, ScaledObject</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">scaleup/psql.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">keda-database link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Secret, TriggerAuth, ScaledObject</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">scaleup/mongodb.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">keda-mongo_db link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Secret, TriggerAuth, ScaledObject</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Ports -->
+        <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #166534; margin-top: 0; margin-bottom: 15px;">Ports</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Port</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Purpose</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Protocol</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">8080</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Metrics server</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTP</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">9666</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Prometheus metrics</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTP</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Technical Info -->
+        <div style="background-color: #1e293b; color: white; padding: 20px; border-radius: 8px;">
+            <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600;">Technical Info</h3>
+            <div style="font-family: monospace; font-size: 12px; line-height: 1.8;">
+                <strong>Chart Version:</strong> 2.18.0<br>
+                <strong>KEDA Version:</strong> 2.18.0<br>
+                <strong>Extensions:</strong> local_extensions.b64encode<br>
+                <strong>CRDs:</strong> ScaledObject, ScaledJob, TriggerAuthentication, ClusterTriggerAuthentication
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

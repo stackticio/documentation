@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SeaweedFS Bucket Links (*-swbucket)</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #0f172a;">
+
+    <div style="max-width: 1000px; margin: 0 auto;">
+
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #14532d 0%, #15803d 100%); border-radius: 16px; padding: 32px; margin-bottom: 24px; border: 1px solid #22c55e;">
+            <h1 style="color: #f8fafc; font-size: 28px; margin: 0 0 12px 0; font-weight: 700;">SeaweedFS Bucket Links (*-swbucket)</h1>
+            <p style="color: #bbf7d0; margin: 0; font-size: 14px;">Links to SeaweedFS swbucket sub-components provide S3-compatible distributed object storage access</p>
+        </div>
+
+        <!-- What These Links Do -->
+        <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #475569;">
+            <h2 style="color: #4ade80; margin: 0 0 16px 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">🌊</span> What These Links Do
+            </h2>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                <div style="background-color: #0f172a; padding: 12px 16px; border-radius: 8px; border-left: 3px solid #22c55e;">
+                    <span style="color: #e2e8f0; font-size: 13px;">Inject SeaweedFS S3 endpoint URL into environment</span>
+                </div>
+                <div style="background-color: #0f172a; padding: 12px 16px; border-radius: 8px; border-left: 3px solid #22c55e;">
+                    <span style="color: #e2e8f0; font-size: 13px;">Provide bucket-specific access credentials</span>
+                </div>
+                <div style="background-color: #0f172a; padding: 12px 16px; border-radius: 8px; border-left: 3px solid #22c55e;">
+                    <span style="color: #e2e8f0; font-size: 13px;">Configure bucket name for the application</span>
+                </div>
+                <div style="background-color: #0f172a; padding: 12px 16px; border-radius: 8px; border-left: 3px solid #22c55e;">
+                    <span style="color: #e2e8f0; font-size: 13px;">Set region and path-style access for S3 compatibility</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Supported Link Types -->
+        <div style="background: linear-gradient(135deg, #14532d 0%, #166534 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #22c55e;">
+            <h2 style="color: #bbf7d0; margin: 0 0 20px 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">🔗</span> Supported Link Types
+            </h2>
+
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0; background-color: #0f172a; border-radius: 12px; overflow: hidden;">
+                <thead>
+                    <tr>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #4ade80; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #22c55e;">Link Type</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #4ade80; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #22c55e;">Use Case</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #4ade80; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #22c55e;">Generated Files</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #166534; color: #bbf7d0; padding: 4px 10px; border-radius: 6px; font-size: 12px;">image_base-swbucket</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Application file storage</td>
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <span style="color: #fbbf24; font-size: 11px;">📁 src/minio_module/</span>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #166534; color: #bbf7d0; padding: 4px 10px; border-radius: 6px; font-size: 12px;">loki-seaweedfs</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Chunk storage for Loki logs</td>
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <span style="color: #fbbf24; font-size: 11px;">📄 values.yaml (storage config)</span>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #166534; color: #bbf7d0; padding: 4px 10px; border-radius: 6px; font-size: 12px;">tempo-seaweedfs</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Trace data storage for Tempo</td>
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <span style="color: #fbbf24; font-size: 11px;">📄 values.yaml (storage config)</span>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #166534; color: #bbf7d0; padding: 4px 10px; border-radius: 6px; font-size: 12px;">velero-seaweedfs</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Kubernetes backup location</td>
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <span style="color: #fbbf24; font-size: 11px;">📄 backupstoragelocation.yaml</span>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #166534; color: #bbf7d0; padding: 4px 10px; border-radius: 6px; font-size: 12px;">cnpg-swbucket</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">PostgreSQL backup & PITR</td>
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <span style="color: #fbbf24; font-size: 11px;">📄 cluster.yaml (backup config)</span>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #166534; color: #bbf7d0; padding: 4px 10px; border-radius: 6px; font-size: 12px;">mongodb-swbucket</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">MongoDB backup storage</td>
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <span style="color: #fbbf24; font-size: 11px;">📄 backup-schedule.yaml</span>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px;">
+                            <code style="background-color: #166534; color: #bbf7d0; padding: 4px 10px; border-radius: 6px; font-size: 12px;">topic-seaweedfs</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px;">Kafka cold storage tier</td>
+                        <td style="padding: 12px 16px;">
+                            <span style="color: #fbbf24; font-size: 11px;">📄 tiered-storage.yaml</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Environment Variables -->
+        <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #475569;">
+            <h2 style="color: #4ade80; margin: 0 0 16px 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">⚙️</span> Generated Environment Variables
+            </h2>
+            <div style="background-color: #0f172a; padding: 20px; border-radius: 12px; font-family: monospace; font-size: 12px; line-height: 2; border: 1px solid #334155;">
+                <div style="color: #64748b;"># Automatically configured when you create a SeaweedFS bucket link</div>
+                <div><span style="color: #4ade80;">S3_ENDPOINT</span><span style="color: #94a3b8;">=</span><span style="color: #fbbf24;">auto-configured</span></div>
+                <div><span style="color: #4ade80;">S3_BUCKET</span><span style="color: #94a3b8;">=</span><span style="color: #c4b5fd;">{bucket_name}</span></div>
+                <div><span style="color: #4ade80;">S3_ACCESS_KEY</span><span style="color: #94a3b8;">=</span><span style="color: #c4b5fd;">{bucket_access_key}</span></div>
+                <div><span style="color: #4ade80;">S3_SECRET_KEY</span><span style="color: #94a3b8;">=</span><span style="color: #c4b5fd;">{bucket_secret_key}</span></div>
+                <div><span style="color: #4ade80;">S3_REGION</span><span style="color: #94a3b8;">=</span><span style="color: #fbbf24;">seaweedfs</span></div>
+                <div><span style="color: #4ade80;">S3_USE_PATH_STYLE</span><span style="color: #94a3b8;">=</span><span style="color: #fbbf24;">true</span></div>
+            </div>
+        </div>
+
+        <!-- SeaweedFS vs MinIO -->
+        <div style="background: linear-gradient(135deg, #14532d 0%, #166534 100%); border-radius: 16px; padding: 24px; border: 1px solid #22c55e;">
+            <h2 style="color: #bbf7d0; margin: 0 0 20px 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">⚖️</span> SeaweedFS vs MinIO Buckets
+            </h2>
+
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0; background-color: #0f172a; border-radius: 12px; overflow: hidden;">
+                <thead>
+                    <tr>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #f8fafc; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #475569;">Feature</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #a78bfa; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #475569;">*-bucket (MinIO)</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #4ade80; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #475569;">*-swbucket (SeaweedFS)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px; color: #e2e8f0; border-bottom: 1px solid #334155;">Default Port</td>
+                        <td style="padding: 12px 16px; color: #c4b5fd; font-size: 12px; border-bottom: 1px solid #334155;">9000</td>
+                        <td style="padding: 12px 16px; color: #86efac; font-size: 12px; border-bottom: 1px solid #334155;">8333</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 12px 16px; color: #e2e8f0; border-bottom: 1px solid #334155;">Region</td>
+                        <td style="padding: 12px 16px; color: #c4b5fd; font-size: 12px; border-bottom: 1px solid #334155;">minio</td>
+                        <td style="padding: 12px 16px; color: #86efac; font-size: 12px; border-bottom: 1px solid #334155;">seaweedfs</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px; color: #e2e8f0;">Best Use Case</td>
+                        <td style="padding: 12px 16px; color: #c4b5fd; font-size: 12px;">Simple object storage</td>
+                        <td style="padding: 12px 16px; color: #86efac; font-size: 12px;">Distributed/tiered storage</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</body>
+</html>

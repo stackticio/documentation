@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Base Component</title>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 1000px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 10px;">
+
+        <h1 style="color: #4a5568; margin-bottom: 10px;">Image Base Component</h1>
+        <p style="color: #718096; margin-bottom: 25px;">Deploys pre-built container images with production security and auto-configured service connections.</p>
+
+        <!-- ==================== QUICK REFERENCE MATRIX ==================== -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+            <h2 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Quick Reference</h2>
+
+            <!-- Legend -->
+            <div style="margin-bottom: 10px; font-size: 11px;">
+                <span style="background-color: #f59e0b; color: #1e293b; padding: 2px 8px; border-radius: 3px; font-weight: bold;">REQUIRED</span>
+                <span style="color: #94a3b8; margin-left: 10px;">= Must be defined by user</span>
+            </div>
+
+            <!-- Attributes Matrix -->
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 15px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Generated In</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Effect</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <!-- REQUIRED: version -->
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">version</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>ghcr.io/org/app:v1</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">image_base.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Container image</td>
+                    </tr>
+                    <!-- REQUIRED: port -->
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">port</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>8080</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">image_base.yaml, cloud.env</td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">containerPort + SERVICE_PORT</td>
+                    </tr>
+                    <!-- REQUIRED: user_id -->
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">user_id</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>10001</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">image_base.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">runAsUser (must match image USER)</td>
+                    </tr>
+                    <!-- REQUIRED: group_id -->
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">group_id</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>10001</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">image_base.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">runAsGroup, fsGroup</td>
+                    </tr>
+                    <!-- REQUIRED: namespace -->
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">namespace</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>my-app</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">all files</td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">K8s namespace</td>
+                    </tr>
+                    <!-- Optional fields -->
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>framework_type</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>python</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">cloud.env</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">ENV naming convention</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>startup_commands</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>python manage.py migrate</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">startup.sh, image_base.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Init container runs before app</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>security_features</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>[pod_security, ...]</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">image_base.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">securityContext settings</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>configmap</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>KEY=value</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">cloud.env</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Custom ENV vars (app-specific)</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>pvc: true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">-</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">pvc.yaml, image_base.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">PVC + volumeMount</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>hpa: true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">-</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">hpa.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">HorizontalPodAutoscaler</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Links Matrix -->
+            <h3 style="color: #f8fafc; margin-bottom: 10px;">Service Links → cloud.env</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Link To</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">spring</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">nodejs/python/rails</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">laravel</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">generic</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1; font-family: monospace; font-size: 11px;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: Arial;"><strong>CNPG/PostgreSQL</strong></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">SPRING_DATASOURCE_*</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">DATABASE_URL</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">DB_*</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">POSTGRESS_*</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: Arial;"><strong>Valkey/Redis</strong></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">SPRING_DATA_REDIS_*</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">REDIS_URL</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">REDIS_*</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">REDIS_*</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: Arial;"><strong>MongoDB</strong></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">SPRING_DATA_MONGODB_*</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MONGODB_URI</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">-</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MONGODB_*</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: Arial;"><strong>RabbitMQ</strong></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">SPRING_RABBITMQ_*</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">AMQP_URL</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">RABBITMQ_*</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">RABBIT_*</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: Arial;"><strong>SeaweedFS (S3)</strong></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">AWS_S3_*</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">S3_*</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">AWS_*</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">SW_*</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: Arial;"><strong>OTEL</strong></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;" colspan="4">OTEL_* + pod annotation | <span style="color: #fbbf24;">python requires <code>pythonpath</code> attribute</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ==================== SECURITY FEATURES MATRIX ==================== -->
+        <div style="background-color: #fef2f2; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="color: #991b1b; margin-top: 0; margin-bottom: 15px;">Security Features Matrix</h2>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #fecaca;">
+                        <th style="padding: 8px; border: 1px solid #fca5a5; text-align: left;">security_features item</th>
+                        <th style="padding: 8px; border: 1px solid #fca5a5; text-align: left;">K8s field</th>
+                        <th style="padding: 8px; border: 1px solid #fca5a5; text-align: left;">Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fecaca;"><code>pod_security</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fecaca; font-family: monospace; font-size: 11px;">runAsNonRoot, runAsUser, runAsGroup, fsGroup</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fecaca;">user_id/group_id values</td>
+                    </tr>
+                    <tr style="background-color: #fef2f2;">
+                        <td style="padding: 6px 8px; border: 1px solid #fecaca;"><code>no_host_access</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fecaca; font-family: monospace; font-size: 11px;">hostNetwork, hostPID, hostIPC</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fecaca;">false</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fecaca;"><code>no_privilege_escalation</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fecaca; font-family: monospace; font-size: 11px;">allowPrivilegeEscalation, privileged</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fecaca;">false</td>
+                    </tr>
+                    <tr style="background-color: #fef2f2;">
+                        <td style="padding: 6px 8px; border: 1px solid #fecaca;"><code>read_only_fs</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fecaca; font-family: monospace; font-size: 11px;">readOnlyRootFilesystem</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fecaca;">true + /tmp emptyDir</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fecaca;"><code>drop_capabilities</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fecaca; font-family: monospace; font-size: 11px;">capabilities.drop</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fecaca;">[ALL]</td>
+                    </tr>
+                    <tr style="background-color: #fef2f2;">
+                        <td style="padding: 6px 8px; border: 1px solid #fecaca;"><code>seccomp</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fecaca; font-family: monospace; font-size: 11px;">seccompProfile.type</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fecaca;">RuntimeDefault</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ==================== GENERATED FILES ==================== -->
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="color: #0369a1; margin-top: 0; margin-bottom: 15px;">Generated Files</h2>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bae6fd;">
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">File</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Condition</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Contains</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">image_base.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Deployment + Service + ServiceMonitor</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">rbac.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ServiceAccount</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">secret/cloud.env</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Auto-configured ENVs from links</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">files/startup.sh</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;"><code>startup_commands</code> set</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Init container script</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">pvc.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;"><code>pvc: true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">PersistentVolumeClaim</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">hpa.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;"><code>hpa: true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">HorizontalPodAutoscaler</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ==================== DETAILED SECTIONS (Collapsible style) ==================== -->
+
+        <!-- Init Container Details -->
+        <details style="margin-bottom: 15px; border: 1px solid #e2e8f0; border-radius: 8px;">
+            <summary style="padding: 15px; background-color: #e0f2fe; cursor: pointer; font-weight: bold; color: #0369a1;">
+                Init Container (startup_commands) - Click to expand
+            </summary>
+            <div style="padding: 15px;">
+                <p>When <code>startup_commands</code> is set, an init container runs the same image before the main app starts:</p>
+                <ul>
+                    <li>Commands written to <code>startup.sh</code> ConfigMap</li>
+                    <li>Mounted at <code>/startup/startup.sh</code></li>
+                    <li>Shares volumes with main container (PVC, writable dirs)</li>
+                    <li>Main app waits for init to complete successfully</li>
+                </ul>
+                <div style="background-color: #f1f5f9; padding: 10px; border-radius: 5px; font-family: monospace; font-size: 12px;">
+startup_commands: |<br>
+&nbsp;&nbsp;python manage.py migrate<br>
+&nbsp;&nbsp;python manage.py collectstatic --noinput
+                </div>
+            </div>
+        </details>
+
+        <!-- OTEL Details -->
+        <details style="margin-bottom: 15px; border: 1px solid #e2e8f0; border-radius: 8px;">
+            <summary style="padding: 15px; background-color: #f3e8ff; cursor: pointer; font-weight: bold; color: #7c3aed;">
+                OTEL Auto-Instrumentation - Click to expand
+            </summary>
+            <div style="padding: 15px;">
+                <p>When linked to OTEL component:</p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin: 10px 0;">
+                    <tr>
+                        <td style="padding: 6px; border: 1px solid #e9d5ff; width: 30%;"><strong>Link attribute</strong></td>
+                        <td style="padding: 6px; border: 1px solid #e9d5ff;"><code>otel_language</code>: java, python, nodejs, dotnet, go</td>
+                    </tr>
+                    <tr style="background-color: #faf5ff;">
+                        <td style="padding: 6px; border: 1px solid #e9d5ff;"><strong>Python only</strong></td>
+                        <td style="padding: 6px; border: 1px solid #e9d5ff;"><code>pythonpath</code>: App working directory (e.g., <code>/usr/src/app</code>)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px; border: 1px solid #e9d5ff;"><strong>Generated</strong></td>
+                        <td style="padding: 6px; border: 1px solid #e9d5ff;">Pod annotation + OTEL_* ENVs + PYTHONPATH (if python)</td>
+                    </tr>
+                </table>
+                <div style="background-color: #fef3c7; padding: 10px; border-radius: 5px; border-left: 4px solid #f59e0b; margin-top: 10px;">
+                    <strong>Python PYTHONPATH:</strong> Required because OTEL operator's sitecustomize.py doesn't add CWD to sys.path. Must match Dockerfile WORKDIR.
+                </div>
+            </div>
+        </details>
+
+        <!-- vs external_source_code -->
+        <details style="margin-bottom: 15px; border: 1px solid #e2e8f0; border-radius: 8px;">
+            <summary style="padding: 15px; background-color: #fdf4ff; cursor: pointer; font-weight: bold; color: #a855f7;">
+                image_base vs external_source_code - Click to expand
+            </summary>
+            <div style="padding: 15px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                    <tr style="background-color: #faf5ff;">
+                        <th style="padding: 8px; border: 1px solid #e9d5ff; text-align: left;">Feature</th>
+                        <th style="padding: 8px; border: 1px solid #e9d5ff; text-align: left;">image_base</th>
+                        <th style="padding: 8px; border: 1px solid #e9d5ff; text-align: left;">external_source_code</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px; border: 1px solid #e9d5ff;">Image source</td>
+                        <td style="padding: 6px; border: 1px solid #e9d5ff;">Full image path in <code>version</code></td>
+                        <td style="padding: 6px; border: 1px solid #e9d5ff;">Built from registry config</td>
+                    </tr>
+                    <tr style="background-color: #faf5ff;">
+                        <td style="padding: 6px; border: 1px solid #e9d5ff;">Init containers</td>
+                        <td style="padding: 6px; border: 1px solid #e9d5ff; color: #059669;">✓ startup_commands</td>
+                        <td style="padding: 6px; border: 1px solid #e9d5ff; color: #dc2626;">✗</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px; border: 1px solid #e9d5ff;">imagePullSecrets</td>
+                        <td style="padding: 6px; border: 1px solid #e9d5ff; color: #059669;">✓ registry-credential</td>
+                        <td style="padding: 6px; border: 1px solid #e9d5ff; color: #dc2626;">✗</td>
+                    </tr>
+                    <tr style="background-color: #faf5ff;">
+                        <td style="padding: 6px; border: 1px solid #e9d5ff;">Service links, Security, OTEL</td>
+                        <td style="padding: 6px; border: 1px solid #e9d5ff;" colspan="2" style="text-align: center;">Same</td>
+                    </tr>
+                </table>
+            </div>
+        </details>
+
+        <!-- ==================== QUICK TIPS ==================== -->
+        <div style="display: flex; gap: 15px; margin-top: 20px;">
+            <div style="flex: 1; background-color: #fef3c7; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                <strong style="color: #92400e;">Common Issues</strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 20px; font-size: 12px; color: #78350f;">
+                    <li>user_id must match image USER</li>
+                    <li>Python OTEL needs pythonpath</li>
+                    <li>read_only_fs needs writable dirs</li>
+                </ul>
+            </div>
+            <div style="flex: 1; background-color: #dcfce7; padding: 15px; border-radius: 8px; border-left: 4px solid #22c55e;">
+                <strong style="color: #166534;">Production Checklist</strong>
+                <ul style="margin: 10px 0 0 0; padding-left: 20px; font-size: 12px; color: #14532d;">
+                    <li>All security_features enabled</li>
+                    <li>user_id != 0 (non-root)</li>
+                    <li>framework_type set correctly</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bucket Storage Links (*-bucket)</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #0f172a;">
+
+    <div style="max-width: 1000px; margin: 0 auto;">
+
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%); border-radius: 16px; padding: 32px; margin-bottom: 24px; border: 1px solid #ef4444;">
+            <h1 style="color: #f8fafc; font-size: 28px; margin: 0 0 12px 0; font-weight: 700;">Bucket Storage Links (*-bucket)</h1>
+            <p style="color: #fecaca; margin: 0; font-size: 14px;">Links to MinIO bucket sub-components provide S3-compatible object storage access</p>
+        </div>
+
+        <!-- What These Links Do -->
+        <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #475569;">
+            <h2 style="color: #f87171; margin: 0 0 16px 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">🪣</span> What These Links Do
+            </h2>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                <div style="background-color: #0f172a; padding: 12px 16px; border-radius: 8px; border-left: 3px solid #ef4444;">
+                    <span style="color: #e2e8f0; font-size: 13px;">Inject S3 endpoint URL into environment variables</span>
+                </div>
+                <div style="background-color: #0f172a; padding: 12px 16px; border-radius: 8px; border-left: 3px solid #ef4444;">
+                    <span style="color: #e2e8f0; font-size: 13px;">Provide bucket-specific access credentials</span>
+                </div>
+                <div style="background-color: #0f172a; padding: 12px 16px; border-radius: 8px; border-left: 3px solid #ef4444;">
+                    <span style="color: #e2e8f0; font-size: 13px;">Configure bucket name for the application</span>
+                </div>
+                <div style="background-color: #0f172a; padding: 12px 16px; border-radius: 8px; border-left: 3px solid #ef4444;">
+                    <span style="color: #e2e8f0; font-size: 13px;">Set region (minio) for S3 compatibility</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Supported Link Types -->
+        <div style="background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #ef4444;">
+            <h2 style="color: #fecaca; margin: 0 0 20px 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">🔗</span> Supported Link Types
+            </h2>
+
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0; background-color: #0f172a; border-radius: 12px; overflow: hidden;">
+                <thead>
+                    <tr>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #f87171; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #ef4444;">Link Type</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #f87171; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #ef4444;">Use Case</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #f87171; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #ef4444;">Generated Files</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #991b1b; color: #fecaca; padding: 4px 10px; border-radius: 6px; font-size: 12px;">image_base-bucket</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Application file storage</td>
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <span style="color: #fbbf24; font-size: 11px;">📁 src/minio_module/</span>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #991b1b; color: #fecaca; padding: 4px 10px; border-radius: 6px; font-size: 12px;">fastapi-bucket</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">FastAPI file uploads/downloads</td>
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <span style="color: #fbbf24; font-size: 11px;">📁 src/minio_module/</span>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #991b1b; color: #fecaca; padding: 4px 10px; border-radius: 6px; font-size: 12px;">cnpg-bucket</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">PostgreSQL backup & PITR</td>
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <span style="color: #fbbf24; font-size: 11px;">📄 cluster.yaml (backup config)</span>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #991b1b; color: #fecaca; padding: 4px 10px; border-radius: 6px; font-size: 12px;">mongodb-bucket</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">MongoDB backup storage</td>
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <span style="color: #fbbf24; font-size: 11px;">📄 backup-schedule.yaml</span>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #991b1b; color: #fecaca; padding: 4px 10px; border-radius: 6px; font-size: 12px;">loki-bucket</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Chunk storage for Loki logs</td>
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <span style="color: #fbbf24; font-size: 11px;">📄 values.yaml (storage config)</span>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #991b1b; color: #fecaca; padding: 4px 10px; border-radius: 6px; font-size: 12px;">tempo-bucket</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Trace data storage for Tempo</td>
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <span style="color: #fbbf24; font-size: 11px;">📄 values.yaml (storage config)</span>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #991b1b; color: #fecaca; padding: 4px 10px; border-radius: 6px; font-size: 12px;">velero-bucket</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Kubernetes backup location</td>
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <span style="color: #fbbf24; font-size: 11px;">📄 backupstoragelocation.yaml</span>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 12px 16px;">
+                            <code style="background-color: #991b1b; color: #fecaca; padding: 4px 10px; border-radius: 6px; font-size: 12px;">topic-bucket</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px;">Kafka cold storage tier</td>
+                        <td style="padding: 12px 16px;">
+                            <span style="color: #fbbf24; font-size: 11px;">📄 tiered-storage.yaml</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Environment Variables -->
+        <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #475569;">
+            <h2 style="color: #f87171; margin: 0 0 16px 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">⚙️</span> Generated Environment Variables
+            </h2>
+            <div style="background-color: #0f172a; padding: 20px; border-radius: 12px; font-family: monospace; font-size: 12px; line-height: 2; border: 1px solid #334155;">
+                <div style="color: #64748b;"># Automatically configured when you create a bucket link</div>
+                <div><span style="color: #f87171;">S3_ENDPOINT</span><span style="color: #94a3b8;">=</span><span style="color: #fbbf24;">auto-configured</span></div>
+                <div><span style="color: #f87171;">S3_BUCKET</span><span style="color: #94a3b8;">=</span><span style="color: #c4b5fd;">{bucket_name}</span></div>
+                <div><span style="color: #f87171;">S3_ACCESS_KEY</span><span style="color: #94a3b8;">=</span><span style="color: #c4b5fd;">{bucket_access_key}</span></div>
+                <div><span style="color: #f87171;">S3_SECRET_KEY</span><span style="color: #94a3b8;">=</span><span style="color: #c4b5fd;">{bucket_secret_key}</span></div>
+                <div><span style="color: #f87171;">S3_REGION</span><span style="color: #94a3b8;">=</span><span style="color: #fbbf24;">minio</span></div>
+                <div><span style="color: #f87171;">S3_USE_PATH_STYLE</span><span style="color: #94a3b8;">=</span><span style="color: #fbbf24;">true</span></div>
+            </div>
+        </div>
+
+        <!-- Key Points -->
+        <div style="background: linear-gradient(135deg, #78350f 0%, #92400e 100%); border-radius: 16px; padding: 24px; border: 1px solid #f59e0b;">
+            <h2 style="color: #fef3c7; margin: 0 0 16px 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">💡</span> Key Points
+            </h2>
+            <div style="display: grid; gap: 12px;">
+                <div style="background-color: #0f172a; padding: 12px 16px; border-radius: 8px; border-left: 3px solid #fbbf24;">
+                    <span style="color: #fbbf24; font-weight: 600;">Multiple buckets:</span>
+                    <span style="color: #e2e8f0; font-size: 13px;"> You can link to multiple bucket sub-components</span>
+                </div>
+                <div style="background-color: #0f172a; padding: 12px 16px; border-radius: 8px; border-left: 3px solid #fbbf24;">
+                    <span style="color: #fbbf24; font-weight: 600;">Separate credentials:</span>
+                    <span style="color: #e2e8f0; font-size: 13px;"> Each bucket uses its own access credentials, not MinIO root credentials</span>
+                </div>
+                <div style="background-color: #0f172a; padding: 12px 16px; border-radius: 8px; border-left: 3px solid #fbbf24;">
+                    <span style="color: #fbbf24; font-weight: 600;">Auto-configuration:</span>
+                    <span style="color: #e2e8f0; font-size: 13px;"> All connection details are automatically configured</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

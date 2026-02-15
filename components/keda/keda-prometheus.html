@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>keda-prometheus Link</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 800px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #1e293b; font-size: 24px; margin: 0 0 24px 0; font-weight: 700; border-bottom: 3px solid #ef4444; padding-bottom: 12px;">keda-prometheus Link</h1>
+        <p style="color: #64748b; margin: 0 0 20px 0;">KEDA → Prometheus (PromQL-based scaling)</p>
+
+        <!-- Generated File -->
+        <div style="background-color: #1e293b; color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">Generated File</h2>
+            <div style="font-family: monospace; font-size: 13px; line-height: 1.8;">
+                <span style="color: #fbbf24;">k8s/deploy/base/scaleup/prometheus.yaml</span>
+            </div>
+        </div>
+
+        <!-- Link Attributes -->
+        <div style="background-color: #f3e8ff; border: 2px solid #8b5cf6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #5b21b6; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Link Attributes</h3>
+            <div style="font-family: monospace; background-color: #e9d5ff; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.8;">
+                <strong>keda_query</strong> → PromQL query (default: "up")<br>
+                <strong>keda_threshold</strong> → Threshold value (default: "1")<br>
+                <strong>keda_pollinginterval</strong> → Polling interval (default: 30)<br>
+                <strong>keda_cooldownperiod</strong> → Cooldown period (default: 300)<br>
+                <strong>keda_minreplicacount</strong> → Min replicas (default: 1)<br>
+                <strong>keda_maxreplicacount</strong> → Max replicas (default: 20)<br>
+                <strong>keda_activationthreshold</strong> → Activation threshold<br>
+                <strong>keda_ignorenullvalues</strong> → Ignore null results<br>
+                <strong>keda_timeout</strong> → Query timeout<br>
+                <strong>keda_unsafessl</strong> → Allow insecure SSL<br>
+                <strong>keda_customheaders</strong> → Custom HTTP headers<br>
+                <strong>keda_queryparameters</strong> → Custom query parameters
+            </div>
+        </div>
+
+        <!-- What Gets Created -->
+        <div style="background-color: #f0fff4; border-radius: 8px; padding: 20px; border: 1px solid #9ae6b4;">
+            <h3 style="color: #1e293b; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">What Gets Created</h3>
+            <div style="font-family: monospace; background-color: #dcfce7; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.8;">
+                • ScaledObject: [prometheus-name]-prometheus-scale<br>
+                <em style="color: #166534;">Targets: prometheus-prometheus-kube-prometheus-prometheus StatefulSet</em>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

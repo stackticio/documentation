@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CNPG (CloudNativePG)</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 900px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #1e293b; font-size: 24px; margin: 0 0 24px 0; font-weight: 700; border-bottom: 3px solid #3b82f6; padding-bottom: 12px;">CNPG (CloudNativePG)</h1>
+        <p style="color: #64748b; margin-bottom: 24px;">Enterprise-grade PostgreSQL on Kubernetes with CNPG Operator, primary/standby replication, Barman Cloud Plugin for WAL archiving, and automated user provisioning via Grant Jobs.</p>
+
+        <!-- Architecture -->
+        <div style="background-color: #1e293b; color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">Architecture</h2>
+            <div style="font-family: monospace; font-size: 13px; line-height: 1.8;">
+                <span style="color: #3b82f6;">CNPG Operator</span> - Manages PostgreSQL cluster lifecycle<br>
+                <span style="color: #22d3ee;">PostgreSQL Cluster</span> - Primary + standby instances (:5432)<br>
+                <span style="color: #a78bfa;">Barman Cloud Plugin</span> - WAL archiving + base backups (:9090)<br>
+                <span style="color: #fbbf24;">Grant Job</span> - Automated user provisioning + permission GRANTs<br>
+                <span style="color: #4ade80;">PITR</span> - Point-in-Time Recovery cluster from backup snapshot
+            </div>
+        </div>
+
+        <!-- Attributes -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Attributes</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Where It Impacts</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">namespace</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>database</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">All manifests, service DNS (cluster-{ns}-rw.{ns}.svc.cluster.local)</td>
+                    </tr>
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">psql_version</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>16.2</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">cluster.yaml container image tag</td>
+                    </tr>
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">admin_user</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>admin</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">cluster.yaml superuser configuration</td>
+                    </tr>
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">admin_password</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>******</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">secret/database-secret.yaml admin credential</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>storage_size</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>10Gi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">cluster.yaml PVC storage size per instance</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>storage_class</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>standard</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">cluster.yaml storageClassName (optional, uses default if omitted)</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>mem_request / mem_limit</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>1Gi / 4Gi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">cluster.yaml resources.requests/limits.memory</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>cpu_request / cpu_limit</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>500m / 2000m</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">cluster.yaml resources.requests/limits.cpu</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>nodepool</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>db-pool</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">cluster.yaml nodeAffinity rule</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>init_db</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>CREATE EXTENSION pg_stat...</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">cluster.yaml post-init SQL commands</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>rotation</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>quarterly</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">secret/database-secret.yaml rotation label</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>custom_labels</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>team: platform</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">kustomization.yaml commonLabels</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sub-Components -->
+        <div style="background-color: #f3e8ff; border: 2px solid #8b5cf6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #5b21b6; font-size: 16px; margin: 0 0 16px 0; font-weight: 600;">Sub-Components</h3>
+
+            <!-- db sub-component -->
+            <div style="background-color: #e9d5ff; padding: 16px; border-radius: 6px; margin-bottom: 12px;">
+                <h4 style="color: #5b21b6; margin: 0 0 8px 0; font-size: 14px;">db - Database</h4>
+                <p style="color: #6b21a8; font-size: 12px; margin-bottom: 8px;">Each db generates: <code>database.yaml</code> (Database CR), <code>roles.yaml</code> (role definitions), <code>secret/database-secret.yaml</code> (credentials), and <code>jobs/grant-job.yaml</code> (permission provisioning).</p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #c4b5fd;">
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e1b4b;">
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>database</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>myapp</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Database name in database.yaml</td>
+                        </tr>
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>username</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>myapp_user</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Role name in roles.yaml, grant-job.yaml user creation</td>
+                        </tr>
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>password</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>******</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">secret/database-secret.yaml user credential</td>
+                        </tr>
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>cnpg_permissions</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>connect, read, write</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">grant-job.yaml GRANT statements (see flags below)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>rotation_db</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>monthly</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">secret/database-secret.yaml rotation label per db</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Permission Flags -->
+                <div style="margin-top: 12px; padding: 12px; background-color: #ddd6fe; border-radius: 6px;">
+                    <strong style="color: #5b21b6; font-size: 12px;">Permission Flags (cnpg_permissions):</strong>
+                    <div style="font-family: monospace; font-size: 11px; color: #1e1b4b; margin-top: 6px; line-height: 1.8;">
+                        <code>connect</code> - CONNECT to database |
+                        <code>read</code> - SELECT on all tables |
+                        <code>write</code> - INSERT/UPDATE/DELETE |
+                        <code>manage_roles</code> - CREATE/ALTER roles<br>
+                        <code>create_schema</code> - CREATE SCHEMA |
+                        <code>create_tables</code> - CREATE TABLE |
+                        <code>execute_functions</code> - EXECUTE on functions<br>
+                        <code>default_privileges</code> - ALTER DEFAULT PRIVILEGES |
+                        <code>metadata_access</code> - pg_catalog/information_schema access
+                    </div>
+                </div>
+
+                <!-- Grant Job -->
+                <div style="margin-top: 12px; padding: 12px; background-color: #ddd6fe; border-radius: 6px;">
+                    <strong style="color: #5b21b6; font-size: 12px;">Grant Job Sequence (jobs/grant-job.yaml):</strong>
+                    <div style="font-family: monospace; font-size: 11px; color: #1e1b4b; margin-top: 6px; line-height: 1.8;">
+                        1. Wait for cluster ready state<br>
+                        2. CREATE USER with password<br>
+                        3. Apply GRANT statements per cnpg_permissions flags<br>
+                        4. Test connection with new credentials<br>
+                        <span style="color: #6b21a8;">TTL: 3600s | Active Deadline: 600s</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- pitr_cluster sub-component -->
+            <div style="background-color: #e9d5ff; padding: 16px; border-radius: 6px; margin-bottom: 12px;">
+                <h4 style="color: #5b21b6; margin: 0 0 8px 0; font-size: 14px;">pitr_cluster - Point-in-Time Recovery</h4>
+                <p style="color: #6b21a8; font-size: 12px; margin-bottom: 8px;">Generates <code>day2/backup/point-in-time-recovery.yaml</code> - creates a recovery cluster restored from a specific backup snapshot.</p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #c4b5fd;">
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e1b4b;">
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>psql_version</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>16.2</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Recovery cluster PostgreSQL version</td>
+                        </tr>
+                        <tr style="background-color: #f3e8ff;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>backup_id</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>backup-20240101</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Backup object name to restore from</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- migration sub-component -->
+            <div style="background-color: #e9d5ff; padding: 16px; border-radius: 6px;">
+                <h4 style="color: #5b21b6; margin: 0 0 8px 0; font-size: 14px;">migration - Cross-Database Migration</h4>
+                <p style="color: #6b21a8; font-size: 12px; margin: 0;">Handles cross-database migration via <code>db-migration</code> (source) and <code>migration-db</code> (destination) link types. Enables ETL and schema migration between databases.</p>
+            </div>
+        </div>
+
+        <!-- Links -->
+        <div style="background-color: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #166534; font-size: 16px; margin: 0 0 16px 0; font-weight: 600;">Links</h3>
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Link</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Direction</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Generated Output</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>Prometheus</strong> &rarr; CNPG</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Inbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Enables PodMonitor in <code>cluster.yaml</code> for PostgreSQL metrics scraping</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>Istio</strong> &rarr; CNPG</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Inbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Enables istio-injection label on <code>namespace.yaml</code></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>Backend apps</strong> &rarr; CNPG db</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Inbound (group)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>backend-db</code> group - apps (fastapi, image_base, etc.) connect to db sub-components</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Sub-component level links -->
+            <div style="margin-top: 16px; padding: 12px; background-color: #bbf7d0; border-radius: 6px; font-size: 12px;">
+                <strong style="color: #166534;">Sub-component level (bucket links):</strong><br>
+                <span style="color: #14532d;"><strong>cnpg-bucket</strong> (db &rarr; MinIO):</span> Generates <code>plugin/barman.yaml</code> + ObjectStore config in <code>cluster.yaml</code> + <code>secret/minio.env</code> (SOPS)<br>
+                <span style="color: #14532d;"><strong>cnpg-swbucket</strong> (db &rarr; SeaweedFS):</span> Generates <code>plugin/barman.yaml</code> + ObjectStore config in <code>cluster.yaml</code> + <code>secret/swbucket.env</code> (SOPS)
+            </div>
+        </div>
+
+        <!-- Generated Files -->
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #0369a1; margin-top: 0; margin-bottom: 15px;">Generated Files</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bae6fd;">
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">File</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Condition</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Content</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/namespace.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Namespace definition with optional istio-injection label</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/cluster.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">CNPG Cluster CR - image, storage, resources, affinity, backup config, PodMonitor</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/cnpg.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">CNPG operator configuration</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/kustomization.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Kustomize resources, secretGenerator, custom_labels</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/database.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #7c3aed; font-weight: bold;">db sub-components exist</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Database CR definitions (one per db)</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/roles.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #7c3aed; font-weight: bold;">db sub-components exist</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Role definitions per database user</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/jobs/grant-job.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #7c3aed; font-weight: bold;">db sub-components exist</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">User provisioning + GRANT jobs (TTL 3600s, deadline 600s)</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/plugin/barman.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">MinIO or SeaweedFS bucket linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Barman Cloud Plugin for WAL archiving + base backups</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/secret/database-secret.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Admin + per-db user credentials, rotation labels</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/secret/cnpg.env</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Database connection credentials (SOPS encrypted)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/secret/minio.env</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">MinIO bucket linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">MinIO backup credentials (SOPS encrypted)</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/secret/swbucket.env</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">SeaweedFS bucket linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">SeaweedFS backup credentials (SOPS encrypted)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/secret/registry.json</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Container registry credentials (SOPS encrypted)</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">day2/backup/manual-backup.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">On-demand backup manifest</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">day2/backup/schedule-backup.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ScheduledBackup CR for automated backups</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">day2/backup/cluster-restore.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Full cluster restore from backup</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">day2/backup/point-in-time-recovery.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #7c3aed; font-weight: bold;">pitr_cluster sub-components exist</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">PITR recovery cluster from specific backup_id</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">day2/backup/backup-to-bucket-job.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">MinIO or SeaweedFS bucket linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Backup export job to object storage</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Ports -->
+        <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #166534; margin-top: 0; margin-bottom: 15px;">Ports</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Port</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Service</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Protocol</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">5432</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">PostgreSQL (primary + replicas)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">TCP</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">9090</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Barman Cloud Plugin</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTP</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Internal Endpoints -->
+        <div style="background-color: #f0f9ff; border: 2px solid #0ea5e9; border-radius: 8px; padding: 20px;">
+            <h3 style="color: #0369a1; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Internal Endpoints</h3>
+            <div style="font-family: monospace; background-color: #e0f2fe; padding: 12px; border-radius: 6px; font-size: 13px; line-height: 1.8;">
+                <strong>Read-Write (primary):</strong> cluster-{ns}-rw.{ns}.svc.cluster.local:5432<br>
+                <strong>Read-Only (replicas):</strong> cluster-{ns}-ro.{ns}.svc.cluster.local:5432<br>
+                <strong>Read (any instance):</strong> cluster-{ns}-r.{ns}.svc.cluster.local:5432
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

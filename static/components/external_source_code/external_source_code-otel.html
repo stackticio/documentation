@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OTEL to External Source Code Link</title>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 900px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 10px;">
+
+        <h1 style="color: #7c3aed; margin-bottom: 20px;">OTEL Auto-Instrumentation Link</h1>
+        <p><strong>Automatically configures OpenTelemetry auto-instrumentation for your application pods.</strong></p>
+
+        <!-- What This Link Does -->
+        <div style="background-color: #f3e8ff; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+            <h2 style="color: #7c3aed; margin-top: 0;">What This Link Does</h2>
+            <p>When you link an <strong>external_source_code</strong> or <strong>image_base</strong> component to an <strong>OTEL</strong> component, Stacktic automatically:</p>
+            <ul style="line-height: 2;">
+                <li>Adds the auto-instrumentation annotation to the pod</li>
+                <li>Configures OTEL exporter environment variables</li>
+                <li>Handles Python PYTHONPATH requirements for Django/Flask/FastAPI</li>
+            </ul>
+        </div>
+
+        <!-- Link Attributes -->
+        <div style="background-color: #e9d5ff; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+            <h2 style="color: #6b21a8; margin-top: 0;">Link Attributes</h2>
+            <table style="width: 100%; border-collapse: collapse; background-color: white; font-size: 13px;">
+                <thead>
+                    <tr style="background-color: #ddd6fe;">
+                        <th style="padding: 10px; border: 1px solid #c4b5fd; text-align: left;">Attribute</th>
+                        <th style="padding: 10px; border: 1px solid #c4b5fd; text-align: left;">Required</th>
+                        <th style="padding: 10px; border: 1px solid #c4b5fd; text-align: left;">Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid #e0e0e0;"><strong>otel_language</strong></td>
+                        <td style="padding: 8px; border: 1px solid #e0e0e0;">Yes</td>
+                        <td style="padding: 8px; border: 1px solid #e0e0e0;">Language for auto-instrumentation: <code>java</code>, <code>python</code>, <code>nodejs</code>, <code>dotnet</code>, <code>go</code></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid #e0e0e0;"><strong>pythonpath</strong></td>
+                        <td style="padding: 8px; border: 1px solid #e0e0e0;">For Python</td>
+                        <td style="padding: 8px; border: 1px solid #e0e0e0;">Required for Python apps. The working directory of your app (e.g., <code>/usr/src/app</code>)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid #e0e0e0;"><strong>otel_language_custom</strong></td>
+                        <td style="padding: 8px; border: 1px solid #e0e0e0;">No</td>
+                        <td style="padding: 8px; border: 1px solid #e0e0e0;">Custom annotation key (overrides default <code>instrumentation.opentelemetry.io/inject-{language}</code>)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Auto-Generated Configuration -->
+        <div style="background-color: #f0f4ff; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+            <h2 style="color: #4299e1; margin-top: 0;">Auto-Generated Configuration</h2>
+
+            <h3 style="color: #2b6cb0;">1. Pod Annotation</h3>
+            <div style="background-color: #dbeafe; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 13px;">
+                <pre style="margin: 0;">metadata:
+  annotations:
+    instrumentation.opentelemetry.io/inject-python: "otel/otel-instrumentation"</pre>
+            </div>
+
+            <h3 style="color: #2b6cb0; margin-top: 20px;">2. Environment Variables (cloud.env)</h3>
+            <div style="background-color: #dbeafe; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 13px;">
+                <pre style="margin: 0;">OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector-collector.otel.svc.cluster.local:4318
+OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector-collector.otel.svc.cluster.local:4318/v1/traces
+OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=http://otel-collector-collector.otel.svc.cluster.local:4318/v1/metrics
+OTEL_SERVICE_NAME=my-app
+PYTHONPATH=/usr/src/app  # Only for Python</pre>
+            </div>
+
+            <h3 style="color: #2b6cb0; margin-top: 20px;">3. Deployment env: section (Python only)</h3>
+            <div style="background-color: #dbeafe; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 13px;">
+                <pre style="margin: 0;">containers:
+  - name: app
+    env:
+      - name: PYTHONPATH
+        value: "/usr/src/app"
+    envFrom:
+      - secretRef:
+          name: my-app-external-source-secrets</pre>
+            </div>
+        </div>
+
+        <!-- Python PYTHONPATH Explanation -->
+        <div style="background-color: #fef3c7; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+            <h2 style="color: #d97706; margin-top: 0;">Why PYTHONPATH is Required for Python</h2>
+            <p>The OTEL operator's Python auto-instrumentation has a known issue (<a href="https://github.com/open-telemetry/opentelemetry-python-contrib/issues/2495" target="_blank">GitHub #2495</a>):</p>
+            <ul style="line-height: 1.8;">
+                <li>The operator's <code>sitecustomize.py</code> runs <strong>before</strong> your app starts</li>
+                <li>It doesn't add the current working directory to <code>sys.path</code></li>
+                <li>Django/Flask/FastAPI can't find their settings module</li>
+                <li>Django falls back to <code>global_settings</code> which has <code>DEBUG=False</code></li>
+                <li>Result: <code>CommandError: You must set settings.ALLOWED_HOSTS if DEBUG is False</code></li>
+            </ul>
+            <div style="background-color: #fde68a; padding: 15px; margin-top: 15px; border-radius: 5px; border-left: 4px solid #d97706;">
+                <strong>Solution:</strong> Set <code>pythonpath</code> attribute to your app's working directory (must match Dockerfile WORKDIR)
+            </div>
+        </div>
+
+        <!-- Why env: not envFrom: -->
+        <div style="background-color: #fee2e2; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+            <h2 style="color: #dc2626; margin-top: 0;">Why PYTHONPATH Must Be in env: (Not Secret)</h2>
+            <p>The OTEL operator init container behavior:</p>
+            <ul style="line-height: 1.8;">
+                <li><strong>envFrom:</strong> (secrets/configmaps) - OTEL operator <strong>overwrites</strong> these values</li>
+                <li><strong>env:</strong> (explicit) - OTEL operator <strong>appends</strong> to these values</li>
+            </ul>
+            <p>That's why Stacktic generates PYTHONPATH in <strong>both</strong> places:</p>
+            <ol>
+                <li><code>cloud.env</code> (secret) - For non-OTEL scenarios</li>
+                <li><code>source_code.yaml</code> (deployment env:) - For OTEL to work correctly</li>
+            </ol>
+        </div>
+
+        <!-- Supported Languages -->
+        <div style="background-color: #e0f2fe; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+            <h2 style="color: #0284c7; margin-top: 0;">Supported Languages</h2>
+            <table style="width: 100%; border-collapse: collapse; background-color: white; font-size: 13px;">
+                <thead>
+                    <tr style="background-color: #bae6fd;">
+                        <th style="padding: 10px; border: 1px solid #7dd3fc; text-align: left;">otel_language</th>
+                        <th style="padding: 10px; border: 1px solid #7dd3fc; text-align: left;">Annotation</th>
+                        <th style="padding: 10px; border: 1px solid #7dd3fc; text-align: left;">Extra Config</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid #e0e0e0;"><strong>java</strong></td>
+                        <td style="padding: 8px; border: 1px solid #e0e0e0; font-family: monospace;">instrumentation.opentelemetry.io/inject-java</td>
+                        <td style="padding: 8px; border: 1px solid #e0e0e0;">None</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid #e0e0e0;"><strong>python</strong></td>
+                        <td style="padding: 8px; border: 1px solid #e0e0e0; font-family: monospace;">instrumentation.opentelemetry.io/inject-python</td>
+                        <td style="padding: 8px; border: 1px solid #e0e0e0; color: #dc2626;"><strong>Requires pythonpath attribute</strong></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid #e0e0e0;"><strong>nodejs</strong></td>
+                        <td style="padding: 8px; border: 1px solid #e0e0e0; font-family: monospace;">instrumentation.opentelemetry.io/inject-nodejs</td>
+                        <td style="padding: 8px; border: 1px solid #e0e0e0;">None</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid #e0e0e0;"><strong>dotnet</strong></td>
+                        <td style="padding: 8px; border: 1px solid #e0e0e0; font-family: monospace;">instrumentation.opentelemetry.io/inject-dotnet</td>
+                        <td style="padding: 8px; border: 1px solid #e0e0e0;">None</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid #e0e0e0;"><strong>go</strong></td>
+                        <td style="padding: 8px; border: 1px solid #e0e0e0; font-family: monospace;">instrumentation.opentelemetry.io/inject-go</td>
+                        <td style="padding: 8px; border: 1px solid #e0e0e0;">None</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Example Configuration -->
+        <div style="background-color: #f7fafc; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+            <h2 style="color: #4a5568; margin-top: 0;">Example Link Configuration</h2>
+
+            <h3 style="color: #718096;">Python (Django/Flask/FastAPI)</h3>
+            <div style="background-color: #edf2f7; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px;">
+                <pre style="margin: 0;">Link: django -> otel
+Attributes:
+  otel_language: "python"
+  pythonpath: "/usr/src/app"</pre>
+            </div>
+
+            <h3 style="color: #718096; margin-top: 20px;">Java (Spring Boot)</h3>
+            <div style="background-color: #edf2f7; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px;">
+                <pre style="margin: 0;">Link: backend -> otel
+Attributes:
+  otel_language: "java"</pre>
+            </div>
+
+            <h3 style="color: #718096; margin-top: 20px;">Node.js (Express/NestJS)</h3>
+            <div style="background-color: #edf2f7; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px;">
+                <pre style="margin: 0;">Link: api -> otel
+Attributes:
+  otel_language: "nodejs"</pre>
+            </div>
+        </div>
+
+        <!-- How to Find pythonpath -->
+        <div style="background-color: #ecfdf5; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+            <h2 style="color: #059669; margin-top: 0;">How to Find Your pythonpath Value</h2>
+            <p>Check your Dockerfile for the <code>WORKDIR</code> directive:</p>
+            <div style="background-color: #d1fae5; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 13px;">
+                <pre style="margin: 0;"># Dockerfile
+FROM python:3.12-slim
+WORKDIR /usr/src/app  # <-- This is your pythonpath
+COPY . .
+CMD ["python", "manage.py", "runserver"]</pre>
+            </div>
+            <p style="margin-top: 15px;"><strong>Common values:</strong></p>
+            <ul>
+                <li><code>/usr/src/app</code> - Django default</li>
+                <li><code>/app</code> - Generic Python apps</li>
+                <li><code>/code</code> - Some Docker Compose setups</li>
+            </ul>
+        </div>
+
+        <!-- Troubleshooting -->
+        <div style="background-color: #fff8dc; padding: 15px; margin-bottom: 15px; border-radius: 5px; border-left: 4px solid #ff8c00;">
+            <p style="color: #cc6600; font-weight: bold; margin: 0;">Troubleshooting</p>
+            <ul style="color: #cc6600; margin: 10px 0 0 0; padding-left: 20px; line-height: 1.8;">
+                <li><strong>"ALLOWED_HOSTS if DEBUG is False"</strong> - Missing or wrong pythonpath</li>
+                <li><strong>"ModuleNotFoundError: No module named 'myapp'"</strong> - Wrong pythonpath value</li>
+                <li><strong>Pod stuck in Init</strong> - OTEL Instrumentation CR may not exist in target namespace</li>
+                <li><strong>No traces appearing</strong> - Check OTEL collector is running and reachable</li>
+            </ul>
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FastAPI Component</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 900px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #1e293b; font-size: 24px; margin: 0 0 24px 0; font-weight: 700; border-bottom: 3px solid #22c55e; padding-bottom: 12px;">FastAPI</h1>
+        <p style="color: #64748b; margin-bottom: 24px;">Python web application with dynamic module loading, Prometheus instrumentation, and Kaniko/BuildKit container builds.</p>
+
+        <!-- Architecture -->
+        <div style="background-color: #1e293b; color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">Architecture</h2>
+            <div style="font-family: monospace; font-size: 13px; line-height: 1.8;">
+                <span style="color: #22c55e;">main.py</span> - Uvicorn entrypoint, module discovery, lifespan management<br>
+                <span style="color: #22d3ee;">api.py</span> - Router aggregation, auto-imports per linked service + custom APIs<br>
+                <span style="color: #a78bfa;">config.py</span> - Environment variable parsing, service endpoint resolution<br>
+                <span style="color: #fbbf24;">Prometheus</span> - prometheus-fastapi-instrumentator on /metrics<br>
+                <span style="color: #f97316;">Kaniko / BuildKit</span> - In-cluster container image builds
+            </div>
+        </div>
+
+        <!-- Attributes -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Attributes</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Description</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">namespace</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>fastapi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Kubernetes namespace - used in all generated manifests and service DNS</td>
+                    </tr>
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">port</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>8080</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Container port - written to Dockerfile EXPOSE, fastapi.yaml containerPort, and Service targetPort</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>user_id</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>1000</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Non-root UID/GID in Dockerfile USER directive and securityContext runAsUser/runAsGroup</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>service_type</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>ClusterIP</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Kubernetes Service type in fastapi.yaml (ClusterIP / NodePort / LoadBalancer)</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>pvc</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">When enabled, generates pvc.yaml PersistentVolumeClaim and volume mount in fastapi.yaml</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>hpa</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">When enabled, generates hpa.yaml HorizontalPodAutoscaler</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>rbac</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Generates rbac.yaml with Role and RoleBinding for the service account</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>probes</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Generates probes-patch.yaml with liveness and readiness probe definitions</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>securityContext</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Container-level security context (readOnlyRootFilesystem, drop capabilities)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>pod_level_security</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Pod-level security settings (runAsNonRoot, fsGroup, seccompProfile)</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>cpu_request</code> / <code>cpu_limit</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>100m</code> / <code>500m</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">CPU requests and limits in patch/resource-patch.yaml</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>mem_request</code> / <code>mem_limit</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>128Mi</code> / <code>512Mi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Memory requests and limits in patch/resource-patch.yaml</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>ephemeral_storage</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>1Gi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Ephemeral storage limit in patch/resource-patch.yaml</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>writable_directory</code> / <code>directory</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>true</code> / <code>/tmp/data</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Adds emptyDir volume mount at specified directory path in fastapi.yaml</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>add_custom_api</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Injects custom API router imports into src/api.py for sub-component modules</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sub-Components -->
+        <div style="background-color: #f3e8ff; border: 2px solid #8b5cf6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #5b21b6; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Sub-Components</h3>
+
+            <!-- custom_api -->
+            <div style="background-color: #e9d5ff; padding: 16px; border-radius: 6px;">
+                <h4 style="color: #5b21b6; margin: 0 0 8px 0; font-size: 14px;">custom_api - Custom API Module</h4>
+                <p style="color: #6b21a8; font-size: 12px; margin-bottom: 8px;">Each custom_api generates a full Python module: <code>src/{name}_module/__init__.py</code>, <code>routes.py</code>, <code>services.py</code>, <code>models.py</code>. Router is auto-registered in api.py at <code>/api/v1/{name}/</code>.</p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #c4b5fd;">
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e1b4b;">
+                        <tr style="background-color: #ede9fe;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>fastapi_init</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>from .routes import router</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Written to src/{name}_module/__init__.py</td>
+                        </tr>
+                        <tr style="background-color: #f5f3ff;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>fastapi_custom_route</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Route definitions</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Written to src/{name}_module/routes.py</td>
+                        </tr>
+                        <tr style="background-color: #ede9fe;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>fastapi_custom_service</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Business logic</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Written to src/{name}_module/services.py</td>
+                        </tr>
+                        <tr style="background-color: #f5f3ff;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>fastapi_custom_model</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Pydantic models</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Written to src/{name}_module/models.py</td>
+                        </tr>
+                        <tr style="background-color: #ede9fe;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>requirements</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>httpx==0.27.0</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Appended to requirements.txt</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Links -->
+        <div style="background-color: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #166534; font-size: 16px; margin: 0 0 16px 0; font-weight: 600;">Links</h3>
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Link</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Direction</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Generated Output</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Outbound -->
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>FastAPI</strong> &rarr; <strong>PostgreSQL</strong></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Outbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Connection env vars in secret/cloud.env, psycopg2 in requirements.txt, src/postgresql_module/ kept</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>FastAPI</strong> &rarr; <strong>RabbitMQ</strong></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Outbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Connection env vars in secret/cloud.env, aio-pika in requirements.txt, src/rabbitmq_module/ kept</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>FastAPI</strong> &rarr; <strong>exchange</strong> <span style="color: #6b7280; font-size: 10px;">(parent: rabbitmq)</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Outbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">RABBITMQ_EXCHANGES env var, src/rabbitmq_module/ kept</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>FastAPI</strong> &rarr; <strong>queue</strong> <span style="color: #6b7280; font-size: 10px;">(parent: rabbitmq)</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Outbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">RABBITMQ_QUEUES env var, src/rabbitmq_module/ kept</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>FastAPI</strong> &rarr; <strong>database</strong> <span style="color: #6b7280; font-size: 10px;">(parent: postgresql)</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Outbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">POSTGRES_HOST + POSTGRES_DATABASES env vars, src/postgresql_module/ kept</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>FastAPI</strong> &rarr; <strong>mongo_db</strong> <span style="color: #6b7280; font-size: 10px;">(parent: mongodb)</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Outbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">MONGODB_HOST + MONGODB_DATABASES env vars, src/mongodb_module/ kept</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>FastAPI</strong> &rarr; <strong>bucket</strong> <span style="color: #6b7280; font-size: 10px;">(parent: minio)</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Outbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">MINIO_HOST + MINIO_BUCKETS env vars, src/minio_module/ kept</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>FastAPI</strong> &rarr; <strong>db</strong> <span style="color: #6b7280; font-size: 10px;">(parent: cnpg)</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Outbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">CNPG_HOST + CNPG_DATABASES env vars, src/postgresql_module/ kept</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>FastAPI</strong> &rarr; <strong>topic</strong> <span style="color: #6b7280; font-size: 10px;">(parent: kafka)</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Outbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">KAFKA_BOOTSTRAP_SERVERS + KAFKA_TOPICS env vars, aiokafka in requirements.txt</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>FastAPI</strong> &rarr; <strong>Celery</strong></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Outbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Celery worker integration, resolves celery-redis broker for CELERY_BROKER_URL</td>
+                    </tr>
+                    <!-- Inbound -->
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>Prometheus</strong> &rarr; FastAPI</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Inbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Generates service-monitor.yaml ServiceMonitor CR, adds prometheus libs to requirements.txt, exposes /metrics</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>Kong gateway</strong> &rarr; FastAPI</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Inbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Generates ingress.yaml + cors.yaml + rate-limit.yaml for external access</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>Istio</strong> &rarr; FastAPI</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Inbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Enables sidecar injection + mTLS via namespace label in namespace.yaml</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>APISIX</strong> &rarr; FastAPI</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Inbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">APISIX route/upstream YAML generated on the APISIX side</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>APISIX gateway</strong> &rarr; FastAPI</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Inbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Gateway sub-component reference from APISIX</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Post-gen removals -->
+            <div style="margin-top: 16px; padding: 12px; background-color: #bbf7d0; border-radius: 6px; font-size: 12px;">
+                <strong style="color: #166534;">Conditional module cleanup:</strong><br>
+                <span style="color: #14532d;">No PostgreSQL/CNPG link:</span> src/postgresql_module/ removed<br>
+                <span style="color: #14532d;">No MongoDB link:</span> src/mongodb_module/ removed<br>
+                <span style="color: #14532d;">No RabbitMQ link:</span> src/rabbitmq_module/ removed<br>
+                <span style="color: #14532d;">No MinIO link:</span> src/minio_module/ removed<br>
+                <span style="color: #14532d;">No gateway link:</span> ingress.yaml, cors.yaml, rate-limit.yaml removed
+            </div>
+        </div>
+
+        <!-- Generated Files -->
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #0369a1; margin-top: 0; margin-bottom: 15px;">Generated Files</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bae6fd;">
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">File</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Condition</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Content</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Always -->
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/fastapi.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Deployment, Service, ServiceAccount, ConfigMap</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/namespace.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Namespace definition</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/kustomization.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Kustomize resources, secretGenerator, patches</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/rbac.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">rbac enabled</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Role and RoleBinding for the service account</td>
+                    </tr>
+                    <!-- Conditional K8s -->
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/ingress.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">Kong gateway linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Kong Ingress route for external access</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/cors.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">Kong gateway linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Kong CORS plugin configuration</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/rate-limit.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">Kong gateway linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Kong rate limiting plugin configuration</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/service-monitor.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">Prometheus linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Prometheus ServiceMonitor CR for /metrics scraping</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/pvc.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">pvc enabled</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">PersistentVolumeClaim definition</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/hpa.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">hpa enabled</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">HorizontalPodAutoscaler definition</td>
+                    </tr>
+                    <!-- Patches -->
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/patch/resource-patch.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">CPU, memory, ephemeral storage requests and limits</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/patch/probes-patch.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">probes enabled</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Liveness and readiness probe definitions</td>
+                    </tr>
+                    <!-- Static files -->
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/files/startup.sh</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Container startup script</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/files/test_file.text</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Static test file mounted via ConfigMap</td>
+                    </tr>
+                    <!-- Secrets -->
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/secret/registry.json</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Docker registry credentials (SOPS encrypted)</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/secret/cloud.env</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Service connection env vars (SOPS encrypted)</td>
+                    </tr>
+                    <!-- Build -->
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/build/base/kaniko.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Kaniko in-cluster container build Job</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/build/base/buildkit.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">BuildKit in-cluster container build Job</td>
+                    </tr>
+                    <!-- App source -->
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">Dockerfile</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Multi-stage Python image with non-root user (user_id), EXPOSE port</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">Dockerfile.test</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Test runner Dockerfile for CI pipeline</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">requirements.txt</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Python deps (fastapi, uvicorn, + link-specific: psycopg2, aio-pika, aiokafka, etc.)</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">src/main.py</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Uvicorn app entrypoint, lifespan hooks, module discovery</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">src/config.py</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Settings class, env var parsing, endpoint resolution</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">src/api.py</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Router aggregation - auto-includes linked service modules + custom_api routers</td>
+                    </tr>
+                    <!-- Dynamic modules -->
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">src/postgresql_module/*</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">PostgreSQL or CNPG linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">PostgreSQL connection pool, CRUD routes, models</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">src/mongodb_module/*</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">MongoDB linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">MongoDB client, collection routes, models</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">src/rabbitmq_module/*</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">RabbitMQ linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">aio-pika connection, publisher/consumer routes</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">src/minio_module/*</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">MinIO linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">MinIO/S3 client, upload/download routes</td>
+                    </tr>
+                    <!-- Day2 -->
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">day2/fastapi-test-job.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Day-2 test Job manifest for validation</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Ports -->
+        <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #166534; margin-top: 0; margin-bottom: 15px;">Ports</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Port</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Target</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Protocol</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">port attr (8080)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Container (Dockerfile EXPOSE, containerPort)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTP</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">80</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Service port (maps to containerPort)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTP</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- API Endpoints -->
+        <div style="background-color: #f0f9ff; border: 2px solid #0ea5e9; border-radius: 8px; padding: 20px;">
+            <h3 style="color: #0369a1; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">API Endpoints</h3>
+            <div style="font-family: monospace; background-color: #e0f2fe; padding: 12px; border-radius: 6px; font-size: 13px; line-height: 1.8;">
+                GET /health &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Liveness check<br>
+                GET /info &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Component info<br>
+                GET /metrics &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Prometheus metrics<br>
+                GET /api/v1/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Base API router<br>
+                GET /api/v1/postgresql/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- PostgreSQL/CNPG routes (when linked)<br>
+                GET /api/v1/mongodb/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- MongoDB routes (when linked)<br>
+                GET /api/v1/rabbitmq/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- RabbitMQ routes (when linked)<br>
+                GET /api/v1/minio/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- MinIO routes (when linked)<br>
+                GET /api/v1/kafka/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Kafka routes (when linked)<br>
+                GET /api/v1/{custom_api}/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Custom API module routes (per sub-component)
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

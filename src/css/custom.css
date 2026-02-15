@@ -90,3 +90,11 @@ body, .docMainWrapper, .main-wrapper {
     background-color: #ffffff; /* Ensuring a white background */
 }
 
+/* Component documentation iframes */
+.markdown iframe {
+    width: 100%;
+    border: none;
+    border-radius: 8px;
+    min-height: 400px;
+}
+

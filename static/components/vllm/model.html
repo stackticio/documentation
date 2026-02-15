@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>vLLM Model (Sub-Component)</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 800px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #1e293b; font-size: 24px; margin: 0 0 24px 0; font-weight: 700; border-bottom: 3px solid #fbbf24; padding-bottom: 12px;">vLLM Model Sub-Component</h1>
+
+        <!-- What This Creates -->
+        <div style="background-color: #1e293b; color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">What This Creates</h2>
+            <div style="font-family: monospace; font-size: 13px; line-height: 1.8;">
+                <span style="color: #fbbf24;">VLLMRuntime CR</span> - Kubernetes custom resource<br>
+                <span style="color: #22d3ee;">Deployment</span> - Pod running the model<br>
+                <span style="color: #a78bfa;">Service</span> - Internal endpoint for router
+            </div>
+        </div>
+
+        <!-- Model Types -->
+        <div style="background-color: #f3e8ff; border: 2px solid #8b5cf6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #5b21b6; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Model Types</h3>
+            <div style="font-family: monospace; background-color: #e9d5ff; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.8;">
+                <strong>task: generate</strong> (default)<br>
+                Chat/Instruct models for conversation<br>
+                Examples: Qwen/Qwen2-1.5B-Instruct, mistralai/Mistral-7B-Instruct-v0.3<br><br>
+                <strong>task: embed</strong><br>
+                Embedding models for vector search<br>
+                Examples: BAAI/bge-small-en-v1.5, Alibaba-NLP/gte-Qwen2-1.5B-instruct
+            </div>
+        </div>
+
+        <!-- Required Attributes -->
+        <div style="background-color: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #166534; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Required Attributes</h3>
+            <div style="font-family: monospace; background-color: #bbf7d0; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.8;">
+                <strong>model_path</strong> - HuggingFace model path<br>
+                Example: Qwen/Qwen2-1.5B-Instruct
+            </div>
+        </div>
+
+        <!-- Optional Attributes -->
+        <div style="background-color: #f0f4ff; border-radius: 8px; padding: 20px; margin-bottom: 20px; border: 1px solid #a3bffa;">
+            <h3 style="color: #1e293b; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Optional Attributes</h3>
+            <div style="font-family: monospace; background-color: #dbeafe; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.8;">
+                <strong>task</strong> - generate (chat) or embed (embedding)<br>
+                <strong>max_model_len</strong> - Max context length<br>
+                <strong>dtype</strong> - auto, float16, bfloat16<br>
+                <strong>gpu_request</strong> - GPU count (0 = CPU)<br>
+                <strong>cpu_request</strong> - CPU cores<br>
+                <strong>mem_request</strong> - Memory<br>
+                <strong>pvc_size</strong> - Storage for model cache<br>
+                <strong>enable_lora</strong> - Enable LoRA adapters<br>
+                <strong>extra_args</strong> - Additional vLLM CLI args
+            </div>
+        </div>
+
+        <!-- Attribute Inheritance -->
+        <div style="background-color: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #92400e; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Attribute Inheritance</h3>
+            <div style="font-family: monospace; background-color: #fde68a; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.8;">
+                <strong>Priority:</strong> model attribute > parent attribute > default<br><br>
+                <em>Example:</em><br>
+                Parent: gpu_request: 1<br>
+                Model: gpu_request: 0<br>
+                <strong>Result:</strong> Model runs on CPU (0 overrides 1)
+            </div>
+        </div>
+
+        <!-- max_model_len -->
+        <div style="background-color: #fee2e2; border: 2px solid #ef4444; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #991b1b; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">max_model_len Configuration</h3>
+            <div style="font-family: monospace; background-color: #fecaca; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.8;">
+                <strong>Must not exceed model's max_position_embeddings</strong><br><br>
+                Qwen/Qwen2-1.5B-Instruct: 32768<br>
+                BAAI/bge-small-en-v1.5: 512<br>
+                Alibaba-NLP/gte-Qwen2-1.5B-instruct: 32768<br><br>
+                <em>If omitted, vLLM uses model's default</em>
+            </div>
+        </div>
+
+        <!-- GPU vs CPU -->
+        <div style="background-color: #f8f9fc; border-radius: 8px; padding: 20px; border: 1px solid #e5e8f0;">
+            <h3 style="color: #1e293b; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">GPU vs CPU Mode</h3>
+            <div style="font-family: monospace; background-color: #e2e8f0; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.8;">
+                <strong>gpu_request: 0</strong> - CPU mode (no GPU nodepool)<br>
+                <strong>gpu_request: 1+</strong> - GPU mode (uses parent nodepool)<br><br>
+                <em>CPU mode useful for small embedding models</em>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CNPG Database (Sub-Component)</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 800px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #1e293b; font-size: 24px; margin: 0 0 24px 0; font-weight: 700; border-bottom: 3px solid #3b82f6; padding-bottom: 12px;">CNPG Database Sub-Component</h1>
+
+        <!-- What This Creates -->
+        <div style="background-color: #1e293b; color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">What This Creates</h2>
+            <div style="font-family: monospace; font-size: 13px; line-height: 1.8;">
+                <span style="color: #3b82f6;">Database</span> - PostgreSQL database<br>
+                <span style="color: #22d3ee;">Role</span> - Database user with password<br>
+                <span style="color: #a78bfa;">Grants</span> - Permission assignments<br>
+                <span style="color: #fbbf24;">Secret</span> - K8s secret with credentials
+            </div>
+        </div>
+
+        <!-- Required Attributes -->
+        <div style="background-color: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #166534; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Required Attributes</h3>
+            <div style="font-family: monospace; background-color: #bbf7d0; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.8;">
+                <strong>database</strong> - Database name (default: sub-component name)<br>
+                <strong>username</strong> - Database user
+            </div>
+        </div>
+
+        <!-- Optional Attributes -->
+        <div style="background-color: #f0f4ff; border-radius: 8px; padding: 20px; margin-bottom: 20px; border: 1px solid #a3bffa;">
+            <h3 style="color: #1e293b; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Optional Attributes</h3>
+            <div style="font-family: monospace; background-color: #dbeafe; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.8;">
+                <strong>password</strong> - User password (auto-generated if empty)<br>
+                <strong>cnpg_permissions</strong> - SQL grant statements<br>
+                <strong>rotation_db</strong> - Enable password rotation
+            </div>
+        </div>
+
+        <!-- Link Automation -->
+        <div style="background-color: #fee2e2; border: 2px solid #ef4444; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #991b1b; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Link Automations</h3>
+            <div style="font-family: monospace; background-color: #fecaca; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.8;">
+                <strong>image_base-db</strong> - Injects DATABASE_URL into app<br>
+                <strong>external_source_code-db</strong> - Injects DATABASE_URL<br>
+                <strong>langflow-db</strong> - Sets LANGFLOW_DATABASE_URL<br>
+                <strong>airflow-db</strong> - Sets Airflow metadata DB<br>
+                <strong>keda-db</strong> - Enables PostgreSQL-based autoscaling
+            </div>
+        </div>
+
+        <!-- Generated ENV Variables -->
+        <div style="background-color: #f3e8ff; border: 2px solid #8b5cf6; border-radius: 8px; padding: 20px;">
+            <h3 style="color: #5b21b6; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Generated ENV Variables (by framework_type)</h3>
+            <div style="font-family: monospace; background-color: #e9d5ff; padding: 12px; border-radius: 6px; font-size: 11px; line-height: 1.8;">
+                <strong>spring:</strong> SPRING_DATASOURCE_URL, SPRING_DATASOURCE_USERNAME, SPRING_DATASOURCE_PASSWORD<br>
+                <strong>python/nodejs/rails:</strong> DATABASE_URL (connection string)<br>
+                <strong>laravel:</strong> DB_CONNECTION, DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD<br>
+                <strong>generic:</strong> POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

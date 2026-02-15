@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cert Manager Component</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 900px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #1e293b; font-size: 24px; margin: 0 0 24px 0; font-weight: 700; border-bottom: 3px solid #06b6d4; padding-bottom: 12px;">Cert Manager Component</h1>
+        <p style="color: #64748b; margin-bottom: 24px;">Automated TLS certificate management for Kubernetes. Supports Let's Encrypt, ZeroSSL, self-signed, and custom CA issuers with automatic renewal.</p>
+
+        <!-- Architecture -->
+        <div style="background-color: #1e293b; color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">Architecture</h2>
+            <div style="font-family: monospace; font-size: 13px; line-height: 1.8;">
+                <span style="color: #06b6d4;">Cert Manager</span> - Certificate controller<br>
+                <span style="color: #22d3ee;">Issuers</span> - Certificate authorities (ACME, self-signed)<br>
+                <span style="color: #fbbf24;">Certificates</span> - TLS cert resources<br>
+                <span style="color: #4ade80;">Secrets</span> - Auto-created K8s TLS secrets
+            </div>
+        </div>
+
+        <!-- Quick Reference -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Quick Reference</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Default</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Effect</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">namespace</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>cert-manager</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">-</td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Kubernetes namespace</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>issuer_type</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>letsencrypt</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">letsencrypt</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">letsencrypt, zerossl, selfsigned, generic</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>email</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>admin@example.com</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">-</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">ACME account email</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>dns_names</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>*.example.com</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">-</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Certificate DNS names</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>solver_type</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>http01</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">http01</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">ACME challenge type</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>secret_name</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>tls-secret</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">-</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">TLS secret name</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Link Variables -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Link Variables</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Variable</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Link Type</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Purpose</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__prometheus</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">prometheus-cert_manager</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Certificate expiry metrics</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__ingress</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">gateway-cert_manager</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">HTTP01 solver ingress</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__external_dns</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">cert_manager-external_dns</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">DNS01 solver automation</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Issuer Types -->
+        <div style="background-color: #f3e8ff; border: 2px solid #8b5cf6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #5b21b6; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Issuer Types</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #e9d5ff;">
+                        <th style="padding: 8px; border: 1px solid #c4b5fd; text-align: left;">Type</th>
+                        <th style="padding: 8px; border: 1px solid #c4b5fd; text-align: left;">Use Case</th>
+                        <th style="padding: 8px; border: 1px solid #c4b5fd; text-align: left;">File Generated</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd; font-weight: bold;">letsencrypt</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">Production public certs (free)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">letsencrypt-issuer.yaml</td>
+                    </tr>
+                    <tr style="background-color: #faf5ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd; font-weight: bold;">zerossl</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">Alternative ACME CA</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">zerossl-issuer.yaml</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd; font-weight: bold;">selfsigned</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">Development/internal</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">selfsigned-issuer.yaml</td>
+                    </tr>
+                    <tr style="background-color: #faf5ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd; font-weight: bold;">generic_acme</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">Custom ACME server</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">generic_acme-issuer.yaml</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd; font-weight: bold;">generic_non_acme</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">Venafi, Vault, custom CA</td>
+                        <td style="padding: 6px 8px; border: 1px solid #c4b5fd;">generic_non_acme-issuer.yaml</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Generated Files -->
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #0369a1; margin-top: 0; margin-bottom: 15px;">Generated Files</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bae6fd;">
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">File</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Condition</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Contains</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">helm/helm-values.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Cert-manager Helm config</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">cert-manager.crds.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">CRD definitions</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">certificate.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Certificate resource</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">issuer/*.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Per issuer_type</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ClusterIssuer/Issuer</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Ports -->
+        <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #166534; margin-top: 0; margin-bottom: 15px;">Ports</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Port</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Purpose</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Protocol</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">9402</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Metrics endpoint</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTP</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">10250</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Webhook</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTPS</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ACME Solvers -->
+        <div style="background-color: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #166534; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">ACME Challenge Solvers</h3>
+            <div style="font-family: monospace; background-color: #bbf7d0; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.8;">
+                <strong>HTTP01:</strong><br>
+                - Requires ingress controller<br>
+                - Verifies via /.well-known/acme-challenge/<br><br>
+                <strong>DNS01:</strong><br>
+                - Works with external-dns<br>
+                - Supports wildcard certificates<br>
+                - Requires DNS provider credentials
+            </div>
+        </div>
+
+        <!-- Technical Info -->
+        <div style="background-color: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 20px;">
+            <h3 style="color: #92400e; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Technical Info</h3>
+            <div style="font-family: monospace; background-color: #fde68a; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.8;">
+                <strong>Chart Version:</strong> 1.15.0<br>
+                <strong>Ports:</strong> 9402 (metrics), 10250 (webhook)<br>
+                <strong>Extensions:</strong> local_extensions.password_hash
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

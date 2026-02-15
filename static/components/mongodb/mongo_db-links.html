@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MongoDB Database Links (*-mongo_db)</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #0f172a;">
+
+    <div style="max-width: 1000px; margin: 0 auto;">
+
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #064e3b 0%, #10b981 100%); border-radius: 16px; padding: 32px; margin-bottom: 24px; border: 1px solid #34d399;">
+            <h1 style="color: #f8fafc; font-size: 28px; margin: 0 0 12px 0; font-weight: 700;">MongoDB Database Links (*-mongo_db)</h1>
+            <p style="color: #a7f3d0; margin: 0; font-size: 14px;">Links to MongoDB mongo_db sub-components provide document database access with auto-generated connection configuration</p>
+        </div>
+
+        <!-- What These Links Do -->
+        <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #475569;">
+            <h2 style="color: #34d399; margin: 0 0 16px 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">🍃</span> What These Links Do
+            </h2>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                <div style="background-color: #0f172a; padding: 12px 16px; border-radius: 8px; border-left: 3px solid #10b981;">
+                    <span style="color: #e2e8f0; font-size: 13px;">Inject MongoDB connection URI into environment</span>
+                </div>
+                <div style="background-color: #0f172a; padding: 12px 16px; border-radius: 8px; border-left: 3px solid #10b981;">
+                    <span style="color: #e2e8f0; font-size: 13px;">Configure database-specific credentials</span>
+                </div>
+                <div style="background-color: #0f172a; padding: 12px 16px; border-radius: 8px; border-left: 3px solid #10b981;">
+                    <span style="color: #e2e8f0; font-size: 13px;">Set database name and auth database</span>
+                </div>
+                <div style="background-color: #0f172a; padding: 12px 16px; border-radius: 8px; border-left: 3px solid #10b981;">
+                    <span style="color: #e2e8f0; font-size: 13px;">Enable replica set connection (for HA)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Supported Link Types -->
+        <div style="background: linear-gradient(135deg, #064e3b 0%, #065f46 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #10b981;">
+            <h2 style="color: #a7f3d0; margin: 0 0 20px 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">🔗</span> Supported Link Types
+            </h2>
+
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0; background-color: #0f172a; border-radius: 12px; overflow: hidden;">
+                <thead>
+                    <tr>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #34d399; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #10b981;">Link Type</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #34d399; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #10b981;">Use Case</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #34d399; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #10b981;">Generated Files</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #065f46; color: #a7f3d0; padding: 4px 10px; border-radius: 6px; font-size: 12px;">image_base-mongo_db</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Base application MongoDB access</td>
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <span style="color: #fbbf24; font-size: 11px;">📁 src/mongodb_module/</span>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #065f46; color: #a7f3d0; padding: 4px 10px; border-radius: 6px; font-size: 12px;">fastapi-mongo_db</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">FastAPI document storage</td>
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <span style="color: #fbbf24; font-size: 11px;">📁 src/mongodb_module/</span>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #065f46; color: #a7f3d0; padding: 4px 10px; border-radius: 6px; font-size: 12px;">python-mongo_db</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Python application MongoDB</td>
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <span style="color: #fbbf24; font-size: 11px;">📁 src/mongodb_module/</span>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #065f46; color: #a7f3d0; padding: 4px 10px; border-radius: 6px; font-size: 12px;">nodejs-mongo_db</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Node.js document storage</td>
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <span style="color: #fbbf24; font-size: 11px;">📁 src/mongodb/</span>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #065f46; color: #a7f3d0; padding: 4px 10px; border-radius: 6px; font-size: 12px;">k6-mongo_db</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Load testing with MongoDB</td>
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <span style="color: #fbbf24; font-size: 11px;">📄 configmap.yaml</span>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #065f46; color: #a7f3d0; padding: 4px 10px; border-radius: 6px; font-size: 12px;">keda-mongo_db</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Query-based autoscaling</td>
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <span style="color: #fbbf24; font-size: 11px;">📄 scaledobject.yaml</span>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px;">
+                            <code style="background-color: #065f46; color: #a7f3d0; padding: 4px 10px; border-radius: 6px; font-size: 12px;">topic-mongo_db</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px;">Kafka → MongoDB sink</td>
+                        <td style="padding: 12px 16px;">
+                            <span style="color: #fbbf24; font-size: 11px;">📄 connector.yaml</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Environment Variables -->
+        <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #475569;">
+            <h2 style="color: #34d399; margin: 0 0 16px 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">⚙️</span> Generated Environment Variables
+            </h2>
+            <div style="background-color: #0f172a; padding: 20px; border-radius: 12px; font-family: monospace; font-size: 12px; line-height: 2; border: 1px solid #334155;">
+                <div style="color: #64748b;"># Automatically configured when you create a MongoDB link</div>
+                <div><span style="color: #34d399;">MONGODB_HOST</span><span style="color: #94a3b8;">=</span><span style="color: #fbbf24;">auto-configured</span></div>
+                <div><span style="color: #34d399;">MONGODB_PORT</span><span style="color: #94a3b8;">=</span><span style="color: #fbbf24;">27017</span></div>
+                <div><span style="color: #34d399;">MONGODB_DATABASE</span><span style="color: #94a3b8;">=</span><span style="color: #c4b5fd;">{database_name}</span></div>
+                <div><span style="color: #34d399;">MONGODB_USERNAME</span><span style="color: #94a3b8;">=</span><span style="color: #c4b5fd;">{database_user}</span></div>
+                <div><span style="color: #34d399;">MONGODB_PASSWORD</span><span style="color: #94a3b8;">=</span><span style="color: #c4b5fd;">{database_password}</span></div>
+                <div><span style="color: #34d399;">MONGODB_AUTH_SOURCE</span><span style="color: #94a3b8;">=</span><span style="color: #fbbf24;">admin</span></div>
+                <div><span style="color: #34d399;">MONGODB_URI</span><span style="color: #94a3b8;">=</span><span style="color: #fbbf24;">mongodb://{user}:{password}@{host}:{port}/{db}?authSource=admin</span></div>
+            </div>
+        </div>
+
+        <!-- KEDA Integration -->
+        <div style="background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #3b82f6;">
+            <h2 style="color: #bfdbfe; margin: 0 0 20px 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">📈</span> KEDA MongoDB Scaling (keda-mongo_db)
+            </h2>
+            <p style="color: #93c5fd; font-size: 13px; margin: 0 0 16px 0;">When KEDA links to a MongoDB database, it creates a ScaledObject for query-based scaling:</p>
+
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0; background-color: #0f172a; border-radius: 12px; overflow: hidden;">
+                <thead>
+                    <tr>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #60a5fa; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #3b82f6;">Attribute</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #60a5fa; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #3b82f6;">Description</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #60a5fa; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #3b82f6;">Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #1e40af; color: #bfdbfe; padding: 4px 10px; border-radius: 6px; font-size: 12px;">keda_query</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">MongoDB query (JSON format)</td>
+                        <td style="padding: 12px 16px; color: #94a3b8; font-size: 11px; border-bottom: 1px solid #334155;">{"status": "pending"}</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #1e40af; color: #bfdbfe; padding: 4px 10px; border-radius: 6px; font-size: 12px;">keda_collection</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Target collection for query</td>
+                        <td style="padding: 12px 16px; color: #94a3b8; font-size: 11px; border-bottom: 1px solid #334155;">tasks</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px;">
+                            <code style="background-color: #1e40af; color: #bfdbfe; padding: 4px 10px; border-radius: 6px; font-size: 12px;">keda_query_value</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px;">Threshold value to trigger scaling</td>
+                        <td style="padding: 12px 16px; color: #94a3b8; font-size: 11px;">10</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sharding and Backup Links -->
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+            <!-- Sharding Links -->
+            <div style="background: linear-gradient(135deg, #78350f 0%, #92400e 100%); border-radius: 16px; padding: 24px; border: 1px solid #f59e0b;">
+                <h2 style="color: #fef3c7; margin: 0 0 16px 0; font-size: 16px; display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 20px;">🔀</span> Shard Links
+                </h2>
+                <table style="width: 100%; border-collapse: separate; border-spacing: 0; background-color: #0f172a; border-radius: 8px; overflow: hidden;">
+                    <tbody>
+                        <tr>
+                            <td style="padding: 12px 16px;">
+                                <code style="background-color: #92400e; color: #fef3c7; padding: 4px 10px; border-radius: 6px; font-size: 11px;">mongo_db-shard</code>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="color: #fde68a; font-size: 11px; margin: 12px 0 0 0;">Assign database to specific shard in sharded clusters</p>
+            </div>
+
+            <!-- Backup Storage Links -->
+            <div style="background: linear-gradient(135deg, #14532d 0%, #166534 100%); border-radius: 16px; padding: 24px; border: 1px solid #22c55e;">
+                <h2 style="color: #bbf7d0; margin: 0 0 16px 0; font-size: 16px; display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 20px;">💾</span> Backup Links
+                </h2>
+                <table style="width: 100%; border-collapse: separate; border-spacing: 0; background-color: #0f172a; border-radius: 8px; overflow: hidden;">
+                    <tbody>
+                        <tr style="border-bottom: 1px solid #334155;">
+                            <td style="padding: 10px 16px; border-bottom: 1px solid #334155;">
+                                <code style="background-color: #166534; color: #bbf7d0; padding: 4px 10px; border-radius: 6px; font-size: 11px;">mongodb-bucket</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px 16px;">
+                                <code style="background-color: #166534; color: #bbf7d0; padding: 4px 10px; border-radius: 6px; font-size: 11px;">mongodb-swbucket</code>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="color: #86efac; font-size: 11px; margin: 12px 0 0 0;">Automated backups to MinIO or SeaweedFS</p>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

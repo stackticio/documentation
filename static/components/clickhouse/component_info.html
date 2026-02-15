@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ClickHouse Component</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 900px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #1e293b; font-size: 24px; margin: 0 0 24px 0; font-weight: 700; border-bottom: 3px solid #facc15; padding-bottom: 12px;">ClickHouse</h1>
+        <p style="color: #64748b; margin-bottom: 24px;">Columnar OLAP database managed by the Altinity ClickHouse Operator, deployed as a sharded and replicated cluster via ClickHouseInstallation CR.</p>
+
+        <!-- Architecture -->
+        <div style="background-color: #1e293b; color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">Architecture</h2>
+            <div style="font-family: monospace; font-size: 13px; line-height: 1.8;">
+                <span style="color: #facc15;">Altinity Operator</span> - Manages ClickHouseInstallation CR lifecycle<br>
+                <span style="color: #22d3ee;">ClickHouse Server</span> - Columnar OLAP database (:8123 HTTP, :9000 native)<br>
+                <span style="color: #a78bfa;">Shards</span> - Horizontal data partitioning across nodes<br>
+                <span style="color: #fbbf24;">Replicas</span> - Per-shard redundancy for high availability<br>
+                <span style="color: #f97316;">Metrics Exporter</span> - Prometheus metrics on /metrics (:8123)
+            </div>
+        </div>
+
+        <!-- Attributes -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Attributes</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Description</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">namespace</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>clickhouse</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Kubernetes namespace - used in all generated manifests and service DNS</td>
+                    </tr>
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">admin_password</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>secretpass</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Admin user password - written to clickhouse-installation.yaml users section, sub_comp_database-job.yaml init commands, and secret/clickhouse.env</td>
+                    </tr>
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">image_version</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>clickhouse/clickhouse-server:24.3</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Container image - used in clickhouse-installation.yaml pod template and sub_comp_database-job.yaml init container</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>http_port</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>8123</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">HTTP API port - clickhouse-installation.yaml container port, secret/clickhouse.env</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>native_port</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>9000</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Native TCP protocol port - clickhouse-installation.yaml container port, secret/clickhouse.env</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>shard</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>2</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Number of shards - clickhouse-installation.yaml cluster layout shardsCount</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>replicas</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>2</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Replicas per shard - clickhouse-installation.yaml cluster layout replicasCount</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>pvc_size</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>100Gi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Data volume size per replica - clickhouse-installation.yaml volumeClaimTemplates</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>storageclass</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>longhorn</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">StorageClass name (optional) - clickhouse-installation.yaml volumeClaimTemplates, omitted if empty</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>mem_request</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>4Gi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Memory request - clickhouse-installation.yaml pod template resources</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>mem_limit</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>16Gi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Memory limit - clickhouse-installation.yaml pod template resources</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>cpu_request</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>1000m</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">CPU request - clickhouse-installation.yaml pod template resources</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>cpu_limit</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>4000m</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">CPU limit - clickhouse-installation.yaml pod template resources</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>env</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>production</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Environment label - clickhouse-installation.yaml metadata labels</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sub-Components -->
+        <div style="background-color: #f3e8ff; border: 2px solid #8b5cf6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #5b21b6; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Sub-Components</h3>
+
+            <!-- clickhouse_db -->
+            <div style="background-color: #e9d5ff; padding: 16px; border-radius: 6px;">
+                <h4 style="color: #5b21b6; margin: 0 0 8px 0; font-size: 14px;">clickhouse_db - ClickHouse Database</h4>
+                <p style="color: #6b21a8; font-size: 12px; margin-bottom: 8px;">Each clickhouse_db generates: user entry in <code>clickhouse-installation.yaml</code> (password, network ACL, database access), a per-database initialization Job in <code>sub_comp_database-job.yaml</code> (CREATE DATABASE, CREATE USER, GRANT), and credentials in <code>secret/clickhouse.env</code>.</p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #c4b5fd;">
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e1b4b;">
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>database</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>otel</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Database name created by init Job, referenced in user ACL</td>
+                        </tr>
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>username</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>otel_user</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">User created with GRANT ALL on the database, written to clickhouse-installation.yaml and secret/clickhouse.env</td>
+                        </tr>
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>password</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>secret123</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">User password, written to clickhouse-installation.yaml and secret/clickhouse.env</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Links -->
+        <div style="background-color: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #166534; font-size: 16px; margin: 0 0 16px 0; font-weight: 600;">Links</h3>
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Link</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Direction</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Generated Output</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>Prometheus</strong> -> ClickHouse</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Inbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Generates <code>service-monitor.yaml</code> - ServiceMonitor CR scraping /metrics on HTTP port at 30s interval</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>Istio</strong> -> ClickHouse</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Inbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Adds <code>istio-injection: enabled</code> label on namespace.yaml</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">ClickHouse -> <strong>MinIO bucket</strong></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Outbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Detects MinIO bucket sub-component for backup storage (variable only, no template file output)</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>OTEL</strong> -> ClickHouse DB</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Inbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Adds OpenTelemetry query examples (traces, logs, metrics, HTTP latency) to <code>doc/README.md</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Sub-component level links -->
+            <div style="margin-top: 16px; padding: 12px; background-color: #bbf7d0; border-radius: 6px; font-size: 12px;">
+                <strong style="color: #166534;">Sub-component level:</strong><br>
+                <span style="color: #14532d;">OTEL -> clickhouse_db:</span> ClickHouse becomes the OTEL Collector storage backend for traces, logs, and metrics
+            </div>
+        </div>
+
+        <!-- Generated Files -->
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #0369a1; margin-top: 0; margin-bottom: 15px;">Generated Files</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bae6fd;">
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">File</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Condition</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Content</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/namespace.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Namespace definition (with istio-injection label if Istio linked)</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/kustomization.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Kustomize resources, secretGenerator for registry credentials, stacktic labels</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/clickhouse-installation.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ClickHouseInstallation CR - cluster layout, users, profiles, quotas, pod template, volume claims</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/service-monitor.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">Prometheus linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Prometheus ServiceMonitor CR - scrapes /metrics on HTTP port every 30s</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/sub_comp_database-job.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #7c3aed; font-weight: bold;">clickhouse_db sub-components exist</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Per-database K8s Job - CREATE DATABASE, CREATE USER, GRANT ALL</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/secret/clickhouse.env</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Admin password, host, ports, per-database user/password (SOPS encrypted)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/secret/registry.json</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Docker registry credentials (SOPS encrypted)</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">doc/README.md</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Connection details, user list, cluster layout, CLI examples (OTEL queries added if OTEL linked)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Ports -->
+        <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #166534; margin-top: 0; margin-bottom: 15px;">Ports</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Port</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Service</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Protocol</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">8123</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTP API</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTP</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">9000</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Native protocol</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">TCP</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">9009</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Inter-server communication (clustering)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">TCP</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Internal Endpoints -->
+        <div style="background-color: #f0f9ff; border: 2px solid #0ea5e9; border-radius: 8px; padding: 20px;">
+            <h3 style="color: #0369a1; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Internal Endpoints</h3>
+            <div style="font-family: monospace; background-color: #e0f2fe; padding: 12px; border-radius: 6px; font-size: 13px; line-height: 1.8;">
+                <strong>HTTP:</strong> clickhouse-{name}.{namespace}.svc.cluster.local:8123<br>
+                <strong>Native:</strong> clickhouse-{name}.{namespace}.svc.cluster.local:9000
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FastAPI Link Types - Stacktic</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #0f172a;">
+
+    <div style="max-width: 1100px; margin: 0 auto;">
+
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 16px; padding: 32px; margin-bottom: 24px; border: 1px solid #475569;">
+            <h1 style="color: #f8fafc; font-size: 28px; margin: 0 0 12px 0; font-weight: 700;">FastAPI Link Types</h1>
+            <p style="color: #94a3b8; margin: 0; font-size: 14px;">Complete reference for all link types supported by the FastAPI component</p>
+        </div>
+
+        <!-- Legend -->
+        <div style="display: flex; gap: 24px; margin-bottom: 24px; padding: 16px; background-color: #1e293b; border-radius: 12px; border: 1px solid #334155;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 12px; height: 12px; background: linear-gradient(135deg, #22c55e, #16a34a); border-radius: 50%;"></div>
+                <span style="font-size: 13px; color: #e2e8f0;"><strong>Outbound</strong> - FastAPI connects TO these</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 12px; height: 12px; background: linear-gradient(135deg, #3b82f6, #2563eb); border-radius: 50%;"></div>
+                <span style="font-size: 13px; color: #e2e8f0;"><strong>Inbound</strong> - These connect TO FastAPI</span>
+            </div>
+        </div>
+
+        <!-- DATABASE LINKS -->
+        <div style="background: linear-gradient(135deg, #14532d 0%, #166534 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #22c55e;">
+            <h2 style="color: #bbf7d0; margin: 0 0 20px 0; font-size: 20px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 24px;">🗄️</span> Database Links
+                <span style="background-color: #22c55e; color: #052e16; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;">OUTBOUND</span>
+            </h2>
+
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0; background-color: #0f172a; border-radius: 12px; overflow: hidden;">
+                <thead>
+                    <tr>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #22c55e; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #22c55e;">Link Type</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #22c55e; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #22c55e;">Description</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #22c55e; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #22c55e;">Environment Variables</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #22c55e; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #22c55e;">Generated Files</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 14px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #166534; color: #bbf7d0; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">fastapi-database</code>
+                            <div style="color: #94a3b8; font-size: 11px; margin-top: 4px;">PostgreSQL</div>
+                        </td>
+                        <td style="padding: 14px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Connect to PostgreSQL for relational data storage</td>
+                        <td style="padding: 14px 16px; border-bottom: 1px solid #334155;">
+                            <code style="color: #4ade80; font-size: 11px;">POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD</code>
+                        </td>
+                        <td style="padding: 14px 16px; border-bottom: 1px solid #334155;">
+                            <div style="color: #fbbf24; font-size: 11px;">📁 src/postgresql_module/</div>
+                            <div style="color: #94a3b8; font-size: 10px; margin-top: 2px;">Connection helpers & models</div>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 14px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #166534; color: #bbf7d0; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">fastapi-db</code>
+                            <div style="color: #94a3b8; font-size: 11px; margin-top: 4px;">CNPG (Cloud Native PG)</div>
+                        </td>
+                        <td style="padding: 14px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Connect to CNPG-managed PostgreSQL cluster</td>
+                        <td style="padding: 14px 16px; border-bottom: 1px solid #334155;">
+                            <code style="color: #4ade80; font-size: 11px;">CNPG_HOST, CNPG_PORT, CNPG_DB, CNPG_USER, CNPG_PASSWORD</code>
+                        </td>
+                        <td style="padding: 14px 16px; border-bottom: 1px solid #334155;">
+                            <div style="color: #fbbf24; font-size: 11px;">📁 src/postgresql_module/</div>
+                            <div style="color: #94a3b8; font-size: 10px; margin-top: 2px;">Connection helpers & models</div>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 14px 16px;">
+                            <code style="background-color: #166534; color: #bbf7d0; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">fastapi-mongo_db</code>
+                            <div style="color: #94a3b8; font-size: 11px; margin-top: 4px;">MongoDB</div>
+                        </td>
+                        <td style="padding: 14px 16px; color: #e2e8f0; font-size: 12px;">Connect to MongoDB for document storage</td>
+                        <td style="padding: 14px 16px;">
+                            <code style="color: #4ade80; font-size: 11px;">MONGODB_HOST, MONGODB_PORT, MONGODB_DB, MONGODB_USER, MONGODB_PASSWORD</code>
+                        </td>
+                        <td style="padding: 14px 16px;">
+                            <div style="color: #fbbf24; font-size: 11px;">📁 src/mongodb_module/</div>
+                            <div style="color: #94a3b8; font-size: 10px; margin-top: 2px;">Connection helpers & models</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- MESSAGING LINKS -->
+        <div style="background: linear-gradient(135deg, #78350f 0%, #92400e 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #f59e0b;">
+            <h2 style="color: #fef3c7; margin: 0 0 20px 0; font-size: 20px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 24px;">📨</span> Messaging Links
+                <span style="background-color: #f59e0b; color: #451a03; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;">OUTBOUND</span>
+            </h2>
+
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0; background-color: #0f172a; border-radius: 12px; overflow: hidden;">
+                <thead>
+                    <tr>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #fbbf24; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #f59e0b;">Link Type</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #fbbf24; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #f59e0b;">Description</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #fbbf24; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #f59e0b;">Environment Variables</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #fbbf24; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #f59e0b;">Generated Files</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 14px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #92400e; color: #fef3c7; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">fastapi-exchange</code>
+                            <div style="color: #94a3b8; font-size: 11px; margin-top: 4px;">RabbitMQ Exchange</div>
+                        </td>
+                        <td style="padding: 14px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Publish messages to RabbitMQ exchange</td>
+                        <td style="padding: 14px 16px; border-bottom: 1px solid #334155;">
+                            <code style="color: #fcd34d; font-size: 11px;">RABBITMQ_HOST, RABBITMQ_PORT, RABBITMQ_USER, RABBITMQ_PASSWORD, RABBITMQ_EXCHANGE</code>
+                        </td>
+                        <td style="padding: 14px 16px; border-bottom: 1px solid #334155;">
+                            <div style="color: #fbbf24; font-size: 11px;">📁 src/rabbitmq_module/</div>
+                            <div style="color: #94a3b8; font-size: 10px; margin-top: 2px;">Publisher helpers</div>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 14px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #92400e; color: #fef3c7; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">fastapi-queue</code>
+                            <div style="color: #94a3b8; font-size: 11px; margin-top: 4px;">RabbitMQ Queue</div>
+                        </td>
+                        <td style="padding: 14px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Consume messages from RabbitMQ queue</td>
+                        <td style="padding: 14px 16px; border-bottom: 1px solid #334155;">
+                            <code style="color: #fcd34d; font-size: 11px;">RABBITMQ_HOST, RABBITMQ_PORT, RABBITMQ_USER, RABBITMQ_PASSWORD, RABBITMQ_QUEUE</code>
+                        </td>
+                        <td style="padding: 14px 16px; border-bottom: 1px solid #334155;">
+                            <div style="color: #fbbf24; font-size: 11px;">📁 src/rabbitmq_module/</div>
+                            <div style="color: #94a3b8; font-size: 10px; margin-top: 2px;">Consumer helpers</div>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 14px 16px;">
+                            <code style="background-color: #92400e; color: #fef3c7; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">fastapi-topic</code>
+                            <div style="color: #94a3b8; font-size: 11px; margin-top: 4px;">Kafka Topic</div>
+                        </td>
+                        <td style="padding: 14px 16px; color: #e2e8f0; font-size: 12px;">Produce/consume Kafka messages</td>
+                        <td style="padding: 14px 16px;">
+                            <code style="color: #fcd34d; font-size: 11px;">KAFKA_BOOTSTRAP_SERVERS, KAFKA_TOPIC, KAFKA_CONSUMER_GROUP</code>
+                        </td>
+                        <td style="padding: 14px 16px;">
+                            <div style="color: #fbbf24; font-size: 11px;">📁 src/kafka_module/</div>
+                            <div style="color: #94a3b8; font-size: 10px; margin-top: 2px;">Producer & consumer helpers</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- STORAGE LINKS -->
+        <div style="background: linear-gradient(135deg, #4c1d95 0%, #5b21b6 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #8b5cf6;">
+            <h2 style="color: #e9d5ff; margin: 0 0 20px 0; font-size: 20px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 24px;">📦</span> Storage Links
+                <span style="background-color: #8b5cf6; color: #2e1065; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;">OUTBOUND</span>
+            </h2>
+
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0; background-color: #0f172a; border-radius: 12px; overflow: hidden;">
+                <thead>
+                    <tr>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #a78bfa; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #8b5cf6;">Link Type</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #a78bfa; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #8b5cf6;">Description</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #a78bfa; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #8b5cf6;">Environment Variables</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #a78bfa; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #8b5cf6;">Generated Files</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 14px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #5b21b6; color: #e9d5ff; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">fastapi-bucket</code>
+                            <div style="color: #94a3b8; font-size: 11px; margin-top: 4px;">MinIO Bucket</div>
+                        </td>
+                        <td style="padding: 14px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">S3-compatible object storage</td>
+                        <td style="padding: 14px 16px; border-bottom: 1px solid #334155;">
+                            <code style="color: #c4b5fd; font-size: 11px;">S3_ENDPOINT, S3_BUCKET, S3_ACCESS_KEY, S3_SECRET_KEY</code>
+                        </td>
+                        <td style="padding: 14px 16px; border-bottom: 1px solid #334155;">
+                            <div style="color: #fbbf24; font-size: 11px;">📁 src/minio_module/</div>
+                            <div style="color: #94a3b8; font-size: 10px; margin-top: 2px;">S3 client helpers</div>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 14px 16px;">
+                            <code style="background-color: #5b21b6; color: #e9d5ff; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">fastapi-swbucket</code>
+                            <div style="color: #94a3b8; font-size: 11px; margin-top: 4px;">SeaweedFS Bucket</div>
+                        </td>
+                        <td style="padding: 14px 16px; color: #e2e8f0; font-size: 12px;">Distributed S3-compatible storage</td>
+                        <td style="padding: 14px 16px;">
+                            <code style="color: #c4b5fd; font-size: 11px;">S3_ENDPOINT, S3_BUCKET, S3_ACCESS_KEY, S3_SECRET_KEY, S3_REGION</code>
+                        </td>
+                        <td style="padding: 14px 16px;">
+                            <div style="color: #fbbf24; font-size: 11px;">📁 src/minio_module/</div>
+                            <div style="color: #94a3b8; font-size: 10px; margin-top: 2px;">S3 client helpers</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- INFRASTRUCTURE LINKS (INBOUND) -->
+        <div style="background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #3b82f6;">
+            <h2 style="color: #bfdbfe; margin: 0 0 20px 0; font-size: 20px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 24px;">🔧</span> Infrastructure Links
+                <span style="background-color: #3b82f6; color: #1e3a8a; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;">INBOUND</span>
+            </h2>
+
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0; background-color: #0f172a; border-radius: 12px; overflow: hidden;">
+                <thead>
+                    <tr>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #60a5fa; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #3b82f6;">Link Type</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #60a5fa; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #3b82f6;">Description</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #60a5fa; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #3b82f6;">Configurable Options</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #60a5fa; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #3b82f6;">Generated Files</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 14px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #1d4ed8; color: #bfdbfe; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">prometheus-fastapi</code>
+                            <div style="color: #94a3b8; font-size: 11px; margin-top: 4px;">Metrics Monitoring</div>
+                        </td>
+                        <td style="padding: 14px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Enable Prometheus scraping at /metrics</td>
+                        <td style="padding: 14px 16px; color: #93c5fd; font-size: 11px; border-bottom: 1px solid #334155;">
+                            scrape_interval, port, path
+                        </td>
+                        <td style="padding: 14px 16px; border-bottom: 1px solid #334155;">
+                            <div style="color: #fbbf24; font-size: 11px;">📄 monitoring.yaml</div>
+                            <div style="color: #94a3b8; font-size: 10px; margin-top: 2px;">ServiceMonitor CR</div>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 14px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #1d4ed8; color: #bfdbfe; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">apisix-fastapi</code>
+                            <div style="color: #94a3b8; font-size: 11px; margin-top: 4px;">API Gateway</div>
+                        </td>
+                        <td style="padding: 14px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Expose via APISIX with routing & auth</td>
+                        <td style="padding: 14px 16px; color: #93c5fd; font-size: 11px; border-bottom: 1px solid #334155;">
+                            subdomain, path, cors, rate_limit, auth, timeout
+                        </td>
+                        <td style="padding: 14px 16px; border-bottom: 1px solid #334155;">
+                            <div style="color: #fbbf24; font-size: 11px;">📄 route.yaml</div>
+                            <div style="color: #94a3b8; font-size: 10px; margin-top: 2px;">ApisixRoute CR</div>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 14px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #1d4ed8; color: #bfdbfe; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">gateway-fastapi</code>
+                            <div style="color: #94a3b8; font-size: 11px; margin-top: 4px;">Kubernetes Ingress</div>
+                        </td>
+                        <td style="padding: 14px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">External HTTPS access via Ingress</td>
+                        <td style="padding: 14px 16px; color: #93c5fd; font-size: 11px; border-bottom: 1px solid #334155;">
+                            subdomain, cors, rate_limiting
+                        </td>
+                        <td style="padding: 14px 16px; border-bottom: 1px solid #334155;">
+                            <div style="color: #fbbf24; font-size: 11px;">📄 ingress.yaml, cors.yaml, rate-limit.yaml</div>
+                            <div style="color: #94a3b8; font-size: 10px; margin-top: 2px;">Ingress + optional policies</div>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 14px 16px;">
+                            <code style="background-color: #1d4ed8; color: #bfdbfe; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">istio-fastapi</code>
+                            <div style="color: #94a3b8; font-size: 11px; margin-top: 4px;">Service Mesh</div>
+                        </td>
+                        <td style="padding: 14px 16px; color: #e2e8f0; font-size: 12px;">Istio traffic management & security</td>
+                        <td style="padding: 14px 16px; color: #93c5fd; font-size: 11px;">
+                            traffic_policy, mtls, timeout
+                        </td>
+                        <td style="padding: 14px 16px;">
+                            <div style="color: #fbbf24; font-size: 11px;">📄 virtualservice.yaml, destinationrule.yaml</div>
+                            <div style="color: #94a3b8; font-size: 10px; margin-top: 2px;">Istio CRs</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- QUICK REFERENCE -->
+        <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 16px; padding: 24px; border: 1px solid #475569;">
+            <h2 style="color: #f8fafc; margin: 0 0 20px 0; font-size: 20px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 24px;">⚡</span> Quick Reference
+            </h2>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                <div style="background-color: #0f172a; padding: 16px; border-radius: 12px; border: 1px solid #334155;">
+                    <h3 style="color: #22c55e; margin: 0 0 12px 0; font-size: 14px;">Generated Python Modules</h3>
+                    <div style="font-size: 12px; color: #94a3b8; line-height: 1.8;">
+                        <div><span style="color: #4ade80;">📁</span> postgresql_module/ - DB connection, queries</div>
+                        <div><span style="color: #4ade80;">📁</span> mongodb_module/ - Mongo client helpers</div>
+                        <div><span style="color: #4ade80;">📁</span> rabbitmq_module/ - Publisher/consumer</div>
+                        <div><span style="color: #4ade80;">📁</span> minio_module/ - S3 operations</div>
+                        <div><span style="color: #4ade80;">📁</span> kafka_module/ - Kafka producer/consumer</div>
+                    </div>
+                </div>
+                <div style="background-color: #0f172a; padding: 16px; border-radius: 12px; border: 1px solid #334155;">
+                    <h3 style="color: #3b82f6; margin: 0 0 12px 0; font-size: 14px;">Generated Kubernetes Files</h3>
+                    <div style="font-size: 12px; color: #94a3b8; line-height: 1.8;">
+                        <div><span style="color: #60a5fa;">📄</span> monitoring.yaml - ServiceMonitor</div>
+                        <div><span style="color: #60a5fa;">📄</span> ingress.yaml - External access</div>
+                        <div><span style="color: #60a5fa;">📄</span> route.yaml - APISIX routing</div>
+                        <div><span style="color: #60a5fa;">📄</span> cors.yaml - CORS policy</div>
+                        <div><span style="color: #60a5fa;">📄</span> rate-limit.yaml - Rate limiting</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

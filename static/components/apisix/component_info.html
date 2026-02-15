@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>APISIX Component</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 900px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #1e293b; font-size: 24px; margin: 0 0 24px 0; font-weight: 700; border-bottom: 3px solid #ef4444; padding-bottom: 12px;">APISIX</h1>
+        <p style="color: #64748b; margin-bottom: 24px;">API Gateway with TLS termination, per-service route generation, OIDC auth, rate limiting, CORS, IP whitelisting, proxy-rewrite, and WebSocket support. Each linked component gets a dedicated route file in the route/ directory.</p>
+
+        <!-- Architecture -->
+        <div style="background-color: #1e293b; color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">Architecture</h2>
+            <div style="font-family: monospace; font-size: 13px; line-height: 1.8;">
+                <span style="color: #ef4444;">APISIX Gateway</span> - API routing, TLS termination, plugin execution (:9080/:9443)<br>
+                <span style="color: #22d3ee;">APISIX Controller</span> - Syncs ApisixRoute/ApisixUpstream CRDs to APISIX config<br>
+                <span style="color: #a78bfa;">APISIX Dashboard</span> - Admin web UI for route management<br>
+                <span style="color: #fbbf24;">etcd</span> - Configuration store for gateway state<br>
+                <span style="color: #22c55e;">CRDs</span> - ApisixRoute, ApisixUpstream, ApisixTls, ApisixConsumer per linked service
+            </div>
+        </div>
+
+        <!-- Attributes -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Attributes</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Description</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">namespace</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>ingress-apisix</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Kubernetes namespace for all generated manifests, services, and route CRDs</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>apisix_version</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>3.9.1-debian-12-r3</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">APISIX container image tag in helm-values-apix.yaml</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>external_traffic</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>Local</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Service externalTrafficPolicy in kustomization.yaml. <code>Local</code> preserves client source IP, <code>Cluster</code> distributes evenly.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Configuration (Stack-Level) -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Configuration (Stack-Level)</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Config</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Default</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Effect</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>domain</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>stack-3.source-lab.io</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Base domain for all route hosts: <code>{subdomain}.{domain}</code>. Also used for TLS certificate matching.</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>chart_version_apisix</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>2.10.0</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Helm chart version for APISIX gateway</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>chart_version_apisix_controller</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>1.0.5</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Helm chart version for APISIX Ingress Controller</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>chart_version_apisix_dashboard</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>0.8.2</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Helm chart version for APISIX Dashboard</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sub-Components -->
+        <div style="background-color: #f3e8ff; border: 2px solid #8b5cf6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #5b21b6; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Sub-Components</h3>
+
+            <!-- gateway -->
+            <div style="background-color: #e9d5ff; padding: 16px; border-radius: 6px; margin-bottom: 12px;">
+                <h4 style="color: #5b21b6; margin: 0 0 8px 0; font-size: 14px;">gateway - HTTP/API Gateway Route</h4>
+                <p style="color: #6b21a8; font-size: 12px; margin-bottom: 8px;">Each gateway generates: ApisixConsumer (if api_key) + ApisixUpstream + ApisixRoute + ApisixTls in <code>route/gateway.yaml</code>. Upstream can include multiple weighted backends via <code>gateway-external_source_code</code> links.</p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #c4b5fd;">
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e1b4b;">
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>subdomain</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>api</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Host match: {subdomain}.{domain}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>api_key</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>secret123</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Enables key-auth plugin + generates ApisixConsumer</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="color: #5b21b6; font-size: 11px; margin-top: 8px; margin-bottom: 0;"><strong>Common link attributes also apply:</strong> apisix_oidc_enable, apisix_oidc_param, apisix_timeout, websocket, rate_limiting, cors, cors_headers, whitelist, ip_whitelist, proxy_rewrite, headers (see Common Link Attributes below)</p>
+
+                <div style="margin-top: 10px; padding: 8px; background-color: #ddd6fe; border-radius: 4px; font-size: 11px; color: #1e1b4b;">
+                    <strong>gateway-external_source_code link attributes:</strong><br>
+                    <code>weight</code> (default 50) - Load balancing weight per backend in the upstream node list
+                </div>
+            </div>
+
+            <!-- ai_gateway -->
+            <div style="background-color: #e9d5ff; padding: 16px; border-radius: 6px;">
+                <h4 style="color: #5b21b6; margin: 0 0 8px 0; font-size: 14px;">ai_gateway - AI Model Gateway Route</h4>
+                <p style="color: #6b21a8; font-size: 12px; margin-bottom: 8px;">Each ai_gateway generates: ApisixConsumer (if api_key) + ApisixUpstream + ApisixRoute in <code>route/ai_gateway.yaml</code>. External AI backends generate additional resources in <code>route/ai_gateway_external.yaml</code>.</p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #c4b5fd;">
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e1b4b;">
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>subdomain</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>ai</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Host match: {subdomain}.{domain}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>api_key</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>secret123</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Enables key-auth plugin + generates ApisixConsumer</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="color: #5b21b6; font-size: 11px; margin-top: 8px; margin-bottom: 4px;"><strong>Common link attributes also apply:</strong> apisix_oidc_enable, apisix_oidc_param, apisix_timeout, websocket, rate_limiting, cors, cors_headers, whitelist, ip_whitelist, proxy_rewrite, headers</p>
+
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 8px;">
+                    <thead>
+                        <tr style="background-color: #c4b5fd;">
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">AI Backend Link Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e1b4b;">
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>path</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>/v1/*</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">URL path match on ApisixRoute. Default: <code>/v1/*</code></td>
+                        </tr>
+                        <tr style="background-color: #faf5ff;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>deny_patterns</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">(multiline list)</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">ai-prompt-guard plugin: blocked prompt patterns</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>allow_patterns</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">(multiline list)</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">ai-prompt-guard plugin: allowed prompt patterns</td>
+                        </tr>
+                        <tr style="background-color: #faf5ff;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>prompt_decorator</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">(multiline)</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">ai-prompt-decorator plugin: system prompt prepend rules</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>ai_rate_limit</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">(multiline config)</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">ai-rate-limiting plugin: AI-specific rate limits</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div style="margin-top: 10px; padding: 8px; background-color: #ddd6fe; border-radius: 4px; font-size: 11px; color: #1e1b4b;">
+                    <strong>Backend link types:</strong><br>
+                    <code>ai_gateway-vllm</code> &rarr; vLLM router service ({name}-router-service.{ns}:80)<br>
+                    <code>ai_gateway-model</code> &rarr; vLLM model sub-component ({model}.{parent_ns}:80)<br>
+                    <code>ai_gateway-external_ai</code> &rarr; External AI provider ({ai_endpoint}:443). Attributes: <code>ai_provider</code> (default "openai"), <code>ai_provider_api_key</code>. Azure uses <code>api-key</code> header; others use <code>Authorization: Bearer</code>.
+                </div>
+            </div>
+        </div>
+
+        <!-- Common Link Attributes -->
+        <div style="background-color: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #92400e; font-size: 16px; margin: 0 0 16px 0; font-weight: 600;">Common Link Attributes (applied on most outbound links)</h3>
+            <p style="color: #78350f; font-size: 11px; margin-bottom: 12px;">These attributes are available on most outbound links (apisix-X). Each controls an APISIX plugin or upstream behavior in the generated route file.<br><strong>Exceptions:</strong> <code>rabbitmq</code> has NO OIDC. <code>bridge</code> has NO apisix_timeout. <code>kubecost</code> only supports subdomain, OIDC, ip_whitelist. <code>vllm</code> uses component attributes instead (see below).</p>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #fde68a;">
+                        <th style="padding: 8px; border: 1px solid #f59e0b; text-align: left;">Link Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #f59e0b; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #f59e0b; text-align: left;">Behavior</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a; color: #fbbf24;"><code style="color: #fbbf24;">subdomain</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a; color: #fbbf24;"><code style="color: #fbbf24;">grafana</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a; color: #fbbf24;">Route host match: <code>{subdomain}.{domain}</code>. Also used in ApisixTls SNI.</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>apisix_timeout</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">(multiline YAML)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">ApisixUpstream timeout block (connect/send/read). Each line becomes a YAML key-value.</td>
+                    </tr>
+                    <tr style="background-color: #fffbeb;">
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>websocket</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">Enables <code>enableWebsocket: true</code> on ApisixRoute</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>apisix_oidc_enable</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">Enables openid-connect plugin on route. Requires <code>apisix_oidc_param</code> to be set.</td>
+                    </tr>
+                    <tr style="background-color: #fffbeb;">
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>apisix_oidc_param</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">(multiline YAML)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">OIDC plugin config (client_id, client_secret, discovery, etc.). Only used when <code>apisix_oidc_enable</code> is true.</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>rate_limiting</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">Enables limit-count plugin (100 requests per 60 seconds)</td>
+                    </tr>
+                    <tr style="background-color: #fffbeb;">
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>cors</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">Enables cors plugin with <code>allow_origins: "*"</code>. Override with <code>cors_headers</code>.</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>cors_headers</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">(multiline)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">Custom CORS config lines. Replaces default <code>allow_origins: "*"</code> when set.</td>
+                    </tr>
+                    <tr style="background-color: #fffbeb;">
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>whitelist</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">Enables ip-restriction plugin. Requires <code>ip_whitelist</code> to be set.</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>ip_whitelist</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>10.0.0.0/8 192.168.1.0/24</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">Space-separated IP/CIDR allow list. Only used when <code>whitelist</code> is true.</td>
+                    </tr>
+                    <tr style="background-color: #fffbeb;">
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>proxy_rewrite</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">Enables proxy-rewrite plugin. Uses <code>headers</code> for header injection.</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>headers</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>X-Custom: value</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">Space-separated key-value pairs for proxy-rewrite header injection. Only used when <code>proxy_rewrite</code> is true.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Attribute Dependencies -->
+        <div style="background-color: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #92400e; font-size: 16px; margin: 0 0 16px 0; font-weight: 600;">Attribute Dependencies &amp; Conditional Behavior</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #fde68a;">
+                        <th style="padding: 8px; border: 1px solid #f59e0b; text-align: left;">Toggle</th>
+                        <th style="padding: 8px; border: 1px solid #f59e0b; text-align: left;">Requires</th>
+                        <th style="padding: 8px; border: 1px solid #f59e0b; text-align: left;">Behavior</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>apisix_oidc_enable = true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>apisix_oidc_param</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">Adds openid-connect plugin block to ApisixRoute. Without <code>apisix_oidc_param</code> the plugin has no config.</td>
+                    </tr>
+                    <tr style="background-color: #fffbeb;">
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>whitelist = true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>ip_whitelist</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">Adds ip-restriction plugin. Without <code>ip_whitelist</code> there are no IPs to allow.</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>proxy_rewrite = true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>headers</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">Adds proxy-rewrite plugin. <code>headers</code> provides key-value pairs for header injection.</td>
+                    </tr>
+                    <tr style="background-color: #fffbeb;">
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>cors = true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>cors_headers</code> (optional)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">If <code>cors_headers</code> set: uses custom CORS config. If empty: defaults to <code>allow_origins: "*"</code>.</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>api_key</code> set (gateway/ai_gateway)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">(none)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">Generates ApisixConsumer with key-auth plugin + adds key-auth to route plugin chain.</td>
+                    </tr>
+                    <tr style="background-color: #fffbeb;">
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">Keycloak version detection</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">(auto)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">If Keycloak tag is <code>v1.3_keycloak-x</code>: upstream uses <code>keycloak-keycloakx-http.{ns}:80</code>. Otherwise: <code>{name}.{ns}:80</code>.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Outbound Links -->
+        <div style="background-color: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #166534; font-size: 16px; margin: 0 0 16px 0; font-weight: 600;">Outbound Links (APISIX &rarr; target)</h3>
+            <p style="color: #166534; font-size: 11px; margin-bottom: 12px;">Each outbound link generates a dedicated <code>route/{service}.yaml</code>. Default K8s resources: ApisixUpstream + ApisixRoute + ApisixTls. Upstream endpoint: <code>{component}.{namespace}.svc.cluster.local:80</code>. Attributes column shows what differs from the common set.</p>
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 6px; border: 1px solid #86efac; text-align: left;">Link Type</th>
+                        <th style="padding: 6px; border: 1px solid #86efac; text-align: left;">Target</th>
+                        <th style="padding: 6px; border: 1px solid #86efac; text-align: left;">Route File</th>
+                        <th style="padding: 6px; border: 1px solid #86efac; text-align: left;">Attributes &amp; Special Behavior</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="4" style="padding: 6px; border: 1px solid #bbf7d0; background-color: #bbf7d0; font-weight: bold; color: #166534;">Full common attribute set (subdomain, timeout, websocket, OIDC, rate_limiting, cors, whitelist, proxy_rewrite, headers)</td></tr>
+                    <tr>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><code>apisix-grafana</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">Grafana</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0; font-family: monospace;">route/grafana.yaml</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">All common attributes</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><code>apisix-keycloak</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">Keycloak</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0; font-family: monospace;">route/keycloak.yaml</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">All common. Auto-detects Keycloak-X: if tag is <code>v1.3_keycloak-x</code> uses <code>keycloak-keycloakx-http.{ns}:80</code></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><code>apisix-keycloak_operator</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">Keycloak Operator</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0; font-family: monospace;">route/keycloak_operator.yaml</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">All common attributes</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><code>apisix-dex</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">Dex</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0; font-family: monospace;">route/dex.yaml</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">All common attributes</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><code>apisix-postgresql</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">PostgreSQL</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0; font-family: monospace;">route/postgresql.yaml</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">All common attributes</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><code>apisix-opensearch</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">OpenSearch</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0; font-family: monospace;">route/opensearch.yaml</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">All common attributes</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><code>apisix-clickhouse</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">ClickHouse</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0; font-family: monospace;">route/clickhouse.yaml</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">All common attributes</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><code>apisix-backstage</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">Backstage</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0; font-family: monospace;">route/backstage.yaml</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">All common attributes</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><code>apisix-flowise</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">Flowise</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0; font-family: monospace;">route/flowise.yaml</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">All common attributes</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><code>apisix-langflow</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">Langflow</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0; font-family: monospace;">route/langflow.yaml</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">All common attributes</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><code>apisix-fastapi</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">FastAPI</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0; font-family: monospace;">route/fastapi.yaml</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">All common attributes</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><code>apisix-stack_agent</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">Stack Agent</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0; font-family: monospace;">route/stack_agent.yaml</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">All common attributes</td>
+                    </tr>
+
+                    <!-- Special attribute links -->
+                    <tr><td colspan="4" style="padding: 6px; border: 1px solid #bbf7d0; background-color: #fef3c7; font-weight: bold; color: #92400e;">Extra or different attributes from common set</td></tr>
+                    <tr style="background-color: #fffbeb;">
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><code>apisix-prometheus</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">Prometheus</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0; font-family: monospace;">route/prometheus_ingress.yaml</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">All common + <strong>EXTRA:</strong> <code>api_key</code> (ApisixConsumer), <code>token_path</code>. Generates multiple Upstreams/Routes (Prometheus + Alertmanager sub-routes).</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><code>apisix-loki</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">Loki</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0; font-family: monospace;">route/loki.yaml</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">All common + <strong>EXTRA:</strong> <code>api_key</code> (ApisixConsumer), <code>token_path</code>.</td>
+                    </tr>
+                    <tr style="background-color: #fffbeb;">
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><code>apisix-minio</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">MinIO</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0; font-family: monospace;">route/minio.yaml</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">All common. <strong>DUAL routes:</strong> generates 2x Upstream + 2x Route + 2x TLS (console + API on separate subdomains).</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><code>apisix-open-webui</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">Open WebUI</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0; font-family: monospace;">route/open_webui.yaml</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">All common + <strong>EXTRA:</strong> <code>pipelines_subdomain</code>. <strong>DUAL routes:</strong> main UI + pipelines endpoint on separate subdomains.</td>
+                    </tr>
+                    <tr style="background-color: #fffbeb;">
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><code>apisix-vllm</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">vLLM</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0; font-family: monospace;">route/vllm.yaml</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><strong>DIFFERENT:</strong> Uses link attributes <code>api_key</code>, <code>enable_auth</code>, <code>enable_cors</code>, <code>cors_headers</code>. NO common attrs (no OIDC, no rate_limiting, no proxy_rewrite). ApisixConsumer if api_key set. No ApisixTls.</td>
+                    </tr>
+
+                    <!-- Reduced attribute links -->
+                    <tr><td colspan="4" style="padding: 6px; border: 1px solid #bbf7d0; background-color: #fecaca; font-weight: bold; color: #991b1b;">Reduced attribute set (missing some common attributes)</td></tr>
+                    <tr style="background-color: #fef2f2;">
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><code>apisix-rabbitmq</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">RabbitMQ</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0; font-family: monospace;">route/rabbitmq.yaml</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><strong>NO OIDC</strong> (no apisix_oidc_enable/param). Has: subdomain, timeout, websocket, rate_limiting, cors, whitelist, proxy_rewrite, headers.</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><code>apisix-kubecost</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">Kubecost</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0; font-family: monospace;">route/kubecost.yaml</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><strong>MINIMAL:</strong> Only <code>subdomain</code>, <code>apisix_oidc_enable</code>, <code>apisix_oidc_param</code>, <code>ip_whitelist</code>. NO timeout, NO websocket, NO rate_limiting, NO cors, NO proxy_rewrite.</td>
+                    </tr>
+
+                    <!-- Multi-instance links -->
+                    <tr><td colspan="4" style="padding: 6px; border: 1px solid #bbf7d0; background-color: #bbf7d0; font-weight: bold; color: #166534;">Multi-instance links (one route per linked instance)</td></tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><code>apisix-external_source_code</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">External Source Code</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0; font-family: monospace;">route/backend.yaml</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">All common. One ApisixUpstream + ApisixRoute + ApisixTls per linked instance.</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><code>apisix-python</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">Python app</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0; font-family: monospace;">route/python.yaml</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">All common. One route per linked instance.</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><code>apisix-image_base</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">Image Base</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0; font-family: monospace;">route/image_base.yaml</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">All common. One route per linked instance.</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;"><code>apisix-bridge</code></td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">Kafka Bridge</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0; font-family: monospace;">route/bridge.yaml</td>
+                        <td style="padding: 4px 6px; border: 1px solid #bbf7d0;">Common <strong>except NO apisix_timeout</strong>. One route per linked instance.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sub-Component Link Types -->
+        <div style="background-color: #f3e8ff; border: 2px solid #8b5cf6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #5b21b6; font-size: 16px; margin: 0 0 16px 0; font-weight: 600;">Sub-Component Link Types</h3>
+
+            <!-- gateway links -->
+            <div style="background-color: #e9d5ff; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+                <h4 style="color: #5b21b6; margin: 0 0 6px 0; font-size: 13px;">gateway-external_source_code (gateway sub-component &rarr; backend)</h4>
+                <p style="color: #6b21a8; font-size: 11px; margin-bottom: 8px;">Each gateway can link to multiple external_source_code backends. All backends are combined into a single ApisixUpstream with weighted load balancing in <code>route/gateway.yaml</code>.</p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #c4b5fd;">
+                            <th style="padding: 4px 6px; border: 1px solid #a78bfa; text-align: left;">Link Attribute</th>
+                            <th style="padding: 4px 6px; border: 1px solid #a78bfa; text-align: left;">Default</th>
+                            <th style="padding: 4px 6px; border: 1px solid #a78bfa; text-align: left;">Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e1b4b;">
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>weight</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>50</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Load balancing weight in ApisixUpstream nodes list. Multiple backends get weighted distribution.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ai_gateway links -->
+            <div style="background-color: #e9d5ff; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+                <h4 style="color: #5b21b6; margin: 0 0 6px 0; font-size: 13px;">ai_gateway-vllm (ai_gateway sub-component &rarr; vLLM)</h4>
+                <p style="color: #6b21a8; font-size: 11px; margin-bottom: 8px;">Routes to vLLM router service. Upstream: <code>{name}-router-service.{namespace}.svc.cluster.local:80</code>. Generated in <code>route/ai_gateway.yaml</code>.</p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #c4b5fd;">
+                            <th style="padding: 4px 6px; border: 1px solid #a78bfa; text-align: left;">Link Attribute</th>
+                            <th style="padding: 4px 6px; border: 1px solid #a78bfa; text-align: left;">Default</th>
+                            <th style="padding: 4px 6px; border: 1px solid #a78bfa; text-align: left;">Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e1b4b;">
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>subdomain</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 3px; border-radius: 2px; font-size: 8px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">-</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Host match: {subdomain}.{domain}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>path</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>/v1/*</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">URL path match on ApisixRoute</td>
+                        </tr>
+                        <tr style="background-color: #faf5ff;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>deny_patterns</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">-</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">ai-prompt-guard: blocked prompt patterns (multiline list)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>allow_patterns</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">-</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">ai-prompt-guard: allowed prompt patterns (multiline list)</td>
+                        </tr>
+                        <tr style="background-color: #faf5ff;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>prompt_decorator</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">-</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">ai-prompt-decorator: system prompt prepend rules</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>ai_rate_limit</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">-</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">ai-rate-limiting: AI-specific rate limits</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="background-color: #e9d5ff; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+                <h4 style="color: #5b21b6; margin: 0 0 6px 0; font-size: 13px;">ai_gateway-model (ai_gateway sub-component &rarr; vLLM model)</h4>
+                <p style="color: #6b21a8; font-size: 11px;">Routes to individual vLLM model. Upstream: <code>{model}.{parent_namespace}.svc.cluster.local:80</code>. Same link attributes as ai_gateway-vllm (subdomain, path, deny_patterns, allow_patterns, prompt_decorator, ai_rate_limit).</p>
+            </div>
+
+            <div style="background-color: #e9d5ff; padding: 12px; border-radius: 6px;">
+                <h4 style="color: #5b21b6; margin: 0 0 6px 0; font-size: 13px;">ai_gateway-external_ai (ai_gateway sub-component &rarr; external AI provider)</h4>
+                <p style="color: #6b21a8; font-size: 11px; margin-bottom: 8px;">Routes to external AI providers (OpenAI, Azure, etc.). Upstream: HTTPS on port 443 with <code>scheme: https</code> and <code>passHost: node</code>. Generated in <code>route/ai_gateway_external.yaml</code>.</p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #c4b5fd;">
+                            <th style="padding: 4px 6px; border: 1px solid #a78bfa; text-align: left;">Link Attribute</th>
+                            <th style="padding: 4px 6px; border: 1px solid #a78bfa; text-align: left;">Default</th>
+                            <th style="padding: 4px 6px; border: 1px solid #a78bfa; text-align: left;">Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e1b4b;">
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>ai_endpoint</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 3px; border-radius: 2px; font-size: 8px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">-</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">External AI endpoint (e.g. <code>api.openai.com</code>)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>ai_provider</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>openai</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Provider type. Azure (<code>azure_openai</code>): uses <code>api-key</code> header. Others: uses <code>Authorization: Bearer</code> header.</td>
+                        </tr>
+                        <tr style="background-color: #faf5ff;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>ai_provider_api_key</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">-</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">API key for external provider. Injected via proxy-rewrite headers.</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>subdomain</code>, <code>path</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>/v1/*</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Same as internal backends</td>
+                        </tr>
+                        <tr style="background-color: #faf5ff;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>deny_patterns</code>, <code>allow_patterns</code>, <code>prompt_decorator</code>, <code>ai_rate_limit</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">-</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Same AI plugins as internal backends</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Inbound Links -->
+        <div style="background-color: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #166534; font-size: 16px; margin: 0 0 16px 0; font-weight: 600;">Inbound Links (source &rarr; APISIX)</h3>
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Link Type</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Source</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Generated Output</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>prometheus-apisix</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Prometheus</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Generates <code>monitoring.yaml</code> (PodMonitor on :9091), <code>rbac.yaml</code>, <code>prometheus-global-rule.yaml</code>, <code>alerts/apisix-alerts.yaml</code></td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>istio-apisix</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Istio</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Adds <code>istio-injection: enabled</code> label to namespace.yaml + generates <code>patch/istio-patch.yaml</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Generated Files -->
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #0369a1; margin-top: 0; margin-bottom: 15px;">Generated Files</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bae6fd;">
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">File</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Condition</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Content</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Helm -->
+                    <tr><td colspan="3" style="padding: 8px; border: 1px solid #bae6fd; background-color: #e0f2fe; font-weight: bold; color: #0369a1;">Helm Values (helm/)</td></tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">helm-values-apix.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">APISIX gateway config: image tag (<code>apisix_version</code>), LoadBalancer service (80/443), admin API, etcd</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">helm-values-controller.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">APISIX Ingress Controller config</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">helm-values-dashboard.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">APISIX Dashboard config</td>
+                    </tr>
+                    <!-- Deploy Base -->
+                    <tr><td colspan="3" style="padding: 8px; border: 1px solid #bae6fd; background-color: #e0f2fe; font-weight: bold; color: #0369a1;">Deploy (k8s/deploy/base/)</td></tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">namespace.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Namespace. Adds <code>istio-injection: enabled</code> label if Istio linked.</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">kustomization.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Kustomize: resources, patches, externalTrafficPolicy from <code>external_traffic</code>, stacktic labels</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">gatewayproxy.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Gateway proxy config (admin endpoint + admin key)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">centralized-route.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Centralized routing configuration</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">standard-install.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Standard installation manifest</td>
+                    </tr>
+                    <!-- Conditional Monitoring -->
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">monitoring.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">Prometheus linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">PodMonitor CR scraping metrics on :9091</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">rbac.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">Prometheus linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">RBAC roles for Prometheus scraping</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">prometheus-global-rule.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">Prometheus linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">PrometheusRule CR with global recording rules</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">alerts/apisix-alerts.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">Prometheus linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">PrometheusRule CR with APISIX alerting rules</td>
+                    </tr>
+                    <!-- Secrets -->
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">secret/kong.env</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always (SOPS)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Gateway credentials</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">secret/postgresql.env</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always (SOPS)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">PostgreSQL connection credentials for APISIX etcd</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">secret/registry.json</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always (SOPS)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Docker registry credentials (.dockerconfigjson)</td>
+                    </tr>
+                    <!-- Patches -->
+                    <tr><td colspan="3" style="padding: 8px; border: 1px solid #bae6fd; background-color: #e0f2fe; font-weight: bold; color: #0369a1;">Patches (k8s/deploy/base/patch/)</td></tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">resource.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Resource limit/request patches</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">ingressclass-patch.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">IngressClass configuration patch</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">istio-patch.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">Istio linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Istio sidecar injection and mTLS config</td>
+                    </tr>
+                    <!-- CRDs -->
+                    <tr><td colspan="3" style="padding: 8px; border: 1px solid #bae6fd; background-color: #e0f2fe; font-weight: bold; color: #0369a1;">CRDs (k8s/deploy/base/crd/)</td></tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">crd/*.yaml (12 files)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">APISIX CRD definitions: ApisixRoute, ApisixUpstream, ApisixTls, ApisixConsumer, ApisixGlobalRule, ApisixPluginConfig, etc. + Gateway API CRDs</td>
+                    </tr>
+                    <!-- Routes -->
+                    <tr><td colspan="3" style="padding: 8px; border: 1px solid #bae6fd; background-color: #e0f2fe; font-weight: bold; color: #0369a1;">Routes (k8s/deploy/base/route/) - each removed by post_gen if link not present</td></tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/grafana.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">apisix-grafana linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ApisixUpstream + ApisixRoute + ApisixTls</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/prometheus_ingress.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">apisix-prometheus linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ApisixUpstream + ApisixRoute + ApisixTls</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/loki.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">apisix-loki linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ApisixUpstream + ApisixRoute + ApisixTls</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/kubecost.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">apisix-kubecost linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ApisixUpstream + ApisixRoute + ApisixTls</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/keycloak.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">apisix-keycloak linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ApisixUpstream + ApisixRoute + ApisixTls (version-aware endpoint)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/keycloak_operator.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">apisix-keycloak_operator linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ApisixUpstream + ApisixRoute + ApisixTls</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/dex.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">apisix-dex linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ApisixUpstream + ApisixRoute + ApisixTls</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/postgresql.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">apisix-postgresql linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ApisixUpstream + ApisixRoute + ApisixTls</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/opensearch.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">apisix-opensearch linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ApisixUpstream + ApisixRoute + ApisixTls</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/clickhouse.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">apisix-clickhouse linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ApisixUpstream + ApisixRoute + ApisixTls</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/rabbitmq.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">apisix-rabbitmq linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ApisixUpstream + ApisixRoute + ApisixTls</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/minio.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">apisix-minio linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ApisixUpstream + ApisixRoute + ApisixTls</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/backstage.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">apisix-backstage linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ApisixUpstream + ApisixRoute + ApisixTls</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/flowise.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">apisix-flowise linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ApisixUpstream + ApisixRoute + ApisixTls</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/langflow.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">apisix-langflow linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ApisixUpstream + ApisixRoute + ApisixTls</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/open_webui.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">apisix-open-webui linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ApisixUpstream + ApisixRoute + ApisixTls</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/vllm.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">apisix-vllm linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ApisixUpstream + ApisixRoute + ApisixTls</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/fastapi.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">apisix-fastapi linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ApisixUpstream + ApisixRoute + ApisixTls</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/stack_agent.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">apisix-stack_agent linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ApisixUpstream + ApisixRoute + ApisixTls</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/backend.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">apisix-external_source_code linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">One ApisixUpstream + ApisixRoute + ApisixTls per linked instance</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/python.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">apisix-python linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">One ApisixUpstream + ApisixRoute + ApisixTls per linked instance</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/image_base.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">apisix-image_base linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">One ApisixUpstream + ApisixRoute + ApisixTls per linked instance</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/bridge.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">apisix-bridge linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">One ApisixUpstream + ApisixRoute + ApisixTls per linked instance</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/gateway.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">gateway sub-component exists</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Per gateway: ApisixConsumer (if api_key) + ApisixUpstream (weighted backends) + ApisixRoute + ApisixTls</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/ai_gateway.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">ai_gateway sub-component exists</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Per ai_gateway: ApisixConsumer (if api_key) + internal backend routes with AI plugins</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/ai_gateway_external.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">ai_gateway has external_ai links</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">External AI provider routes (HTTPS upstream, provider-specific auth headers)</td>
+                    </tr>
+                    <!-- Kustomization route -->
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">route/kustomization.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Kustomize for route directory (references all route files)</td>
+                    </tr>
+                    <!-- Docs -->
+                    <tr><td colspan="3" style="padding: 8px; border: 1px solid #bae6fd; background-color: #e0f2fe; font-weight: bold; color: #0369a1;">Documentation</td></tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">doc/README.md</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Component documentation</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">doc/metrics/apisix.text</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Prometheus metrics reference</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Plugin Matrix -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Plugin Matrix (per route)</h3>
+            <p style="color: #94a3b8; font-size: 11px; margin-bottom: 12px;">Each route can have any combination of these plugins, controlled by link attributes.</p>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Plugin</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Trigger</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Available On</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>key-auth</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>api_key</code> attribute set</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">gateway, ai_gateway</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>openid-connect</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>apisix_oidc_enable</code> + <code>apisix_oidc_param</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">All routes</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>limit-count</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>rate_limiting = true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">All routes</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>cors</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>cors = true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">All routes</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>ip-restriction</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>whitelist = true</code> + <code>ip_whitelist</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">All routes</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>proxy-rewrite</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>proxy_rewrite = true</code> + <code>headers</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">All routes</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>ai-prompt-guard</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>deny_patterns</code> or <code>allow_patterns</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">ai_gateway only</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>ai-prompt-decorator</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>prompt_decorator</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">ai_gateway only</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>ai-rate-limiting</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>ai_rate_limit</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">ai_gateway only</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Ports -->
+        <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #166534; margin-top: 0; margin-bottom: 15px;">Ports</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Port</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Service</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Protocol</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">80</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTP data plane (external LoadBalancer)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTP</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">443</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTPS data plane (external LoadBalancer)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTPS</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">9080</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTP data plane (container)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTP</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">9443</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTPS data plane (container)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTPS</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">9180</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Admin API (internal only)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTP</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">9091</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Prometheus metrics</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTP</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Internal Endpoints -->
+        <div style="background-color: #f0f9ff; border: 2px solid #0ea5e9; border-radius: 8px; padding: 20px;">
+            <h3 style="color: #0369a1; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Endpoints</h3>
+            <div style="font-family: monospace; background-color: #e0f2fe; padding: 12px; border-radius: 6px; font-size: 13px; line-height: 1.8;">
+                <strong>External route:</strong> https://{subdomain}.{domain}<br>
+                <strong>Admin API:</strong> http://apisix-admin.{namespace}.svc.cluster.local:9180<br>
+                <strong>Upstream pattern:</strong> {component}.{namespace}.svc.cluster.local:80<br>
+                <strong>TLS secret:</strong> wildcard-tls-secret (cert-manager namespace)
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

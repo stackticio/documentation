@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OPA Gatekeeper Component</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 900px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #1e293b; font-size: 24px; margin: 0 0 24px 0; font-weight: 700; border-bottom: 3px solid #7c3aed; padding-bottom: 12px;">OPA Gatekeeper</h1>
+        <p style="color: #64748b; margin-bottom: 24px;">Kubernetes admission control via OPA Gatekeeper. ValidatingWebhookConfiguration that enforces ConstraintTemplate + Constraint policies on resource creation/updates, with periodic audit scanning for existing violations.</p>
+
+        <!-- Architecture -->
+        <div style="background-color: #1e293b; color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">Architecture</h2>
+            <div style="font-family: monospace; font-size: 13px; line-height: 1.8;">
+                <span style="color: #7c3aed;">Controller Manager</span> - Policy enforcement, 3 replicas (ValidatingWebhookConfiguration)<br>
+                <span style="color: #22d3ee;">Audit Controller</span> - Periodic compliance scanning of existing resources<br>
+                <span style="color: #fbbf24;">Webhook</span> - Admission control endpoint (:8443 HTTPS)<br>
+                <span style="color: #4ade80;">Metrics Exporter</span> - Prometheus metrics for webhook + audit (:8888)<br>
+                <span style="color: #f97316;">Health Check</span> - Readiness/liveness probe (:9090)
+            </div>
+        </div>
+
+        <!-- Attributes -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Attributes</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Description</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">namespace</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>opa</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Kubernetes namespace - used in all generated manifests, namespace.yaml, kustomization.yaml, monitoring.yaml</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>cpu_request</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>100m</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">CPU request for controller manager &rarr; patch/resource.yaml</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>mem_request</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>256Mi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Memory request for controller manager &rarr; patch/resource.yaml</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>cpu_limit</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>1000m</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">CPU limit for controller manager &rarr; patch/resource.yaml</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>mem_limit</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>512Mi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Memory limit for controller manager &rarr; patch/resource.yaml</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>opa_failure_policy</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>Ignore</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Webhook failure mode: <code>Ignore</code> (fail open) or <code>Fail</code> (fail closed) &rarr; patch/webhook-tuning.yaml</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>opa_timeout</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>3</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Webhook timeout in seconds &rarr; patch/webhook-tuning.yaml</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>opa_excluded_namespaces</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>monitoring<br>logging</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Newline-separated list of namespaces excluded from admission validation. OPA namespace + kube-system are always included automatically &rarr; patch/webhook-tuning.yaml</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sub-Components -->
+        <div style="background-color: #f3e8ff; border: 2px solid #8b5cf6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #5b21b6; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Sub-Components (9 Policy Types)</h3>
+            <p style="color: #6b21a8; font-size: 12px; margin-bottom: 16px;">Each sub-component generates a ConstraintTemplate + Constraint pair in the <code>k8s/deploy/base/policies/</code> directory. If a sub-component is not added, the corresponding policy file is removed from the output.</p>
+
+            <!-- securitycontext -->
+            <div style="background-color: #e9d5ff; padding: 16px; border-radius: 6px; margin-bottom: 12px;">
+                <h4 style="color: #5b21b6; margin: 0 0 8px 0; font-size: 14px;">securitycontext - Container Security Context Policy</h4>
+                <p style="color: #6b21a8; font-size: 12px; margin-bottom: 8px;">Enforces: allowPrivilegeEscalation=false, privileged=false, readOnlyRootFilesystem=true, runAsNonRoot=true. Generates: <code>policies/security-context.yaml</code></p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #c4b5fd;">
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e1b4b;">
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>labels</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>stacktic.io/group: backend</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Key:value label pairs that select which pods this policy targets</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>opa_action</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>deny</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Enforcement action: deny, warn, or dryrun</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- resource_policy -->
+            <div style="background-color: #e9d5ff; padding: 16px; border-radius: 6px; margin-bottom: 12px;">
+                <h4 style="color: #5b21b6; margin: 0 0 8px 0; font-size: 14px;">resource_policy - Resource Limits Policy</h4>
+                <p style="color: #6b21a8; font-size: 12px; margin-bottom: 8px;">Enforces: CPU/memory requests and limits must be set, ephemeral-storage requests required. Generates: <code>policies/resource-policy.yaml</code></p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #c4b5fd;">
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e1b4b;">
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>labels</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>stacktic.io/group: backend</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Key:value label pairs that select which pods this policy targets</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>opa_action</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>deny</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Enforcement action: deny, warn, or dryrun</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- pod_level_security -->
+            <div style="background-color: #e9d5ff; padding: 16px; border-radius: 6px; margin-bottom: 12px;">
+                <h4 style="color: #5b21b6; margin: 0 0 8px 0; font-size: 14px;">pod_level_security - Pod-Level Security Policy</h4>
+                <p style="color: #6b21a8; font-size: 12px; margin-bottom: 8px;">Enforces: No hostNetwork, no hostPID, no hostIPC, no hostPath volumes. Generates: <code>policies/pod-level-security.yaml</code></p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #c4b5fd;">
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e1b4b;">
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>labels</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>stacktic.io/group: backend</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Key:value label pairs that select which pods this policy targets</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>opa_action</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>deny</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Enforcement action: deny, warn, or dryrun</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- probes -->
+            <div style="background-color: #e9d5ff; padding: 16px; border-radius: 6px; margin-bottom: 12px;">
+                <h4 style="color: #5b21b6; margin: 0 0 8px 0; font-size: 14px;">probes - Health Probes Policy</h4>
+                <p style="color: #6b21a8; font-size: 12px; margin-bottom: 8px;">Enforces: All containers must define livenessProbe and readinessProbe. Generates: <code>policies/probes.yaml</code></p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #c4b5fd;">
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e1b4b;">
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>labels</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>stacktic.io/group: backend</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Key:value label pairs that select which pods this policy targets</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>opa_action</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>deny</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Enforcement action: deny, warn, or dryrun</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- custom -->
+            <div style="background-color: #e9d5ff; padding: 16px; border-radius: 6px; margin-bottom: 12px;">
+                <h4 style="color: #5b21b6; margin: 0 0 8px 0; font-size: 14px;">custom - Custom Rego Policy</h4>
+                <p style="color: #6b21a8; font-size: 12px; margin-bottom: 8px;">User-defined Rego logic injected as a ConstraintTemplate. Generates: <code>policies/custom-policy.yaml</code></p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #c4b5fd;">
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e1b4b;">
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>labels</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>stacktic.io/group: backend</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Key:value label pairs that select which pods this policy targets</td>
+                        </tr>
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>policy</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>violation[{"msg": msg}] { ... }</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Raw Rego code inserted into the ConstraintTemplate</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>opa_action</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>deny</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Enforcement action: deny, warn, or dryrun</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- disallow -->
+            <div style="background-color: #e9d5ff; padding: 16px; border-radius: 6px; margin-bottom: 12px;">
+                <h4 style="color: #5b21b6; margin: 0 0 8px 0; font-size: 14px;">disallow - Dangerous Settings Policy</h4>
+                <p style="color: #6b21a8; font-size: 12px; margin-bottom: 8px;">Enforces: No privileged=true, allowPrivilegeEscalation=false, no :latest image tags. Generates: <code>policies/disallow.yaml</code></p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #c4b5fd;">
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e1b4b;">
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>labels</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>stacktic.io/group: backend</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Key:value label pairs that select which pods this policy targets</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>opa_action</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>deny</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Enforcement action: deny, warn, or dryrun</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- image_policy -->
+            <div style="background-color: #e9d5ff; padding: 16px; border-radius: 6px; margin-bottom: 12px;">
+                <h4 style="color: #5b21b6; margin: 0 0 8px 0; font-size: 14px;">image_policy - Image Registry Policy</h4>
+                <p style="color: #6b21a8; font-size: 12px; margin-bottom: 8px;">Enforces: Only images from approved registries allowed, optional :latest tag ban. Generates: <code>policies/image-policies.yaml</code></p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #c4b5fd;">
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e1b4b;">
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>images</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>gcr.io/my-project<br>docker.io/library</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Newline-separated list of allowed container image registries</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>disallow_latest</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>true</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Boolean - when true, blocks containers using :latest tag</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- image_signing -->
+            <div style="background-color: #e9d5ff; padding: 16px; border-radius: 6px; margin-bottom: 12px;">
+                <h4 style="color: #5b21b6; margin: 0 0 8px 0; font-size: 14px;">image_signing - Image Signing Policy</h4>
+                <p style="color: #6b21a8; font-size: 12px; margin-bottom: 8px;">Enforces: Requires label <code>stacktic.io/imageSigned=true</code> on resources. Generates: <code>policies/image_signing.yaml</code></p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #c4b5fd;">
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e1b4b;">
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>labels</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>stacktic.io/group: backend</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Key:value label pairs that select which pods this policy targets</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>opa_action</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>deny</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Enforcement action: deny, warn, or dryrun</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- label_deny -->
+            <div style="background-color: #e9d5ff; padding: 16px; border-radius: 6px;">
+                <h4 style="color: #5b21b6; margin: 0 0 8px 0; font-size: 14px;">label_deny - Required Labels Policy</h4>
+                <p style="color: #6b21a8; font-size: 12px; margin-bottom: 8px;">Enforces: Resources must have specified labels. Targets: Pod, Deployment, StatefulSet, DaemonSet, ReplicaSet. Generates: <code>policies/prod_label_deny.yaml</code></p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #c4b5fd;">
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e1b4b;">
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>labels</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>app.kubernetes.io/name: required<br>app.kubernetes.io/version: required</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Key:value pairs defining the required labels on targeted resources</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>namespaces</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>production</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Optional namespace filter - only enforce in these namespaces</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>opa_action</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>deny</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Enforcement action: deny, warn, or dryrun</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Links -->
+        <div style="background-color: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #166534; font-size: 16px; margin: 0 0 16px 0; font-weight: 600;">Links</h3>
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Link</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Direction</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Generated Output</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>Prometheus</strong> &rarr; OPA</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Inbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Generates <code>monitoring.yaml</code> - 2 Services (webhook-metrics + audit-metrics on :8888) and 2 ServiceMonitor CRs for Prometheus scraping</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Generated Files -->
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #0369a1; margin-top: 0; margin-bottom: 15px;">Generated Files</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bae6fd;">
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">File</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Condition</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Content</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/namespace.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Namespace definition</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/kustomization.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Kustomize resources, patches, policy file references</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/patch/resource.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">CPU/memory requests and limits for controller manager</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/patch/webhook-tuning.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Failure policy, timeout seconds, excluded namespaces</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/monitoring.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">Prometheus linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">2 Services + 2 ServiceMonitor CRs (webhook-metrics, audit-metrics on :8888)</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/policies/security-context.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #7c3aed; font-weight: bold;">securitycontext sub-components exist</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ConstraintTemplate + Constraint for container security context enforcement</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/policies/resource-policy.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #7c3aed; font-weight: bold;">resource_policy sub-components exist</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ConstraintTemplate + Constraint for CPU/memory/ephemeral-storage limits</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/policies/pod-level-security.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #7c3aed; font-weight: bold;">pod_level_security sub-components exist</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ConstraintTemplate + Constraint blocking hostNetwork/hostPID/hostIPC/hostPath</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/policies/probes.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #7c3aed; font-weight: bold;">probes sub-components exist</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ConstraintTemplate + Constraint requiring liveness and readiness probes</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/policies/custom-policy.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #7c3aed; font-weight: bold;">custom sub-components exist</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ConstraintTemplate + Constraint with user-defined Rego logic</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/policies/disallow.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #7c3aed; font-weight: bold;">disallow sub-components exist</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ConstraintTemplate + Constraint blocking privileged, escalation, :latest tags</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/policies/image-policies.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #7c3aed; font-weight: bold;">image_policy sub-components exist</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ConstraintTemplate + Constraint for approved registry allowlist</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/policies/image_signing.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #7c3aed; font-weight: bold;">image_signing sub-components exist</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ConstraintTemplate + Constraint requiring stacktic.io/imageSigned=true label</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/policies/prod_label_deny.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #7c3aed; font-weight: bold;">label_deny sub-components exist</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ConstraintTemplate + Constraint enforcing required labels on Pod/Deployment/StatefulSet/DaemonSet/ReplicaSet</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/secret/registry.json</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Docker registry credentials (SOPS encrypted)</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">day2/test.sh</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Policy validation test script</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">doc/README.md</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Component documentation</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Ports -->
+        <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #166534; margin-top: 0; margin-bottom: 15px;">Ports</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Port</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Service</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Protocol</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">8443</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Admission webhook (ValidatingWebhookConfiguration)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTPS</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">8888</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Metrics (webhook-metrics + audit-metrics)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTP</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">9090</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Health check (readiness/liveness)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTP</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Policy Targeting -->
+        <div style="background-color: #f0f9ff; border: 2px solid #0ea5e9; border-radius: 8px; padding: 20px;">
+            <h3 style="color: #0369a1; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Policy Targeting</h3>
+            <div style="font-family: monospace; background-color: #e0f2fe; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.8;">
+                <strong>Label-based selection:</strong> Policies target pods via label selectors (e.g. <code>stacktic.io/group: backend</code>)<br>
+                <strong>Enforcement actions:</strong> <code>deny</code> = block non-compliant resources | <code>warn</code> = warn but allow | <code>dryrun</code> = log violations only<br>
+                <strong>Excluded namespaces:</strong> OPA namespace + kube-system are always excluded from webhook validation<br>
+                <strong>Note:</strong> OPA Gatekeeper cannot do logical OR across labels in a single constraint
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

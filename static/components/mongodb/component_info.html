@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MongoDB (Percona Operator) Component</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 900px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #1e293b; font-size: 24px; margin: 0 0 24px 0; font-weight: 700; border-bottom: 3px solid #10b981; padding-bottom: 12px;">MongoDB (Percona Operator) Component</h1>
+        <p style="color: #64748b; margin-bottom: 24px;">Sharded or non-sharded MongoDB cluster using Percona Operator with automatic backup to S3-compatible storage and dynamic shard management.</p>
+
+        <!-- Architecture -->
+        <div style="background-color: #1e293b; color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">Architecture</h2>
+            <div style="font-family: monospace; font-size: 13px; line-height: 1.8;">
+                <span style="color: #10b981;">PerconaServerMongoDB CR</span> - Cluster definition<br>
+                <span style="color: #22d3ee;">Replica Set</span> - Non-sharded mode (default)<br>
+                <span style="color: #a78bfa;">Sharded Cluster</span> - mongos + config servers + shards<br>
+                <span style="color: #fbbf24;">Percona Operator</span> - Manages lifecycle
+            </div>
+        </div>
+
+        <!-- Quick Reference -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Quick Reference</h3>
+            <div style="margin-bottom: 10px; font-size: 11px;">
+                <span style="background-color: #f59e0b; color: #1e293b; padding: 2px 8px; border-radius: 3px; font-weight: bold;">REQUIRED</span>
+                <span style="color: #94a3b8; margin-left: 10px;">= Must be defined by user</span>
+            </div>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Generated In</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Effect</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">namespace</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>mongodb</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">all files</td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">K8s namespace</td>
+                    </tr>
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">replicas</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>3</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">cluster.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Number of replicas</td>
+                    </tr>
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">storage_size</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>10Gi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">cluster.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Storage per replica</td>
+                    </tr>
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">chart_version_mongodb</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>1.15.0</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">operator</td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Percona operator version</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>cpu_request / cpu_limit</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>500m / 2000m</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">cluster.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">CPU resources</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>mem_request / mem_limit</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>1Gi / 4Gi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">cluster.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Memory resources</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>antiaffinity</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">cluster.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Pod anti-affinity</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>sidecar_metrics</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">cluster.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MongoDB exporter sidecar</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>config_replicas</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>3</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">cluster.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Config server replicas (sharded)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Link Variables -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Link Variables</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Variable</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Link Type</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Purpose</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__prometheus</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">prometheus-mongodb</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Metrics collection</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__bucket</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">mongodb-bucket</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MinIO backup destination</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__swbucket</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">mongodb-swbucket</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">SeaweedFS backup destination</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__mongo_db</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">(sub-component)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Database sub-components</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__shard</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">(sub-component)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Shard sub-components</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__shard_link</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">mongo_db-shard</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">DB to shard mapping</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sub-Components -->
+        <div style="background-color: #f3e8ff; border: 2px solid #8b5cf6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #5b21b6; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Sub-Components</h3>
+            <div style="font-family: monospace; background-color: #e9d5ff; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.8;">
+                <strong style="color: #7c3aed;">mongo_db</strong> - Individual database<br>
+                &nbsp;&nbsp;database - Database name<br>
+                &nbsp;&nbsp;username - Database user<br>
+                &nbsp;&nbsp;password - User password<br>
+                &nbsp;&nbsp;collector_name - Change stream collector<br><br>
+                <strong style="color: #7c3aed;">shard</strong> - Shard configuration<br>
+                &nbsp;&nbsp;replicas - Shard replicas<br>
+                &nbsp;&nbsp;cpu_request / cpu_limit<br>
+                &nbsp;&nbsp;mem_request / mem_limit<br>
+                &nbsp;&nbsp;storage_size
+            </div>
+        </div>
+
+        <!-- Generated Files -->
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #0369a1; margin-top: 0; margin-bottom: 15px;">Generated Files</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bae6fd;">
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">File</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Condition</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Contains</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">cluster.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">PerconaServerMongoDB CR</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">crd.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">CRD definitions</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">service-monitor.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">__prometheus</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Prometheus ServiceMonitor</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">secret/cluster-secret.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Cluster auth secrets</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">sub_comp_db-job.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">__mongo_db</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Database creation jobs</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Ports -->
+        <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #166534; margin-top: 0; margin-bottom: 15px;">Ports</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Port</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Purpose</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Service</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">27017</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">MongoDB protocol</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">[cluster]-mongos (sharded) or [cluster]-rs0 (replica)</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">9216</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Metrics exporter</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">If sidecar_metrics enabled</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sharding Mode -->
+        <div style="background-color: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 20px;">
+            <h3 style="color: #92400e; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Sharding Mode</h3>
+            <div style="font-family: monospace; background-color: #fde68a; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.8;">
+                <strong>Enabled when:</strong> shard sub-components exist<br><br>
+                <strong>Components created:</strong><br>
+                - mongos routers (route_cpu/mem resources)<br>
+                - Config servers (config_replicas)<br>
+                - Data shards (per shard sub-component)<br><br>
+                <strong>Connect via:</strong> [cluster]-mongos:27017
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prometheus Monitoring Links</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #0f172a;">
+
+    <div style="max-width: 1000px; margin: 0 auto;">
+
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #78350f 0%, #b45309 100%); border-radius: 16px; padding: 32px; margin-bottom: 24px; border: 1px solid #f59e0b;">
+            <h1 style="color: #f8fafc; font-size: 28px; margin: 0 0 12px 0; font-weight: 700;">Prometheus Monitoring Links</h1>
+            <p style="color: #fef3c7; margin: 0; font-size: 14px;">Auto-generate ServiceMonitor CRDs and optional PrometheusRules for alerting</p>
+        </div>
+
+        <!-- What These Links Do -->
+        <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #475569;">
+            <h2 style="color: #fbbf24; margin: 0 0 16px 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">📊</span> What These Links Do
+            </h2>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                <div style="background-color: #0f172a; padding: 12px 16px; border-radius: 8px; border-left: 3px solid #f59e0b;">
+                    <span style="color: #e2e8f0; font-size: 13px;">Create ServiceMonitor CR for automatic metrics scraping</span>
+                </div>
+                <div style="background-color: #0f172a; padding: 12px 16px; border-radius: 8px; border-left: 3px solid #f59e0b;">
+                    <span style="color: #e2e8f0; font-size: 13px;">Configure scrape endpoint, port, and path</span>
+                </div>
+                <div style="background-color: #0f172a; padding: 12px 16px; border-radius: 8px; border-left: 3px solid #f59e0b;">
+                    <span style="color: #e2e8f0; font-size: 13px;">Optionally generate PrometheusRule for alerting</span>
+                </div>
+                <div style="background-color: #0f172a; padding: 12px 16px; border-radius: 8px; border-left: 3px solid #f59e0b;">
+                    <span style="color: #e2e8f0; font-size: 13px;">Add component-specific alert definitions</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Supported Link Types -->
+        <div style="background: linear-gradient(135deg, #78350f 0%, #92400e 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #f59e0b;">
+            <h2 style="color: #fef3c7; margin: 0 0 20px 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">🔗</span> Supported Link Types (40+)
+            </h2>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+                <code style="background-color: #0f172a; color: #fcd34d; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-align: center;">prometheus-apisix</code>
+                <code style="background-color: #0f172a; color: #fcd34d; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-align: center;">prometheus-mongodb</code>
+                <code style="background-color: #0f172a; color: #fcd34d; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-align: center;">prometheus-rabbitmq</code>
+                <code style="background-color: #0f172a; color: #fcd34d; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-align: center;">prometheus-kafka</code>
+                <code style="background-color: #0f172a; color: #fcd34d; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-align: center;">prometheus-cnpg</code>
+                <code style="background-color: #0f172a; color: #fcd34d; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-align: center;">prometheus-minio</code>
+                <code style="background-color: #0f172a; color: #fcd34d; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-align: center;">prometheus-elasticsearch</code>
+                <code style="background-color: #0f172a; color: #fcd34d; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-align: center;">prometheus-keycloak</code>
+                <code style="background-color: #0f172a; color: #fcd34d; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-align: center;">prometheus-loki</code>
+                <code style="background-color: #0f172a; color: #fcd34d; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-align: center;">prometheus-redis</code>
+                <code style="background-color: #0f172a; color: #fcd34d; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-align: center;">prometheus-fastapi</code>
+                <code style="background-color: #0f172a; color: #fcd34d; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-align: center;">prometheus-nodejs</code>
+                <code style="background-color: #0f172a; color: #fcd34d; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-align: center;">prometheus-spring</code>
+                <code style="background-color: #0f172a; color: #fcd34d; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-align: center;">prometheus-vllm</code>
+                <code style="background-color: #0f172a; color: #fcd34d; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-align: center;">prometheus-otel</code>
+                <code style="background-color: #0f172a; color: #94a3b8; padding: 6px 10px; border-radius: 6px; font-size: 11px; text-align: center;">...and more</code>
+            </div>
+        </div>
+
+        <!-- Generated Files -->
+        <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #475569;">
+            <h2 style="color: #fbbf24; margin: 0 0 20px 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">📄</span> Generated Files
+            </h2>
+
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0; background-color: #0f172a; border-radius: 12px; overflow: hidden;">
+                <thead>
+                    <tr>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #fbbf24; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #f59e0b;">Location</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #fbbf24; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #f59e0b;">File</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #fbbf24; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #f59e0b;">Contents</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px; color: #94a3b8; font-size: 12px; border-bottom: 1px solid #334155;">Target Component</td>
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <span style="color: #fbbf24; font-size: 11px;">📄 monitoring.yaml</span>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">ServiceMonitor CR</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 12px 16px; color: #94a3b8; font-size: 12px;">Prometheus Component</td>
+                        <td style="padding: 12px 16px;">
+                            <span style="color: #fbbf24; font-size: 11px;">📄 prometheusrules-{component}.yaml</span>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px;">PrometheusRule with component alerts</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Components with Alerts -->
+        <div style="background: linear-gradient(135deg, #78350f 0%, #92400e 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #f59e0b;">
+            <h2 style="color: #fef3c7; margin: 0 0 20px 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">🚨</span> Components with Auto-Generated Alerts
+            </h2>
+
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0; background-color: #0f172a; border-radius: 12px; overflow: hidden;">
+                <thead>
+                    <tr>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #fbbf24; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #f59e0b;">Component</th>
+                        <th style="padding: 14px 16px; background-color: #1e293b; color: #fbbf24; text-align: left; font-size: 12px; font-weight: 600; border-bottom: 2px solid #f59e0b;">Alert Types</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #92400e; color: #fef3c7; padding: 4px 8px; border-radius: 4px; font-size: 11px;">mongodb</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Replication lag, connection count, storage</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #92400e; color: #fef3c7; padding: 4px 8px; border-radius: 4px; font-size: 11px;">rabbitmq</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Queue depth, memory usage, node health</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #92400e; color: #fef3c7; padding: 4px 8px; border-radius: 4px; font-size: 11px;">apisix</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">High error rate, latency spikes</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #92400e; color: #fef3c7; padding: 4px 8px; border-radius: 4px; font-size: 11px;">cert_manager</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Certificate expiring soon</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #92400e; color: #fef3c7; padding: 4px 8px; border-radius: 4px; font-size: 11px;">elasticsearch</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Cluster health, disk usage, shard status</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 12px 16px;">
+                            <code style="background-color: #92400e; color: #fef3c7; padding: 4px 8px; border-radius: 4px; font-size: 11px;">keycloak</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px;">Login failures, session count</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ServiceMonitor Example -->
+        <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #475569;">
+            <h2 style="color: #fbbf24; margin: 0 0 16px 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">📝</span> ServiceMonitor Example
+            </h2>
+            <div style="background-color: #0f172a; padding: 20px; border-radius: 12px; font-family: monospace; font-size: 11px; line-height: 1.8; border: 1px solid #334155; overflow-x: auto;">
+                <div style="color: #94a3b8;">apiVersion: monitoring.coreos.com/v1</div>
+                <div style="color: #94a3b8;">kind: ServiceMonitor</div>
+                <div style="color: #94a3b8;">metadata:</div>
+                <div style="color: #94a3b8;">  name: <span style="color: #4ade80;">mongodb-monitor</span></div>
+                <div style="color: #94a3b8;">  labels:</div>
+                <div style="color: #94a3b8;">    release: <span style="color: #fbbf24;">prometheus</span></div>
+                <div style="color: #94a3b8;">spec:</div>
+                <div style="color: #94a3b8;">  selector:</div>
+                <div style="color: #94a3b8;">    matchLabels:</div>
+                <div style="color: #94a3b8;">      app: <span style="color: #4ade80;">mongodb</span></div>
+                <div style="color: #94a3b8;">  endpoints:</div>
+                <div style="color: #94a3b8;">    - port: <span style="color: #c4b5fd;">metrics</span></div>
+                <div style="color: #94a3b8;">      interval: <span style="color: #fbbf24;">30s</span></div>
+                <div style="color: #94a3b8;">      path: <span style="color: #c4b5fd;">/metrics</span></div>
+            </div>
+        </div>
+
+        <!-- Remote Federation -->
+        <div style="background: linear-gradient(135deg, #831843 0%, #be185d 100%); border-radius: 16px; padding: 24px; border: 1px solid #ec4899;">
+            <h2 style="color: #fce7f3; margin: 0 0 16px 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">🌐</span> Remote Prometheus Federation
+            </h2>
+            <p style="color: #fbcfe8; font-size: 12px; margin-bottom: 16px;">When linking Prometheus to an external Prometheus (from another stack), metrics are federated using remote_write.</p>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                <div style="background-color: #0f172a; padding: 12px 16px; border-radius: 8px;">
+                    <div style="color: #f472b6; font-size: 12px; font-weight: 600; margin-bottom: 4px;">Multi-cluster monitoring</div>
+                    <div style="color: #94a3b8; font-size: 11px;">Local → Central (external) with remote_write</div>
+                </div>
+                <div style="background-color: #0f172a; padding: 12px 16px; border-radius: 8px;">
+                    <div style="color: #f472b6; font-size: 12px; font-weight: 600; margin-bottom: 4px;">Cross-stack alerts</div>
+                    <div style="color: #94a3b8; font-size: 11px;">Central receives all metrics, unified alerting</div>
+                </div>
+                <div style="background-color: #0f172a; padding: 12px 16px; border-radius: 8px;">
+                    <div style="color: #f472b6; font-size: 12px; font-weight: 600; margin-bottom: 4px;">Cluster label</div>
+                    <div style="color: #94a3b8; font-size: 11px;">System name provides cluster label for filtering</div>
+                </div>
+                <div style="background-color: #0f172a; padding: 12px 16px; border-radius: 8px;">
+                    <div style="color: #f472b6; font-size: 12px; font-weight: 600; margin-bottom: 4px;">PromQL across clusters</div>
+                    <div style="color: #94a3b8; font-size: 11px;">Filter by cluster="stack-name"</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -152,6 +152,11 @@ module.exports = {
     },
     {
       type: 'doc',
+      id: 'ai_stacktic',
+      label: 'AI & Stacktic',
+    },
+    {
+      type: 'doc',
       id: 'ai_governance',
       label: 'AI Governance & MCP',
     },

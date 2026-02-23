@@ -152,6 +152,8 @@ Stacktic doesn't just generate infrastructure — it generates the **metadata la
 
 ## 🏭 The Dark Open-Source Factory
 
+<iframe src="/documentation/website/solution/dark-factory.html" width="100%" height="700px" frameBorder="0" style={{borderRadius: '12px', marginBottom: '24px'}}></iframe>
+
 In manufacturing, a **dark factory** runs lights-out — fully automated, zero human intervention. Stacktic brings this model to open-source infrastructure:
 
 > **An open-source dark factory for topology, relationships, and operations automation.**

@@ -12,6 +12,8 @@ hide_table_of_contents: false
   </p>
 </div>
 
+<iframe src="/documentation/website/solution/ai-governance.html" width="100%" height="750px" frameBorder="0" style={{borderRadius: '12px', marginBottom: '24px'}}></iframe>
+
 {/* THE BIGGER PICTURE */}
 <div style={{background: '#1a1a2e', borderRadius: '12px', padding: '24px', marginBottom: '32px', border: '1px solid #1976d2'}}>
   <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px'}}>

@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stacktic — AI & Production</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Fira Code', monospace;
+      background: #2A2847;
+      color: #e2e8f0;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      text-align: center;
+      padding: 28px 32px 0;
+      opacity: 0;
+      animation: fadeIn 0.8s ease forwards 0.2s;
+    }
+    .title {
+      font-size: 56px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #a78bfa 0%, #60d5ff 50%, #34d399 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -2px;
+    }
+    .subtitle {
+      font-size: 18px;
+      color: #94a3b8;
+      margin-top: 10px;
+    }
+    .subtitle .hl { font-weight: 600; color: #34d399; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Grid ── */
+    .main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 14px;
+      padding: 18px 32px;
+      opacity: 0;
+      animation: fadeIn 0.8s ease forwards 0.5s;
+    }
+
+    /* ── Card ── */
+    .card {
+      position: relative;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.06) 0%, rgba(96, 213, 255, 0.03) 100%);
+      border: 1px solid rgba(139, 92, 246, 0.18);
+      border-radius: 14px;
+      padding: 20px 24px;
+      backdrop-filter: blur(10px);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s ease;
+    }
+    .card:hover {
+      border-color: rgba(139, 92, 246, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 40px rgba(139, 92, 246, 0.12);
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: 14px 14px 0 0;
+    }
+    .card.c1::before { background: linear-gradient(90deg, #c084fc, #a78bfa); }
+    .card.c2::before { background: linear-gradient(90deg, #60d5ff, #38bdf8); }
+    .card.c3::before { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+    .card.c4::before { background: linear-gradient(90deg, #34d399, #10b981); }
+
+    .card-head {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+    .card-num {
+      font-size: 14px;
+      font-weight: 700;
+      opacity: 0.4;
+    }
+    .card.c1 .card-num { color: #c084fc; }
+    .card.c2 .card-num { color: #60d5ff; }
+    .card.c3 .card-num { color: #fbbf24; }
+    .card.c4 .card-num { color: #34d399; }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .card.c1 .card-title { color: #c084fc; }
+    .card.c2 .card-title { color: #60d5ff; }
+    .card.c3 .card-title { color: #fbbf24; }
+    .card.c4 .card-title { color: #34d399; }
+
+    .card-oneliner {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-bottom: 14px;
+    }
+
+    /* ── Flow diagram ── */
+    .flow {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+    .flow-sources {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+    .flow-item {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+    .card.c1 .flow-item { background: rgba(192, 132, 252, 0.1); color: #c4b5fd; border: 1px solid rgba(192, 132, 252, 0.15); }
+    .card.c2 .flow-item { background: rgba(96, 213, 255, 0.1); color: #93e0ff; border: 1px solid rgba(96, 213, 255, 0.15); }
+    .card.c3 .flow-item { background: rgba(251, 191, 36, 0.1); color: #fcd34d; border: 1px solid rgba(251, 191, 36, 0.15); }
+    .card.c4 .flow-item { background: rgba(52, 211, 153, 0.1); color: #6ee7b7; border: 1px solid rgba(52, 211, 153, 0.15); }
+
+    .flow-arrow {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      min-width: 60px;
+    }
+    .flow-arrow-line {
+      width: 100%;
+      height: 2px;
+      border-radius: 1px;
+      position: relative;
+      overflow: hidden;
+    }
+    .card.c1 .flow-arrow-line { background: rgba(192, 132, 252, 0.15); }
+    .card.c2 .flow-arrow-line { background: rgba(96, 213, 255, 0.15); }
+    .card.c3 .flow-arrow-line { background: rgba(251, 191, 36, 0.15); }
+    .card.c4 .flow-arrow-line { background: rgba(52, 211, 153, 0.15); }
+
+    .flow-arrow-line::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -40%;
+      width: 40%;
+      height: 100%;
+      animation: flowPulse 2s linear infinite;
+    }
+    .card.c1 .flow-arrow-line::after { background: linear-gradient(90deg, transparent, #c084fc, transparent); }
+    .card.c2 .flow-arrow-line::after { background: linear-gradient(90deg, transparent, #60d5ff, transparent); }
+    .card.c3 .flow-arrow-line::after { background: linear-gradient(90deg, transparent, #fbbf24, transparent); }
+    .card.c4 .flow-arrow-line::after { background: linear-gradient(90deg, transparent, #34d399, transparent); }
+
+    @keyframes flowPulse {
+      from { left: -40%; }
+      to { left: 100%; }
+    }
+
+    .flow-arrow-head {
+      font-size: 20px;
+      margin-left: -4px;
+      animation: arrowBounce 1.5s ease-in-out infinite;
+    }
+    .card.c1 .flow-arrow-head { color: #c084fc; }
+    .card.c2 .flow-arrow-head { color: #60d5ff; }
+    .card.c3 .flow-arrow-head { color: #fbbf24; }
+    .card.c4 .flow-arrow-head { color: #34d399; }
+
+    @keyframes arrowBounce {
+      0%, 100% { transform: translateX(0); opacity: 0.5; }
+      50% { transform: translateX(4px); opacity: 1; }
+    }
+
+    .flow-target {
+      flex-shrink: 0;
+      text-align: center;
+    }
+    .flow-target-box {
+      font-size: 16px;
+      font-weight: 700;
+      padding: 14px 20px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+    .flow-target-sub {
+      font-size: 9px;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 32px 18px;
+      opacity: 0;
+      animation: fadeIn 0.6s ease forwards 1s;
+    }
+    .footer-logo {
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .footer-logo .br { color: #a78bfa; }
+    .footer-logo .tx {
+      background: linear-gradient(135deg, #a78bfa, #60d5ff, #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .footer-line {
+      font-size: 13px;
+      color: #34d399;
+      text-shadow: 0 0 10px rgba(52, 211, 153, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .cursor {
+      display: inline-block;
+      width: 8px; height: 15px;
+      background: #34d399;
+      border-radius: 1px;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .footer-tag {
+      font-size: 11px;
+      color: #64748b;
+    }
+    .footer-tag .g { color: #34d399; }
+
+    @media (max-width: 1024px) {
+      .title { font-size: 40px; }
+      .card-title { font-size: 16px; }
+      .flow-item { font-size: 10px; padding: 4px 8px; }
+    }
+    @media (max-width: 768px) {
+      body { height: auto; overflow: auto; }
+      .main { grid-template-columns: 1fr; }
+      .title { font-size: 32px; }
+      .footer { flex-direction: column; gap: 10px; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="title">AI & Stacktic</div>
+    <div class="subtitle">AI can now work in production — <span class="hl">with no risk</span></div>
+  </div>
+
+  <div class="main">
+
+    <!-- 1. Metadata -->
+    <div class="card c1">
+      <div class="card-head">
+        <div class="card-num">01</div>
+        <div class="card-title">Metadata & Relationships</div>
+      </div>
+      <div class="card-oneliner">// topology you designed → structured data AI operates on</div>
+      <div class="flow">
+        <div class="flow-sources">
+          <div class="flow-item">components</div>
+          <div class="flow-item">links</div>
+          <div class="flow-item">sub-components</div>
+          <div class="flow-item">attributes</div>
+          <div class="flow-item">cross-stack</div>
+        </div>
+        <div class="flow-arrow">
+          <div class="flow-arrow-line"></div>
+          <div class="flow-arrow-head">›</div>
+        </div>
+        <div class="flow-target">
+          <div class="flow-target-box">AI</div>
+          <div class="flow-target-sub">full stack awareness</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. MCP Governance -->
+    <div class="card c2">
+      <div class="card-head">
+        <div class="card-num">02</div>
+        <div class="card-title">MCP & Permission Governance</div>
+      </div>
+      <div class="card-oneliner">// draw link → tools appear · remove link → tools disappear</div>
+      <div class="flow">
+        <div class="flow-sources">
+          <div class="flow-item">observability tools</div>
+          <div class="flow-item">database tools</div>
+          <div class="flow-item">messaging tools</div>
+          <div class="flow-item">deployment tools</div>
+          <div class="flow-item">write-access gating</div>
+        </div>
+        <div class="flow-arrow">
+          <div class="flow-arrow-line"></div>
+          <div class="flow-arrow-head">›</div>
+        </div>
+        <div class="flow-target">
+          <div class="flow-target-box">AI</div>
+          <div class="flow-target-sub">governed per layer</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Framework -->
+    <div class="card c3">
+      <div class="card-head">
+        <div class="card-num">03</div>
+        <div class="card-title">Restricted to Framework</div>
+      </div>
+      <div class="card-oneliner">// no kubectl · no raw access · typed tools only</div>
+      <div class="flow">
+        <div class="flow-sources">
+          <div class="flow-item">validated templates</div>
+          <div class="flow-item">typed parameters</div>
+          <div class="flow-item">JSON-RPC protocol</div>
+          <div class="flow-item">scoped credentials</div>
+          <div class="flow-item">no hallucinations</div>
+        </div>
+        <div class="flow-arrow">
+          <div class="flow-arrow-line"></div>
+          <div class="flow-arrow-head">›</div>
+        </div>
+        <div class="flow-target">
+          <div class="flow-target-box">AI</div>
+          <div class="flow-target-sub">error-proof ops</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Safety -->
+    <div class="card c4">
+      <div class="card-head">
+        <div class="card-num">04</div>
+        <div class="card-title">Log · Version · Rollback</div>
+      </div>
+      <div class="card-oneliner">// every action audited · every state versioned · every change reversible</div>
+      <div class="flow">
+        <div class="flow-sources">
+          <div class="flow-item">JSON-RPC audit trail</div>
+          <div class="flow-item">unified stack versions</div>
+          <div class="flow-item">full-stack rollback</div>
+          <div class="flow-item">Prometheus + Loki</div>
+          <div class="flow-item">zero risk</div>
+        </div>
+        <div class="flow-arrow">
+          <div class="flow-arrow-line"></div>
+          <div class="flow-arrow-head">›</div>
+        </div>
+        <div class="flow-target">
+          <div class="flow-target-box">AI</div>
+          <div class="flow-target-sub">safe in production</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <div class="footer-logo">
+      <span class="br">{</span><span class="tx">Stacktic</span><span class="br">}</span>
+    </div>
+    <div class="footer-line">
+      <span id="term">$ metadata → governance → framework → safety → AI</span>
+      <span class="cursor"></span>
+    </div>
+    <div class="footer-tag">
+      the production interface for AI — <span class="g">dark open-source factory</span>
+    </div>
+  </div>
+
+<script>
+(function() {
+  const cmds = [
+    '$ metadata → governance → framework → safety → AI',
+    '$ AI in production — zero risk',
+    '$ log everything · version everything · rollback everything',
+    '$ no kubectl · no raw access · no drift',
+  ];
+  let ci = 0, chi = 0, del = false, wait = 0;
+  (function type() {
+    const el = document.getElementById('term');
+    if (!el) return;
+    const cmd = cmds[ci];
+    if (!del) {
+      if (chi < cmd.length) { el.textContent = cmd.substring(0, chi+1); chi++; setTimeout(type, 35); }
+      else { wait++; if (wait > 50) { del = true; wait = 0; } setTimeout(type, 50); }
+    } else {
+      if (chi > 0) { chi--; el.textContent = cmd.substring(0, chi); setTimeout(type, 15); }
+      else { del = false; ci = (ci+1) % cmds.length; setTimeout(type, 200); }
+    }
+  })();
+})();
+</script>
+</body>
+</html>

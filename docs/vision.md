@@ -150,6 +150,31 @@ Stacktic doesn't just generate infrastructure — it generates the **metadata la
 
 ---
 
+## 🏭 The Dark Open-Source Factory
+
+In manufacturing, a **dark factory** runs lights-out — fully automated, zero human intervention. Stacktic brings this model to open-source infrastructure:
+
+> **An open-source dark factory for topology, relationships, and operations automation.**
+
+### The Factory Pipeline
+
+| Stage | What Happens |
+|---|---|
+| **1. Topology** | Design your stack — components, links, sub-components, attributes |
+| **2. Generation** | 70 open-source templates assemble production-ready Helm, K8s, secrets, Day-2 ops |
+| **3. Intelligence** | Stack Agent API extracts structured metadata — every relationship becomes queryable data |
+| **4. Governance** | MCP server auto-generated per stack — typed tools, credential scoping, write gating |
+| **5. Autonomous** | AI agents operate with full stack awareness — incidents, validation, diagnostics — lights out |
+
+### Why "Dark Factory"
+
+- **Lights out**: Once topology is designed and deployed, AI agents operate autonomously through governed metadata — no manual kubectl, no ad-hoc scripts
+- **Open source**: 70 community templates, no proprietary lock-in, fork and extend anything
+- **Cloud agnostic**: Same stack definition deploys to any Kubernetes on any cloud
+- **Self-aware**: The factory knows its own topology — every component, link, and dependency is metadata that feeds AI intelligence
+
+---
+
 ## 🌟 Vision
 
 Stacktic bridges the gap between:
@@ -157,12 +182,12 @@ Stacktic bridges the gap between:
 - **Disadvantages** of pure open-source (time-to-market, operational overhead)
 - **Advantages** of both approaches
 
-By bypassing skill gaps and reducing operational complexity, Stacktic delivers **fully stable, automated, cloud-agnostic, and sovereignty-compliant full stacks** — with AI governance built into the architecture from day one.
+By bypassing skill gaps and reducing operational complexity, Stacktic delivers **fully stable, automated, cloud-agnostic, and sovereignty-compliant full stacks** — an open-source dark factory where AI governance is the architecture, not a layer on top.
 
-**Our vision**: A unified platform engineering solution that democratizes open source, boosts adoption, and removes vendor lock-in — providing full freedom to innovate, adapt, and keep pace with technology. Where AI agents operate infrastructure through structured metadata and governed tools, not raw cluster access.
+**Our vision**: The dark open-source factory for full-stack automation — where topology drives generation, generation produces metadata, metadata governs AI, and AI operates infrastructure autonomously. No vendor lock-in. No raw access. No manual intervention. Just topology in, governed autonomous operations out.
 
 ![alt text](image-12.png)
 
 ---
 
-*Stacktic: Transforming stack complexity into versioned simplicity — with AI governance built in.*
+*Stacktic: The dark open-source factory — topology in, autonomous operations out.*

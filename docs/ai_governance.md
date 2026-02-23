@@ -6,9 +6,9 @@ hide_table_of_contents: false
 # AI Governance & MCP
 
 <div style={{background: 'linear-gradient(135deg, #0052cc 0%, #003d99 100%)', borderRadius: '12px', padding: '32px 40px', color: 'white', marginBottom: '32px'}}>
-  <h2 style={{color: 'white', margin: '0 0 8px 0', fontSize: '1.6rem'}}>The first platform where AI governance is the architecture — not a layer on top</h2>
+  <h2 style={{color: 'white', margin: '0 0 8px 0', fontSize: '1.6rem'}}>The Dark Open-Source Factory — where AI governance is the architecture</h2>
   <p style={{margin: 0, opacity: 0.9, fontSize: '1.05rem'}}>
-    Every enterprise is racing to bring AI into infrastructure operations. The problem isn't capability — it's control. Stacktic solves this by generating a governed MCP (Model Context Protocol) server per stack, where the topology you design determines exactly what AI can see, query, and modify. No policy bolted on. No permissions to maintain. The architecture IS the governance.
+    In manufacturing, a "dark factory" runs lights-out — fully automated, zero human intervention. Stacktic brings this model to open-source infrastructure. Every stack generates a governed MCP server where the topology you design determines exactly what AI can see, query, and modify. The result: autonomous, metadata-driven operations with zero raw access — an open-source dark factory for topology, relationships, and operations automation.
   </p>
 </div>
 
@@ -37,9 +37,37 @@ hide_table_of_contents: false
         <p style={{color: '#e0e0e0', fontSize: '0.85rem', margin: 0}}>AI receives structured metadata, typed tools, and scoped credentials — auto-generated from the stack topology. The metadata feed IS the control plane.</p>
       </div>
       <div style={{background: '#0d2137', borderRadius: '8px', padding: '14px', borderLeft: '3px solid #0052cc'}}>
-        <div style={{color: '#90caf9', fontWeight: 700, fontSize: '0.8rem', marginBottom: '4px'}}>THE KEY INSIGHT</div>
-        <p style={{color: '#e0e0e0', fontSize: '0.85rem', margin: 0}}>You don't govern AI by restricting it. You govern AI by <strong style={{color: 'white'}}>feeding it the right metadata</strong>. Stacktic's topology metadata gives AI complete understanding with zero raw access.</p>
+        <div style={{color: '#90caf9', fontWeight: 700, fontSize: '0.8rem', marginBottom: '4px'}}>THE DARK FACTORY MODEL</div>
+        <p style={{color: '#e0e0e0', fontSize: '0.85rem', margin: 0}}>You don't govern AI by restricting it. You govern AI by <strong style={{color: 'white'}}>feeding it the right metadata</strong>. Stacktic is the interface between AI and production — every tool is validated, every configuration production-hardened, every secret scoped, every operation error-proof. The topology metadata gives AI complete understanding with zero raw access. Lights-out operations.</p>
       </div>
+    </div>
+  </div>
+</div>
+
+---
+
+## Stacktic: The Production Interface for AI
+
+<div style={{background: '#1a1a2e', borderRadius: '12px', padding: '24px', marginBottom: '32px', border: '1px solid #1976d2'}}>
+  <p style={{color: '#e0e0e0', fontSize: '0.95rem', margin: '0 0 16px 0'}}>
+    AI doesn't talk to your infrastructure directly. <strong style={{color: 'white'}}>Stacktic is the interface.</strong> Every tool AI calls was generated from a validated template. Every configuration is production-hardened. Every credential is scoped and resolved at runtime. Every operation is bounded by typed parameters — no arbitrary commands, no room for hallucinated kubectl.
+  </p>
+  <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '12px'}}>
+    <div style={{background: '#0d2137', borderRadius: '8px', padding: '14px', textAlign: 'center'}}>
+      <div style={{color: '#4caf50', fontWeight: 700, fontSize: '1.2rem', marginBottom: '4px'}}>Validated</div>
+      <p style={{color: '#b0bec5', fontSize: '0.8rem', margin: 0}}>Every tool generated from tested templates with typed parameters</p>
+    </div>
+    <div style={{background: '#0d2137', borderRadius: '8px', padding: '14px', textAlign: 'center'}}>
+      <div style={{color: '#60d5ff', fontWeight: 700, fontSize: '1.2rem', marginBottom: '4px'}}>Production</div>
+      <p style={{color: '#b0bec5', fontSize: '0.8rem', margin: 0}}>Configurations are production-grade — Helm values, K8s manifests, SOPS secrets</p>
+    </div>
+    <div style={{background: '#0d2137', borderRadius: '8px', padding: '14px', textAlign: 'center'}}>
+      <div style={{color: '#fbbf24', fontWeight: 700, fontSize: '1.2rem', marginBottom: '4px'}}>Restricted</div>
+      <p style={{color: '#b0bec5', fontSize: '0.8rem', margin: 0}}>No kubectl, no arbitrary commands — only scoped tools from drawn links</p>
+    </div>
+    <div style={{background: '#0d2137', borderRadius: '8px', padding: '14px', textAlign: 'center'}}>
+      <div style={{color: '#f44336', fontWeight: 700, fontSize: '1.2rem', marginBottom: '4px'}}>Error-Proof</div>
+      <p style={{color: '#b0bec5', fontSize: '0.8rem', margin: 0}}>Typed params, credential scoping, write gating — AI cannot make destructive mistakes</p>
     </div>
   </div>
 </div>

@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stacktic AI Governance</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Fira Code', monospace;
+      background: #2A2847;
+      color: #e2e8f0;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .governance-plane {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+      min-height: 700px;
+      max-height: 800px;
+    }
+
+    /* Header */
+    .gp-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(139, 92, 246, 0.15);
+      margin-bottom: 16px;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .logo-bracket { color: #a78bfa; }
+    .logo-text {
+      background: linear-gradient(135deg, #a78bfa 0%, #60d5ff 50%, #34d399 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .logo-sub {
+      font-size: 10px;
+      color: #a78bfa;
+      letter-spacing: 1px;
+      margin-top: 2px;
+    }
+
+    .header-badges {
+      display: flex;
+      gap: 12px;
+    }
+    .badge {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .badge.governance {
+      background: rgba(139, 92, 246, 0.2);
+      color: #c4b5fd;
+      border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+    .badge.mcp {
+      background: rgba(96, 213, 255, 0.15);
+      color: #60d5ff;
+      border: 1px solid rgba(96, 213, 255, 0.3);
+    }
+    .badge.secure {
+      background: rgba(52, 211, 153, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      animation: securePulse 2s ease-in-out infinite;
+    }
+    @keyframes securePulse {
+      0%, 100% { box-shadow: 0 0 0 rgba(52, 211, 153, 0); }
+      50% { box-shadow: 0 0 12px rgba(52, 211, 153, 0.3); }
+    }
+
+    /* Main Grid */
+    .gp-main {
+      display: grid;
+      grid-template-columns: 230px 1fr 230px;
+      gap: 16px;
+      height: calc(100% - 80px);
+      max-height: 620px;
+    }
+
+    /* Panels */
+    .panel {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(96, 213, 255, 0.04) 100%);
+      border: 1px solid rgba(139, 92, 246, 0.2);
+      border-radius: 12px;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+    .panel-header {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(139, 92, 246, 0.15);
+      font-size: 11px;
+      color: #c4b5fd;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(139, 92, 246, 0.08);
+      font-weight: 600;
+    }
+    .panel-header::before {
+      content: "//";
+      color: #34d399;
+      opacity: 0.8;
+    }
+    .panel-content {
+      padding: 14px;
+    }
+
+    /* Left Column */
+    .left-col {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Governance Controls */
+    .control-item {
+      padding: 10px 12px;
+      background: rgba(139, 92, 246, 0.05);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      border-left: 3px solid;
+      transition: all 0.2s ease;
+    }
+    .control-item:hover {
+      background: rgba(139, 92, 246, 0.1);
+      transform: translateX(4px);
+    }
+    .control-item:last-child { margin-bottom: 0; }
+    .control-item.topology { border-left-color: #a78bfa; }
+    .control-item.credentials { border-left-color: #34d399; }
+    .control-item.write-gate { border-left-color: #fbbf24; }
+    .control-item.tools { border-left-color: #60d5ff; }
+    .control-item.isolation { border-left-color: #f472b6; }
+
+    .control-title {
+      font-size: 11px;
+      color: #ffffff;
+      margin-bottom: 3px;
+      font-weight: 600;
+    }
+    .control-meta {
+      font-size: 9px;
+      color: #c4b5fd;
+    }
+    .control-status {
+      display: inline-block;
+      font-size: 8px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    .control-status.enforced {
+      background: rgba(52, 211, 153, 0.2);
+      color: #34d399;
+    }
+    .control-status.gated {
+      background: rgba(251, 191, 36, 0.2);
+      color: #fbbf24;
+    }
+    .control-status.scoped {
+      background: rgba(167, 139, 250, 0.2);
+      color: #a78bfa;
+    }
+
+    /* Center - Flow Canvas */
+    .flow-panel {
+      display: flex;
+      flex-direction: column;
+    }
+    .flow-canvas {
+      flex: 1;
+      position: relative;
+      background: rgba(20, 18, 40, 0.6);
+      border-radius: 8px;
+      overflow: hidden;
+      min-height: 400px;
+    }
+    #flowCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Right Column */
+    .right-col {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* AI Capabilities */
+    .capability {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      background: rgba(139, 92, 246, 0.06);
+      border-radius: 6px;
+      margin-bottom: 6px;
+      font-size: 9px;
+      transition: all 0.2s ease;
+    }
+    .capability:hover {
+      background: rgba(139, 92, 246, 0.12);
+    }
+    .capability:last-child { margin-bottom: 0; }
+    .capability-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      flex-shrink: 0;
+    }
+    .capability-icon.query { background: linear-gradient(135deg, rgba(96, 213, 255, 0.3), rgba(96, 213, 255, 0.1)); }
+    .capability-icon.test { background: linear-gradient(135deg, rgba(52, 211, 153, 0.3), rgba(52, 211, 153, 0.1)); }
+    .capability-icon.observe { background: linear-gradient(135deg, rgba(167, 139, 250, 0.3), rgba(167, 139, 250, 0.1)); }
+    .capability-icon.prompt { background: linear-gradient(135deg, rgba(244, 114, 182, 0.3), rgba(244, 114, 182, 0.1)); }
+    .capability-name { color: #ffffff; flex: 1; font-weight: 500; font-size: 10px; }
+    .capability-count {
+      font-size: 9px;
+      color: #c4b5fd;
+      padding: 2px 6px;
+      background: rgba(139, 92, 246, 0.1);
+      border-radius: 4px;
+    }
+
+    /* Tool Tags */
+    .tool-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 8px;
+    }
+    .tool-tag {
+      font-size: 8px;
+      padding: 3px 8px;
+      background: linear-gradient(135deg, rgba(96, 213, 255, 0.2), rgba(139, 92, 246, 0.15));
+      color: #c4b5fd;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    /* Metadata Preview */
+    .metadata-preview {
+      padding: 10px;
+      background: rgba(20, 18, 40, 0.8);
+      border-radius: 8px;
+      font-size: 9px;
+      line-height: 1.6;
+      border: 1px solid rgba(139, 92, 246, 0.15);
+    }
+    .meta-key { color: #a78bfa; }
+    .meta-val { color: #34d399; }
+    .meta-val.cyan { color: #60d5ff; }
+    .meta-bracket { color: #94a3b8; }
+
+    /* Footer */
+    .gp-footer {
+      padding-top: 14px;
+      border-top: 1px solid rgba(139, 92, 246, 0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+    }
+    .terminal {
+      font-size: 11px;
+      color: #34d399;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      text-shadow: 0 0 10px rgba(52, 211, 153, 0.4);
+    }
+    .cursor {
+      display: inline-block;
+      width: 8px;
+      height: 14px;
+      background: linear-gradient(180deg, #34d399, #10b981);
+      border-radius: 1px;
+      animation: cursorBlink 1s step-end infinite;
+    }
+    @keyframes cursorBlink { 50% { opacity: 0; } }
+    .footer-info {
+      font-size: 10px;
+      color: #c4b5fd;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .gp-main { grid-template-columns: 210px 1fr 210px; gap: 12px; }
+    }
+    @media (max-width: 1024px) {
+      .gp-main { grid-template-columns: 1fr 1fr; max-height: none; }
+      .left-col { order: 2; }
+      .flow-panel { order: 1; grid-column: span 2; min-height: 350px; }
+      .right-col { order: 3; }
+    }
+    @media (max-width: 768px) {
+      .governance-plane { padding: 16px; min-height: auto; max-height: none; }
+      .gp-header { flex-direction: column; gap: 16px; align-items: flex-start; }
+      .gp-main { grid-template-columns: 1fr; }
+      .flow-panel { grid-column: span 1; min-height: 300px; }
+      .gp-footer { flex-direction: column; gap: 10px; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="governance-plane">
+    <!-- Header -->
+    <header class="gp-header">
+      <div class="logo-section">
+        <div class="logo">
+          <span class="logo-bracket">{</span>
+          <span class="logo-text">Stacktic</span>
+          <span class="logo-bracket">}</span>
+        </div>
+        <div class="logo-sub">// dark open-source factory · ai governance layer</div>
+      </div>
+      <div class="header-badges">
+        <span class="badge governance">DARK FACTORY</span>
+        <span class="badge mcp">MCP GOVERNED</span>
+        <span class="badge secure">LIGHTS-OUT OPS</span>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="gp-main">
+      <!-- Left: Governance Controls -->
+      <div class="left-col">
+        <div class="panel">
+          <div class="panel-header">Governance Controls</div>
+          <div class="panel-content">
+            <div class="control-item topology">
+              <div class="control-title">Topology = Governance</div>
+              <div class="control-meta">Draw links → tools generated</div>
+              <span class="control-status enforced">auto-enforced</span>
+            </div>
+            <div class="control-item credentials">
+              <div class="control-title">Credential Scoping</div>
+              <div class="control-meta">AI never sees raw passwords</div>
+              <span class="control-status enforced">{variable} resolved</span>
+            </div>
+            <div class="control-item write-gate">
+              <div class="control-title">Write-Access Gating</div>
+              <div class="control-meta">Per-service boolean flags</div>
+              <span class="control-status gated">read-only default</span>
+            </div>
+            <div class="control-item tools">
+              <div class="control-title">Tool Boundaries</div>
+              <div class="control-meta">Typed params, no kubectl</div>
+              <span class="control-status scoped">scoped per link</span>
+            </div>
+            <div class="control-item isolation">
+              <div class="control-title">Multi-Stack Isolation</div>
+              <div class="control-meta">Per-stack MCP + credentials</div>
+              <span class="control-status enforced">is_external boundary</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="flex: 1;">
+          <div class="panel-header">Security Model</div>
+          <div class="panel-content">
+            <div class="control-item credentials">
+              <div class="control-title">SOPS Encrypted Secrets</div>
+              <div class="control-meta">cloud.env → K8s Secret</div>
+            </div>
+            <div class="control-item topology">
+              <div class="control-title">APISIX Gateway Auth</div>
+              <div class="control-meta">key-auth + TLS termination</div>
+            </div>
+            <div class="control-item write-gate">
+              <div class="control-title">MCP Bearer Token</div>
+              <div class="control-meta">Authorization: Bearer &lt;key&gt;</div>
+            </div>
+            <div class="control-item tools">
+              <div class="control-title">Audit Trail</div>
+              <div class="control-meta">JSON-RPC method + params + ts</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center: Governance Flow -->
+      <div class="panel flow-panel">
+        <div class="panel-header">AI Governance Flow</div>
+        <div class="flow-canvas">
+          <canvas id="flowCanvas"></canvas>
+        </div>
+      </div>
+
+      <!-- Right: AI Capabilities -->
+      <div class="right-col">
+        <div class="panel">
+          <div class="panel-header">AI Capabilities</div>
+          <div class="panel-content">
+            <div class="capability">
+              <div class="capability-icon query">Q</div>
+              <span class="capability-name">Topology Query</span>
+              <span class="capability-count">7 tools</span>
+            </div>
+            <div class="capability">
+              <div class="capability-icon observe">M</div>
+              <span class="capability-name">Prometheus</span>
+              <span class="capability-count">7 tools</span>
+            </div>
+            <div class="capability">
+              <div class="capability-icon observe">G</div>
+              <span class="capability-name">Grafana</span>
+              <span class="capability-count">6 tools</span>
+            </div>
+            <div class="capability">
+              <div class="capability-icon observe">L</div>
+              <span class="capability-name">Loki Logs</span>
+              <span class="capability-count">5 tools</span>
+            </div>
+            <div class="capability">
+              <div class="capability-icon test">D</div>
+              <span class="capability-name">Databases</span>
+              <span class="capability-count">15+ tools</span>
+            </div>
+            <div class="capability">
+              <div class="capability-icon test">A</div>
+              <span class="capability-name">ArgoCD</span>
+              <span class="capability-count">6 tools</span>
+            </div>
+            <div class="capability">
+              <div class="capability-icon prompt">P</div>
+              <span class="capability-name">AI Playbooks</span>
+              <span class="capability-count">6 prompts</span>
+            </div>
+            <div class="tool-tags">
+              <span class="tool-tag">query_topology</span>
+              <span class="tool-tag">run_test</span>
+              <span class="tool-tag">prom_query</span>
+              <span class="tool-tag">loki_query</span>
+              <span class="tool-tag">ch_query</span>
+              <span class="tool-tag">cnpg_query</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">Metadata Feed</div>
+          <div class="panel-content">
+            <div class="metadata-preview">
+              <span class="meta-bracket">{</span><br>
+              &nbsp;&nbsp;<span class="meta-key">"source"</span>: <span class="meta-val">"type:kafka"</span>,<br>
+              &nbsp;&nbsp;<span class="meta-key">"target"</span>: <span class="meta-val">"sub_components"</span>,<br>
+              &nbsp;&nbsp;<span class="meta-key">"command"</span>: <span class="meta-val.cyan">"kubectl -n {namespace}"</span>,<br>
+              &nbsp;&nbsp;<span class="meta-key">"dry_run"</span>: <span class="meta-val">true</span><br>
+              <span class="meta-bracket">}</span>
+            </div>
+            <div class="tool-tags" style="margin-top: 10px;">
+              <span class="tool-tag">{namespace}</span>
+              <span class="tool-tag">{password}</span>
+              <span class="tool-tag">{database}</span>
+              <span class="tool-tag">{host}</span>
+              <span class="tool-tag">{port}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="flex: 1;">
+          <div class="panel-header">Stack Awareness</div>
+          <div class="panel-content">
+            <div class="capability">
+              <div class="capability-icon query">T</div>
+              <span class="capability-name">Components + Links</span>
+            </div>
+            <div class="capability">
+              <div class="capability-icon test">S</div>
+              <span class="capability-name">Sub-components</span>
+            </div>
+            <div class="capability">
+              <div class="capability-icon observe">A</div>
+              <span class="capability-name">Attributes + Config</span>
+            </div>
+            <div class="capability">
+              <div class="capability-icon prompt">X</div>
+              <span class="capability-name">Cross-stack Boundaries</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="gp-footer">
+      <div class="terminal">
+        <span id="terminal-text">$ mcp tools/call query_topology</span>
+        <span class="cursor"></span>
+      </div>
+      <div class="footer-info">dark open-source factory · metadata-driven · lights-out operations</div>
+    </footer>
+  </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  initFlow();
+  typeTerminal();
+});
+
+function initFlow() {
+  const canvas = document.getElementById('flowCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H;
+  const dpr = window.devicePixelRatio || 1;
+  let animId = null;
+  let visible = true;
+
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) { requestAnimationFrame(resize); return; }
+    W = rect.width;
+    H = rect.height;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  setTimeout(resize, 100);
+  window.addEventListener('resize', resize);
+  document.addEventListener('visibilitychange', function() {
+    visible = !document.hidden;
+    if (visible && !animId) animate();
+  });
+
+  const COLORS = {
+    cyan: '#60d5ff', purple: '#a78bfa', green: '#34d399',
+    pink: '#f472b6', orange: '#fbbf24', red: '#f87171'
+  };
+
+  function rgba(hex, a) {
+    const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+    return `rgba(${r},${g},${b},${a})`;
+  }
+
+  // Flow nodes: Topology → Stack Agent → MCP Server → AI Client
+  // Plus side nodes for governance concepts
+  const nodes = [
+    // Main flow (top to bottom)
+    { id: 'topology', label: 'Topology Design', color: COLORS.purple, x: 0.5, y: 0.08, size: 24 },
+    { id: 'metadata', label: 'Stack Agent API', color: COLORS.green, x: 0.5, y: 0.3, size: 22 },
+    { id: 'mcp', label: 'MCP Server', color: COLORS.cyan, x: 0.5, y: 0.55, size: 24 },
+    { id: 'ai', label: 'AI Client', color: COLORS.orange, x: 0.5, y: 0.82, size: 22 },
+
+    // Left side: governance controls
+    { id: 'templates', label: '70 Templates', color: COLORS.purple, x: 0.12, y: 0.12, size: 14 },
+    { id: 'links', label: 'Link Types', color: COLORS.purple, x: 0.12, y: 0.25, size: 14 },
+    { id: 'credentials', label: 'SOPS Secrets', color: COLORS.green, x: 0.12, y: 0.4, size: 14 },
+    { id: 'writegate', label: 'Write Gating', color: COLORS.orange, x: 0.12, y: 0.55, size: 14 },
+
+    // Right side: AI gets
+    { id: 'tools', label: '50+ Tools', color: COLORS.cyan, x: 0.88, y: 0.4, size: 14 },
+    { id: 'prompts', label: '6 Prompts', color: COLORS.pink, x: 0.88, y: 0.55, size: 14 },
+    { id: 'resources', label: '3 Resources', color: COLORS.green, x: 0.88, y: 0.7, size: 14 },
+
+    // Services (bottom clusters)
+    { id: 'prom', label: 'Prometheus', color: COLORS.red, x: 0.18, y: 0.78, size: 12 },
+    { id: 'graf', label: 'Grafana', color: COLORS.orange, x: 0.3, y: 0.9, size: 12 },
+    { id: 'loki', label: 'Loki', color: COLORS.cyan, x: 0.42, y: 0.78, size: 12 },
+    { id: 'db', label: 'Databases', color: COLORS.purple, x: 0.58, y: 0.78, size: 12 },
+    { id: 'kafka', label: 'Kafka', color: COLORS.green, x: 0.7, y: 0.9, size: 12 },
+    { id: 'argocd', label: 'ArgoCD', color: COLORS.pink, x: 0.82, y: 0.78, size: 12 },
+  ];
+
+  const connections = [
+    // Main vertical flow
+    { from: 'topology', to: 'metadata' },
+    { from: 'metadata', to: 'mcp' },
+    { from: 'mcp', to: 'ai' },
+
+    // Governance → flow
+    { from: 'templates', to: 'topology' },
+    { from: 'links', to: 'topology' },
+    { from: 'credentials', to: 'mcp' },
+    { from: 'writegate', to: 'mcp' },
+
+    // Flow → AI gets
+    { from: 'mcp', to: 'tools' },
+    { from: 'mcp', to: 'prompts' },
+    { from: 'mcp', to: 'resources' },
+
+    // Services ← MCP
+    { from: 'mcp', to: 'prom' },
+    { from: 'mcp', to: 'graf' },
+    { from: 'mcp', to: 'loki' },
+    { from: 'mcp', to: 'db' },
+    { from: 'mcp', to: 'kafka' },
+    { from: 'mcp', to: 'argocd' },
+  ];
+
+  class Particle {
+    constructor(conn) {
+      this.conn = conn;
+      this.t = Math.random();
+      this.speed = 0.003 + Math.random() * 0.003;
+    }
+    update() { this.t += this.speed; if (this.t > 1) this.t = 0; }
+    draw(ctx, from, to) {
+      const x = from.px + (to.px - from.px) * this.t;
+      const y = from.py + (to.py - from.py) * this.t;
+      ctx.beginPath();
+      ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = from.color;
+      ctx.fill();
+      const glow = ctx.createRadialGradient(x, y, 0, x, y, 10);
+      glow.addColorStop(0, rgba(from.color, 0.5));
+      glow.addColorStop(0.5, rgba(from.color, 0.15));
+      glow.addColorStop(1, 'transparent');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(x, y, 10, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  const particles = [];
+  connections.forEach(c => {
+    const count = (c.from === 'topology' || c.from === 'metadata' || c.from === 'mcp' && c.to === 'ai') ? 3 : 1;
+    for (let i = 0; i < count; i++) particles.push(new Particle(c));
+  });
+
+  let time = 0;
+
+  function getNode(id) { return nodes.find(n => n.id === id); }
+
+  function draw() {
+    if (!W || !H) return;
+    ctx.clearRect(0, 0, W, H);
+    time++;
+
+    const mx = 40, my = 30;
+    const uw = W - mx * 2, uh = H - my * 2;
+
+    nodes.forEach(n => {
+      n.px = mx + n.x * uw;
+      n.py = my + n.y * uh;
+    });
+
+    // Draw connections
+    connections.forEach(c => {
+      const from = getNode(c.from), to = getNode(c.to);
+      const grad = ctx.createLinearGradient(from.px, from.py, to.px, to.py);
+      grad.addColorStop(0, rgba(from.color, 0.2));
+      grad.addColorStop(1, rgba(to.color, 0.1));
+      ctx.beginPath();
+      ctx.moveTo(from.px, from.py);
+      ctx.lineTo(to.px, to.py);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    });
+
+    // Draw particles
+    particles.forEach(p => {
+      p.update();
+      const from = getNode(p.conn.from), to = getNode(p.conn.to);
+      p.draw(ctx, from, to);
+    });
+
+    // Draw nodes
+    nodes.forEach((n, idx) => {
+      const pulse = 1 + Math.sin(time * 0.025 + idx) * 0.06;
+      const sz = n.size * pulse;
+
+      // Outer glow
+      const glow = ctx.createRadialGradient(n.px, n.py, 0, n.px, n.py, sz * 2);
+      glow.addColorStop(0, rgba(n.color, 0.15));
+      glow.addColorStop(0.5, rgba(n.color, 0.05));
+      glow.addColorStop(1, 'transparent');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(n.px, n.py, sz * 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Circle
+      const cg = ctx.createRadialGradient(n.px - sz/3, n.py - sz/3, 0, n.px, n.py, sz);
+      cg.addColorStop(0, rgba(n.color, 0.25));
+      cg.addColorStop(1, rgba(n.color, 0.08));
+      ctx.beginPath();
+      ctx.arc(n.px, n.py, sz, 0, Math.PI * 2);
+      ctx.fillStyle = cg;
+      ctx.fill();
+      ctx.strokeStyle = n.color;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Center dot
+      ctx.beginPath();
+      ctx.arc(n.px, n.py, 4, 0, Math.PI * 2);
+      ctx.fillStyle = n.color;
+      ctx.fill();
+
+      // Label
+      ctx.font = '600 ' + (n.size > 18 ? 11 : 9) + 'px "Fira Code", monospace';
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText(n.label, n.px, n.py + sz + 6);
+    });
+
+    // Title text
+    ctx.font = '400 9px "Fira Code", monospace';
+    ctx.fillStyle = rgba(COLORS.purple, 0.5);
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText('// the production interface for ai — validated · restricted · error-proof', 10, 10);
+  }
+
+  function animate() {
+    if (!visible) { animId = null; return; }
+    draw();
+    animId = requestAnimationFrame(animate);
+  }
+
+  animate();
+}
+
+function typeTerminal() {
+  const cmds = [
+    '$ mcp tools/call query_topology',
+    '$ mcp tools/call run_test --source=kafka',
+    '$ mcp prompts/get diagnose_component',
+    '$ mcp tools/call prom_alerts',
+    '$ mcp tools/call loki_query_range',
+    '$ mcp resources/read stack://live/structure',
+  ];
+  let ci = 0, chi = 0, del = false, w = 0;
+
+  function type() {
+    const el = document.getElementById('terminal-text');
+    if (!el) return;
+    const cmd = cmds[ci];
+    if (!del) {
+      if (chi < cmd.length) { el.textContent = cmd.substring(0, chi + 1); chi++; setTimeout(type, 45); }
+      else { w++; if (w > 40) { del = true; w = 0; } setTimeout(type, 60); }
+    } else {
+      if (chi > 0) { chi--; el.textContent = cmd.substring(0, chi); setTimeout(type, 20); }
+      else { del = false; ci = (ci + 1) % cmds.length; setTimeout(type, 300); }
+    }
+  }
+  type();
+}
+</script>
+</body>
+</html>

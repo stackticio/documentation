@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stacktic - combine(stack, tactic)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Fira Code', monospace;
+      background: #2A2847;
+      min-height: 100vh;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .container {
+      text-align: center;
+      position: relative;
+    }
+
+    /* Background grid effect */
+    .bg-grid {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image:
+        linear-gradient(rgba(96, 213, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(96, 213, 255, 0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+    }
+
+    /* Floating particles */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #34d399;
+      border-radius: 50%;
+      opacity: 0.6;
+      animation: float 8s ease-in-out infinite;
+    }
+    .particle:nth-child(1) { left: 10%; top: 20%; animation-delay: 0s; background: #60d5ff; }
+    .particle:nth-child(2) { left: 20%; top: 80%; animation-delay: 1s; background: #c084fc; }
+    .particle:nth-child(3) { left: 60%; top: 10%; animation-delay: 2s; }
+    .particle:nth-child(4) { left: 80%; top: 50%; animation-delay: 3s; background: #60d5ff; }
+    .particle:nth-child(5) { left: 90%; top: 90%; animation-delay: 4s; background: #c084fc; }
+    .particle:nth-child(6) { left: 40%; top: 60%; animation-delay: 5s; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
+      50% { transform: translateY(-30px) scale(1.5); opacity: 1; }
+    }
+
+    /* Main logo */
+    .logo {
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Function call line */
+    .function-line {
+      font-size: 56px;
+      font-weight: 500;
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: slideDown 0.8s ease forwards 0.2s;
+    }
+
+    .func {
+      color: #fbbf24;
+      text-shadow: 0 0 30px rgba(251, 191, 36, 0.5);
+      animation: glowPulse 2s ease-in-out infinite;
+    }
+
+    .paren {
+      color: #94a3b8;
+    }
+
+    .stack {
+      color: #60d5ff;
+      text-shadow: 0 0 20px rgba(96, 213, 255, 0.6);
+      position: relative;
+    }
+    .stack::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: #60d5ff;
+      transform: scaleX(0);
+      animation: underline 0.5s ease forwards 1s;
+    }
+
+    .comma {
+      color: #94a3b8;
+    }
+
+    .tactic {
+      color: #c084fc;
+      text-shadow: 0 0 20px rgba(192, 132, 252, 0.6);
+      position: relative;
+    }
+    .tactic::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: #c084fc;
+      transform: scaleX(0);
+      animation: underline 0.5s ease forwards 1.2s;
+    }
+
+    @keyframes underline {
+      to { transform: scaleX(1); }
+    }
+
+    /* Arrow */
+    .arrow-container {
+      margin: 30px 0;
+      opacity: 0;
+      animation: fadeIn 0.5s ease forwards 1.5s;
+    }
+
+    .arrow {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .arrow-line {
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(90deg, #60d5ff, #34d399, #c084fc);
+      border-radius: 2px;
+      position: relative;
+      overflow: hidden;
+    }
+    .arrow-line::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+      animation: shimmer 1.5s ease-in-out infinite 2s;
+    }
+
+    .arrow-head {
+      font-size: 32px;
+      color: #34d399;
+      text-shadow: 0 0 20px rgba(52, 211, 153, 0.8);
+      animation: arrowPulse 1s ease-in-out infinite 2s;
+    }
+
+    @keyframes shimmer {
+      to { left: 200%; }
+    }
+
+    @keyframes arrowPulse {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(5px); }
+    }
+
+    /* Result - Stacktic */
+    .result {
+      font-size: 96px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #60d5ff 0%, #34d399 50%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 60px rgba(52, 211, 153, 0.5));
+      opacity: 0;
+      transform: scale(0.8);
+      animation: resultIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards 2s;
+      position: relative;
+    }
+
+    .result::before {
+      content: 'Stacktic';
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: linear-gradient(135deg, #60d5ff 0%, #34d399 50%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: blur(30px);
+      opacity: 0.5;
+      z-index: -1;
+    }
+
+    @keyframes resultIn {
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* Tagline */
+    .tagline {
+      margin-top: 40px;
+      opacity: 0;
+      animation: fadeIn 0.5s ease forwards 2.5s;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .tagline .line1 {
+      font-size: 24px;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+    .tagline .line2 {
+      font-size: 18px;
+      color: #64748b;
+    }
+    .tagline .highlight-main {
+      background: linear-gradient(90deg, #60d5ff, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+    }
+    .tagline .highlight {
+      color: #34d399;
+      font-weight: 600;
+    }
+    .tagline .highlight-alt {
+      color: #60d5ff;
+      font-weight: 700;
+      text-shadow: 0 0 20px rgba(96, 213, 255, 0.6);
+    }
+
+    /* Code block decoration */
+    .code-block {
+      position: absolute;
+      font-size: 12px;
+      color: #475569;
+      opacity: 0;
+      animation: fadeIn 0.5s ease forwards 3s;
+    }
+    .code-block.top-left {
+      top: -80px;
+      left: -100px;
+    }
+    .code-block.top-right {
+      top: -80px;
+      right: -100px;
+    }
+    .code-block.bottom-left {
+      bottom: -60px;
+      left: -80px;
+    }
+    .code-block.bottom-right {
+      bottom: -60px;
+      right: -80px;
+    }
+    .code-block .line-num {
+      color: #374151;
+      margin-right: 8px;
+    }
+    .code-block .keyword { color: #c084fc; }
+    .code-block .string { color: #34d399; }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    @keyframes glowPulse {
+      0%, 100% { text-shadow: 0 0 30px rgba(251, 191, 36, 0.5); }
+      50% { text-shadow: 0 0 50px rgba(251, 191, 36, 0.8); }
+    }
+
+    /* Cursor blink */
+    .cursor {
+      display: inline-block;
+      width: 3px;
+      height: 50px;
+      background: #34d399;
+      margin-left: 8px;
+      animation: blink 1s step-end infinite;
+      vertical-align: middle;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <div class="container">
+    <div class="logo">
+      <!-- Code decorations -->
+      <div class="code-block top-left">
+        <span class="line-num">01</span><span class="keyword">import</span> { automation }
+      </div>
+      <div class="code-block top-right">
+        <span class="line-num">02</span><span class="keyword">const</span> result = <span class="string">true</span>
+      </div>
+      <div class="code-block bottom-left">
+        <span class="line-num">03</span>// Day 0 → Day 2
+      </div>
+      <div class="code-block bottom-right">
+        <span class="line-num">04</span>complexity.<span class="string">solved</span>()
+      </div>
+
+      <!-- Function call -->
+      <div class="function-line">
+        <span class="func">combine</span><span class="paren">(</span><span class="stack">stack</span><span class="comma">,</span> <span class="tactic">tactic</span><span class="paren">)</span><span class="cursor"></span>
+      </div>
+
+      <!-- Arrow -->
+      <div class="arrow-container">
+        <div class="arrow">
+          <div class="arrow-line"></div>
+          <span class="arrow-head">→</span>
+        </div>
+      </div>
+
+      <!-- Result -->
+      <div class="result">Stacktic</div>
+
+      <!-- Tagline -->
+      <div class="tagline">
+        <span class="line1">// <span class="highlight-main">full automation</span> · <span class="highlight-main">360° control</span></span>
+        <span class="line2">complexity → <span class="highlight">mapped</span> → <span class="highlight">automated</span> → <span class="highlight">controlled</span> → <span class="highlight">versioned</span> → <span class="highlight-alt">rollback</span></span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

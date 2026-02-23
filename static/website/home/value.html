@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stacktic - Additional Value</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Fira Code', monospace;
+      background: #2A2847;
+      min-height: 100vh;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .slide {
+      width: 100%;
+      max-width: 1400px;
+      padding: 40px 60px;
+    }
+
+    /* Title */
+    .title {
+      font-size: 52px;
+      font-weight: 700;
+      margin-bottom: 50px;
+      text-align: center;
+      opacity: 0;
+      animation: fadeIn 0.8s ease forwards 0.2s;
+    }
+    .title .comment {
+      color: #4a5568;
+    }
+    .title .main {
+      background: linear-gradient(90deg, #60d5ff, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .title .value {
+      color: #34d399;
+      text-shadow: 0 0 50px rgba(52, 211, 153, 0.7);
+    }
+
+    /* Cards grid */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+
+    /* Individual card */
+    .card {
+      position: relative;
+      padding: 35px;
+      background: rgba(52, 211, 153, 0.03);
+      border: 2px solid rgba(52, 211, 153, 0.15);
+      border-radius: 16px;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    .card:hover {
+      border-color: rgba(52, 211, 153, 0.4);
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(52, 211, 153, 0.1);
+    }
+
+    /* Staggered animations */
+    .card:nth-child(1) { animation: slideUp 0.5s ease forwards 0.3s; }
+    .card:nth-child(2) { animation: slideUp 0.5s ease forwards 0.4s; }
+    .card:nth-child(3) { animation: slideUp 0.5s ease forwards 0.5s; }
+    .card:nth-child(4) { animation: slideUp 0.5s ease forwards 0.6s; }
+    .card:nth-child(5) { animation: slideUp 0.5s ease forwards 0.7s; }
+    .card:nth-child(6) { animation: slideUp 0.5s ease forwards 0.8s; }
+
+    /* Top accent bar */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #059669, #34d399);
+      opacity: 0.8;
+    }
+
+    /* Function name - big and clear */
+    .card-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card-title .func {
+      color: #fbbf24;
+    }
+    .card-title .paren {
+      color: #94a3b8;
+    }
+
+    /* Description with background for readability */
+    .card-desc {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #94a3b8;
+    }
+    .card-desc .highlight {
+      display: inline-block;
+      color: #34d399;
+      font-weight: 700;
+      background: rgba(52, 211, 153, 0.15);
+      padding: 2px 10px;
+      border-radius: 4px;
+      margin-top: 8px;
+    }
+
+    /* Bottom message */
+    .bottom {
+      text-align: center;
+      padding: 30px 40px;
+      background: rgba(52, 211, 153, 0.08);
+      border: 2px solid rgba(52, 211, 153, 0.3);
+      border-radius: 16px;
+      opacity: 0;
+      animation: fadeIn 0.6s ease forwards 1.2s;
+    }
+
+    .bottom-text {
+      font-size: 22px;
+      color: #ffffff;
+    }
+    .bottom-text .key {
+      color: #94a3b8;
+    }
+    .bottom-text .val {
+      color: #34d399;
+      font-weight: 600;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Shimmer effect on hover */
+    .card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(52, 211, 153, 0.05), transparent);
+      transition: left 0.5s ease;
+    }
+    .card:hover::after {
+      left: 100%;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 1024px) {
+      .slide { padding: 30px 40px; }
+      .title { font-size: 40px; margin-bottom: 40px; }
+      .cards { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+      .card { padding: 25px; }
+      .card-title { font-size: 20px; }
+      .card-desc { font-size: 14px; }
+      .bottom { padding: 25px 30px; }
+      .bottom-text { font-size: 18px; }
+    }
+
+    @media (max-width: 768px) {
+      body { overflow-y: auto; }
+      .slide { padding: 20px; }
+      .title { font-size: 28px; margin-bottom: 30px; }
+      .cards { grid-template-columns: 1fr; gap: 15px; }
+      .card { padding: 20px; }
+      .card-title { font-size: 18px; flex-wrap: wrap; }
+      .card-desc { font-size: 13px; }
+      .card-desc .highlight { padding: 2px 8px; font-size: 12px; }
+      .bottom { padding: 20px; }
+      .bottom-text { font-size: 14px; line-height: 1.8; }
+    }
+
+    @media (max-width: 480px) {
+      .slide { padding: 15px; }
+      .title { font-size: 22px; margin-bottom: 25px; }
+      .card { padding: 15px; }
+      .card-title { font-size: 16px; margin-bottom: 15px; }
+      .card-desc { font-size: 12px; }
+      .bottom-text { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <!-- Title -->
+    <div class="title">
+      <span class="comment">// </span><span class="main">Significant</span> <span class="value">additional_value</span>
+    </div>
+
+    <!-- Cards -->
+    <div class="cards">
+      <div class="card">
+        <div class="card-title"><span class="func">eliminate_legacy</span><span class="paren">()</span></div>
+        <div class="card-desc">
+          Automated migration + versioning
+          <span class="highlight">modernize forever</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="func">lower_infrastructure</span><span class="paren">()</span></div>
+        <div class="card-desc">
+          Cloud-agnostic platform
+          <span class="highlight">reduce spend 30%+</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="func">avoid_vendor_costs</span><span class="paren">()</span></div>
+        <div class="card-desc">
+          Replace commercial tools
+          <span class="highlight">no licensing, no lock-in</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="func">true_portability</span><span class="paren">()</span></div>
+        <div class="card-desc">
+          Move across clouds, on-prem, edge
+          <span class="highlight">with a few clicks</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="func">unified_support</span><span class="paren">()</span></div>
+        <div class="card-desc">
+          Single support for all OSS
+          <span class="highlight">one contract, all components</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="func">security_compliance</span><span class="paren">()</span></div>
+        <div class="card-desc">
+          Built-in security scanning
+          <span class="highlight">audit-ready day one</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom -->
+    <div class="bottom">
+      <div class="bottom-text">
+        <span class="key">speed:</span> <span class="val">"improved"</span> ·
+        <span class="key">revenue:</span> <span class="val">"improved"</span> ·
+        <span class="key">organization:</span> <span class="val">"transformed"</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

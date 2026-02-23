@@ -120,6 +120,235 @@ hide_table_of_contents: false
 
 ---
 
+## Stack Agent API — The Intelligence Layer
+
+<div style={{background: '#1a1a2e', borderRadius: '12px', padding: '24px', marginBottom: '32px', border: '1px solid #1976d2'}}>
+  <p style={{color: '#b0bec5', fontSize: '0.95rem', marginTop: 0}}>
+    The Stack Agent is a lightweight pod deployed per stack that holds the <strong style={{color: 'white'}}>entire topology as structured metadata</strong>. It exposes a single API endpoint — <code style={{color: '#8ecaff'}}>POST /metadata/q</code> — that lets you query your stack like a database. The MCP topology tools are a thin wrapper around this API.
+  </p>
+
+  <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px'}}>
+
+    <div style={{background: '#0d2137', borderRadius: '10px', padding: '20px', borderTop: '3px solid #4caf50'}}>
+      <h4 style={{color: '#4caf50', margin: '0 0 12px 0'}}>What AI gets from the API</h4>
+      <ul style={{margin: 0, paddingLeft: '18px', color: '#b0bec5', fontSize: '0.88rem'}}>
+        <li>Every component — name, type, namespace, group</li>
+        <li>Every sub-component — databases, topics, queues, buckets, models</li>
+        <li>Every link — who connects to whom, with direction and type</li>
+        <li>Every attribute — ports, credentials, endpoints, config</li>
+        <li>Cross-stack boundaries — <code style={{color: '#8ecaff'}}>is_external</code> flag</li>
+        <li>Run shell commands with auto-resolved variables</li>
+      </ul>
+    </div>
+
+    <div style={{background: '#0d2137', borderRadius: '10px', padding: '20px', borderTop: '3px solid #f9a825'}}>
+      <h4 style={{color: '#f9a825', margin: '0 0 12px 0'}}>Why this matters for governance</h4>
+      <ul style={{margin: 0, paddingLeft: '18px', color: '#b0bec5', fontSize: '0.88rem'}}>
+        <li>AI doesn't need <code style={{color: '#8ecaff'}}>kubectl</code> — it queries structured JSON</li>
+        <li>Variables like <code style={{color: '#8ecaff'}}>{'{namespace}'}</code>, <code style={{color: '#8ecaff'}}>{'{password}'}</code> resolve automatically</li>
+        <li>AI never sees raw credentials — the Agent substitutes them</li>
+        <li>Commands run inside the Agent pod — not from AI's context</li>
+        <li>Every query is scoped to the stack's topology</li>
+        <li>Dry-run mode lets AI preview without executing</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+### Query Model — Source / Target / Where
+
+<div style={{background: '#f8f9fb', borderRadius: '12px', padding: '24px', border: '1px solid #e0e4e8', marginBottom: '24px'}}>
+  <p style={{fontSize: '0.95rem', color: '#555', marginTop: 0}}>
+    Every MCP topology call maps to a <code>POST /metadata/q</code> request with a source/target/where structure. This is the "SQL" of your stack.
+  </p>
+
+  <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '16px'}}>
+
+    <div style={{background: 'white', borderRadius: '8px', padding: '16px', borderTop: '3px solid #0052cc', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
+      <h4 style={{margin: '0 0 8px 0', color: '#0052cc', fontSize: '0.9rem'}}>Source — WHAT to query</h4>
+      <div style={{fontSize: '0.82rem', color: '#555'}}>
+        <code>"all"</code> — every component<br/>
+        <code>"type:kafka"</code> — all Kafka instances<br/>
+        <code>"namespace:db"</code> — all in namespace<br/>
+        <code>"group:backend"</code> — all in group<br/>
+        <code>"kafka"</code> — specific by name
+      </div>
+    </div>
+
+    <div style={{background: 'white', borderRadius: '8px', padding: '16px', borderTop: '3px solid #2e7d32', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
+      <h4 style={{margin: '0 0 8px 0', color: '#2e7d32', fontSize: '0.9rem'}}>Target — WHAT to return</h4>
+      <div style={{fontSize: '0.82rem', color: '#555'}}>
+        <code>"component"</code> — the component itself<br/>
+        <code>"sub_components"</code> — DBs, topics, queues<br/>
+        <code>"links_to"</code> — outbound connections<br/>
+        <code>"links_from"</code> — inbound connections<br/>
+        <code>"attributes"</code> — config values
+      </div>
+    </div>
+
+    <div style={{background: 'white', borderRadius: '8px', padding: '16px', borderTop: '3px solid #e65100', boxShadow: '0 1px 4px rgba(0,0,0,0.06)'}}>
+      <h4 style={{margin: '0 0 8px 0', color: '#e65100', fontSize: '0.9rem'}}>Where — HOW to filter</h4>
+      <div style={{fontSize: '0.82rem', color: '#555'}}>
+        <code>"field": "value"</code> — exact match<br/>
+        <code>"field__contains": "str"</code> — substring<br/>
+        <code>"field__exists": true</code> — field present<br/>
+        <code>"field__in": ["a","b"]</code> — in list<br/>
+        <code>"field__gt": N</code> — greater than
+      </div>
+    </div>
+
+  </div>
+</div>
+
+### Variable Substitution — Zero Hardcoding
+
+<div style={{background: '#1a1a2e', borderRadius: '12px', padding: '24px', marginBottom: '24px', border: '1px solid #1976d2'}}>
+  <p style={{color: '#b0bec5', fontSize: '0.95rem', marginTop: 0}}>
+    When AI sends a command like <code style={{color: '#8ecaff'}}>kubectl get pods -n {'{namespace}'}</code>, the Stack Agent resolves <code style={{color: '#8ecaff'}}>{'{namespace}'}</code> to the actual namespace from the topology. The AI never hardcodes service names, ports, or credentials.
+  </p>
+
+| Variable | Resolved from | Example value |
+|---|---|---|
+| `{namespace}` | Component metadata | `kafka`, `db`, `monitoring` |
+| `{name}` | Component name | `kafka`, `cnpg`, `prometheus` |
+| `{port}` | Component attributes | `5432`, `9092`, `9090` |
+| `{password}` | Component attributes | *(auto-resolved, AI never sees it)* |
+| `{database}` | Sub-component attributes | `app_db`, `analytics` |
+| `{username}` | Sub-component attributes | `app_user`, `admin` |
+| `{host}` | Computed from type pattern | `cluster-db-rw.db.svc.cluster.local` |
+| `{link_name}` | Link metadata | `fastapi-kafka_topic` |
+| `{linked_namespace}` | Linked component | `messaging` |
+| `{linked_is_external}` | Cross-stack flag | `true` / `false` |
+
+  <div style={{background: '#162032', borderLeft: '3px solid #90caf9', borderRadius: '6px', padding: '12px 16px', marginTop: '16px'}}>
+    <p style={{color: '#b0bec5', fontSize: '0.85rem', margin: 0}}>
+      <strong style={{color: 'white'}}>Key governance point:</strong> AI writes generic commands with {'{variables}'}. The Stack Agent resolves them. The same command works across any stack, any environment — <strong style={{color: 'white'}}>zero hardcoded names, ports, or credentials</strong>.
+    </p>
+  </div>
+</div>
+
+### Command Pipeline — Test + Diagnose
+
+<div style={{background: '#f8f9fb', borderRadius: '12px', padding: '24px', border: '1px solid #e0e4e8', marginBottom: '24px'}}>
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│  AI calls: run_test(source="type:cnpg", target="sub_components",        │
+│            command="PGPASSWORD={password} psql -h {host} -U {username}  │
+│                     -d {database} -c 'SELECT 1'")                       │
+└──────────────────────────────┬───────────────────────────────────────────┘
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│  Stack Agent resolves variables per sub-component:                       │
+│  {password} → "s3cur3pw", {host} → "cluster-db-rw.db.svc...",          │
+│  {username} → "app_user", {database} → "app_db"                         │
+└──────────────────────────────┬───────────────────────────────────────────┘
+                               │
+                    ┌──────────┴──────────┐
+                    │    command executes   │
+                    │    (exit code check)  │
+                    └──────────┬──────────┘
+                               │
+                   ┌───────────┴───────────┐
+                   │                       │
+              exit 0 (pass)          exit ≠ 0 (fail)
+                   │                       │
+                   ▼                       ▼
+         ┌─────────────────┐     ┌─────────────────┐
+         │  wait            │     │  run on_failure  │
+         │  verify_delay    │     │  (diagnostics)   │
+         │  then on_success │     └─────────────────┘
+         └─────────────────┘
+```
+
+</div>
+
+### MCP Tools that Wrap the API
+
+<div style={{marginBottom: '24px'}}>
+
+| MCP Tool | What it does | Maps to |
+|---|---|---|
+| **`query_topology()`** | Full query with all parameters — source, target, where, command, pipeline | `POST /metadata/q` with full body |
+| **`list_components()`** | List all components with types, groups, namespaces | `POST /metadata/q` → source="all", target="component" |
+| **`get_component_links()`** | Get outbound or inbound links for a component | `POST /metadata/q` → target="links_to" or "links_from" |
+| **`run_test()`** | Run a validation command with full pipeline | `POST /metadata/q` with command + on_success/on_failure |
+| **`get_stack_structure()`** | Get component tree with sub-component counts | `GET /metadata/structure` |
+| **`get_available_fields()`** | Discover what {'{variables}'} are available for a component | `GET /metadata/fields/{'{component}'}` |
+
+</div>
+
+### MCP Resources — Persistent Context
+
+<div style={{marginBottom: '24px'}}>
+
+| Resource URI | What AI gets | Use case |
+|---|---|---|
+| **`stack://guide/api`** | Full API reference — source options, target options, where operators, host patterns, CLI tools, test examples | AI reads once, knows how to query everything |
+| **`stack://live/summary`** | Live snapshot — domain, component counts by type, namespaces, groups | Quick stack overview before deep queries |
+| **`stack://live/structure`** | Live topology tree — every component, sub-component count, link list | Full map for navigation and planning |
+
+  <div style={{background: '#e3f2fd', borderLeft: '4px solid #1976d2', borderRadius: '6px', padding: '12px 16px', marginTop: '12px'}}>
+    <strong>How it works together:</strong> AI reads the <code>stack://guide/api</code> resource once to learn the query language. Then calls <code>get_stack_structure()</code> to understand the topology. Then uses <code>query_topology()</code> and <code>run_test()</code> to investigate specific components. The MCP prompts (diagnose_component, incident_response, etc.) encode this workflow as reusable playbooks.
+  </div>
+</div>
+
+### Example: AI Queries the Stack
+
+<div style={{background: '#1a1a2e', borderRadius: '12px', padding: '24px', marginBottom: '32px', border: '1px solid #1976d2'}}>
+
+  <div style={{display: 'flex', flexDirection: 'column', gap: '12px'}}>
+
+    <div style={{background: '#0d2137', borderRadius: '8px', padding: '14px', borderLeft: '3px solid #4caf50'}}>
+      <div style={{color: '#4caf50', fontWeight: 700, fontSize: '0.8rem', marginBottom: '6px'}}>1. "What's in this stack?"</div>
+      <pre style={{background: '#162032', color: '#e0e0e0', borderRadius: '6px', padding: '10px', fontSize: '0.78rem', overflow: 'auto', margin: 0}}><code>{`tools/call → list_components()
+→ [{name: "kafka", type: "kafka", namespace: "kafka", group: "messaging"},
+   {name: "cnpg", type: "cnpg", namespace: "db", group: "databases"},
+   {name: "fastapi", type: "fastapi", namespace: "app", group: "backend"},
+   {name: "apisix", type: "apisix", namespace: "ingress", group: "gateway"}, ...]`}</code></pre>
+    </div>
+
+    <div style={{background: '#0d2137', borderRadius: '8px', padding: '14px', borderLeft: '3px solid #f9a825'}}>
+      <div style={{color: '#f9a825', fontWeight: 700, fontSize: '0.8rem', marginBottom: '6px'}}>2. "What databases exist?"</div>
+      <pre style={{background: '#162032', color: '#e0e0e0', borderRadius: '6px', padding: '10px', fontSize: '0.78rem', overflow: 'auto', margin: 0}}><code>{`tools/call → query_topology(source="type:cnpg", target="sub_components",
+                              select=["database", "username", "consumers"])
+→ [{database: "app_db", username: "app_user", consumers: ["fastapi"]},
+   {database: "keycloak_db", username: "keycloak", consumers: ["keycloak"]}]`}</code></pre>
+    </div>
+
+    <div style={{background: '#0d2137', borderRadius: '8px', padding: '14px', borderLeft: '3px solid #0052cc'}}>
+      <div style={{color: '#90caf9', fontWeight: 700, fontSize: '0.8rem', marginBottom: '6px'}}>3. "Can the backend reach its database?"</div>
+      <pre style={{background: '#162032', color: '#e0e0e0', borderRadius: '6px', padding: '10px', fontSize: '0.78rem', overflow: 'auto', margin: 0}}><code>{`tools/call → run_test(
+  source="type:cnpg", target="sub_components",
+  command='PGPASSWORD={password} psql -h {host} -p {port} -U {username} -d {database} -c "SELECT 1"',
+  on_failure='kubectl get pods -n {namespace} -l cnpg.io/cluster --no-headers')
+→ {status: "passed", results: [{name: "app_db", status: "passed", output: "1"},
+                                {name: "keycloak_db", status: "passed", output: "1"}]}`}</code></pre>
+    </div>
+
+    <div style={{background: '#0d2137', borderRadius: '8px', padding: '14px', borderLeft: '3px solid #e65100'}}>
+      <div style={{color: '#e65100', fontWeight: 700, fontSize: '0.8rem', marginBottom: '6px'}}>4. "Preview before executing" (dry run)</div>
+      <pre style={{background: '#162032', color: '#e0e0e0', borderRadius: '6px', padding: '10px', fontSize: '0.78rem', overflow: 'auto', margin: 0}}><code>{`tools/call → query_topology(source="apisix", target="links_to",
+                              command="curl -sk https://{subdomain}.{domain}",
+                              dry_run=true)
+→ [{name: "fastapi", command: "curl -sk https://api.stack-3.source-lab.io"},
+   {name: "grafana", command: "curl -sk https://grafana.stack-3.source-lab.io"},
+   {name: "langflow", command: "curl -sk https://langflow.stack-3.source-lab.io"}]`}</code></pre>
+    </div>
+
+  </div>
+
+  <div style={{background: '#162032', borderLeft: '3px solid #90caf9', borderRadius: '6px', padding: '12px 16px', marginTop: '16px'}}>
+    <p style={{color: '#b0bec5', fontSize: '0.85rem', margin: 0}}>
+      <strong style={{color: 'white'}}>AI never hardcoded a single name, port, or password.</strong> It queried the topology, got structured data, and used {'{variables}'} for commands. The Stack Agent resolved everything from the metadata. Same queries work on any stack.
+    </p>
+  </div>
+</div>
+
+---
+
 ## Governance by Architecture — 4 Layers
 
 <div style={{background: '#1a1a2e', borderRadius: '12px', padding: '24px', marginBottom: '32px', border: '1px solid #1976d2'}}>

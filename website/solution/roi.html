@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stacktic ROI</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Fira Code', 'Courier New', monospace;
+            background: #2a2847;
+            color: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 25px;
+            opacity: 0;
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        .page-title h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #f1f5f9;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .page-title h1::before {
+            content: "// ";
+            color: #60d5ff;
+            opacity: 0.7;
+        }
+
+        /* Grid - 2 columns, 3 rows */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .chart-box {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            opacity: 0;
+            transform: translateY(15px);
+            animation: slideUp 0.5s ease forwards;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .chart-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            border-color: rgba(96, 213, 255, 0.2);
+        }
+
+        .chart-box:nth-child(1) { animation-delay: 0.1s; }
+        .chart-box:nth-child(2) { animation-delay: 0.2s; }
+        .chart-box:nth-child(3) { animation-delay: 0.3s; }
+        .chart-box:nth-child(4) { animation-delay: 0.4s; }
+        .chart-box:nth-child(5) { animation-delay: 0.5s; }
+        .chart-box:nth-child(6) { animation-delay: 0.6s; }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .chart-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #f1f5f9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .legend {
+            display: flex;
+            gap: 12px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 9px;
+            color: #94a3b8;
+        }
+
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.today { background: #64748b; }
+        .legend-dot.stacktic { background: #34d399; }
+
+        .chart-container {
+            position: relative;
+            height: 100px;
+        }
+
+        .metric-text {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .metric-highlight {
+            font-size: 12px;
+            font-weight: 700;
+            color: #60d5ff;
+            transition: text-shadow 0.2s ease;
+        }
+
+        .chart-box:hover .metric-highlight {
+            text-shadow: 0 0 12px rgba(96, 213, 255, 0.5);
+        }
+
+        .metric-detail {
+            font-size: 10px;
+            color: #34d399;
+            margin-top: 3px;
+        }
+
+        /* Horizontal bars */
+        .horizontal-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .bar-row {
+            display: grid;
+            grid-template-columns: 50px 1fr;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bar-label {
+            font-size: 9px;
+            color: #94a3b8;
+            text-align: right;
+        }
+
+        .bar-track {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            width: 0;
+            animation: growBar 0.8s ease forwards;
+        }
+
+        .bar-fill.today { background: #64748b; }
+        .bar-fill.stacktic { background: #34d399; }
+
+        @keyframes growBar {
+            to { width: var(--bar-width); }
+        }
+
+        .bar-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        /* Stagger bar animations */
+        .bar-row:nth-child(1) .bar-fill { animation-delay: 0.3s; }
+        .bar-row:nth-child(2) .bar-fill { animation-delay: 0.4s; }
+        .bar-row:nth-child(3) .bar-fill { animation-delay: 0.5s; }
+        .bar-row:nth-child(4) .bar-fill { animation-delay: 0.6s; }
+
+        @media (max-width: 600px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-title">
+            <h1>Stacktic ROI</h1>
+        </div>
+
+        <div class="grid">
+            <!-- Time to Market -->
+            <div class="chart-box">
+                <div class="chart-header">
+                    <div class="chart-title">Time to Market</div>
+                    <div class="legend">
+                        <div class="legend-item"><div class="legend-dot today"></div><span>before</span></div>
+                        <div class="legend-item"><div class="legend-dot stacktic"></div><span>after</span></div>
+                    </div>
+                </div>
+                <div class="horizontal-bars">
+                    <div class="bar-row">
+                        <span class="bar-label">plan</span>
+                        <div class="bar-group">
+                            <div class="bar-track"><div class="bar-fill today" style="--bar-width: 50%;"></div></div>
+                            <div class="bar-track"><div class="bar-fill stacktic" style="--bar-width: 17%;"></div></div>
+                        </div>
+                    </div>
+                    <div class="bar-row">
+                        <span class="bar-label">deploy</span>
+                        <div class="bar-group">
+                            <div class="bar-track"><div class="bar-fill today" style="--bar-width: 83%;"></div></div>
+                            <div class="bar-track"><div class="bar-fill stacktic" style="--bar-width: 17%;"></div></div>
+                        </div>
+                    </div>
+                    <div class="bar-row">
+                        <span class="bar-label">secure</span>
+                        <div class="bar-group">
+                            <div class="bar-track"><div class="bar-fill today" style="--bar-width: 67%;"></div></div>
+                            <div class="bar-track"><div class="bar-fill stacktic" style="--bar-width: 17%;"></div></div>
+                        </div>
+                    </div>
+                    <div class="bar-row">
+                        <span class="bar-label">operate</span>
+                        <div class="bar-group">
+                            <div class="bar-track"><div class="bar-fill today" style="--bar-width: 100%;"></div></div>
+                            <div class="bar-track"><div class="bar-fill stacktic" style="--bar-width: 8%;"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-text">
+                    <div class="metric-highlight">5 months faster</div>
+                    <div class="metric-detail">Earlier revenue per application</div>
+                </div>
+            </div>
+
+            <!-- Operation Cost -->
+            <div class="chart-box">
+                <div class="chart-header">
+                    <div class="chart-title">Operation Cost</div>
+                    <div class="legend">
+                        <div class="legend-item"><div class="legend-dot today"></div><span>before</span></div>
+                        <div class="legend-item"><div class="legend-dot stacktic"></div><span>after</span></div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="operationCostChart"></canvas>
+                </div>
+                <div class="metric-text">
+                    <div class="metric-highlight">70% reduction</div>
+                    <div class="metric-detail">Automated operations</div>
+                </div>
+            </div>
+
+            <!-- Legacy Removal -->
+            <div class="chart-box">
+                <div class="chart-header">
+                    <div class="chart-title">Legacy Removal</div>
+                    <div class="legend">
+                        <div class="legend-item"><div class="legend-dot today"></div><span>before</span></div>
+                        <div class="legend-item"><div class="legend-dot stacktic"></div><span>after</span></div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="legacyChart"></canvas>
+                </div>
+                <div class="metric-text">
+                    <div class="metric-highlight">90% less tech debt</div>
+                    <div class="metric-detail">Auto-versioning & migration</div>
+                </div>
+            </div>
+
+            <!-- Managed Infra -->
+            <div class="chart-box">
+                <div class="chart-header">
+                    <div class="chart-title">Infrastructure Cost</div>
+                    <div class="legend">
+                        <div class="legend-item"><div class="legend-dot today"></div><span>before</span></div>
+                        <div class="legend-item"><div class="legend-dot stacktic"></div><span>after</span></div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="infraChart"></canvas>
+                </div>
+                <div class="metric-text">
+                    <div class="metric-highlight">70% savings</div>
+                    <div class="metric-detail">Cloud-native infrastructure</div>
+                </div>
+            </div>
+
+            <!-- Commercial Tools -->
+            <div class="chart-box">
+                <div class="chart-header">
+                    <div class="chart-title">Tool Licenses</div>
+                    <div class="legend">
+                        <div class="legend-item"><div class="legend-dot today"></div><span>before</span></div>
+                        <div class="legend-item"><div class="legend-dot stacktic"></div><span>after</span></div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="commercialChart"></canvas>
+                </div>
+                <div class="metric-text">
+                    <div class="metric-highlight">85% reduction</div>
+                    <div class="metric-detail">Open source alternatives</div>
+                </div>
+            </div>
+
+            <!-- Vendor Lock-in -->
+            <div class="chart-box">
+                <div class="chart-header">
+                    <div class="chart-title">Vendor Lock-in</div>
+                    <div class="legend">
+                        <div class="legend-item"><div class="legend-dot today"></div><span>before</span></div>
+                        <div class="legend-item"><div class="legend-dot stacktic"></div><span>after</span></div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="vendorChart"></canvas>
+                </div>
+                <div class="metric-text">
+                    <div class="metric-highlight">75% lower exit cost</div>
+                    <div class="metric-detail">Multi-cloud portable</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'Fira Code', monospace";
+        Chart.defaults.font.size = 9;
+
+        const todayColor = '#64748b';
+        const stackticColor = '#34d399';
+
+        const opts = {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+                duration: 800,
+                easing: 'easeOutQuart'
+            },
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { display: false } },
+                x: { grid: { display: false } }
+            }
+        };
+
+        new Chart(document.getElementById('operationCostChart'), {
+            type: 'bar',
+            data: {
+                labels: ['CAPEX', 'OPEX'],
+                datasets: [
+                    { data: [220, 120], backgroundColor: todayColor, borderRadius: 3, barPercentage: 0.6 },
+                    { data: [50, 30], backgroundColor: stackticColor, borderRadius: 3, barPercentage: 0.6 }
+                ]
+            },
+            options: opts
+        });
+
+        new Chart(document.getElementById('legacyChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Cost'],
+                datasets: [
+                    { data: [4], backgroundColor: todayColor, borderRadius: 3, barPercentage: 0.5 },
+                    { data: [0.5], backgroundColor: stackticColor, borderRadius: 3, barPercentage: 0.5 }
+                ]
+            },
+            options: opts
+        });
+
+        new Chart(document.getElementById('infraChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Cost'],
+                datasets: [
+                    { data: [2.0], backgroundColor: todayColor, borderRadius: 3, barPercentage: 0.5 },
+                    { data: [0.6], backgroundColor: stackticColor, borderRadius: 3, barPercentage: 0.5 }
+                ]
+            },
+            options: opts
+        });
+
+        new Chart(document.getElementById('commercialChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Cost'],
+                datasets: [
+                    { data: [0.8], backgroundColor: todayColor, borderRadius: 3, barPercentage: 0.5 },
+                    { data: [0.1], backgroundColor: stackticColor, borderRadius: 3, barPercentage: 0.5 }
+                ]
+            },
+            options: opts
+        });
+
+        new Chart(document.getElementById('vendorChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Cost'],
+                datasets: [
+                    { data: [2.0], backgroundColor: todayColor, borderRadius: 3, barPercentage: 0.5 },
+                    { data: [0.5], backgroundColor: stackticColor, borderRadius: 3, barPercentage: 0.5 }
+                ]
+            },
+            options: opts
+        });
+    </script>
+</body>
+</html>

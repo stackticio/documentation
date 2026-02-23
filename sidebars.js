@@ -150,5 +150,10 @@ module.exports = {
       id: 'ai_ops',
       label: 'AI Ops',
     },
+    {
+      type: 'doc',
+      id: 'ai_governance',
+      label: 'AI Governance & MCP',
+    },
   ],
 };

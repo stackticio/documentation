@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Why Stacktic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: transparent;
+            color: #0f172a;
+            padding: 48px 20px 56px;
+        }
+        .wrap { max-width: 880px; margin: 0 auto; }
+
+        /* ── TITLE ── */
+        .page-title {
+            text-align: center;
+            margin-bottom: 44px;
+        }
+        .page-title h1 {
+            font-size: 30px;
+            font-weight: 900;
+            letter-spacing: -1.2px;
+        }
+
+        /* ── NEEDS GRID ── */
+        .needs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        .need {
+            border-radius: 10px;
+            padding: 20px 16px 18px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-top: 4px solid;
+            text-align: left;
+        }
+        .need h3 {
+            font-size: 14.5px;
+            font-weight: 800;
+            letter-spacing: -0.4px;
+            line-height: 1.2;
+            margin-bottom: 5px;
+        }
+        .need p {
+            font-size: 11.5px;
+            line-height: 1.4;
+            color: #475569;
+        }
+
+        /* card top-border colors */
+        .n1 { border-top-color: #2563eb; }
+        .n2 { border-top-color: #059669; }
+        .n3 { border-top-color: #7c3aed; }
+        .n4 { border-top-color: #d97706; }
+        .n5 { border-top-color: #dc2626; }
+        .n6 { border-top-color: #0891b2; }
+        .n7 { border-top-color: #4f46e5; }
+        .n8 { border-top-color: #be185d; }
+
+        /* ── FUNNEL (converge) ── */
+        .funnel {
+            display: flex;
+            justify-content: center;
+            margin: 0;
+            line-height: 0;
+        }
+        .funnel svg { width: 100%; max-width: 880px; }
+
+        /* ── SOLUTION BADGE ── */
+        .solution {
+            display: flex;
+            justify-content: center;
+        }
+        .badge {
+            background: #0f172a;
+            color: #fff;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            padding: 16px 56px;
+            border-radius: 12px;
+        }
+
+        /* ── FAN OUT (diverge) ── */
+        .fan {
+            display: flex;
+            justify-content: center;
+            margin: 0;
+            line-height: 0;
+        }
+        .fan svg { width: 100%; max-width: 880px; }
+
+        /* ── OUTCOME ── */
+        .outcome {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .outcome-grid {
+            display: inline-flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .outcome-item {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.2px;
+        }
+        .outcome-item span {
+            color: #059669;
+            margin-right: 5px;
+        }
+
+        /* ── CTA ── */
+        .cta { text-align: center; margin-top: 8px; }
+        .cta a {
+            display: inline-block;
+            background: #0f172a;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 13px 40px;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .cta a:hover { background: #1e40af; }
+
+        /* ── MOBILE ── */
+        @media (max-width: 640px) {
+            .needs { grid-template-columns: 1fr 1fr; }
+            .funnel svg, .fan svg { max-width: 400px; }
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+
+    <div class="page-title">
+        <h1>Why Stacktic</h1>
+    </div>
+
+    <!-- ── 8 USE CASES ── -->
+    <div class="needs">
+        <div class="need n1">
+            <h3>Cloud-Agnostic Portability</h3>
+            <p>You need the same stack to deploy on any cloud provider, any region, any environment — without rewrites.</p>
+        </div>
+        <div class="need n2">
+            <h3>80% Ops Cost Reduction</h3>
+            <p>You need end-to-end automation across DevOps, DataOps, SecOps, and AIOps — not four separate tools.</p>
+        </div>
+        <div class="need n3">
+            <h3>Edge, Air-Gapped &amp; Private AI</h3>
+            <p>You need to operate in regulated, disconnected, and high-compliance environments without compromises.</p>
+        </div>
+        <div class="need n4">
+            <h3>Zero Vendor Lock-In</h3>
+            <p>You need 100% open source with full ownership, no hidden costs, and no vendor dependency.</p>
+        </div>
+        <div class="need n5">
+            <h3>Continuous Stack Versioning</h3>
+            <p>You need stacks engineered for continuous versioning, constant change, and rapid adoption of new technologies.</p>
+        </div>
+        <div class="need n6">
+            <h3>Cross-Cloud Automation</h3>
+            <p>You need dependencies, connectivity, and logic across multi-cloud environments managed automatically.</p>
+        </div>
+        <div class="need n7">
+            <h3>Controlled Migrations &amp; Rollouts</h3>
+            <p>You need zero-friction migrations and controlled rollouts across teams and environments.</p>
+        </div>
+        <div class="need n8">
+            <h3>Validated Open-Source Portfolio</h3>
+            <p>You need battle-tested, pre-integrated components with zero configuration errors out of the box.</p>
+        </div>
+    </div>
+
+    <!-- ── CONVERGE LINES ── -->
+    <div class="funnel">
+        <svg viewBox="0 0 880 56" preserveAspectRatio="xMidYMid meet">
+            <line x1="110" y1="0" x2="440" y2="54" stroke="#2563eb" stroke-width="1.5" opacity="0.2"/>
+            <line x1="330" y1="0" x2="440" y2="54" stroke="#059669" stroke-width="1.5" opacity="0.2"/>
+            <line x1="550" y1="0" x2="440" y2="54" stroke="#7c3aed" stroke-width="1.5" opacity="0.2"/>
+            <line x1="770" y1="0" x2="440" y2="54" stroke="#d97706" stroke-width="1.5" opacity="0.2"/>
+            <!-- second row offsets -->
+            <line x1="110" y1="0" x2="440" y2="54" stroke="#dc2626" stroke-width="1.5" opacity="0.12"/>
+            <line x1="330" y1="0" x2="440" y2="54" stroke="#0891b2" stroke-width="1.5" opacity="0.12"/>
+            <line x1="550" y1="0" x2="440" y2="54" stroke="#4f46e5" stroke-width="1.5" opacity="0.12"/>
+            <line x1="770" y1="0" x2="440" y2="54" stroke="#be185d" stroke-width="1.5" opacity="0.12"/>
+        </svg>
+    </div>
+
+    <!-- ── STACKTIC ── -->
+    <div class="solution">
+        <div class="badge">Stacktic</div>
+    </div>
+
+    <!-- ── DIVERGE LINES ── -->
+    <div class="fan">
+        <svg viewBox="0 0 880 48" preserveAspectRatio="xMidYMid meet">
+            <line x1="440" y1="0" x2="220" y2="46" stroke="#059669" stroke-width="1.5" opacity="0.18"/>
+            <line x1="440" y1="0" x2="370" y2="46" stroke="#059669" stroke-width="1.5" opacity="0.18"/>
+            <line x1="440" y1="0" x2="510" y2="46" stroke="#059669" stroke-width="1.5" opacity="0.18"/>
+            <line x1="440" y1="0" x2="660" y2="46" stroke="#059669" stroke-width="1.5" opacity="0.18"/>
+        </svg>
+    </div>
+
+    <!-- ── OUTCOME ── -->
+    <div class="outcome">
+        <div class="outcome-grid">
+            <div class="outcome-item"><span>&check;</span>Production-ready</div>
+            <div class="outcome-item"><span>&check;</span>Automated</div>
+            <div class="outcome-item"><span>&check;</span>Portable</div>
+            <div class="outcome-item"><span>&check;</span>Versioned</div>
+        </div>
+    </div>
+
+    <div class="cta">
+        <a href="mailto:contact@stacktic.io">Talk to us &rarr;</a>
+    </div>
+
+</div>
+</body>
+</html>

@@ -114,6 +114,42 @@ Using metadata, Stacktic creates **actual version control** for your entire stac
 
 ---
 
+## 🤖 AI Governance, Automation & Control
+
+### The Challenge: AI Meets Infrastructure
+
+AI agents are becoming the primary operators of infrastructure — diagnosing incidents, querying databases, reading logs, triggering deployments. But without structure, AI operates blind: raw `kubectl` access, no understanding of relationships, no boundaries.
+
+### Stacktic's Answer: Metadata-Driven AI Control
+
+Stacktic doesn't just generate infrastructure — it generates the **metadata layer that governs AI**:
+
+- **Structured Metadata Feed**: Every component, link, sub-component, and attribute in your stack is exposed as typed, queryable data through the Stack Agent API. AI never parses YAML or guesses service names — it queries structured JSON.
+
+- **Auto-Generated MCP Server**: When you draw links in Stacktic, an MCP (Model Context Protocol) server is generated per stack with typed tools for every connected service — databases, message queues, observability, deployments. Draw a link → tools appear. Remove a link → tools disappear.
+
+- **Governance by Architecture**: The topology you design IS the governance. What AI can see, access, query, and modify is determined by the links you draw — not by a separate policy layer that can drift.
+
+- **Zero Raw Access**: AI agents operate through scoped tools with variable substitution (`{namespace}`, `{password}`, `{database}`) — the Stack Agent resolves variables from metadata. AI never sees raw credentials or runs arbitrary kubectl commands.
+
+- **Write-Access Gating**: Every service connection has an independent write-access flag. Read operations are always available. Write operations (publish messages, trigger syncs, insert rows) only appear when explicitly enabled per service.
+
+- **Multi-Stack Isolation**: Each stack generates its own MCP with its own credentials and topology scope. Cross-stack boundaries are explicitly controlled via `is_external` flags.
+
+### What This Means
+
+| Without Stacktic | With Stacktic |
+|---|---|
+| AI + kubectl = unlimited cluster access | AI + MCP = scoped tools, typed metadata |
+| AI must guess relationships from labels | AI knows every link, direction, and dependency |
+| Governance bolted on after deployment | Governance auto-generated from topology |
+| Manual policy maintenance and drift | Zero-drift — topology changes propagate instantly |
+| Same AI access across all environments | Per-stack isolation with independent credentials |
+
+> **The metadata you feed AI IS the control.** Stacktic generates 360° stack metadata — components, links, sub-components, attributes, cross-stack boundaries — and feeds it to AI through governed tools. This isn't a feature. It's a fundamental shift in how AI operates infrastructure.
+
+---
+
 ## 🌟 Vision
 
 Stacktic bridges the gap between:
@@ -121,12 +157,12 @@ Stacktic bridges the gap between:
 - **Disadvantages** of pure open-source (time-to-market, operational overhead)
 - **Advantages** of both approaches
 
-By bypassing skill gaps and reducing operational complexity, Stacktic delivers **fully stable, automated, cloud-agnostic, and sovereignty-compliant full stacks**.
+By bypassing skill gaps and reducing operational complexity, Stacktic delivers **fully stable, automated, cloud-agnostic, and sovereignty-compliant full stacks** — with AI governance built into the architecture from day one.
 
-**Our vision**: A unified platform engineering solution that democratizes open source, boosts adoption, and removes vendor lock-in - providing full freedom to innovate, adapt, and keep pace with technology.
+**Our vision**: A unified platform engineering solution that democratizes open source, boosts adoption, and removes vendor lock-in — providing full freedom to innovate, adapt, and keep pace with technology. Where AI agents operate infrastructure through structured metadata and governed tools, not raw cluster access.
 
 ![alt text](image-12.png)
 
 ---
 
-*Stacktic: Transforming stack complexity into versioned simplicity.*
+*Stacktic: Transforming stack complexity into versioned simplicity — with AI governance built in.*

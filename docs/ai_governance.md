@@ -6,39 +6,39 @@ hide_table_of_contents: false
 # AI Governance & MCP
 
 <div style={{background: 'linear-gradient(135deg, #0052cc 0%, #003d99 100%)', borderRadius: '12px', padding: '32px 40px', color: 'white', marginBottom: '32px'}}>
-  <h2 style={{color: 'white', margin: '0 0 8px 0', fontSize: '1.6rem'}}>Governed AI operations — built into the architecture</h2>
+  <h2 style={{color: 'white', margin: '0 0 8px 0', fontSize: '1.6rem'}}>The first platform where AI governance is the architecture — not a layer on top</h2>
   <p style={{margin: 0, opacity: 0.9, fontSize: '1.05rem'}}>
-    Stacktic generates an MCP (Model Context Protocol) server per stack that gives AI agents structured, scoped, and governed access to your infrastructure. The AI sees only what the topology allows — no raw cluster access, no guessing.
+    Every enterprise is racing to bring AI into infrastructure operations. The problem isn't capability — it's control. Stacktic solves this by generating a governed MCP (Model Context Protocol) server per stack, where the topology you design determines exactly what AI can see, query, and modify. No policy bolted on. No permissions to maintain. The architecture IS the governance.
   </p>
 </div>
 
-{/* WHY THIS MATTERS */}
+{/* THE BIGGER PICTURE */}
 <div style={{background: '#1a1a2e', borderRadius: '12px', padding: '24px', marginBottom: '32px', border: '1px solid #1976d2'}}>
   <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px'}}>
     <div>
-      <h3 style={{color: 'white', margin: '0 0 12px 0'}}>The problem with AI + Infrastructure</h3>
+      <h3 style={{color: 'white', margin: '0 0 12px 0'}}>Why AI governance is the next infrastructure challenge</h3>
       <p style={{color: '#b0bec5', fontSize: '0.95rem', margin: '0 0 16px 0'}}>
-        Giving AI agents raw <code style={{color: '#8ecaff'}}>kubectl</code> access to your cluster is like giving an intern root access on day one. They can read any secret, delete any namespace, and break anything — with no boundaries.
+        AI agents are becoming the primary operators of infrastructure. They diagnose incidents, query databases, read logs, and trigger deployments. But today, giving AI access means giving it <code style={{color: '#8ecaff'}}>kubectl</code> — raw, unstructured, unlimited access to your entire cluster.
       </p>
       <p style={{color: '#b0bec5', fontSize: '0.95rem', margin: '0 0 16px 0'}}>
-        Most AI governance solutions are <strong style={{color: 'white'}}>bolted on</strong> — you deploy AI, then add policy layers to block bad actions. Stacktic takes a fundamentally different approach.
+        The industry response is to <strong style={{color: 'white'}}>bolt on governance after the fact</strong> — policy engines, permission layers, audit wrappers. This creates another system to maintain, another thing that can drift, another gap between intention and reality.
       </p>
       <p style={{color: '#b0bec5', fontSize: '0.95rem', margin: 0}}>
-        Governance is not a layer. <strong style={{color: 'white'}}>The architecture IS the governance.</strong> The topology you draw determines what AI can see, access, query, and modify — automatically.
+        Stacktic eliminates this problem entirely. <strong style={{color: 'white'}}>The topology you draw IS the governance.</strong> When you design your stack — components, links, sub-components — you're simultaneously defining what AI can access, what metadata it receives, what operations it can perform, and what credentials it holds. Nothing to bolt on. Nothing to drift.
       </p>
     </div>
     <div style={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
       <div style={{background: '#0d2137', borderRadius: '8px', padding: '14px', borderLeft: '3px solid #f44336'}}>
-        <div style={{color: '#f44336', fontWeight: 700, fontSize: '0.8rem', marginBottom: '4px'}}>WITHOUT STACKTIC</div>
-        <p style={{color: '#e0e0e0', fontSize: '0.85rem', margin: 0}}>AI + kubectl = full cluster access. Can read secrets, delete namespaces, exec into pods. No structural boundaries.</p>
+        <div style={{color: '#f44336', fontWeight: 700, fontSize: '0.8rem', marginBottom: '4px'}}>THE INDUSTRY PROBLEM</div>
+        <p style={{color: '#e0e0e0', fontSize: '0.85rem', margin: 0}}>AI + kubectl = full cluster access. No structural boundaries. Every enterprise is one hallucinated command away from a production incident.</p>
       </div>
       <div style={{background: '#0d2137', borderRadius: '8px', padding: '14px', borderLeft: '3px solid #4caf50'}}>
-        <div style={{color: '#4caf50', fontWeight: 700, fontSize: '0.8rem', marginBottom: '4px'}}>WITH STACKTIC</div>
-        <p style={{color: '#e0e0e0', fontSize: '0.85rem', margin: 0}}>AI + MCP = typed tools, scoped credentials, write-access gating. Only what the topology exposes.</p>
+        <div style={{color: '#4caf50', fontWeight: 700, fontSize: '0.8rem', marginBottom: '4px'}}>THE STACKTIC ANSWER</div>
+        <p style={{color: '#e0e0e0', fontSize: '0.85rem', margin: 0}}>AI receives structured metadata, typed tools, and scoped credentials — auto-generated from the stack topology. The metadata feed IS the control plane.</p>
       </div>
       <div style={{background: '#0d2137', borderRadius: '8px', padding: '14px', borderLeft: '3px solid #0052cc'}}>
-        <div style={{color: '#90caf9', fontWeight: 700, fontSize: '0.8rem', marginBottom: '4px'}}>KEY DIFFERENCE</div>
-        <p style={{color: '#e0e0e0', fontSize: '0.85rem', margin: 0}}>MCP tools are <strong style={{color: 'white'}}>auto-generated from your topology</strong>. Draw a link → tools appear. Remove a link → tools disappear.</p>
+        <div style={{color: '#90caf9', fontWeight: 700, fontSize: '0.8rem', marginBottom: '4px'}}>THE KEY INSIGHT</div>
+        <p style={{color: '#e0e0e0', fontSize: '0.85rem', margin: 0}}>You don't govern AI by restricting it. You govern AI by <strong style={{color: 'white'}}>feeding it the right metadata</strong>. Stacktic's topology metadata gives AI complete understanding with zero raw access.</p>
       </div>
     </div>
   </div>

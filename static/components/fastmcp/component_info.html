@@ -187,10 +187,37 @@
                 </table>
             </div>
 
+            <!-- Sub-Component Links -->
+            <div style="background-color: #fef3c7; padding: 16px; border-radius: 6px; margin-bottom: 12px; border-left: 4px solid #f59e0b;">
+                <h4 style="color: #92400e; margin: 0 0 8px 0; font-size: 14px;">Sub-Component Links</h4>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #fde68a;">
+                            <th style="padding: 6px; border: 1px solid #f59e0b; text-align: left; color: #78350f;">Link Type</th>
+                            <th style="padding: 6px; border: 1px solid #f59e0b; text-align: left; color: #78350f;">From &rarr; To</th>
+                            <th style="padding: 6px; border: 1px solid #f59e0b; text-align: left; color: #78350f;">Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #78350f;">
+                        <tr style="background-color: #fffbeb;">
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;"><code>ai_task-agent</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">ai_task &rarr; agent</td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;"><strong>Which AI runs the task.</strong> Each task can target a different agent. If missing, <strong>falls back to first available agent</strong>.</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;"><code>ai_task-ai_task</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">ai_task &rarr; ai_task</td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;"><strong>Task chaining.</strong> On success, triggers next task with previous output as context. Only first task needs cron.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="color: #92400e; font-size: 10px; margin: 8px 0 0 0;"><strong>Agent fallback:</strong> In single-agent setups, tasks without an explicit <code>ai_task-agent</code> link automatically use the first agent. No link needed.</p>
+            </div>
+
             <!-- ai_task -->
             <div style="background-color: #e9d5ff; padding: 16px; border-radius: 6px;">
                 <h4 style="color: #5b21b6; margin: 0 0 8px 0; font-size: 14px;">ai_task &mdash; Autonomous Task Definition</h4>
-                <p style="color: #6b21a8; font-size: 12px; margin-bottom: 8px;">Each task defines what the agent should do (natural language), how often, and in what mode. Link a task to an agent via <code>ai_task-agent</code>.</p>
+                <p style="color: #6b21a8; font-size: 12px; margin-bottom: 8px;">Each task defines what the agent should do (natural language), when (cron), and in what mode. Link to an agent via <code>ai_task-agent</code>. Chain tasks via <code>ai_task-ai_task</code>.</p>
                 <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
                     <thead>
                         <tr style="background-color: #c4b5fd;">
@@ -206,9 +233,9 @@
                             <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Natural language instruction. Write it like you'd instruct a human operator.</td>
                         </tr>
                         <tr>
-                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>schedule_minutes</code></td>
-                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>30</code></td>
-                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">How often the task runs (minutes)</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>cron_expression</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">(empty)</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Cron schedule (5-field). e.g. <code>*/30 * * * *</code> = every 30min. Empty = run once on start.</td>
                         </tr>
                         <tr style="background-color: #faf5ff;">
                             <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>agent_mode</code></td>
@@ -216,16 +243,21 @@
                             <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>monitor</code> = read-only tools (safe). <code>act</code> = read + write tools (INSERT, DELETE, publish).</td>
                         </tr>
                         <tr>
-                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>tools</code></td>
-                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>all</code></td>
-                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Comma-separated tool keywords (e.g., <code>prometheus,kubectl</code>). <code>all</code> = auto-select from description.</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>retry_count</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>0</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">How many retries on failure. <code>0</code> = no retry.</td>
                         </tr>
                         <tr style="background-color: #faf5ff;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>retry_delay_seconds</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>60</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Seconds to wait between retries.</td>
+                        </tr>
+                        <tr>
                             <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>notify_webhook</code></td>
                             <td style="padding: 4px 6px; border: 1px solid #a78bfa;">&mdash;</td>
                             <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Webhook URL for task results (Slack, Teams, PagerDuty)</td>
                         </tr>
-                        <tr>
+                        <tr style="background-color: #faf5ff;">
                             <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>notify_email</code></td>
                             <td style="padding: 4px 6px; border: 1px solid #a78bfa;">&mdash;</td>
                             <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Email address for task result reports</td>
@@ -251,7 +283,7 @@
                     <tbody style="color: #78350f;">
                         <tr>
                             <td style="padding: 4px 6px; border: 1px solid #f59e0b; font-weight: bold;">1. Schedule</td>
-                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">Background asyncio loop checks if <code>schedule_minutes</code> elapsed since last run</td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">Background asyncio loop evaluates <code>cron_expression</code> every 30s. No cron = run once on start.</td>
                         </tr>
                         <tr style="background-color: #fef3c7;">
                             <td style="padding: 4px 6px; border: 1px solid #f59e0b; font-weight: bold;">2. Tool Selection</td>
@@ -331,7 +363,11 @@
                         </tr>
                         <tr style="background-color: #dbeafe;">
                             <td style="padding: 4px 6px; border: 1px solid #93c5fd; font-weight: bold;"><code>dark_factory_run_now</code></td>
-                            <td style="padding: 4px 6px; border: 1px solid #93c5fd;">Trigger immediate task execution, skipping the schedule timer</td>
+                            <td style="padding: 4px 6px; border: 1px solid #93c5fd;">Trigger immediate task execution, optionally follow the chain</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #93c5fd; font-weight: bold;"><code>dark_factory_cost</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #93c5fd;">Per-task token usage and estimated USD cost since pod start</td>
                         </tr>
                     </tbody>
                 </table>
@@ -452,7 +488,7 @@
         <!-- Tool Selection Keywords -->
         <div style="background-color: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
             <h3 style="color: #166534; font-size: 16px; margin: 0 0 4px 0; font-weight: 600;">Dark Factory Tool Selection Keywords</h3>
-            <p style="color: #166534; font-size: 12px; margin: 0 0 16px 0;">The Dark Factory auto-selects MCP tools based on keywords in the task description. Use the <code>tools</code> attribute to override. These keywords map to actual tool name prefixes.</p>
+            <p style="color: #166534; font-size: 12px; margin: 0 0 16px 0;">The Dark Factory auto-selects MCP tools based on keywords in the task description. These keywords map to actual tool name prefixes. Zero API calls &mdash; local matching only.</p>
 
             <div style="background-color: #bbf7d0; padding: 16px; border-radius: 6px;">
                 <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
@@ -569,7 +605,7 @@
                     <tr style="background-color: #1e293b;">
                         <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/files/dark_factory.py</code></td>
                         <td style="padding: 6px 8px; border: 1px solid #475569; color: #fbbf24; font-weight: bold;">__task exists</td>
-                        <td style="padding: 6px 8px; border: 1px solid #475569;">Autonomous AI loop + 4 MCP tools (status, history, toggle, run_now)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Autonomous AI loop + 6 MCP tools (status, history, toggle, run_now, cost)</td>
                     </tr>
                     <tr style="background-color: #0f172a;">
                         <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/files/postgresql_tools.py</code></td>

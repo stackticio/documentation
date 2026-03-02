@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stacktic vs AI-Only</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Fira Code', monospace;
+      background: #fff;
+      min-height: 100vh;
+      padding: 32px 24px 48px;
+      color: #1a1a1a;
+    }
+    .wrap { max-width: 1200px; margin: 0 auto; }
+
+    /* ═══════════════════════════════════════════
+       TOP PIPELINE SECTION
+    ═══════════════════════════════════════════ */
+    .pipeline {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 0;
+      margin-bottom: 28px;
+      min-height: 200px;
+    }
+
+    /* ── Left: Governed ── */
+    .pipe-gov {
+      background: #7cc49e;
+      border-radius: 16px 0 0 16px;
+      padding: 20px 24px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .pipe-gov .pipe-top-text {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #1a3a2a;
+      margin-bottom: 8px;
+    }
+    .pipe-gov .gov-label {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #fff;
+      background: rgba(0,0,0,0.15);
+      padding: 4px 14px;
+      border-radius: 4px;
+      margin-bottom: 14px;
+    }
+
+    /* Icon flow row */
+    .icon-flow {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .icon-flow .icon-box {
+      width: 48px; height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.25);
+      flex-shrink: 0;
+    }
+    .icon-flow .icon-box svg { width: 28px; height: 28px; }
+    .icon-flow .icon-box img { width: 36px; height: 36px; object-fit: contain; }
+    .icon-flow .icon-box.highlight-box {
+      background: rgba(255,255,255,0.5);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+    .icon-flow .dot-arrow {
+      color: rgba(0,0,0,0.35);
+      font-size: 16px;
+      letter-spacing: -2px;
+    }
+    .pipe-gov .saved-tag {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      background: rgba(0,0,0,0.2);
+      color: #fff;
+      padding: 3px 8px;
+      border-radius: 3px;
+      letter-spacing: 1px;
+    }
+
+    /* ── Center: Production ── */
+    .pipe-prod {
+      background: linear-gradient(135deg, #b8985a 0%, #8a7040 100%);
+      padding: 20px 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-width: 200px;
+    }
+    .pipe-prod h2 {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+      color: #fff;
+    }
+    .pipe-prod .prod-icons {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .pipe-prod .prod-icons .icon-box {
+      width: 52px; height: 52px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pipe-prod .prod-icons .icon-box svg { width: 32px; height: 32px; }
+    .pipe-prod .prod-icons .dot-arrow { color: rgba(255,255,255,0.4); font-size: 18px; }
+
+    /* ── Right: Ungoverned ── */
+    .pipe-ungov {
+      background: #d96577;
+      border-radius: 0 16px 16px 0;
+      padding: 20px 24px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .pipe-ungov .pipe-top-text {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #3a1520;
+      margin-bottom: 16px;
+    }
+
+    /* ═══════════════════════════════════════════
+       COMPARISON ROWS
+    ═══════════════════════════════════════════ */
+    .rows { display: flex; flex-direction: column; gap: 8px; }
+
+    .comp-row {
+      display: grid;
+      grid-template-columns: 1fr 28px 260px 28px 1fr;
+      gap: 0;
+      align-items: stretch;
+      min-height: 64px;
+    }
+
+    /* Green bar (left) */
+    .bar-left {
+      background: #7cc49e;
+      border-radius: 8px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      font-size: 11.5px;
+      font-weight: 600;
+      line-height: 1.5;
+      color: #0d2818;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    /* Dotted arrow connectors */
+    .arrow-left, .arrow-right {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .arrow-left::before, .arrow-right::before {
+      content: '';
+      width: 100%;
+      border-top: 3px dotted rgba(0,0,0,0.25);
+    }
+    .arrow-left::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      width: 0; height: 0;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+      border-right: 7px solid rgba(0,0,0,0.3);
+    }
+    .arrow-right::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      width: 0; height: 0;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+      border-left: 7px solid rgba(0,0,0,0.3);
+    }
+
+    /* Gold bar (center) */
+    .bar-center {
+      background: #d4a843;
+      border-radius: 8px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #2a1f00;
+    }
+    .bar-center svg.topic-ico {
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+      opacity: 0.7;
+    }
+
+    /* Red bar (right) */
+    .bar-right {
+      background: #d96577;
+      border-radius: 8px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      font-size: 11.5px;
+      font-weight: 600;
+      line-height: 1.5;
+      color: #2a0812;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    /* ═══════════════════════════════════════════
+       SVG ICON DEFINITIONS
+    ═══════════════════════════════════════════ */
+    .ico-dev, .ico-gpt, .ico-claude, .ico-stacktic, .ico-laptop, .ico-github, .ico-k8s, .ico-person { fill: #fff; }
+
+    /* ═══════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════ */
+    @media (max-width: 1100px) {
+      .comp-row {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+      .arrow-left, .arrow-right { display: none; }
+      .bar-left, .bar-center, .bar-right { border-radius: 6px; }
+      .pipeline { grid-template-columns: 1fr; gap: 8px; }
+      .pipe-gov { border-radius: 16px 16px 0 0; }
+      .pipe-ungov { border-radius: 0 0 16px 16px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ═══════════════════════════════════════════════════
+     PIPELINE HEADER — exact match to slide
+═══════════════════════════════════════════════════ -->
+<div class="pipeline">
+
+  <!-- LEFT: Governed -->
+  <div class="pipe-gov">
+    <div class="pipe-top-text">Relationship &rarr; Mapped &rarr; Automated &rarr; Controlled</div>
+
+    <!-- Icon row — vertically centered -->
+    <div style="flex:1; display:flex; align-items:center; gap:8px;">
+      <!-- Governance bracket -->
+      <div class="icon-flow" style="border:2px dotted rgba(0,0,0,0.3); border-radius:10px; padding:12px 14px; position:relative; flex-shrink:0;">
+        <span style="position:absolute; top:-10px; left:16px; background:#7cc49e; padding:0 8px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#1a3a2a;">Governance</span>
+        <span style="position:absolute; top:-10px; right:16px; background:#7cc49e; padding:0 8px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#1a3a2a;">Saved</span>
+
+        <!-- Developer </> -->
+        <div class="icon-box">
+          <svg viewBox="0 0 32 32" fill="none">
+            <circle cx="16" cy="9" r="5" fill="#1a1a1a"/>
+            <path d="M6 28v-3a7 7 0 0 1 7-7h6a7 7 0 0 1 7 7v3" fill="#1a1a1a"/>
+            <text x="16" y="26" text-anchor="middle" font-size="7" fill="#fff" font-family="monospace" font-weight="700">&lt;/&gt;</text>
+          </svg>
+        </div>
+        <span class="dot-arrow">&#183;&#183;&#183;&#183;&#183;&rarr;</span>
+
+        <!-- ChatGPT (OpenAI knot) -->
+        <div class="icon-box">
+          <svg viewBox="0 0 24 24"><path d="M22.28 9.82a5.99 5.99 0 0 0-.52-4.91 6.05 6.05 0 0 0-6.51-2.9A6.07 6.07 0 0 0 4.98 4.18 5.99 5.99 0 0 0 .98 7.08a6.05 6.05 0 0 0 .74 7.1 5.98 5.98 0 0 0 .51 4.91 6.05 6.05 0 0 0 6.52 2.9 5.99 5.99 0 0 0 4.5 2.01 6.06 6.06 0 0 0 5.77-4.2 5.99 5.99 0 0 0 4-2.9 6.06 6.06 0 0 0-.74-7.08zM13.26 22.43a4.48 4.48 0 0 1-2.88-1.04l.14-.08 4.78-2.76a.8.8 0 0 0 .39-.68v-6.74l2.02 1.17a.07.07 0 0 1 .04.05v5.58a4.5 4.5 0 0 1-4.49 4.5zM3.6 18.3a4.47 4.47 0 0 1-.54-3.01l.14.08 4.78 2.76a.77.77 0 0 0 .78 0l5.84-3.37v2.33a.08.08 0 0 1-.03.06l-4.84 2.79a4.5 4.5 0 0 1-6.13-1.64zM2.34 7.9a4.49 4.49 0 0 1 2.37-1.97V11.6a.77.77 0 0 0 .39.68l5.82 3.36-2.02 1.17a.08.08 0 0 1-.07 0L4 14.04A4.5 4.5 0 0 1 2.34 7.9zm16.6 3.86l-5.84-3.39 2.02-1.16a.08.08 0 0 1 .07 0l4.83 2.79a4.49 4.49 0 0 1-.68 8.1V12.44a.79.79 0 0 0-.4-.68zm2.01-3.02l-.14-.09-4.78-2.78a.78.78 0 0 0-.78 0L9.41 9.23V6.9a.07.07 0 0 1 .03-.06l4.83-2.79a4.5 4.5 0 0 1 6.68 4.66zM8.31 12.86l-2.02-1.16a.08.08 0 0 1-.04-.06V6.08a4.5 4.5 0 0 1 7.38-3.46l-.14.08-4.78 2.76a.8.8 0 0 0-.4.68zm1.1-2.37l2.6-1.5 2.61 1.5v3l-2.6 1.5-2.61-1.5z" fill="#1a1a1a"/></svg>
+        </div>
+        <span class="dot-arrow">&#183;&#183;&#183;&#183;&#183;&rarr;</span>
+
+        <!-- Claude (Anthropic starburst) -->
+        <div class="icon-box">
+          <svg viewBox="0 0 24 24" fill="none">
+            <line x1="12" y1="2" x2="12" y2="8" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="12" y1="16" x2="12" y2="22" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="2" y1="12" x2="8" y2="12" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="16" y1="12" x2="22" y2="12" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="4.9" y1="4.9" x2="8.7" y2="8.7" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="15.3" y1="15.3" x2="19.1" y2="19.1" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="4.9" y1="19.1" x2="8.7" y2="15.3" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="15.3" y1="8.7" x2="19.1" y2="4.9" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="dot-arrow">&#183;&#183;&#183;&#183;&#183;&rarr;</span>
+
+        <!-- Stacktic UI (laptop with dashboard) -->
+        <div class="icon-box highlight-box" style="width:72px;">
+          <svg viewBox="0 0 40 28" fill="none">
+            <rect x="4" y="2" width="32" height="20" rx="2" fill="#fff" opacity="0.95"/>
+            <rect x="7" y="5" width="10" height="5" rx="1" fill="#7cc49e"/>
+            <rect x="19" y="5" width="14" height="5" rx="1" fill="#d4a843"/>
+            <rect x="7" y="12" width="26" height="2" rx="1" fill="#ddd"/>
+            <rect x="7" y="16" width="18" height="2" rx="1" fill="#eee"/>
+            <rect x="2" y="23" width="36" height="3" rx="1.5" fill="#333"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Arrow to production -->
+      <span class="dot-arrow" style="font-size:20px; color:rgba(0,0,0,0.4); flex-shrink:0;">&#183;&#183;&#183;&#183;&#183;&rarr;</span>
+    </div>
+  </div>
+
+  <!-- CENTER: Production -->
+  <div class="pipe-prod">
+    <h2>Production</h2>
+    <div class="prod-icons">
+      <!-- GitHub (octocat) -->
+      <div class="icon-box" style="width:60px; height:60px; background:rgba(0,0,0,0.25);">
+        <svg viewBox="0 0 24 24" style="width:36px; height:36px;"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z" fill="#fff"/></svg>
+      </div>
+      <span style="color:rgba(255,255,255,0.4); font-size:18px;">&#183;&#183;&#183;&rarr;&#183;&#183;&#183;</span>
+      <!-- Kubernetes -->
+      <div class="icon-box" style="width:60px; height:60px; background:rgba(255,255,255,0.15);">
+        <svg viewBox="0 0 24 24" style="width:40px; height:40px;"><path d="M12 2l8.5 5v10L12 22l-8.5-5V7L12 2z" fill="#326ce5"/><path d="M12 6v12M7 9l5 3 5-3M7 15l5-3 5 3" stroke="#fff" stroke-width="0.8" opacity="0.6"/><circle cx="12" cy="12" r="2.5" fill="#fff"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Ungoverned — REVERSED arrows (←) -->
+  <div class="pipe-ungov">
+    <div class="pipe-top-text">None Governance Predictable Results</div>
+    <div class="icon-flow" style="justify-content:center; flex:1; align-items:center;">
+
+      <!-- ChatGPT (OpenAI knot logo) -->
+      <div class="icon-box">
+        <svg viewBox="0 0 24 24"><path d="M22.28 9.82a5.99 5.99 0 0 0-.52-4.91 6.05 6.05 0 0 0-6.51-2.9A6.07 6.07 0 0 0 4.98 4.18 5.99 5.99 0 0 0 .98 7.08a6.05 6.05 0 0 0 .74 7.1 5.98 5.98 0 0 0 .51 4.91 6.05 6.05 0 0 0 6.52 2.9 5.99 5.99 0 0 0 4.5 2.01 6.06 6.06 0 0 0 5.77-4.2 5.99 5.99 0 0 0 4-2.9 6.06 6.06 0 0 0-.74-7.08zM13.26 22.43a4.48 4.48 0 0 1-2.88-1.04l.14-.08 4.78-2.76a.8.8 0 0 0 .39-.68v-6.74l2.02 1.17a.07.07 0 0 1 .04.05v5.58a4.5 4.5 0 0 1-4.49 4.5zM3.6 18.3a4.47 4.47 0 0 1-.54-3.01l.14.08 4.78 2.76a.77.77 0 0 0 .78 0l5.84-3.37v2.33a.08.08 0 0 1-.03.06l-4.84 2.79a4.5 4.5 0 0 1-6.13-1.64zM2.34 7.9a4.49 4.49 0 0 1 2.37-1.97V11.6a.77.77 0 0 0 .39.68l5.82 3.36-2.02 1.17a.08.08 0 0 1-.07 0L4 14.04A4.5 4.5 0 0 1 2.34 7.9zm16.6 3.86l-5.84-3.39 2.02-1.16a.08.08 0 0 1 .07 0l4.83 2.79a4.49 4.49 0 0 1-.68 8.1V12.44a.79.79 0 0 0-.4-.68zm2.01-3.02l-.14-.09-4.78-2.78a.78.78 0 0 0-.78 0L9.41 9.23V6.9a.07.07 0 0 1 .03-.06l4.83-2.79a4.5 4.5 0 0 1 6.68 4.66zM8.31 12.86l-2.02-1.16a.08.08 0 0 1-.04-.06V6.08a4.5 4.5 0 0 1 7.38-3.46l-.14.08-4.78 2.76a.8.8 0 0 0-.4.68zm1.1-2.37l2.6-1.5 2.61 1.5v3l-2.6 1.5-2.61-1.5z" fill="#1a1a1a"/></svg>
+      </div>
+
+      <span class="dot-arrow">&larr;&#183;&#183;&#183;&#183;&#183;</span>
+
+      <!-- Claude (Anthropic starburst) -->
+      <div class="icon-box">
+        <svg viewBox="0 0 24 24" fill="none">
+          <line x1="12" y1="2" x2="12" y2="8" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="12" y1="16" x2="12" y2="22" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="2" y1="12" x2="8" y2="12" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="16" y1="12" x2="22" y2="12" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="4.9" y1="4.9" x2="8.7" y2="8.7" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="15.3" y1="15.3" x2="19.1" y2="19.1" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="4.9" y1="19.1" x2="8.7" y2="15.3" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="15.3" y1="8.7" x2="19.1" y2="4.9" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <span class="dot-arrow">&larr;&#183;&#183;&#183;&#183;&#183;</span>
+
+      <!-- Developer </> (no governance, confused) -->
+      <div class="icon-box">
+        <svg viewBox="0 0 32 32" fill="none">
+          <circle cx="16" cy="9" r="5" fill="#1a1a1a"/>
+          <path d="M6 28v-3a7 7 0 0 1 7-7h6a7 7 0 0 1 7 7v3" fill="#1a1a1a"/>
+          <text x="16" y="26" text-anchor="middle" font-size="7" fill="#fff" font-family="monospace" font-weight="700">&lt;/&gt;</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     COMPARISON ROWS: green bar ←···· gold bar ····→ red bar
+═══════════════════════════════════════════════════ -->
+<div class="rows">
+
+  <div class="comp-row">
+    <div class="bar-left">Understand app logic &amp; code/service relationships</div>
+    <div class="arrow-left"></div>
+    <div class="bar-center">
+      <svg class="topic-ico" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#2a1f00" stroke-width="1.5"/><path d="M12 7v5l3 3" stroke="#2a1f00" stroke-width="1.5" stroke-linecap="round"/><circle cx="6" cy="6" r="2" fill="#2a1f00" opacity="0.4"/><circle cx="18" cy="6" r="2" fill="#2a1f00" opacity="0.4"/><circle cx="18" cy="18" r="2" fill="#2a1f00" opacity="0.4"/></svg>
+      Stack 360&deg; Intelligence
+    </div>
+    <div class="arrow-right"></div>
+    <div class="bar-right">AI sees fragments. No holistic view. Misses cross-component impacts</div>
+  </div>
+
+  <div class="comp-row">
+    <div class="bar-left">Save stacks as a version control</div>
+    <div class="arrow-left"></div>
+    <div class="bar-center">
+      <svg class="topic-ico" viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="18" rx="2" stroke="#2a1f00" stroke-width="1.5"/><path d="M8 8h8M8 12h8M8 16h5" stroke="#2a1f00" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Source of Truth
+    </div>
+    <div class="arrow-right"></div>
+    <div class="bar-right">AI reads live state, loses context between sessions</div>
+  </div>
+
+  <div class="comp-row">
+    <div class="bar-left">Always the same code automation, tuned to the highest security best practices</div>
+    <div class="arrow-left"></div>
+    <div class="bar-center">
+      <svg class="topic-ico" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 7v5c0 5.55 3.84 10.74 8 12 4.16-1.26 8-6.45 8-12V7l-8-5z" stroke="#2a1f00" stroke-width="1.5"/><path d="M9 12l2 2 4-4" stroke="#2a1f00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Consistency / Standardization
+    </div>
+    <div class="arrow-right"></div>
+    <div class="bar-right">Ask the same question twice, get two different configuration</div>
+  </div>
+
+  <div class="comp-row">
+    <div class="bar-left">Rollback everything from migrations, stacks, or users actions</div>
+    <div class="arrow-left"></div>
+    <div class="bar-center">
+      <svg class="topic-ico" viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 1 1 3 6.7" stroke="#2a1f00" stroke-width="1.5" stroke-linecap="round"/><path d="M3 17V12h5" stroke="#2a1f00" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 7v5l3 2" stroke="#2a1f00" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Rollback in Time
+    </div>
+    <div class="arrow-right"></div>
+    <div class="bar-right">"Undo what you did" &mdash; partial, risky, no guarantee everything is reverted</div>
+  </div>
+
+  <div class="comp-row">
+    <div class="bar-left">Versioning mechanism based on relationship dependencies and impact</div>
+    <div class="arrow-left"></div>
+    <div class="bar-center">
+      <svg class="topic-ico" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="3" stroke="#2a1f00" stroke-width="1.5"/><circle cx="18" cy="6" r="3" stroke="#2a1f00" stroke-width="1.5"/><circle cx="12" cy="18" r="3" stroke="#2a1f00" stroke-width="1.5"/><path d="M9 7l3 8M15 7l-3 8" stroke="#2a1f00" stroke-width="1.2"/></svg>
+      Versioning in 360&deg;
+    </div>
+    <div class="arrow-right"></div>
+    <div class="bar-right">Doesn't track relationships. Changes one side, forgets the other.</div>
+  </div>
+
+  <div class="comp-row">
+    <div class="bar-left">Zero errors &amp; validation, AI governance, production-tuned</div>
+    <div class="arrow-left"></div>
+    <div class="bar-center">
+      <svg class="topic-ico" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4" stroke="#2a1f00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9" stroke="#2a1f00" stroke-width="1.5"/></svg>
+      Prod-Ready / Trust
+    </div>
+    <div class="arrow-right"></div>
+    <div class="bar-right">AI says "looks good." No structured validation. Deploys and hopes</div>
+  </div>
+
+  <div class="comp-row">
+    <div class="bar-left">Centralized UI app factory for managing versions, users, organizations, security &amp; operations</div>
+    <div class="arrow-left"></div>
+    <div class="bar-center">
+      <svg class="topic-ico" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="#2a1f00" stroke-width="1.5"/><rect x="6" y="6" width="5" height="4" rx="1" fill="#2a1f00" opacity="0.5"/><rect x="13" y="6" width="5" height="4" rx="1" fill="#2a1f00" opacity="0.3"/><rect x="6" y="13" width="12" height="3" rx="1" fill="#2a1f00" opacity="0.4"/><circle cx="8" cy="19" r="1" fill="#2a1f00" opacity="0.3"/><circle cx="12" cy="19" r="1" fill="#2a1f00" opacity="0.3"/></svg>
+      Platform Engineering
+    </div>
+    <div class="arrow-right"></div>
+    <div class="bar-right">"I'm not a platform engineering"</div>
+  </div>
+
+  <div class="comp-row">
+    <div class="bar-left">Coded migrations, upgrades, security &amp; operations for prod/stage environments</div>
+    <div class="arrow-left"></div>
+    <div class="bar-center">
+      <svg class="topic-ico" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="#2a1f00" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      Operational Ready
+    </div>
+    <div class="arrow-right"></div>
+    <div class="bar-right">Each operation is a new conversation. AI rebuilds from scratch every time</div>
+  </div>
+
+  <div class="comp-row">
+    <div class="bar-left">Stack A &rarr; Stack B relationship automation &amp; control</div>
+    <div class="arrow-left"></div>
+    <div class="bar-center">
+      <svg class="topic-ico" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="7" height="7" rx="1.5" stroke="#2a1f00" stroke-width="1.5"/><rect x="15" y="13" width="7" height="7" rx="1.5" stroke="#2a1f00" stroke-width="1.5"/><path d="M9 7.5h3a3 3 0 0 1 3 3v6" stroke="#2a1f00" stroke-width="1.5"/><path d="M13 14l2 2.5L13 19" stroke="#2a1f00" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Cross-Stack Operations
+    </div>
+    <div class="arrow-right"></div>
+    <div class="bar-right">No federation, no shared services, no unified view</div>
+  </div>
+
+</div>
+
+</div>
+</body>
+</html>

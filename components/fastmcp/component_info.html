@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FastMCP Component</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 900px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #1e293b; font-size: 24px; margin: 0 0 24px 0; font-weight: 700; border-bottom: 3px solid #8b5cf6; padding-bottom: 12px;">FastMCP</h1>
+        <p style="color: #64748b; margin-bottom: 24px;">Link-driven MCP server for Kubernetes. Draw a link in Stacktic &rarr; tools auto-generate &rarr; <code>kubectl apply -k</code> &rarr; AI has database/storage/messaging tools. No code, no Docker rebuild. Supports autonomous AI agents via Dark Factory.</p>
+
+        <!-- Architecture -->
+        <div style="background-color: #1e293b; color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">Architecture</h2>
+            <div style="font-family: monospace; font-size: 13px; line-height: 1.8;">
+                <span style="color: #a78bfa;">FastMCP Server</span> - MCP over Streamable HTTP (JSON-RPC 2.0). Auto-discovers <code>register_*_tools(mcp)</code> from mounted tool files.<br>
+                <span style="color: #22d3ee;">Tool Files</span> - Python modules mounted via ConfigMap. Each link adds/removes a tool file.<br>
+                <span style="color: #4ade80;">cloud.env</span> - Connection env vars per link (MCP_POSTGRES_*, MCP_KAFKA_*, etc.). SOPS encrypted.<br>
+                <span style="color: #fbbf24;">Dark Factory</span> - Autonomous AI agent loop. Runs tasks on schedule using Claude API + MCP tools.<br>
+                <span style="color: #f97316;">OIDC / API Key</span> - Keycloak OAuth 2.0 + PKCE or APISIX API key authentication.
+            </div>
+        </div>
+
+        <!-- Attributes -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Component Attributes</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Description</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">namespace</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>mcp</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Kubernetes namespace for all MCP resources</td>
+                    </tr>
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">port</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>8080</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Container port for the MCP server</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>transport</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>streamable-http</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MCP transport protocol</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>server_name</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>stacktic-mcp</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MCP server name reported to clients</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>api_key</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>my-secret-key</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">API key for APISIX gateway authentication</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>kubectl_access</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>Readonly</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>Disabled</code> (default) / <code>Readonly</code> / <code>ReadWrite</code>. Enables kubectl + OPA compliance tools.</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>kubectl_all_namespaces</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>false</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">When true, kubectl tools can access all namespaces</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>knowledge_repo_url</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>https://github.com/org/mcp-ai-knowledge</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Git repo with curated Stacktic knowledge (knowledge_base.json). Enables knowledge MCP tools.</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>knowledge_repo_branch</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>main</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Branch for knowledge repo</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Dark Factory Notification Attributes -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Dark Factory Notification Attributes (Component-Level)</h3>
+            <p style="color: #94a3b8; font-size: 11px; margin-bottom: 12px;">These attributes are only needed if you create agent/task sub-components and want email notifications.</p>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Description</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>email_provider</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>http</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>smtp</code> or <code>http</code> (for Resend, Mailgun, SendGrid, etc.)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>email_from</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>ops@company.com</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Sender email address</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>smtp_host</code> / <code>smtp_port</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>smtp.gmail.com</code> / <code>587</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">SMTP server (when email_provider=smtp)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>smtp_user</code> / <code>smtp_password</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>user</code> / <code>pass</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">SMTP credentials (when email_provider=smtp)</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>email_http_api_key</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>re_xxx</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">API key for HTTP email provider (Resend, Mailgun)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>email_http_url</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>https://api.resend.com/emails</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">HTTP email API endpoint (default: Resend)</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>notify_webhook</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>https://hooks.slack.com/...</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Default webhook URL for task notifications (Slack, Teams, PagerDuty)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sub-Components -->
+        <div style="background-color: #f3e8ff; border: 2px solid #8b5cf6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #5b21b6; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Sub-Components (Dark Factory)</h3>
+            <p style="color: #6b21a8; font-size: 12px; margin-bottom: 16px;">The Dark Factory turns FastMCP from a passive tool server into an autonomous agent platform. Create <strong>agent</strong> and <strong>ai_task</strong> sub-components to define autonomous AI agents that run on a schedule.</p>
+
+            <!-- agent -->
+            <div style="background-color: #e9d5ff; padding: 16px; border-radius: 6px; margin-bottom: 12px;">
+                <h4 style="color: #5b21b6; margin: 0 0 8px 0; font-size: 14px;">agent &mdash; AI Model Configuration</h4>
+                <p style="color: #6b21a8; font-size: 12px; margin-bottom: 8px;">Each agent defines which AI model to use, API credentials, and iteration limits. Multiple tasks can share one agent. Tasks link to agents via <code>ai_task-agent</code> sub-component link.</p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #c4b5fd;">
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Default</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e1b4b;">
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>ai_api_key</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">&mdash;</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">API key for the AI provider (Anthropic, OpenAI-compatible)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>ai_model</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>claude-haiku-4-5-20251001</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Model ID. Haiku recommended for cost efficiency. Sonnet for complex reasoning.</td>
+                        </tr>
+                        <tr style="background-color: #faf5ff;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>agent_ai_provider</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>anthropic</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>anthropic</code> or <code>openai-compatible</code> (for vLLM, Ollama)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>ai_base_url</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">&mdash;</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Custom API base URL for OpenAI-compatible providers. Leave empty for Anthropic.</td>
+                        </tr>
+                        <tr style="background-color: #faf5ff;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>ai_max_iterations</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>10</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Max tool-use loop iterations per task run. Higher = more thorough but more tokens.</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>agent_enabled</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>true</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><strong>Enable/disable the agent.</strong> When <code>false</code>, all tasks linked to this agent stop. Survives pod restarts.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ai_task -->
+            <div style="background-color: #e9d5ff; padding: 16px; border-radius: 6px;">
+                <h4 style="color: #5b21b6; margin: 0 0 8px 0; font-size: 14px;">ai_task &mdash; Autonomous Task Definition</h4>
+                <p style="color: #6b21a8; font-size: 12px; margin-bottom: 8px;">Each task defines what the agent should do (natural language), how often, and in what mode. Link a task to an agent via <code>ai_task-agent</code>.</p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #c4b5fd;">
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Default</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e1b4b;">
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>task_description</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">&mdash;</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Natural language instruction. Write it like you'd instruct a human operator.</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>schedule_minutes</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>30</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">How often the task runs (minutes)</td>
+                        </tr>
+                        <tr style="background-color: #faf5ff;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>agent_mode</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>monitor</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>monitor</code> = read-only tools (safe). <code>act</code> = read + write tools (INSERT, DELETE, publish).</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>tools</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>all</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Comma-separated tool keywords (e.g., <code>prometheus,kubectl</code>). <code>all</code> = auto-select from description.</td>
+                        </tr>
+                        <tr style="background-color: #faf5ff;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>notify_webhook</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">&mdash;</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Webhook URL for task results (Slack, Teams, PagerDuty)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>notify_email</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">&mdash;</td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Email address for task result reports</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Dark Factory How It Works -->
+        <div style="background-color: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #92400e; font-size: 16px; margin: 0 0 4px 0; font-weight: 600;">Dark Factory &mdash; How It Works</h3>
+            <p style="color: #92400e; font-size: 12px; margin: 0 0 16px 0;">Autonomous AI loop inside the FastMCP pod. Zero human intervention.</p>
+
+            <div style="background-color: #fde68a; padding: 16px; border-radius: 6px; margin-bottom: 12px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #fbbf24;">
+                            <th style="padding: 6px; border: 1px solid #f59e0b; text-align: left; color: #78350f;">Step</th>
+                            <th style="padding: 6px; border: 1px solid #f59e0b; text-align: left; color: #78350f;">What Happens</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #78350f;">
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b; font-weight: bold;">1. Schedule</td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">Background asyncio loop checks if <code>schedule_minutes</code> elapsed since last run</td>
+                        </tr>
+                        <tr style="background-color: #fef3c7;">
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b; font-weight: bold;">2. Tool Selection</td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">Local keyword matching selects only relevant MCP tools from task description. <strong>Zero API calls.</strong> ~90% token savings vs sending all 150+ tools.</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b; font-weight: bold;">3. Knowledge</td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">Injects relevant Stacktic knowledge (critical attributes, attention points) into system prompt from knowledge_base.json</td>
+                        </tr>
+                        <tr style="background-color: #fef3c7;">
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b; font-weight: bold;">4. AI Loop</td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">Calls Claude API with tools. Claude reasons &rarr; calls tools &rarr; gets results &rarr; reasons again. Repeats until done or max iterations.</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b; font-weight: bold;">5. Notify</td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">Sends results to webhook (JSON) and/or email (styled HTML with status badge, metadata, full output)</td>
+                        </tr>
+                        <tr style="background-color: #fef3c7;">
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b; font-weight: bold;">6. History</td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">Stores last 50 results in memory. Query via <code>dark_factory_status</code> and <code>dark_factory_history</code> MCP tools.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="background-color: #fde68a; padding: 16px; border-radius: 6px;">
+                <h4 style="color: #78350f; margin: 0 0 8px 0; font-size: 13px;">Enable / Disable</h4>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #fbbf24;">
+                            <th style="padding: 6px; border: 1px solid #f59e0b; text-align: left; color: #78350f;">Method</th>
+                            <th style="padding: 6px; border: 1px solid #f59e0b; text-align: left; color: #78350f;">How</th>
+                            <th style="padding: 6px; border: 1px solid #f59e0b; text-align: left; color: #78350f;">Persists?</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #78350f;">
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b; font-weight: bold;">Permanent</td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">Set <code>agent_enabled=false</code> on agent sub-component in Stacktic UI. Regenerate + apply.</td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">Yes (encoded in ENV)</td>
+                        </tr>
+                        <tr style="background-color: #fef3c7;">
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b; font-weight: bold;">Runtime</td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">Call <code>dark_factory_toggle_agent(name, false)</code> MCP tool from Claude Desktop or any MCP client.</td>
+                            <td style="padding: 4px 6px; border: 1px solid #f59e0b;">No (resets on pod restart)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Dark Factory MCP Tools -->
+        <div style="background-color: #dbeafe; border: 2px solid #3b82f6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #1e40af; font-size: 16px; margin: 0 0 4px 0; font-weight: 600;">Dark Factory MCP Tools</h3>
+            <p style="color: #1e40af; font-size: 12px; margin: 0 0 16px 0;">Registered by <code>dark_factory.py</code> when agent/task sub-components exist. Interact with the autonomous loop from any MCP client.</p>
+
+            <div style="background-color: #bfdbfe; padding: 16px; border-radius: 6px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #60a5fa;">
+                            <th style="padding: 6px; border: 1px solid #3b82f6; text-align: left; color: #1e3a8a;">Tool</th>
+                            <th style="padding: 6px; border: 1px solid #3b82f6; text-align: left; color: #1e3a8a;">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e3a8a;">
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #93c5fd; font-weight: bold;"><code>dark_factory_status</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #93c5fd;">Get status of all agents and tasks &mdash; enabled state, last run time, last result</td>
+                        </tr>
+                        <tr style="background-color: #dbeafe;">
+                            <td style="padding: 4px 6px; border: 1px solid #93c5fd; font-weight: bold;"><code>dark_factory_history</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #93c5fd;">Get execution history for a specific task (default: last 10 runs)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #93c5fd; font-weight: bold;"><code>dark_factory_toggle_agent</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #93c5fd;">Enable or disable an agent at runtime without redeployment</td>
+                        </tr>
+                        <tr style="background-color: #dbeafe;">
+                            <td style="padding: 4px 6px; border: 1px solid #93c5fd; font-weight: bold;"><code>dark_factory_run_now</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #93c5fd;">Trigger immediate task execution, skipping the schedule timer</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Links Overview -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Links (19 Types)</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Link Type</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Direction</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">What Gets Automated</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>fastmcp-database</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MCP &rarr; PostgreSQL</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">postgresql_tools.py &mdash; pg_query, pg_list_tables, pg_execute (write)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>fastmcp-db</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MCP &rarr; CNPG</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">cnpg_tools.py &mdash; cnpg_query, cnpg_list_tables, cnpg_execute (write)</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>fastmcp-mongo_db</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MCP &rarr; MongoDB</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">mongodb_tools.py &mdash; mongo_find, mongo_aggregate, mongo_insert (write)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>fastmcp-clickhouse_db</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MCP &rarr; ClickHouse</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">clickhouse_tools.py &mdash; ch_query, ch_list_tables, ch_execute (write)</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>fastmcp-swbucket</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MCP &rarr; SeaweedFS</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">s3_tools.py &mdash; s3_list_objects, s3_read_text, s3_upload_text (write)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>fastmcp-bridge</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MCP &rarr; Kafka</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">kafka_tools.py &mdash; kafka_list_topics, kafka_consume, kafka_produce (write)</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>fastmcp-rabbitmq</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MCP &rarr; RabbitMQ</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">rabbitmq_tools.py &mdash; rmq_list_queues, rmq_peek_messages, rmq_publish (write)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>fastmcp-prometheus</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MCP &rarr; Prometheus</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">prometheus_tools.py &mdash; prom_query, prom_alerts, prom_targets (read-only)</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>fastmcp-loki</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MCP &rarr; Loki</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">loki_tools.py &mdash; loki_query, loki_query_range, loki_labels (read-only)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>fastmcp-grafana</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MCP &rarr; Grafana</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">grafana_tools.py &mdash; grafana_list_dashboards, grafana_query_datasource</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>fastmcp-valkey</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MCP &rarr; Valkey</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">valkey_tools.py &mdash; valkey_get, valkey_keys, valkey_set (write)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>fastmcp-argo_cd</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MCP &rarr; ArgoCD</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">argocd_tools.py &mdash; argocd_list_apps, argocd_sync (write)</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>fastmcp-fastapi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MCP &rarr; FastAPI</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">fastapi_tools.py &mdash; fastapi_openapi, fastapi_get, fastapi_call (write)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>fastmcp-external_source_code</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MCP &rarr; Source Code</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">source_code_tools.py &mdash; clone_repo, read_file, search_code</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>fastmcp-stack_agent</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MCP &rarr; Stack Agent</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">topology.py &mdash; query_topology, list_components, run_test</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>fastmcp-otel</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MCP &rarr; OTEL</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Pod annotation for auto-instrumentation (no tool file)</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>fastmcp-client</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MCP &rarr; Keycloak</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">OIDC auth (OAuth 2.0 + PKCE) via Keycloak operator client</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>prometheus-fastmcp</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Prometheus &rarr; MCP</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">service-monitor.yaml for Prometheus scraping</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>apisix-fastmcp</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">APISIX &rarr; MCP</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Gateway route with API key or OIDC auth</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Tool Selection Keywords -->
+        <div style="background-color: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #166534; font-size: 16px; margin: 0 0 4px 0; font-weight: 600;">Dark Factory Tool Selection Keywords</h3>
+            <p style="color: #166534; font-size: 12px; margin: 0 0 16px 0;">The Dark Factory auto-selects MCP tools based on keywords in the task description. Use the <code>tools</code> attribute to override. These keywords map to actual tool name prefixes.</p>
+
+            <div style="background-color: #bbf7d0; padding: 16px; border-radius: 6px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #86efac;">
+                            <th style="padding: 6px; border: 1px solid #4ade80; text-align: left; color: #166534;">Keyword(s)</th>
+                            <th style="padding: 6px; border: 1px solid #4ade80; text-align: left; color: #166534;">Tool Prefix</th>
+                            <th style="padding: 6px; border: 1px solid #4ade80; text-align: left; color: #166534;">Example Tools</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #166534;">
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">prometheus, metric, alert, cpu, memory</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;"><code>prom_*</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">prom_query, prom_alerts, prom_targets</td>
+                        </tr>
+                        <tr style="background-color: #ecfdf5;">
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">postgresql, postgres, sql, database</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;"><code>pg_*</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">pg_query, pg_list_tables, pg_execute</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">mongodb, mongo, collection</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;"><code>mongo_*</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">mongo_find, mongo_aggregate, mongo_insert</td>
+                        </tr>
+                        <tr style="background-color: #ecfdf5;">
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">clickhouse, olap, analytics</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;"><code>ch_*</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">ch_query, ch_list_tables, ch_execute</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">kafka, topic, consumer, producer</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;"><code>kafka_*</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">kafka_list_topics, kafka_consume, kafka_produce</td>
+                        </tr>
+                        <tr style="background-color: #ecfdf5;">
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">rabbitmq, rabbit, amqp, queue</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;"><code>rmq_*</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">rmq_list_queues, rmq_peek_messages, rmq_publish</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">loki, log, logs, logging</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;"><code>loki_*</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">loki_query, loki_query_range, loki_labels</td>
+                        </tr>
+                        <tr style="background-color: #ecfdf5;">
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">pod, deploy, namespace, kubectl</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;"><code>kubectl_*</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">kubectl_get, kubectl_describe, kubectl_logs</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">topology, stack_agent, test, validate</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">(exact names)</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">query_topology, list_components, run_test</td>
+                        </tr>
+                        <tr style="background-color: #ecfdf5;">
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">valkey, redis, cache</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;"><code>valkey_*</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">valkey_get, valkey_keys, valkey_info</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">s3, bucket, minio, seaweedfs</td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;"><code>s3_*</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #86efac;">s3_list_objects, s3_read_text, s3_upload_text</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Generated Files -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Generated Files</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">File</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Condition</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Contains</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/fastmcp.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Deployment + Service</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/kustomization.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Conditional configMapGenerator &mdash; tool files per link</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/secret/cloud.env</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Always (SOPS)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">MCP_* connection env vars + DARK_FACTORY_* (if agents/tasks)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/files/health.py</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">ping + server_info tools</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/files/template_explorer.py</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Stack repo clone + browse tools</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/files/stacktic_knowledge.py</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Knowledge base tools (from mcp-ai-knowledge repo)</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/files/dark_factory.py</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; color: #fbbf24; font-weight: bold;">__task exists</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Autonomous AI loop + 4 MCP tools (status, history, toggle, run_now)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/files/postgresql_tools.py</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; color: #4ade80;">fastmcp-database link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">pg_* tools</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/files/cnpg_tools.py</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; color: #4ade80;">fastmcp-db link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">cnpg_* tools</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/files/mongodb_tools.py</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; color: #4ade80;">fastmcp-mongo_db link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">mongo_* tools</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/files/clickhouse_tools.py</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; color: #4ade80;">fastmcp-clickhouse_db link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">ch_* tools</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/files/s3_tools.py</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; color: #4ade80;">fastmcp-swbucket link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">s3_* tools</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/files/kafka_tools.py</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; color: #4ade80;">fastmcp-bridge link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">kafka_* tools</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/files/rabbitmq_tools.py</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; color: #4ade80;">fastmcp-rabbitmq link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">rmq_* tools</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/files/prometheus_tools.py</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; color: #4ade80;">fastmcp-prometheus link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">prom_* tools</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/files/loki_tools.py</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; color: #4ade80;">fastmcp-loki link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">loki_* tools</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/files/topology.py</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; color: #4ade80;">fastmcp-stack_agent link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">query_topology, list_components, run_test</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/files/source_code_tools.py</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; color: #4ade80;">fastmcp-external_source_code link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">clone_repo, read_file, search_code</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/files/kubectl_tools.py</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; color: #4ade80;">kubectl_access != Disabled</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">kubectl_get, kubectl_describe, kubectl_logs + OPA compliance</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/service-monitor.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; color: #4ade80;">prometheus-fastmcp link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">ServiceMonitor for Prometheus scraping</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Internal Endpoint -->
+        <div style="background-color: #f0f9ff; border: 2px solid #0ea5e9; border-radius: 8px; padding: 20px;">
+            <h3 style="color: #0369a1; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Endpoints</h3>
+            <div style="font-family: monospace; background-color: #e0f2fe; padding: 12px; border-radius: 6px; font-size: 13px; line-height: 1.8;">
+                <strong>Internal MCP:</strong> http://{component-name}.{namespace}.svc.cluster.local/mcp<br>
+                <strong>Health Check:</strong> http://{component-name}.{namespace}.svc.cluster.local/health<br>
+                <strong>External (APISIX):</strong> https://{subdomain}.{domain}/mcp (API key or OIDC)
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

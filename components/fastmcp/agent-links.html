@@ -100,7 +100,7 @@
         <!-- Task Sub-Component -->
         <div style="background: linear-gradient(135deg, #4c1d95 0%, #5b21b6 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #8b5cf6;">
             <h2 style="color: #e9d5ff; margin: 0 0 20px 0; font-size: 18px;">ai_task Sub-Component</h2>
-            <p style="color: #c4b5fd; font-size: 12px; margin-bottom: 16px;">Each task defines <em>what</em> the agent should do. Link to an agent via <code style="color: #fbbf24;">ai_task-agent</code>. Multiple tasks can share one agent.</p>
+            <p style="color: #c4b5fd; font-size: 12px; margin-bottom: 16px;">Each task defines <em>what</em> the agent should do. Link to an agent via <code style="color: #fbbf24;">ai_task-agent</code>. Chain tasks via <code style="color: #fbbf24;">ai_task-ai_task</code>.</p>
 
             <table style="width: 100%; border-collapse: separate; border-spacing: 0; background-color: #0f172a; border-radius: 12px; overflow: hidden;">
                 <thead>
@@ -117,14 +117,19 @@
                             <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 6px; border-radius: 4px; font-size: 10px; margin-left: 4px;">REQUIRED</span>
                         </td>
                         <td style="padding: 12px 16px; color: #94a3b8; font-size: 12px; border-bottom: 1px solid #334155;">&mdash;</td>
-                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Natural language instruction. Write it like you'd tell a human operator: <em>"Query Prometheus for pods with high CPU usage, check their logs in Loki, and summarize any errors"</em></td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Natural language instruction. Write it like you'd tell a human operator.</td>
                     </tr>
                     <tr style="background-color: #1e293b;">
                         <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
-                            <code style="background-color: #5b21b6; color: #e9d5ff; padding: 4px 10px; border-radius: 6px; font-size: 12px;">schedule_minutes</code>
+                            <code style="background-color: #5b21b6; color: #e9d5ff; padding: 4px 10px; border-radius: 6px; font-size: 12px;">cron_expression</code>
                         </td>
-                        <td style="padding: 12px 16px; color: #4ade80; font-size: 12px; border-bottom: 1px solid #334155;"><code>30</code></td>
-                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">How often the task runs (minutes). Use <code>5</code> for urgent monitoring, <code>60</code> for daily summaries.</td>
+                        <td style="padding: 12px 16px; color: #94a3b8; font-size: 12px; border-bottom: 1px solid #334155;">(empty)</td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">
+                            Standard 5-field cron. Empty = <strong>run once on pod start</strong>.<br>
+                            <code style="color: #4ade80;">*/30 * * * *</code> = every 30 min &nbsp;
+                            <code style="color: #4ade80;">0 9 * * 1-5</code> = weekdays 9am &nbsp;
+                            <code style="color: #4ade80;">0 0 * * 0</code> = Sunday midnight
+                        </td>
                     </tr>
                     <tr style="background-color: #0f172a;">
                         <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
@@ -138,19 +143,26 @@
                     </tr>
                     <tr style="background-color: #1e293b;">
                         <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
-                            <code style="background-color: #5b21b6; color: #e9d5ff; padding: 4px 10px; border-radius: 6px; font-size: 12px;">tools</code>
+                            <code style="background-color: #5b21b6; color: #e9d5ff; padding: 4px 10px; border-radius: 6px; font-size: 12px;">retry_count</code>
                         </td>
-                        <td style="padding: 12px 16px; color: #4ade80; font-size: 12px; border-bottom: 1px solid #334155;"><code>all</code></td>
-                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Comma-separated keywords to limit tools: <code>prometheus,kubectl</code>. Default <code>all</code> = auto-select from description. Reduces token cost by ~90%.</td>
+                        <td style="padding: 12px 16px; color: #4ade80; font-size: 12px; border-bottom: 1px solid #334155;"><code>0</code></td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">How many retries on failure. <code>0</code> = no retry, fail and stop.</td>
                     </tr>
                     <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
+                            <code style="background-color: #5b21b6; color: #e9d5ff; padding: 4px 10px; border-radius: 6px; font-size: 12px;">retry_delay_seconds</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #4ade80; font-size: 12px; border-bottom: 1px solid #334155;"><code>60</code></td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Seconds to wait between retries.</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
                         <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
                             <code style="background-color: #5b21b6; color: #e9d5ff; padding: 4px 10px; border-radius: 6px; font-size: 12px;">notify_webhook</code>
                         </td>
                         <td style="padding: 12px 16px; color: #94a3b8; font-size: 12px; border-bottom: 1px solid #334155;">(empty)</td>
                         <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Webhook URL for JSON notifications. Works with Slack, Teams, PagerDuty, or any generic webhook.</td>
                     </tr>
-                    <tr style="background-color: #1e293b;">
+                    <tr style="background-color: #0f172a;">
                         <td style="padding: 12px 16px;">
                             <code style="background-color: #5b21b6; color: #e9d5ff; padding: 4px 10px; border-radius: 6px; font-size: 12px;">notify_email</code>
                         </td>
@@ -161,34 +173,153 @@
             </table>
         </div>
 
+        <!-- Cron Examples -->
+        <div style="background: linear-gradient(135deg, #065f46 0%, #047857 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #10b981;">
+            <h2 style="color: #d1fae5; margin: 0 0 16px 0; font-size: 18px;">Cron Schedule Examples</h2>
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0; background-color: #0f172a; border-radius: 12px; overflow: hidden;">
+                <thead>
+                    <tr>
+                        <th style="padding: 12px 16px; background-color: #1e293b; color: #6ee7b7; text-align: left; font-size: 12px; border-bottom: 2px solid #10b981;">cron_expression</th>
+                        <th style="padding: 12px 16px; background-color: #1e293b; color: #6ee7b7; text-align: left; font-size: 12px; border-bottom: 2px solid #10b981;">When it runs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 10px 16px; border-bottom: 1px solid #334155;"><code style="color: #4ade80; font-size: 13px;">*/5 * * * *</code></td>
+                        <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Every 5 minutes (urgent monitoring)</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 10px 16px; border-bottom: 1px solid #334155;"><code style="color: #4ade80; font-size: 13px;">*/30 * * * *</code></td>
+                        <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Every 30 minutes (standard monitoring)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 10px 16px; border-bottom: 1px solid #334155;"><code style="color: #4ade80; font-size: 13px;">0 9 * * 1-5</code></td>
+                        <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Weekdays at 9am UTC (daily report)</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 10px 16px; border-bottom: 1px solid #334155;"><code style="color: #4ade80; font-size: 13px;">0 0 * * 0</code></td>
+                        <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Sunday midnight (weekly review)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 10px 16px; border-bottom: 1px solid #334155;"><code style="color: #4ade80; font-size: 13px;">0 0 1 * *</code></td>
+                        <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">First day of month (monthly compliance)</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 10px 16px;"><code style="color: #94a3b8; font-size: 13px;">(empty)</code></td>
+                        <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px;">Run once on pod start, then never again</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sub-Component Links -->
+        <div style="background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #3b82f6;">
+            <h2 style="color: #bfdbfe; margin: 0 0 16px 0; font-size: 18px;">Sub-Component Links</h2>
+
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0; background-color: #0f172a; border-radius: 12px; overflow: hidden; margin-bottom: 16px;">
+                <thead>
+                    <tr>
+                        <th style="padding: 12px 16px; background-color: #1e293b; color: #60a5fa; text-align: left; font-size: 12px; border-bottom: 2px solid #3b82f6;">Link Type</th>
+                        <th style="padding: 12px 16px; background-color: #1e293b; color: #60a5fa; text-align: left; font-size: 12px; border-bottom: 2px solid #3b82f6;">From &rarr; To</th>
+                        <th style="padding: 12px 16px; background-color: #1e293b; color: #60a5fa; text-align: left; font-size: 12px; border-bottom: 2px solid #3b82f6;">Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 10px 16px; border-bottom: 1px solid #334155;"><code style="color: #fbbf24; font-weight: bold;">ai_task-agent</code></td>
+                        <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">ai_task &rarr; agent</td>
+                        <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;"><strong>Which AI runs the task.</strong> Each task can target a different agent (cheap Haiku for data gathering, smart Sonnet for analysis).</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 10px 16px;"><code style="color: #f97316; font-weight: bold;">ai_task-ai_task</code></td>
+                        <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px;">ai_task &rarr; ai_task</td>
+                        <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px;"><strong>Task chaining.</strong> On success, triggers next task with previous output as context. Only first task needs cron.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="background-color: #172554; padding: 12px 16px; border-radius: 8px; border-left: 3px solid #fbbf24;">
+                <p style="color: #fde68a; font-size: 12px; margin: 0;"><strong>Agent fallback:</strong> If a task has no <code>ai_task-agent</code> link, it automatically uses the <strong>first available agent</strong>. In single-agent setups, you don't need to link every task — the fallback handles it.</p>
+            </div>
+        </div>
+
+        <!-- Task Chaining -->
+        <div style="background: linear-gradient(135deg, #7c2d12 0%, #9a3412 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #f97316;">
+            <h2 style="color: #fed7aa; margin: 0 0 12px 0; font-size: 18px;">Task Chaining</h2>
+            <p style="color: #fdba74; font-size: 12px; margin-bottom: 16px;">Link tasks via <code style="color: #fbbf24;">ai_task-ai_task</code> to create pipelines. On success, the next task runs automatically with the previous result as context.</p>
+
+            <div style="background-color: #0f172a; padding: 20px; border-radius: 12px; margin-bottom: 12px;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">
+                    <div style="background-color: #166534; padding: 10px 16px; border-radius: 8px; text-align: center;">
+                        <div style="color: #4ade80; font-weight: bold; font-size: 13px;">health-check</div>
+                        <div style="color: #86efac; font-size: 10px;">cron: */15 * * * *</div>
+                        <div style="color: #6ee7b7; font-size: 9px;">agent: haiku</div>
+                    </div>
+                    <div style="color: #f97316; font-size: 20px; font-weight: bold;">&rarr;</div>
+                    <div style="background-color: #1e3a8a; padding: 10px 16px; border-radius: 8px; text-align: center;">
+                        <div style="color: #93c5fd; font-weight: bold; font-size: 13px;">diagnose-report</div>
+                        <div style="color: #bfdbfe; font-size: 10px;">chain (no cron)</div>
+                        <div style="color: #93c5fd; font-size: 9px;">agent: sonnet</div>
+                    </div>
+                    <div style="color: #f97316; font-size: 20px; font-weight: bold;">&rarr;</div>
+                    <div style="background-color: #7f1d1d; padding: 10px 16px; border-radius: 8px; text-align: center;">
+                        <div style="color: #fca5a5; font-weight: bold; font-size: 13px;">remediate</div>
+                        <div style="color: #fecaca; font-size: 10px;">chain, mode: act</div>
+                        <div style="color: #fca5a5; font-size: 9px;">agent: sonnet</div>
+                    </div>
+                </div>
+                <p style="color: #94a3b8; font-size: 11px; text-align: center; margin: 12px 0 0 0;">Only the first task needs a cron. Each task in the chain can use a different agent (cost optimization).</p>
+            </div>
+
+            <div style="background-color: #431407; padding: 12px 16px; border-radius: 8px;">
+                <p style="color: #fdba74; font-size: 11px; margin: 0 0 6px 0;"><strong>Chain rules:</strong></p>
+                <ul style="color: #fed7aa; font-size: 11px; margin: 0; padding-left: 16px; line-height: 1.8;">
+                    <li>Only the first task needs <code style="color: #fbbf24;">cron_expression</code> &mdash; chained tasks trigger automatically on success</li>
+                    <li>Each task can use a <strong>different agent</strong> (cheap for data, smart for analysis)</li>
+                    <li>Chain stops if a task fails (unless <code style="color: #fbbf24;">retry_count &gt; 0</code>)</li>
+                    <li>Chained tasks receive the previous task's full output as context</li>
+                </ul>
+            </div>
+        </div>
+
         <!-- Example Task Descriptions -->
         <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #475569;">
-            <h2 style="color: #22d3ee; margin: 0 0 16px 0; font-size: 18px;">Example Task Descriptions</h2>
+            <h2 style="color: #22d3ee; margin: 0 0 16px 0; font-size: 18px;">Examples</h2>
 
             <div style="background-color: #0f172a; padding: 16px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #334155;">
                 <h3 style="color: #4ade80; margin: 0 0 6px 0; font-size: 13px;">Prometheus + Loki Monitoring</h3>
-                <p style="color: #e2e8f0; font-size: 12px; margin: 0; font-style: italic;">"Query Prometheus for pods with CPU usage above 80% or memory above 90%. For any flagged pods, query Loki for recent error logs. Summarize findings with pod names, namespaces, resource usage, and any error patterns."</p>
+                <p style="color: #e2e8f0; font-size: 12px; margin: 0; font-style: italic;">"Query Prometheus for pods with CPU &gt; 80% or memory &gt; 90%. Check Loki for error logs. Summarize findings."</p>
                 <div style="margin-top: 8px;">
                     <span style="background-color: #166534; color: #4ade80; padding: 2px 8px; border-radius: 4px; font-size: 10px;">mode: monitor</span>
-                    <span style="background-color: #1e3a8a; color: #60a5fa; padding: 2px 8px; border-radius: 4px; font-size: 10px; margin-left: 4px;">tools: auto (prometheus, loki, kubectl)</span>
+                    <span style="background-color: #065f46; color: #6ee7b7; padding: 2px 8px; border-radius: 4px; font-size: 10px; margin-left: 4px;">cron: */30 * * * *</span>
                 </div>
             </div>
 
             <div style="background-color: #0f172a; padding: 16px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #334155;">
-                <h3 style="color: #4ade80; margin: 0 0 6px 0; font-size: 13px;">Stack Validation</h3>
-                <p style="color: #e2e8f0; font-size: 12px; margin: 0; font-style: italic;">"Run all predefined stack-agent validation tests. Report any failures with the test name, component, and error details."</p>
+                <h3 style="color: #4ade80; margin: 0 0 6px 0; font-size: 13px;">Weekly Stack Validation</h3>
+                <p style="color: #e2e8f0; font-size: 12px; margin: 0; font-style: italic;">"Run all stack-agent validation tests. Report failures with test name, component, and error details."</p>
                 <div style="margin-top: 8px;">
                     <span style="background-color: #166534; color: #4ade80; padding: 2px 8px; border-radius: 4px; font-size: 10px;">mode: monitor</span>
-                    <span style="background-color: #1e3a8a; color: #60a5fa; padding: 2px 8px; border-radius: 4px; font-size: 10px; margin-left: 4px;">tools: auto (topology, kubectl)</span>
+                    <span style="background-color: #065f46; color: #6ee7b7; padding: 2px 8px; border-radius: 4px; font-size: 10px; margin-left: 4px;">cron: 0 9 * * 1</span>
+                    <span style="background-color: #78350f; color: #fbbf24; padding: 2px 8px; border-radius: 4px; font-size: 10px; margin-left: 4px;">retry: 2 (60s delay)</span>
+                </div>
+            </div>
+
+            <div style="background-color: #0f172a; padding: 16px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #334155;">
+                <h3 style="color: #fbbf24; margin: 0 0 6px 0; font-size: 13px;">Database Maintenance (act mode)</h3>
+                <p style="color: #e2e8f0; font-size: 12px; margin: 0; font-style: italic;">"Check PostgreSQL for tables with &gt; 1M rows and no recent VACUUM. Run ANALYZE on tables that need it."</p>
+                <div style="margin-top: 8px;">
+                    <span style="background-color: #7f1d1d; color: #fca5a5; padding: 2px 8px; border-radius: 4px; font-size: 10px;">mode: act</span>
+                    <span style="background-color: #065f46; color: #6ee7b7; padding: 2px 8px; border-radius: 4px; font-size: 10px; margin-left: 4px;">cron: 0 3 * * 0</span>
                 </div>
             </div>
 
             <div style="background-color: #0f172a; padding: 16px; border-radius: 12px; border: 1px solid #334155;">
-                <h3 style="color: #fbbf24; margin: 0 0 6px 0; font-size: 13px;">Database Maintenance (act mode)</h3>
-                <p style="color: #e2e8f0; font-size: 12px; margin: 0; font-style: italic;">"Check PostgreSQL for tables with more than 1M rows and no recent VACUUM. Run ANALYZE on any tables that need it. Report which tables were analyzed."</p>
+                <h3 style="color: #22d3ee; margin: 0 0 6px 0; font-size: 13px;">One-time Security Audit</h3>
+                <p style="color: #e2e8f0; font-size: 12px; margin: 0; font-style: italic;">"Check OPA compliance for all namespaces. Report security violations grouped by severity."</p>
                 <div style="margin-top: 8px;">
-                    <span style="background-color: #7f1d1d; color: #fca5a5; padding: 2px 8px; border-radius: 4px; font-size: 10px;">mode: act (write tools enabled)</span>
-                    <span style="background-color: #1e3a8a; color: #60a5fa; padding: 2px 8px; border-radius: 4px; font-size: 10px; margin-left: 4px;">tools: auto (postgresql)</span>
+                    <span style="background-color: #166534; color: #4ade80; padding: 2px 8px; border-radius: 4px; font-size: 10px;">mode: monitor</span>
+                    <span style="background-color: #374151; color: #94a3b8; padding: 2px 8px; border-radius: 4px; font-size: 10px; margin-left: 4px;">cron: (empty) = run once</span>
                 </div>
             </div>
         </div>
@@ -226,7 +357,7 @@
         <!-- MCP Tools -->
         <div style="background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%); border-radius: 16px; padding: 24px; border: 1px solid #3b82f6;">
             <h2 style="color: #bfdbfe; margin: 0 0 16px 0; font-size: 18px;">Dark Factory MCP Tools</h2>
-            <p style="color: #93c5fd; font-size: 12px; margin-bottom: 16px;">These 4 tools are registered when agent/task sub-components exist. Use them from Claude Desktop or any MCP client to monitor and control the autonomous loop.</p>
+            <p style="color: #93c5fd; font-size: 12px; margin-bottom: 16px;">These 6 tools are registered when agent/task sub-components exist. Use them from Claude Desktop or any MCP client to monitor and control the autonomous loop.</p>
 
             <table style="width: 100%; border-collapse: separate; border-spacing: 0; background-color: #0f172a; border-radius: 12px; overflow: hidden;">
                 <thead>
@@ -238,7 +369,7 @@
                 <tbody>
                     <tr style="background-color: #0f172a;">
                         <td style="padding: 10px 16px; border-bottom: 1px solid #334155;"><code style="color: #93c5fd; font-weight: bold;">dark_factory_status</code></td>
-                        <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Status of all agents and tasks &mdash; enabled, last run, last result</td>
+                        <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Status of all agents and tasks &mdash; cron, last run, cost, retry state</td>
                     </tr>
                     <tr style="background-color: #1e293b;">
                         <td style="padding: 10px 16px; border-bottom: 1px solid #334155;"><code style="color: #93c5fd; font-weight: bold;">dark_factory_history(task_name, limit)</code></td>
@@ -249,8 +380,12 @@
                         <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Enable/disable an agent at runtime. Takes effect instantly. Resets on pod restart.</td>
                     </tr>
                     <tr style="background-color: #1e293b;">
-                        <td style="padding: 10px 16px;"><code style="color: #93c5fd; font-weight: bold;">dark_factory_run_now(task_name)</code></td>
-                        <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px;">Trigger immediate execution, skipping the schedule. Returns the task result.</td>
+                        <td style="padding: 10px 16px; border-bottom: 1px solid #334155;"><code style="color: #93c5fd; font-weight: bold;">dark_factory_run_now(task_name, follow_chain)</code></td>
+                        <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Trigger immediate execution. Optionally follow the chain on success.</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 10px 16px;"><code style="color: #93c5fd; font-weight: bold;">dark_factory_cost</code></td>
+                        <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px;">Per-task token usage breakdown and estimated USD cost since pod start.</td>
                     </tr>
                 </tbody>
             </table>

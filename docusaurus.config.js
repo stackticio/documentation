@@ -11,6 +11,12 @@ module.exports = {
   onBrokenAnchors: 'warn',
 
   themeConfig: {
+    docs: {
+      sidebar: {
+        hideable: false,
+        autoCollapseCategories: true,
+      },
+    },
     navbar: {
       title: '',
       logo: {

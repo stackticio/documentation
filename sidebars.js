@@ -88,6 +88,7 @@ module.exports = {
         { type: 'doc', id: 'components/cnpg', label: 'CloudNativePG' },
         { type: 'doc', id: 'components/external_source_code', label: 'External Source Code' },
         { type: 'doc', id: 'components/fastapi', label: 'FastAPI' },
+        { type: 'doc', id: 'components/fastmcp', label: 'FastMCP' },
         { type: 'doc', id: 'components/grafana', label: 'Grafana' },
         { type: 'doc', id: 'components/image_base', label: 'Image Base' },
         { type: 'doc', id: 'components/k6', label: 'K6' },

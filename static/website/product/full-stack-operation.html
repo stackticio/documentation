@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Full Stack Operation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Fira Code', monospace;
+      background: #fff;
+      min-height: 100vh;
+      padding: 48px 32px 64px;
+      color: #fff;
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; }
+
+    /* ── Page Title ── */
+    .page-title {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #1a2a4a;
+      margin-bottom: 48px;
+    }
+
+    /* ── Section ── */
+    .section {
+      position: relative;
+      margin-bottom: 24px;
+    }
+    .section-title {
+      text-align: center;
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    /* ── Circle Row ── */
+    .circle-row {
+      display: flex;
+      justify-content: center;
+      position: relative;
+    }
+    .circle-row.top { margin-bottom: -40px; z-index: 2; }
+    .circle-row.bottom { z-index: 1; }
+
+    /* ── Circle ── */
+    .circle {
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 32px;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    /* Top row circles — deeper blue */
+    .circle.top-c {
+      background: radial-gradient(circle at 40% 40%, rgba(90,110,200,0.75), rgba(60,80,180,0.65));
+      box-shadow: 0 4px 30px rgba(40,60,140,0.25);
+      margin: 0 -24px;
+    }
+
+    /* Bottom row circles — lighter blue */
+    .circle.bot-c {
+      background: radial-gradient(circle at 40% 40%, rgba(130,150,220,0.55), rgba(100,120,200,0.45));
+      box-shadow: 0 4px 24px rgba(60,80,160,0.15);
+      width: 210px;
+      height: 210px;
+      margin: 0 -16px;
+    }
+
+    .circle .label {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.4;
+      letter-spacing: 0.3px;
+    }
+
+    /* Label colors matching the slide */
+    .c-yellow { color: #f0d060; }
+    .c-maroon { color: #6b1a1a; }
+    .c-pink   { color: #e8c0d0; }
+    .c-orange { color: #f09848; }
+
+    /* ── Bottom section title ── */
+    .section-title-bottom {
+      text-align: center;
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 1px;
+      margin-top: 16px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .circle.top-c { width: 180px; height: 180px; margin: 0 -18px; }
+      .circle.bot-c { width: 160px; height: 160px; margin: 0 -12px; }
+      .circle .label { font-size: 12px; }
+      .section-title, .section-title-bottom { font-size: 20px; }
+      .page-title { font-size: 24px; }
+    }
+    @media (max-width: 600px) {
+      .circle-row { flex-wrap: wrap; gap: 12px; }
+      .circle.top-c, .circle.bot-c { margin: 0; width: 150px; height: 150px; }
+      .circle-row.top { margin-bottom: 12px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="page-title">Full Stack Operation</div>
+
+  <!-- ═══════════════════════════════════════════
+       TOP ROW — CTO / CFO Wishlist
+  ═══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">The Wishlist of Any CTO or CFO</div>
+
+    <div class="circle-row top">
+      <div class="circle top-c">
+        <span class="label c-yellow">90-99% automated<br>Sec &amp; Ops</span>
+      </div>
+      <div class="circle top-c">
+        <span class="label c-maroon">Vendor lock-in free<br>Agnostic Cloud</span>
+      </div>
+      <div class="circle top-c">
+        <span class="label c-pink">No Legacy remains<br>tech Adoptibility</span>
+      </div>
+      <div class="circle top-c">
+        <span class="label c-orange">AI adoption and<br>governance</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       BOTTOM ROW — OPS / DEV Wishlist
+  ═══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="circle-row bottom">
+      <div class="circle bot-c">
+        <span class="label c-yellow">click to rollback</span>
+      </div>
+      <div class="circle bot-c">
+        <span class="label c-yellow">click to version</span>
+      </div>
+      <div class="circle bot-c">
+        <span class="label c-orange">click to secure</span>
+      </div>
+    </div>
+
+    <div class="section-title-bottom">The Wishlist of Any Ops and Dev</div>
+  </div>
+
+</div>
+</body>
+</html>

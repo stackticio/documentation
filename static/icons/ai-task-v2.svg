@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Clipboard -->
+  <rect x="12" y="10" width="40" height="48" rx="6" fill="url(#c)"/>
+  <!-- Clip -->
+  <rect x="22" y="6" width="20" height="10" rx="4" fill="#4338ca"/>
+  <circle cx="32" cy="11" r="3" fill="#818cf8"/>
+  <!-- Check 1 -->
+  <circle cx="22" cy="26" r="5" fill="#10b981"/>
+  <path d="M19.5 26 L21.5 28 L25 24" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="30" y="24" width="16" height="4" rx="2" fill="#a5b4fc" opacity="0.6"/>
+  <!-- Check 2 -->
+  <circle cx="22" cy="38" r="5" fill="#10b981"/>
+  <path d="M19.5 38 L21.5 40 L25 36" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="30" y="36" width="14" height="4" rx="2" fill="#a5b4fc" opacity="0.6"/>
+  <!-- AI sparkle task -->
+  <circle cx="22" cy="50" r="5" fill="#fbbf24"/>
+  <path d="M22 46 L23 49 L26 49 L23.5 51 L24.5 54 L22 52 L19.5 54 L20.5 51 L18 49 L21 49 Z" fill="#fff"/>
+  <rect x="30" y="48" width="12" height="4" rx="2" fill="#a5b4fc" opacity="0.4"/>
+  <defs>
+    <linearGradient id="c" x1="12" y1="10" x2="52" y2="58"><stop stop-color="#eef2ff"/><stop offset="1" stop-color="#c7d2fe"/></linearGradient>
+  </defs>
+</svg>

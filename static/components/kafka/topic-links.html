@@ -158,16 +158,112 @@
                         </td>
                     </tr>
                     <tr style="background-color: #1e293b;">
-                        <td style="padding: 12px 16px;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
                             <code style="background-color: #5b21b6; color: #e9d5ff; padding: 4px 10px; border-radius: 6px; font-size: 12px;">topic-mongo_db</code>
                         </td>
-                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px;">Sink to MongoDB (Kafka Connect)</td>
-                        <td style="padding: 12px 16px;">
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Sink to MongoDB (Kafka Connect)</td>
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;">
                             <span style="color: #fbbf24; font-size: 11px;">📄 connector.yaml</span>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px;">
+                            <code style="background-color: #5b21b6; color: #e9d5ff; padding: 4px 10px; border-radius: 6px; font-size: 12px;">topic-apicurio_schema_registry</code>
+                        </td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px;">Schema validation (overrides sink converters to Avro/JSON)</td>
+                        <td style="padding: 12px 16px;">
+                            <span style="color: #fbbf24; font-size: 11px;">📄 *-sink.yaml converter override</span>
                         </td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <!-- Schema Registry Integration -->
+        <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #475569;">
+            <h2 style="color: #22d3ee; margin: 0 0 16px 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">📋</span> Schema Registry Link (topic-apicurio_schema_registry)
+            </h2>
+            <p style="color: #94a3b8; font-size: 12px; margin-bottom: 16px;">Link a topic to Apicurio Schema Registry to override <code>value.converter</code> on all sink connectors consuming from that topic. The converter JAR is included as a default in <code>kafka_connector_additional_artifacts</code> &mdash; no component-level link needed for this.</p>
+
+            <!-- Link Attribute -->
+            <div style="background-color: #0f172a; padding: 16px; border-radius: 12px; margin-bottom: 16px; border: 1px solid #334155;">
+                <h3 style="color: #22d3ee; margin: 0 0 10px 0; font-size: 14px;">Link Attribute: <code style="color: #fbbf24;">schema_format</code></h3>
+                <table style="width: 100%; border-collapse: separate; border-spacing: 0; background-color: #1e293b; border-radius: 8px; overflow: hidden;">
+                    <thead>
+                        <tr>
+                            <th style="padding: 10px 16px; background-color: #334155; color: #22d3ee; text-align: left; font-size: 12px; border-bottom: 2px solid #22d3ee;">Value</th>
+                            <th style="padding: 10px 16px; background-color: #334155; color: #22d3ee; text-align: left; font-size: 12px; border-bottom: 2px solid #22d3ee;">Converter Class</th>
+                            <th style="padding: 10px 16px; background-color: #334155; color: #22d3ee; text-align: left; font-size: 12px; border-bottom: 2px solid #22d3ee;">Use When</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="background-color: #1e293b;">
+                            <td style="padding: 10px 16px; border-bottom: 1px solid #334155;"><code style="color: #4ade80; font-weight: bold;">AVRO</code> <span style="color: #94a3b8; font-size: 10px;">(default)</span></td>
+                            <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;"><code>AvroConverter</code></td>
+                            <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Producers use Confluent Avro serializer</td>
+                        </tr>
+                        <tr style="background-color: #0f172a;">
+                            <td style="padding: 10px 16px;"><code style="color: #fbbf24; font-weight: bold;">JSON</code></td>
+                            <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px;"><code>ExtJsonConverter</code></td>
+                            <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px;">Producers use Confluent JSON Schema serializer</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- What gets auto-configured -->
+            <div style="background-color: #0f172a; padding: 16px; border-radius: 12px; margin-bottom: 16px; border: 1px solid #334155;">
+                <h3 style="color: #22d3ee; margin: 0 0 10px 0; font-size: 14px;">What Gets Auto-Configured on Sink Connectors</h3>
+                <div style="font-family: monospace; font-size: 12px; line-height: 2;">
+                    <div><span style="color: #c4b5fd;">value.converter</span><span style="color: #94a3b8;">:</span> <span style="color: #4ade80;">AvroConverter | ExtJsonConverter</span> <span style="color: #64748b;"># based on schema_format</span></div>
+                    <div><span style="color: #c4b5fd;">value.converter.apicurio.registry.url</span><span style="color: #94a3b8;">:</span> <span style="color: #fbbf24;">http://{registry}-app-service.{ns}.svc:8080</span></div>
+                    <div><span style="color: #c4b5fd;">value.converter.apicurio.registry.auto-register</span><span style="color: #94a3b8;">:</span> <span style="color: #4ade80;">true</span></div>
+                    <div><span style="color: #c4b5fd;">value.converter.apicurio.registry.id-handler</span><span style="color: #94a3b8;">:</span> <span style="color: #fbbf24;">Legacy4ByteIdHandler</span></div>
+                    <div style="color: #64748b; margin-top: 4px;"># Camel sinks only (PostgreSQL, MinIO, SeaweedFS):</div>
+                    <div><span style="color: #c4b5fd;">transforms</span><span style="color: #94a3b8;">:</span> <span style="color: #fbbf24;">toJson</span> <span style="color: #64748b;"># converts Struct to JSON string</span></div>
+                </div>
+            </div>
+
+            <!-- Breaking Change Warning -->
+            <div style="background-color: #450a0a; padding: 16px; border-radius: 12px; border: 2px solid #ef4444;">
+                <h3 style="color: #fca5a5; margin: 0 0 10px 0; font-size: 14px;">BREAKING CHANGE: Old JSON Method Stops Working</h3>
+                <p style="color: #fca5a5; font-size: 12px; margin-bottom: 12px;">Once this link exists, <strong>plain JSON messages from Bridge, k6, console producer, or any non-Avro producer will crash ALL sink connectors</strong> consuming from this topic.</p>
+
+                <table style="width: 100%; border-collapse: separate; border-spacing: 0; background-color: #1e293b; border-radius: 8px; overflow: hidden;">
+                    <thead>
+                        <tr>
+                            <th style="padding: 10px 16px; background-color: #7f1d1d; color: #fca5a5; text-align: left; font-size: 12px; border-bottom: 2px solid #ef4444;">Producer</th>
+                            <th style="padding: 10px 16px; background-color: #7f1d1d; color: #fca5a5; text-align: left; font-size: 12px; border-bottom: 2px solid #ef4444;">Schema-Linked Topic</th>
+                            <th style="padding: 10px 16px; background-color: #7f1d1d; color: #fca5a5; text-align: left; font-size: 12px; border-bottom: 2px solid #ef4444;">Normal Topic</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="background-color: #1e293b;">
+                            <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Bridge (plain JSON)</td>
+                            <td style="padding: 10px 16px; font-size: 12px; border-bottom: 1px solid #334155; color: #ef4444; font-weight: bold;">CONNECTOR CRASH</td>
+                            <td style="padding: 10px 16px; color: #4ade80; font-size: 12px; border-bottom: 1px solid #334155;">Works</td>
+                        </tr>
+                        <tr style="background-color: #0f172a;">
+                            <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">k6 load test</td>
+                            <td style="padding: 10px 16px; font-size: 12px; border-bottom: 1px solid #334155; color: #ef4444; font-weight: bold;">CONNECTOR CRASH</td>
+                            <td style="padding: 10px 16px; color: #4ade80; font-size: 12px; border-bottom: 1px solid #334155;">Works</td>
+                        </tr>
+                        <tr style="background-color: #1e293b;">
+                            <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">Console producer</td>
+                            <td style="padding: 10px 16px; font-size: 12px; border-bottom: 1px solid #334155; color: #ef4444; font-weight: bold;">CONNECTOR CRASH</td>
+                            <td style="padding: 10px 16px; color: #4ade80; font-size: 12px; border-bottom: 1px solid #334155;">Works</td>
+                        </tr>
+                        <tr style="background-color: #0f172a;">
+                            <td style="padding: 10px 16px; color: #e2e8f0; font-size: 12px;">Avro wire format producer</td>
+                            <td style="padding: 10px 16px; color: #4ade80; font-size: 12px; font-weight: bold;">Works</td>
+                            <td style="padding: 10px 16px; color: #94a3b8; font-size: 12px;">N/A</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p style="color: #fca5a5; font-size: 11px; margin: 12px 0 0 0;">The AvroConverter expects Confluent binary envelope (magic byte + 4-byte schema ID + binary payload). Plain JSON fails immediately. Since <code style="color: #fca5a5;">errors.tolerance</code> defaults to <code style="color: #fca5a5;">none</code>, one bad message crashes the connector task. <strong>This is per-topic</strong> &mdash; topics without the schema link are unaffected.</p>
+            </div>
         </div>
 
         <!-- KEDA Integration -->

@@ -45,6 +45,7 @@ module.exports = {
         { type: 'doc', id: 'ai_ops', label: 'AI Ops' },
         { type: 'doc', id: 'ai_stacktic', label: 'AI & Stacktic' },
         { type: 'doc', id: 'ai_governance', label: 'AI Governance & MCP' },
+        { type: 'doc', id: 'ai_agents', label: 'AI Agents — Dark Factory' },
       ],
     },
     {

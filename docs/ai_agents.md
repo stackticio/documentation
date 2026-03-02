@@ -38,6 +38,8 @@ Two sub-component types on the FastMCP component:
 | **agent** | AI model configuration — who does the work | `anthropic` + `claude-sonnet-4-20250514` + API key |
 | **ai_task** | Task definition — what to do, when, how | "Check pods for CPU > 80%" + cron `*/15 * * * *` |
 
+
+![alt text](image-73.png)
 ---
 
 ## Sub-Component Links
@@ -55,6 +57,8 @@ This is useful for:
 - Quick setups where all tasks use the same model
 - Chain tasks where only the first task has an explicit agent link
 
+
+![alt text](image-75.png)
 ---
 
 ## Agent Attributes
@@ -68,6 +72,7 @@ This is useful for:
 | `ai_max_iterations` | `10` | Max tool-use loop iterations per run |
 | `agent_enabled` | `true` | Master switch. `false` = all linked tasks stop. Survives pod restarts. |
 
+![alt text](image-74.png)
 ---
 
 ## Task Attributes
@@ -168,6 +173,10 @@ Set on the **FastMCP component** (shared across all tasks):
 | `email_http_url` | HTTP email endpoint (default: `https://api.resend.com/emails`) |
 
 Each task's `notify_email` attribute controls who gets the report. Email includes a styled HTML report with status badge, metadata table, and full output.
+
+
+![alt text](image-76.png)
+
 
 ### Webhook
 

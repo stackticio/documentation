@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OPA to OpenSearch Link</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 900px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #7c3aed; margin-bottom: 20px; border-bottom: 3px solid #7c3aed; padding-bottom: 12px;">OPA &rarr; OpenSearch Violation Export Link</h1>
+        <p style="color: #64748b;"><strong>Configures the OTEL sidecar to export OPA violations directly to OpenSearch, and tells OpenSearch to set up SIEM resources (index templates, dashboards, alerting).</strong></p>
+
+        <!-- What This Link Does -->
+        <div style="background-color: #f3e8ff; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+            <h2 style="color: #7c3aed; margin-top: 0;">What This Link Does</h2>
+            <p>This link has <strong>two-sided effects</strong>:</p>
+
+            <h3 style="color: #5b21b6;">On the OPA side (this template):</h3>
+            <ul style="line-height: 1.8;">
+                <li>Switches the OTEL sidecar exporter from OTLP to OpenSearch</li>
+                <li>Configures the OpenSearch endpoint (internal or external) with authentication</li>
+                <li>Sets <code>logs_index: opa</code> so violations land in the <code>opa-*</code> index</li>
+                <li>Adds <code>basicauth/opensearch</code> extension with admin credentials</li>
+            </ul>
+
+            <h3 style="color: #5b21b6;">On the OpenSearch side (<code>opa-opensearch</code> inbound link):</h3>
+            <ul style="line-height: 1.8;">
+                <li>Creates OPA index template (<code>index-template-opa.json</code>)</li>
+                <li>Creates OPA alerting monitor (<code>alerting-opa.json</code>) for violation events</li>
+                <li>Creates OPA dashboard (<code>dashboards-opa.ndjson</code>) in OpenSearch Dashboards</li>
+                <li>Adds OPA to the SIEM bootstrap job for import on every sync</li>
+            </ul>
+        </div>
+
+        <!-- Requires opa-otel -->
+        <div style="background-color: #fef3c7; padding: 16px; margin-bottom: 20px; border-radius: 8px; border-left: 4px solid #f59e0b;">
+            <p style="color: #92400e; margin: 0;"><strong>Prerequisite:</strong> This link only has effect on OPA if the <code>opa-otel</code> link also exists. Without it, there is no OTEL sidecar to configure. On the OpenSearch side, this link works independently (SIEM resources are always created).</p>
+        </div>
+
+        <!-- Cross-Stack (External) Support -->
+        <div style="background-color: #1e293b; color: white; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">Cross-Stack (External) OpenSearch Support</h2>
+            <p style="color: #94a3b8; font-size: 13px;">This link supports exporting to an OpenSearch instance in a <strong>different stack/cluster</strong>.</p>
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Scenario</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Endpoint</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Port</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><strong>Same stack</strong> (<code>is_external: false</code>)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: monospace;">https://opensearch-cluster-master.{namespace}.svc.cluster.local</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">9200</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><strong>External stack</strong> (<code>is_external: true</code>)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: monospace;">https://{remote_host}</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">443</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="background-color: #334155; padding: 12px; border-radius: 6px; margin-top: 12px;">
+                <p style="color: #fbbf24; font-size: 12px; margin: 0;"><strong>remote_host attribute:</strong> When the OpenSearch component is external (from another stack), the <code>remote_host</code> attribute on the OpenSearch component provides the FQDN/IP for cross-cluster access. This is typically an APISIX route or load balancer endpoint. Both cases use <code>insecure_skip_verify: true</code> for TLS.</p>
+            </div>
+        </div>
+
+        <!-- Link Attributes -->
+        <div style="background-color: #1e293b; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+            <h2 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">OpenSearch Component Attributes Used</h2>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Source</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Usage</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">namespace</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>__opensearch.component.attributes.namespace</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Internal endpoint: <code>opensearch-cluster-master.{ns}.svc.cluster.local:9200</code></td>
+                    </tr>
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">admin_password</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>__opensearch.component.attributes.admin_password</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Authentication: <code>basicauth/opensearch</code> extension password</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>remote_host</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__opensearch.attributes.remote_host</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">External endpoint FQDN (only when <code>is_external: true</code>)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Generated Config Example -->
+        <div style="background-color: #f0f4ff; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+            <h2 style="color: #4299e1; margin-top: 0;">Generated Sidecar Config (with OpenSearch link)</h2>
+            <div style="background-color: #dbeafe; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px;">
+                <pre style="margin: 0;">exporters:
+  opensearch:
+    http:
+      endpoint: https://opensearch-cluster-master.opensearch.svc.cluster.local:9200
+      tls:
+        insecure_skip_verify: true
+      auth:
+        authenticator: basicauth/opensearch
+    logs_index: opa
+
+extensions:
+  basicauth/opensearch:
+    client_auth:
+      username: admin
+      password: {admin_password}
+
+service:
+  extensions: [basicauth/opensearch]
+  pipelines:
+    logs:
+      receivers: [filelog]
+      processors: [resource, attributes/cleanup]
+      exporters: [opensearch]</pre>
+            </div>
+        </div>
+
+        <!-- On OpenSearch Side -->
+        <div style="background-color: #ecfdf5; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+            <h2 style="color: #059669; margin-top: 0;">What Gets Created on OpenSearch Side</h2>
+            <p style="font-size: 13px;">When OpenSearch detects the <code>opa-opensearch</code> inbound link AND <code>siem</code> attribute is <code>"true"</code>:</p>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Resource</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">File</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Index Template</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-family: monospace;">siem/index-template-opa.json</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Mapping for <code>opa-*</code> index pattern</td>
+                    </tr>
+                    <tr style="background-color: #ecfdf5;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Alerting Monitor</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-family: monospace;">siem/alerting-opa.json</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>opa-violation-events</code> monitor for policy violation alerts</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Dashboard</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-family: monospace;">siem/dashboards-opa.ndjson</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">OpenSearch Dashboards saved objects (index pattern + visualizations + dashboard)</td>
+                    </tr>
+                    <tr style="background-color: #ecfdf5;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">ISM Policy</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-family: monospace;">siem/ism-policy.json</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">PCI DSS retention policy applied to <code>opa-*</code> indices</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stacktic — Threat Landscape</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Fira Code', monospace;
+      background: #0d0b1a;
+      color: #e2e8f0;
+      height: 100vh;
+      overflow: hidden;
+    }
+    canvas { display: block; width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+(function() {
+  var canvas = document.getElementById('c');
+  var ctx = canvas.getContext('2d');
+  var dpr = window.devicePixelRatio || 1;
+  var W = 0, H = 0, frame = 0;
+  var FPS = 60;
+
+  var COL = {
+    bg:     '#0d0b1a',
+    card:   '#151230',
+    red:    '#ff4757',
+    dred:   '#c0392b',
+    orange: '#ff6b35',
+    pink:   '#f472b6',
+    purple: '#c084fc',
+    cyan:   '#60d5ff',
+    green:  '#34d399',
+    yellow: '#fbbf24',
+    white:  '#ffffff',
+    muted:  '#64748b',
+    dim:    '#2a2550'
+  };
+
+  function rgba(hex, a) {
+    var r = parseInt(hex.slice(1,3),16);
+    var g = parseInt(hex.slice(3,5),16);
+    var b = parseInt(hex.slice(5,7),16);
+    return 'rgba('+r+','+g+','+b+','+a+')';
+  }
+
+  function resize() {
+    W = window.innerWidth || 800;
+    H = window.innerHeight || 600;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function ease(startSec, durSec) {
+    var e = (frame / FPS) - startSec;
+    if (e <= 0) return 0;
+    if (e >= durSec) return 1;
+    var t = e / durSec;
+    return 1 - Math.pow(1 - t, 3);
+  }
+  function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+
+  function roundRect(x, y, w, h, r) {
+    if (w < 1 || h < 1) return;
+    r = Math.min(r, w/2, h/2);
+    ctx.beginPath();
+    ctx.moveTo(x+r, y);
+    ctx.lineTo(x+w-r, y);
+    ctx.arcTo(x+w, y, x+w, y+r, r);
+    ctx.lineTo(x+w, y+h-r);
+    ctx.arcTo(x+w, y+h, x+w-r, y+h, r);
+    ctx.lineTo(x+r, y+h);
+    ctx.arcTo(x, y+h, x, y+h-r, r);
+    ctx.lineTo(x, y+r);
+    ctx.arcTo(x, y, x+r, y, r);
+    ctx.closePath();
+  }
+
+  /* ══════════════════════════════════════════
+     PHASE 1: Threat actors (left side)
+     ══════════════════════════════════════════ */
+  var threatActors = [
+    {
+      type: 'hacker_ai',
+      label: 'Hackers + AI Agents',
+      sub: 'Weaponized LLMs, automated recon',
+      color: COL.red,
+      y: 0.18,
+      startSec: 2.0
+    },
+    {
+      type: 'ai_exploit',
+      label: 'AI-Powered Exploits',
+      sub: 'Self-mutating payloads, 0-day gen',
+      color: COL.orange,
+      y: 0.42,
+      startSec: 3.5
+    },
+    {
+      type: 'ai_swarm',
+      label: 'Autonomous Swarms',
+      sub: 'Thousands of AI bots, 24/7 scanning',
+      color: COL.pink,
+      y: 0.66,
+      startSec: 5.0
+    }
+  ];
+
+  /* Draw hacker commanding AI agents */
+  function drawHackerAIIcon(x, y, size, alpha) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    var s = size;
+    var sec = frame / FPS;
+
+    /* Hacker figure (left side) */
+    var hx = x - s * 0.2;
+    /* Hood */
+    ctx.beginPath();
+    ctx.arc(hx, y - s * 0.25, s * 0.22, Math.PI, 0);
+    ctx.lineTo(hx + s * 0.22, y - s * 0.02);
+    ctx.lineTo(hx - s * 0.22, y - s * 0.02);
+    ctx.closePath();
+    ctx.fillStyle = rgba(COL.red, 0.3);
+    ctx.fill();
+    ctx.strokeStyle = rgba(COL.red, 0.7);
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    /* Eyes */
+    ctx.fillStyle = rgba(COL.red, 0.9);
+    ctx.fillRect(hx - s * 0.1, y - s * 0.2, s * 0.06, s * 0.03);
+    ctx.fillRect(hx + s * 0.04, y - s * 0.2, s * 0.06, s * 0.03);
+
+    /* AI agent bots controlled by hacker (right side) */
+    var bots = [{dx: s*0.2, dy: -s*0.2}, {dx: s*0.35, dy: 0}, {dx: s*0.2, dy: s*0.2}];
+    for (var i = 0; i < bots.length; i++) {
+      var bx = x + bots[i].dx + Math.sin(sec * 2.5 + i * 2) * 2;
+      var by = y + bots[i].dy + Math.cos(sec * 2 + i * 1.5) * 1.5;
+      /* Bot circle */
+      ctx.beginPath();
+      ctx.arc(bx, by, s * 0.08, 0, Math.PI * 2);
+      ctx.fillStyle = rgba(COL.red, 0.3);
+      ctx.fill();
+      ctx.strokeStyle = rgba(COL.red, 0.6);
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      /* AI label */
+      ctx.font = '700 ' + (s * 0.08) + 'px "Fira Code", monospace';
+      ctx.fillStyle = rgba(COL.red, 0.8);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('AI', bx, by);
+      /* Control line from hacker to bot */
+      ctx.beginPath();
+      ctx.moveTo(hx + s * 0.1, y - s * 0.1);
+      ctx.lineTo(bx - s * 0.08, by);
+      ctx.strokeStyle = rgba(COL.red, 0.2);
+      ctx.setLineDash([2, 3]);
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    /* Signal waves from hacker */
+    for (var w = 0; w < 2; w++) {
+      var wPhase = (sec * 2 + w * 0.5) % 1;
+      ctx.beginPath();
+      ctx.arc(hx + s * 0.1, y - s * 0.1, s * 0.15 + wPhase * s * 0.2, -0.8, 0.8);
+      ctx.strokeStyle = rgba(COL.red, (1 - wPhase) * 0.3);
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
+  /* Draw AI-powered exploit chains */
+  function drawAIExploitIcon(x, y, size, alpha) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    var s = size;
+    var sec = frame / FPS;
+
+    /* Central brain/processor */
+    ctx.beginPath();
+    ctx.arc(x, y, s * 0.2, 0, Math.PI * 2);
+    ctx.fillStyle = rgba(COL.orange, 0.15);
+    ctx.fill();
+    ctx.strokeStyle = rgba(COL.orange, 0.6);
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    /* Skull crossbones inside */
+    ctx.beginPath();
+    ctx.arc(x, y - s * 0.04, s * 0.08, 0, Math.PI * 2);
+    ctx.strokeStyle = rgba(COL.orange, 0.7);
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x - s * 0.08, y + s * 0.06);
+    ctx.lineTo(x + s * 0.08, y + s * 0.12);
+    ctx.moveTo(x + s * 0.08, y + s * 0.06);
+    ctx.lineTo(x - s * 0.08, y + s * 0.12);
+    ctx.strokeStyle = rgba(COL.orange, 0.6);
+    ctx.stroke();
+
+    /* Mutating code fragments orbiting */
+    var fragments = ['0x', 'ff', '};', 'rm', '>>'];
+    for (var f = 0; f < fragments.length; f++) {
+      var fa = (sec * 1.2 + f * Math.PI * 2 / fragments.length) % (Math.PI * 2);
+      var fr = s * 0.38;
+      var fx = x + Math.cos(fa) * fr;
+      var fy = y + Math.sin(fa) * fr * 0.6;
+      ctx.font = '600 ' + (s * 0.1) + 'px "Fira Code", monospace';
+      ctx.fillStyle = rgba(COL.orange, 0.5 + Math.sin(sec * 4 + f) * 0.3);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(fragments[f], fx, fy);
+    }
+
+    ctx.restore();
+  }
+
+  /* Draw autonomous swarm (botnet run by AI agent) */
+  function drawAISwarmIcon(x, y, size, alpha) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    var s = size;
+    var sec = frame / FPS;
+
+    /* Central AI controller */
+    ctx.beginPath();
+    ctx.arc(x, y, s * 0.15, 0, Math.PI * 2);
+    ctx.fillStyle = rgba(COL.pink, 0.2);
+    ctx.fill();
+    ctx.strokeStyle = rgba(COL.pink, 0.7);
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.font = '700 ' + (s * 0.12) + 'px "Fira Code", monospace';
+    ctx.fillStyle = rgba(COL.pink, 0.9);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('AI', x, y);
+
+    /* Swarm of bots around it */
+    for (var i = 0; i < 10; i++) {
+      var angle = (i / 10) * Math.PI * 2 + sec * 0.5;
+      var ring = (i < 5) ? s * 0.3 : s * 0.42;
+      var bx = x + Math.cos(angle + (i < 5 ? 0 : 0.3)) * ring + Math.sin(sec * 3 + i) * 2;
+      var by = y + Math.sin(angle + (i < 5 ? 0 : 0.3)) * ring * 0.65 + Math.cos(sec * 2.5 + i) * 1.5;
+      var bs = s * 0.05;
+
+      ctx.beginPath();
+      ctx.arc(bx, by, bs, 0, Math.PI * 2);
+      var bPulse = 0.4 + Math.sin(sec * 4 + i * 1.3) * 0.4;
+      ctx.fillStyle = rgba(COL.pink, bPulse);
+      ctx.fill();
+
+      /* Line from controller */
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(bx, by);
+      ctx.strokeStyle = rgba(COL.pink, 0.1);
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
+
+    /* Pulsing rings */
+    for (var r = 0; r < 2; r++) {
+      var rP = (sec * 1.5 + r * 0.5) % 1;
+      ctx.beginPath();
+      ctx.arc(x, y, s * 0.15 + rP * s * 0.35, 0, Math.PI * 2);
+      ctx.strokeStyle = rgba(COL.pink, (1 - rP) * 0.2);
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
+  /* Draw a threat actor card */
+  function drawThreatActor(actor, alpha) {
+    if (alpha <= 0) return;
+    var cardX = W * 0.03;
+    var cardY = H * actor.y;
+    var cardW = W * 0.17;
+    var cardH = H * 0.16;
+    var sec = frame / FPS;
+
+    ctx.save();
+
+    /* Slide in from left */
+    var slideX = (1 - alpha) * (-W * 0.1);
+    ctx.translate(slideX, 0);
+    ctx.globalAlpha = alpha;
+
+    /* Card bg */
+    roundRect(cardX, cardY, cardW, cardH, 10);
+    ctx.fillStyle = rgba(COL.card, 0.85);
+    ctx.fill();
+    ctx.strokeStyle = rgba(actor.color, 0.35);
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    /* Left danger bar */
+    var dangerPulse = 0.4 + Math.sin(sec * 3) * 0.3;
+    ctx.fillStyle = rgba(actor.color, dangerPulse);
+    ctx.fillRect(cardX, cardY + 5, 3, cardH - 10);
+
+    /* Icon area */
+    var iconX = cardX + cardW * 0.25;
+    var iconY = cardY + cardH * 0.45;
+    var iconSize = Math.min(cardW * 0.35, cardH * 0.65);
+
+    if (actor.type === 'hacker_ai') {
+      drawHackerAIIcon(iconX, iconY, iconSize, 1);
+    } else if (actor.type === 'ai_exploit') {
+      drawAIExploitIcon(iconX, iconY, iconSize, 1);
+    } else {
+      drawAISwarmIcon(iconX, iconY, iconSize, 1);
+    }
+
+    /* Text */
+    ctx.font = '600 ' + Math.max(10, W * 0.008) + 'px "Fira Code", monospace';
+    ctx.fillStyle = actor.color;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText(actor.label, cardX + cardW * 0.52, cardY + cardH * 0.2);
+
+    ctx.font = '400 ' + Math.max(8, W * 0.006) + 'px "Fira Code", monospace';
+    ctx.fillStyle = rgba(COL.muted, 0.7);
+    ctx.fillText(actor.sub, cardX + cardW * 0.52, cardY + cardH * 0.45);
+
+    /* Active indicator */
+    var blinkOn = Math.sin(sec * 4 + threatActors.indexOf(actor)) > 0;
+    ctx.beginPath();
+    ctx.arc(cardX + cardW - 15, cardY + 12, 4, 0, Math.PI * 2);
+    ctx.fillStyle = blinkOn ? rgba(actor.color, 0.9) : rgba(actor.color, 0.2);
+    ctx.fill();
+
+    /* "ACTIVE" text */
+    ctx.font = '600 7px "Fira Code", monospace';
+    ctx.fillStyle = rgba(actor.color, 0.5);
+    ctx.textAlign = 'right';
+    ctx.fillText('ACTIVE', cardX + cardW - 24, cardY + 15);
+
+    ctx.restore();
+  }
+
+  /* ══════════════════════════════════════════
+     PHASE 2: Attack vectors (center-left)
+     ══════════════════════════════════════════ */
+  var vectors = [
+    { label: 'Prompt Injection',  color: COL.red,    startSec: 7.0 },
+    { label: 'Model Poisoning',   color: COL.orange, startSec: 7.4 },
+    { label: 'Secrets & Keys',    color: COL.pink,   startSec: 7.8 },
+    { label: 'API Endpoints',     color: COL.red,    startSec: 8.2 },
+    { label: 'Supply Chain',      color: COL.orange, startSec: 8.6 },
+    { label: 'Data Exfiltration', color: COL.pink,   startSec: 9.0 },
+    { label: 'Lateral Movement',  color: COL.red,    startSec: 9.4 }
+  ];
+
+  var vecPositions = [];
+
+  function drawVectorPill(idx, alpha) {
+    if (alpha <= 0) return null;
+    var vec = vectors[idx];
+    var pillW = W * 0.11;
+    var pillH = H * 0.045;
+    var centerX = W * 0.4;
+    var spacing = H * 0.075;
+    var topY = H * 0.2;
+    var px = centerX - pillW / 2;
+    var py = topY + idx * spacing + idx * H * 0.018;
+    var sec = frame / FPS;
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+
+    /* Scale pop */
+    var sc = alpha < 1 ? 0.85 + 0.15 * alpha : 1;
+    ctx.translate(centerX, py + pillH/2);
+    ctx.scale(sc, sc);
+    ctx.translate(-centerX, -(py + pillH/2));
+
+    /* Pill */
+    var r = pillH / 2;
+    ctx.beginPath();
+    ctx.moveTo(px + r, py);
+    ctx.lineTo(px + pillW - r, py);
+    ctx.arc(px + pillW - r, py + r, r, -Math.PI/2, Math.PI/2);
+    ctx.lineTo(px + r, py + pillH);
+    ctx.arc(px + r, py + r, r, Math.PI/2, -Math.PI/2);
+    ctx.closePath();
+    ctx.fillStyle = rgba(vec.color, 0.12);
+    ctx.fill();
+    ctx.strokeStyle = rgba(vec.color, 0.5);
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    /* Warning triangle */
+    var tx = px + 16;
+    var ty = py + pillH / 2;
+    ctx.beginPath();
+    ctx.moveTo(tx, ty - 5);
+    ctx.lineTo(tx + 5, ty + 4);
+    ctx.lineTo(tx - 5, ty + 4);
+    ctx.closePath();
+    var warnPulse = 0.4 + Math.sin(sec * 5 + idx * 1.2) * 0.5;
+    ctx.fillStyle = rgba(vec.color, warnPulse);
+    ctx.fill();
+    /* ! mark */
+    ctx.fillStyle = rgba(COL.bg, 0.9);
+    ctx.font = '700 6px "Fira Code", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('!', tx, ty + 1);
+
+    /* Label */
+    ctx.font = '500 ' + Math.max(9, W * 0.007) + 'px "Fira Code", monospace';
+    ctx.fillStyle = rgba(COL.white, 0.85);
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(vec.label, px + 28, py + pillH/2);
+
+    ctx.restore();
+
+    return { x: centerX, y: py + pillH / 2, right: px + pillW };
+  }
+
+  /* ══════════════════════════════════════════
+     Attack lines: actors -> vectors
+     ══════════════════════════════════════════ */
+  function drawAttackLines(alpha) {
+    if (alpha <= 0) return;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    var sec = frame / FPS;
+
+    for (var a = 0; a < threatActors.length; a++) {
+      var actor = threatActors[a];
+      var actorAlpha = ease(actor.startSec, 1.5);
+      if (actorAlpha < 1) continue;
+
+      var ax = W * 0.03 + W * 0.17;
+      var ay = H * actor.y + H * 0.08;
+
+      /* Each actor sends lines to 2 vectors */
+      var targets = [a * 2, a * 2 + 1];
+      for (var t = 0; t < targets.length; t++) {
+        if (targets[t] >= vecPositions.length || !vecPositions[targets[t]]) continue;
+        var vp = vecPositions[targets[t]];
+
+        /* Animated dashed attack line */
+        var dashOffset = sec * 40 + a * 10;
+        ctx.beginPath();
+        ctx.moveTo(ax + 5, ay);
+        /* Bezier curve */
+        var cpx = (ax + vp.x) / 2;
+        var cpy = ay + (vp.y - ay) * 0.3;
+        ctx.quadraticCurveTo(cpx, cpy, vp.x - W * 0.055, vp.y);
+        ctx.strokeStyle = rgba(actor.color, 0.2);
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 5]);
+        ctx.lineDashOffset = -dashOffset;
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        /* Traveling attack dot */
+        var dotT = (sec * 0.4 + a * 0.15 + t * 0.35) % 1;
+        var dt = dotT;
+        var dx = (1-dt)*(1-dt)*ax + 2*(1-dt)*dt*cpx + dt*dt*(vp.x - W*0.055);
+        var dy = (1-dt)*(1-dt)*ay + 2*(1-dt)*dt*cpy + dt*dt*vp.y;
+        ctx.beginPath();
+        ctx.arc(dx, dy, 3, 0, Math.PI * 2);
+        ctx.fillStyle = rgba(actor.color, 0.8);
+        ctx.fill();
+
+        /* Trail behind dot */
+        var trailLen = 5;
+        for (var tr = 1; tr <= trailLen; tr++) {
+          var tt = dotT - tr * 0.02;
+          if (tt < 0) tt += 1;
+          var trx = (1-tt)*(1-tt)*ax + 2*(1-tt)*tt*cpx + tt*tt*(vp.x - W*0.055);
+          var try2 = (1-tt)*(1-tt)*ay + 2*(1-tt)*tt*cpy + tt*tt*vp.y;
+          ctx.beginPath();
+          ctx.arc(trx, try2, 2, 0, Math.PI * 2);
+          ctx.fillStyle = rgba(actor.color, 0.3 - tr * 0.05);
+          ctx.fill();
+        }
+      }
+    }
+    ctx.restore();
+  }
+
+  /* ══════════════════════════════════════════
+     PHASE 3: Broken wall — no defense
+     ══════════════════════════════════════════ */
+  function drawBrokenWall(alpha) {
+    if (alpha <= 0) return;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    var sec = frame / FPS;
+
+    var wallX = W * 0.56;
+    var wallTop = H * 0.08;
+    var wallBot = H * 0.92;
+
+    /* Dashed, broken, flickering line */
+    ctx.setLineDash([8, 15, 3, 12]);
+    ctx.lineDashOffset = -sec * 20;
+    var flicker = 0.15 + Math.sin(sec * 6) * 0.1;
+    ctx.beginPath();
+    ctx.moveTo(wallX, wallTop);
+    ctx.lineTo(wallX, wallBot);
+    ctx.strokeStyle = rgba(COL.red, flicker);
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    /* Gaps / breach markers */
+    var breaches = [0.25, 0.45, 0.65, 0.8];
+    for (var b = 0; b < breaches.length; b++) {
+      var by = wallTop + (wallBot - wallTop) * breaches[b];
+      var bPulse = 0.3 + Math.sin(sec * 4 + b * 2) * 0.3;
+
+      /* Gap glow */
+      var gapGrad = ctx.createRadialGradient(wallX, by, 0, wallX, by, 18);
+      gapGrad.addColorStop(0, rgba(COL.red, bPulse * 0.5));
+      gapGrad.addColorStop(1, rgba(COL.red, 0));
+      ctx.fillStyle = gapGrad;
+      ctx.beginPath();
+      ctx.arc(wallX, by, 18, 0, Math.PI * 2);
+      ctx.fill();
+
+      /* X mark */
+      ctx.beginPath();
+      ctx.moveTo(wallX - 5, by - 5);
+      ctx.lineTo(wallX + 5, by + 5);
+      ctx.moveTo(wallX + 5, by - 5);
+      ctx.lineTo(wallX - 5, by + 5);
+      ctx.strokeStyle = rgba(COL.red, bPulse + 0.2);
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+
+    /* "NO DEFENSE" rotated */
+    ctx.save();
+    ctx.translate(wallX + 18, H * 0.5);
+    ctx.rotate(-Math.PI / 2);
+    ctx.font = '600 ' + Math.max(8, W * 0.006) + 'px "Fira Code", monospace';
+    ctx.fillStyle = rgba(COL.red, 0.3);
+    ctx.textAlign = 'center';
+    ctx.fillText('NO AUTOMATED DEFENSE', 0, 0);
+    ctx.restore();
+
+    ctx.restore();
+  }
+
+  /* ══════════════════════════════════════════
+     Attack probes — go THROUGH the broken wall
+     ══════════════════════════════════════════ */
+  var probes = [];
+  var breachFlashes = [];
+  var stats = { breached: 0, launched: 0, active: 0 };
+
+  function spawnProbe() {
+    if (vecPositions.length === 0) return;
+    var vi = Math.floor(Math.random() * vecPositions.length);
+    var vp = vecPositions[vi];
+    if (!vp) return;
+    stats.launched++;
+    probes.push({
+      sx: vp.right + 5,
+      sy: vp.y,
+      t: 0,
+      speed: 0.005 + Math.random() * 0.007,
+      color: vectors[vi].color,
+      done: false,
+      targetX: W * 0.85
+    });
+  }
+
+  function drawProbes() {
+    var wallX = W * 0.56;
+
+    for (var p = probes.length - 1; p >= 0; p--) {
+      var pr = probes[p];
+      pr.t += pr.speed;
+
+      if (!pr.done) {
+        var px = pr.sx + (pr.targetX - pr.sx) * pr.t;
+        var py = pr.sy + Math.sin(pr.t * Math.PI * 4) * 3;
+
+        /* Flash when crossing the wall */
+        var wallCross = (wallX - pr.sx) / (pr.targetX - pr.sx);
+        if (pr.t > wallCross && !pr.flashed) {
+          pr.flashed = true;
+          stats.breached++;
+          breachFlashes.push({ x: wallX, y: pr.sy, life: 1, color: pr.color });
+        }
+
+        if (pr.t >= 1) {
+          pr.done = true;
+        } else {
+          ctx.save();
+
+          /* Probe head — glows brighter after wall */
+          var pastWall = pr.t > wallCross;
+          var headR = pastWall ? 5 : 4;
+          var headA = pastWall ? 1 : 0.8;
+
+          var probeGrad = ctx.createRadialGradient(px, py, 0, px, py, headR + 3);
+          probeGrad.addColorStop(0, rgba(pr.color, headA));
+          probeGrad.addColorStop(0.5, rgba(pr.color, headA * 0.4));
+          probeGrad.addColorStop(1, rgba(pr.color, 0));
+          ctx.fillStyle = probeGrad;
+          ctx.beginPath();
+          ctx.arc(px, py, headR + 3, 0, Math.PI * 2);
+          ctx.fill();
+
+          /* Core */
+          ctx.beginPath();
+          ctx.arc(px, py, 2, 0, Math.PI * 2);
+          ctx.fillStyle = rgba(COL.white, 0.9);
+          ctx.fill();
+
+          /* Trail */
+          for (var tr = 1; tr <= 8; tr++) {
+            var tt = pr.t - tr * 0.012;
+            if (tt < 0) continue;
+            var trx = pr.sx + (pr.targetX - pr.sx) * tt;
+            ctx.beginPath();
+            ctx.arc(trx, pr.sy + Math.sin(tt * Math.PI * 4) * 3, 1.8 - tr * 0.15, 0, Math.PI * 2);
+            ctx.fillStyle = rgba(pr.color, (1 - tr/8) * 0.35);
+            ctx.fill();
+          }
+          ctx.restore();
+        }
+      }
+
+      if (pr.done && pr.t > 2) probes.splice(p, 1);
+    }
+  }
+
+  function drawBreachFlashes() {
+    for (var e = breachFlashes.length - 1; e >= 0; e--) {
+      var bf = breachFlashes[e];
+      if (bf.life <= 0) { breachFlashes.splice(e, 1); continue; }
+
+      ctx.save();
+      ctx.globalAlpha = bf.life;
+
+      /* Red breach ring */
+      var ringR = (1 - bf.life) * 18;
+      ctx.beginPath();
+      ctx.arc(bf.x, bf.y, ringR, 0, Math.PI * 2);
+      ctx.strokeStyle = rgba(COL.red, bf.life * 0.7);
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      /* "BREACH" text */
+      if (bf.life > 0.6) {
+        ctx.font = '700 7px "Fira Code", monospace';
+        ctx.fillStyle = rgba(COL.red, (bf.life - 0.6) * 2.5);
+        ctx.textAlign = 'center';
+        ctx.fillText('BREACH', bf.x, bf.y - ringR - 5);
+      }
+
+      ctx.restore();
+      bf.life -= 0.035;
+    }
+  }
+
+  /* ══════════════════════════════════════════
+     PHASE 4: Customer reality (right side)
+     — overwhelmed, manual, chaotic
+     ══════════════════════════════════════════ */
+  var painPoints = [
+    {
+      label: 'Prompt Injection',
+      sub: 'LLMs exposed, no input validation',
+      icon: 'prompt',
+      color: COL.red,
+      stat: 'zero guardrails on production LLMs',
+      startSec: 12.0
+    },
+    {
+      label: 'No AI Governance',
+      sub: 'Models deployed without policy or audit',
+      icon: 'ai',
+      color: COL.orange,
+      stat: 'shadow AI across 12 teams',
+      startSec: 13.0
+    },
+    {
+      label: 'Secrets Everywhere',
+      sub: '200+ repos, hardcoded keys, no rotation',
+      icon: 'secrets',
+      color: COL.yellow,
+      stat: '1,247 exposed credentials found',
+      startSec: 14.0
+    },
+    {
+      label: 'Manual SecOps',
+      sub: 'Tickets, spreadsheets, 4-day response',
+      icon: 'manual',
+      color: COL.pink,
+      stat: 'humans vs. autonomous AI attacks',
+      startSec: 15.0
+    },
+    {
+      label: 'Multi-Infra Chaos',
+      sub: 'K8s + VMs + serverless + bare metal',
+      icon: 'cloud',
+      color: COL.purple,
+      stat: '5 platforms, 0 unified security',
+      startSec: 16.0
+    }
+  ];
+
+  function drawPainIcon(x, y, size, type, color) {
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 1.5;
+    var s = size;
+
+    if (type === 'prompt') {
+      /* Chat bubble with injection arrow */
+      ctx.beginPath();
+      ctx.moveTo(x - s*0.25, y - s*0.2);
+      ctx.lineTo(x + s*0.25, y - s*0.2);
+      ctx.arcTo(x + s*0.35, y - s*0.2, x + s*0.35, y, 4);
+      ctx.lineTo(x + s*0.35, y + s*0.1);
+      ctx.arcTo(x + s*0.35, y + s*0.2, x + s*0.25, y + s*0.2, 4);
+      ctx.lineTo(x - s*0.1, y + s*0.2);
+      ctx.lineTo(x - s*0.2, y + s*0.35);
+      ctx.lineTo(x - s*0.15, y + s*0.2);
+      ctx.lineTo(x - s*0.25, y + s*0.2);
+      ctx.arcTo(x - s*0.35, y + s*0.2, x - s*0.35, y + s*0.1, 4);
+      ctx.lineTo(x - s*0.35, y - s*0.1);
+      ctx.arcTo(x - s*0.35, y - s*0.2, x - s*0.25, y - s*0.2, 4);
+      ctx.stroke();
+      /* Injection arrow */
+      ctx.beginPath();
+      ctx.moveTo(x - s*0.15, y);
+      ctx.lineTo(x + s*0.15, y);
+      ctx.lineTo(x + s*0.08, y - s*0.06);
+      ctx.moveTo(x + s*0.15, y);
+      ctx.lineTo(x + s*0.08, y + s*0.06);
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    } else if (type === 'manual') {
+      /* Person with clipboard */
+      ctx.beginPath();
+      ctx.arc(x, y - s*0.3, s*0.15, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x, y - s*0.15);
+      ctx.lineTo(x, y + s*0.15);
+      ctx.moveTo(x - s*0.2, y);
+      ctx.lineTo(x + s*0.2, y);
+      ctx.stroke();
+      /* Clipboard */
+      ctx.strokeRect(x + s*0.15, y - s*0.15, s*0.25, s*0.35);
+      ctx.beginPath();
+      ctx.moveTo(x + s*0.2, y - s*0.02);
+      ctx.lineTo(x + s*0.35, y - s*0.02);
+      ctx.moveTo(x + s*0.2, y + s*0.08);
+      ctx.lineTo(x + s*0.35, y + s*0.08);
+      ctx.stroke();
+    } else if (type === 'repos') {
+      /* Stacked folders */
+      for (var i = 0; i < 3; i++) {
+        var ox = i * 3;
+        var oy = -i * 4;
+        ctx.strokeRect(x - s*0.2 + ox, y - s*0.15 + oy, s*0.4, s*0.3);
+        ctx.beginPath();
+        ctx.moveTo(x - s*0.2 + ox, y - s*0.15 + oy);
+        ctx.lineTo(x - s*0.1 + ox, y - s*0.25 + oy);
+        ctx.lineTo(x + s*0.05 + ox, y - s*0.25 + oy);
+        ctx.lineTo(x + ox, y - s*0.15 + oy);
+        ctx.stroke();
+      }
+    } else if (type === 'cloud') {
+      /* Multiple cloud shapes */
+      var clouds = [{dx: -s*0.15, dy: 0, r: s*0.18}, {dx: s*0.15, dy: -s*0.05, r: s*0.15}, {dx: 0, dy: s*0.1, r: s*0.12}];
+      for (var c = 0; c < clouds.length; c++) {
+        ctx.beginPath();
+        ctx.arc(x + clouds[c].dx, y + clouds[c].dy, clouds[c].r, Math.PI, 0);
+        ctx.stroke();
+        /* ? mark inside */
+        ctx.font = '700 ' + (clouds[c].r * 0.8) + 'px "Fira Code", monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.globalAlpha = 0.5;
+        ctx.fillText('?', x + clouds[c].dx, y + clouds[c].dy - clouds[c].r * 0.2);
+        ctx.globalAlpha = 1;
+      }
+    } else if (type === 'secrets') {
+      /* Key with warning */
+      ctx.beginPath();
+      ctx.arc(x - s*0.1, y, s*0.12, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x + s*0.02, y);
+      ctx.lineTo(x + s*0.3, y);
+      ctx.moveTo(x + s*0.2, y);
+      ctx.lineTo(x + s*0.2, y + s*0.1);
+      ctx.stroke();
+      /* Danger ! */
+      ctx.font = '700 ' + (s * 0.35) + 'px "Fira Code", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('!', x + s*0.35, y + s*0.05);
+    } else if (type === 'ai') {
+      /* Brain with X */
+      ctx.beginPath();
+      ctx.arc(x, y, s*0.25, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x - s*0.12, y - s*0.12);
+      ctx.lineTo(x + s*0.12, y + s*0.12);
+      ctx.moveTo(x + s*0.12, y - s*0.12);
+      ctx.lineTo(x - s*0.12, y + s*0.12);
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function drawPainCard(idx, alpha) {
+    if (alpha <= 0) return;
+    var pp = painPoints[idx];
+    var lx = W * 0.6;
+    var spacing = H * 0.145;
+    var ly = H * 0.12 + idx * spacing;
+    var lw = W * 0.36;
+    var lh = H * 0.115;
+    var sec = frame / FPS;
+
+    ctx.save();
+
+    /* Slide in from right */
+    var slideX = (1 - alpha) * W * 0.1;
+    ctx.translate(slideX, 0);
+    ctx.globalAlpha = alpha;
+
+    /* Card bg — darker, more ominous */
+    roundRect(lx, ly, lw, lh, 8);
+    ctx.fillStyle = rgba('#0a0818', 0.9);
+    ctx.fill();
+
+    /* Red danger border */
+    roundRect(lx, ly, lw, lh, 8);
+    var borderPulse = 0.2 + Math.sin(sec * 2.5 + idx * 1.3) * 0.1;
+    ctx.strokeStyle = rgba(pp.color, borderPulse);
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    /* Left danger accent — pulsing */
+    var accentPulse = 0.3 + Math.sin(sec * 3 + idx) * 0.3;
+    ctx.fillStyle = rgba(pp.color, accentPulse);
+    ctx.fillRect(lx, ly + 4, 3, lh - 8);
+
+    /* Icon */
+    drawPainIcon(lx + 28, ly + lh * 0.42, 22, pp.icon, rgba(pp.color, 0.7));
+
+    /* Title */
+    ctx.font = '600 ' + Math.max(10, W * 0.008) + 'px "Fira Code", monospace';
+    ctx.fillStyle = pp.color;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText(pp.label, lx + 50, ly + lh * 0.12);
+
+    /* Subtitle */
+    ctx.font = '400 ' + Math.max(8, W * 0.006) + 'px "Fira Code", monospace';
+    ctx.fillStyle = rgba(COL.muted, 0.55);
+    ctx.fillText(pp.sub, lx + 50, ly + lh * 0.38);
+
+    /* Danger stat — red terminal text */
+    ctx.font = '500 ' + Math.max(8, W * 0.006) + 'px "Fira Code", monospace';
+    var statFlicker = 0.5 + Math.sin(sec * 5 + idx * 2) * 0.3;
+    ctx.fillStyle = rgba(COL.red, statFlicker);
+    ctx.fillText('> ' + pp.stat, lx + 50, ly + lh * 0.65);
+
+    /* Status: EXPOSED / UNPROTECTED — blinking */
+    var blinkOn = Math.sin(sec * 3 + idx * 1.5) > 0;
+    ctx.font = '700 7px "Fira Code", monospace';
+    ctx.textAlign = 'right';
+    ctx.fillStyle = blinkOn ? rgba(COL.red, 0.8) : rgba(COL.red, 0.2);
+    ctx.fillText('EXPOSED', lx + lw - 10, ly + 12);
+
+    ctx.restore();
+  }
+
+  /* ══════════════════════════════════════════
+     Background elements
+     ══════════════════════════════════════════ */
+  function drawBg() {
+    /* Hex grid */
+    var hexR = 35;
+    var hexH = hexR * Math.sqrt(3);
+    ctx.strokeStyle = rgba(COL.purple, 0.025);
+    ctx.lineWidth = 0.5;
+    for (var row = -1; row < H / hexH + 1; row++) {
+      for (var col = -1; col < W / (hexR * 1.5) + 1; col++) {
+        var cx = col * hexR * 1.5;
+        var cy = row * hexH + (col % 2 ? hexH / 2 : 0);
+        ctx.beginPath();
+        for (var i = 0; i < 6; i++) {
+          var angle = Math.PI / 3 * i + Math.PI / 6;
+          var hx = cx + hexR * 0.85 * Math.cos(angle);
+          var hy = cy + hexR * 0.85 * Math.sin(angle);
+          if (i === 0) ctx.moveTo(hx, hy);
+          else ctx.lineTo(hx, hy);
+        }
+        ctx.closePath();
+        ctx.stroke();
+      }
+    }
+
+    /* CRT scanlines */
+    ctx.fillStyle = rgba('#000000', 0.025);
+    for (var y = 0; y < H; y += 3) {
+      ctx.fillRect(0, y, W, 1);
+    }
+
+    /* Left red vignette */
+    var lv = ctx.createLinearGradient(0, 0, W * 0.35, 0);
+    lv.addColorStop(0, rgba(COL.red, 0.05));
+    lv.addColorStop(1, 'transparent');
+    ctx.fillStyle = lv;
+    ctx.fillRect(0, 0, W * 0.35, H);
+
+    /* Right — also ominous, no safe zone */
+    var rv = ctx.createLinearGradient(W * 0.65, 0, W, 0);
+    rv.addColorStop(0, 'transparent');
+    rv.addColorStop(1, rgba(COL.red, 0.025));
+    ctx.fillStyle = rv;
+    ctx.fillRect(W * 0.65, 0, W * 0.35, H);
+  }
+
+  /* ══════════════════════════════════════════
+     Radar + threat counter
+     ══════════════════════════════════════════ */
+  function drawRadar(alpha) {
+    if (alpha <= 0) return;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    var sec = frame / FPS;
+
+    var rx = W * 0.12;
+    var ry = H * 0.88;
+    var rr = Math.min(W * 0.06, H * 0.07);
+
+    /* Rings */
+    for (var r = 1; r <= 3; r++) {
+      ctx.beginPath();
+      ctx.arc(rx, ry, rr * r / 3, 0, Math.PI * 2);
+      ctx.strokeStyle = rgba(COL.red, 0.12);
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
+
+    /* Sweep */
+    var sweepA = (sec * 1.2) % (Math.PI * 2);
+    var sweepGrad = ctx.createRadialGradient(rx, ry, 0, rx, ry, rr);
+    sweepGrad.addColorStop(0, rgba(COL.red, 0.2));
+    sweepGrad.addColorStop(1, rgba(COL.red, 0));
+    ctx.fillStyle = sweepGrad;
+    ctx.beginPath();
+    ctx.moveTo(rx, ry);
+    ctx.arc(rx, ry, rr, sweepA - 0.5, sweepA);
+    ctx.closePath();
+    ctx.fill();
+
+    /* Cross */
+    ctx.strokeStyle = rgba(COL.red, 0.15);
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(rx - rr, ry);
+    ctx.lineTo(rx + rr, ry);
+    ctx.moveTo(rx, ry - rr);
+    ctx.lineTo(rx, ry + rr);
+    ctx.stroke();
+
+    /* Blips */
+    for (var b = 0; b < 5; b++) {
+      var ba = sweepA - b * 0.15;
+      var bd = rr * (0.3 + (b * 0.14));
+      var bx = rx + Math.cos(ba + b * 1.8) * bd;
+      var by = ry + Math.sin(ba + b * 1.8) * bd;
+      ctx.beginPath();
+      ctx.arc(bx, by, 2, 0, Math.PI * 2);
+      ctx.fillStyle = rgba(COL.red, 0.7 - b * 0.12);
+      ctx.fill();
+    }
+
+    /* Label */
+    ctx.font = '600 8px "Fira Code", monospace';
+    ctx.fillStyle = rgba(COL.red, 0.5);
+    ctx.textAlign = 'center';
+    ctx.fillText('THREAT RADAR', rx, ry - rr - 6);
+
+    ctx.restore();
+  }
+
+  /* ══════════════════════════════════════════
+     Stats bar
+     ══════════════════════════════════════════ */
+  function drawStats(alpha) {
+    if (alpha <= 0) return;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    var sec = frame / FPS;
+
+    var barY = H * 0.95;
+    var fontSize = Math.max(9, W * 0.007);
+    ctx.font = '500 ' + fontSize + 'px "Fira Code", monospace';
+    ctx.textBaseline = 'middle';
+
+    var items = [
+      { key: 'threats:', val: String(stats.active), color: COL.red, x: 0.25 },
+      { key: 'probes:', val: String(stats.launched), color: COL.orange, x: 0.4 },
+      { key: 'breached:', val: String(stats.breached), color: COL.red, x: 0.55 },
+      { key: 'defense:', val: '"NONE"', color: COL.red, x: 0.7 },
+      { key: 'status:', val: '"EXPOSED"', color: COL.red, x: 0.83 }
+    ];
+
+    for (var i = 0; i < items.length; i++) {
+      var ix = W * items[i].x;
+      ctx.textAlign = 'right';
+      ctx.fillStyle = rgba(COL.muted, 0.5);
+      ctx.fillText(items[i].key + ' ', ix, barY);
+      ctx.textAlign = 'left';
+      ctx.fillStyle = rgba(items[i].color, 0.9);
+      ctx.fillText(items[i].val, ix + 2, barY);
+    }
+
+    /* Uptime */
+    ctx.textAlign = 'right';
+    ctx.fillStyle = rgba(COL.muted, 0.3);
+    var mm = String(Math.floor(sec / 60));
+    var ss = String(Math.floor(sec % 60));
+    if (mm.length < 2) mm = '0' + mm;
+    if (ss.length < 2) ss = '0' + ss;
+    ctx.fillText('uptime ' + mm + ':' + ss, W * 0.97, barY);
+
+    ctx.restore();
+  }
+
+  /* ══════════════════════════════════════════
+     MAIN DRAW
+     ══════════════════════════════════════════ */
+  function draw() {
+    if (!W || !H) return;
+    ctx.clearRect(0, 0, W, H);
+    frame++;
+    var sec = frame / FPS;
+
+    ctx.fillStyle = COL.bg;
+    ctx.fillRect(0, 0, W, H);
+    drawBg();
+
+    /* ── Phase 0: Title (0-2s) ── */
+    var titleA = ease(0.3, 1.2);
+    if (titleA > 0) {
+      ctx.save();
+      ctx.globalAlpha = titleA;
+      var ts = Math.max(14, W * 0.017);
+      ctx.font = '700 ' + ts + 'px "Fira Code", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      ctx.shadowColor = rgba(COL.red, 0.3);
+      ctx.shadowBlur = 20;
+      var tg = ctx.createLinearGradient(W*0.1, 0, W*0.9, 0);
+      tg.addColorStop(0, COL.red);
+      tg.addColorStop(0.4, COL.orange);
+      tg.addColorStop(0.6, COL.muted);
+      tg.addColorStop(1, COL.green);
+      ctx.fillStyle = tg;
+      ctx.fillText('NEXT-GEN AI ATTACKS REQUIRE PROGRAMMED SECOPS AUTOMATION', W/2, H * 0.05);
+      ctx.shadowBlur = 0;
+      ctx.restore();
+    }
+
+    /* ── Phase 1: Threat actors appear one by one (2-6s) ── */
+    stats.active = 0;
+    for (var a = 0; a < threatActors.length; a++) {
+      var actorA = ease(threatActors[a].startSec, 1.5);
+      drawThreatActor(threatActors[a], actorA);
+      if (actorA > 0.5) stats.active++;
+    }
+
+    /* ── "Thousands scanning" text after actors ── */
+    var scanTxt = ease(6.0, 0.8);
+    if (scanTxt > 0) {
+      ctx.save();
+      ctx.globalAlpha = scanTxt * 0.5;
+      ctx.font = '400 ' + Math.max(8, W * 0.006) + 'px "Fira Code", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = COL.muted;
+      ctx.fillText('// hackers run AI agents 24/7 against your infra', W * 0.12, H * 0.87);
+      ctx.fillText('// autonomous, adaptive, never sleeping', W * 0.12, H * 0.9);
+      ctx.restore();
+    }
+
+    /* ── Phase 2: Attack vectors appear (7-10s) ── */
+    vecPositions = [];
+    for (var v = 0; v < vectors.length; v++) {
+      var vA = ease(vectors[v].startSec, 0.5);
+      var pos = drawVectorPill(v, vA);
+      vecPositions.push(pos);
+    }
+
+    /* ── Attack lines from actors to vectors (after vectors appear) ── */
+    var linesA = ease(10.0, 1.0);
+    drawAttackLines(linesA);
+
+    /* ── Phase 3: Broken wall — no real defense (11s) ── */
+    var wallA = ease(11.0, 1.5);
+    drawBrokenWall(wallA);
+
+    /* ── Probes start launching and GO THROUGH (12s+) ── */
+    if (sec > 12 && frame % 25 === 0) {
+      spawnProbe();
+    }
+    drawProbes();
+    drawBreachFlashes();
+
+    /* ── Phase 4: Customer pain points slide in (12-16s) ── */
+    for (var d = 0; d < painPoints.length; d++) {
+      drawPainCard(d, ease(painPoints[d].startSec, 1.0));
+    }
+
+    /* ── "YOUR REALITY" header on right side ── */
+    var realityA = ease(11.5, 0.8);
+    if (realityA > 0) {
+      ctx.save();
+      ctx.globalAlpha = realityA * 0.7;
+      ctx.font = '700 ' + Math.max(10, W * 0.009) + 'px "Fira Code", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = COL.red;
+      var rFlicker = Math.sin(sec * 2) > 0 ? 1 : 0.5;
+      ctx.globalAlpha = realityA * 0.5 * rFlicker;
+      ctx.fillText('YOUR INFRASTRUCTURE TODAY', W * 0.78, H * 0.085);
+      ctx.globalAlpha = realityA * 0.3;
+      ctx.font = '400 ' + Math.max(8, W * 0.006) + 'px "Fira Code", monospace';
+      ctx.fillStyle = COL.muted;
+      ctx.fillText('// no agents. no automation. no chance.', W * 0.78, H * 0.11);
+      ctx.restore();
+    }
+
+    /* ── Radar (bottom left) ── */
+    drawRadar(ease(3.0, 1.0));
+
+    /* ── Stats bar ── */
+    drawStats(ease(17.0, 1.0));
+
+    /* ── Branding ── */
+    if (sec > 1) {
+      ctx.save();
+      ctx.globalAlpha = 0.2;
+      ctx.font = '400 10px "Fira Code", monospace';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'bottom';
+      ctx.fillStyle = COL.purple;
+      ctx.fillText('{ Stacktic }', W - 14, H - 8);
+      ctx.restore();
+    }
+  }
+
+  var visible = true;
+  document.addEventListener('visibilitychange', function() {
+    visible = !document.hidden;
+    if (visible) loop();
+  });
+  function loop() {
+    if (!visible) return;
+    draw();
+    requestAnimationFrame(loop);
+  }
+  if (document.readyState === 'complete') loop();
+  else window.addEventListener('load', loop);
+})();
+</script>
+</body>
+</html>

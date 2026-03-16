@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stacktic Framework v2</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { width: 100%; height: 100%; }
+    body {
+      font-family: 'Fira Code', 'Courier New', monospace;
+      background: #1a1836;
+      color: #e2e8f0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      margin: 0;
+    }
+    canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+    }
+  </style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+(function() {
+  var canvas = document.getElementById('c');
+  var ctx = canvas.getContext('2d');
+  var dpr = window.devicePixelRatio || 1;
+  var W = 0, H = 0, frame = 0, vis = true;
+  var L = {};
+  var FPS = 60;
+
+  // ── Timing: seconds → frame ──
+  function sec(s) { return s * FPS; }
+  // Smooth 0→1 over duration starting at startFrame
+  function ease(startSec, durSec) {
+    var s = sec(startSec), d = sec(durSec);
+    var t = (frame - s) / d;
+    if (t <= 0) return 0;
+    if (t >= 1) return 1;
+    // ease-out cubic
+    return 1 - Math.pow(1 - t, 3);
+  }
+  // Is phase active (past start)?
+  function after(s) { return frame >= sec(s); }
+
+  function resize() {
+    W = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0, 800);
+    H = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0, 600);
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    buildLayout();
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  document.addEventListener('visibilitychange', function() { vis = !document.hidden; if (vis) animate(); });
+
+  // ── Colors ──
+  var purple = '#c084fc', cyan = '#60d5ff', green = '#34d399';
+  var yellow = '#fbbf24', pink = '#f472b6', red = '#f87171';
+  var indigo = '#818cf8', white = '#ffffff', dim = '#94a3b8';
+  var cardBg = '#2A2847', deep = '#0f172a';
+
+  function rgba(hex, a) {
+    var r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+    return 'rgba('+r+','+g+','+b+','+a+')';
+  }
+
+  /*
+   * ════════════════════════════════════════
+   *  ANIMATION TIMELINE (seconds)
+   * ════════════════════════════════════════
+   *  0.0 - 1.0   Title fades in
+   *  1.0 - 6.0   Role cards appear one-by-one (1s each), arrow draws after each
+   *  6.5 - 8.0   Stacktic platform materializes
+   *  8.0 - 8.5   "step 01 — connect" label
+   *  8.5 - 10.0  Platform → Integration arrow + bubble
+   *  10.0 - 11.5 Platform → Relationships arrow + bubble
+   *  11.5 - 13.0 Platform → Full Stack arrow + bubble
+   *  13.0 - 13.5 "step 02 — generate" label
+   *  13.5 - 15.0 Flow nodes appear one-by-one
+   *  15.0 - 16.5 All-as-Code + Sync-to-K8s outputs
+   *  16.5+       Everything visible, subtle ambient pulses
+   */
+
+  // Role timings: each card starts 1s apart
+  var ROLE_START = [1.0, 2.0, 3.0, 4.0, 5.0];
+  var ROLE_DUR = 0.6;
+  var ARROW_DELAY = 0.3; // arrow starts 0.3s after card
+  var ARROW_DUR = 0.8;
+
+  var PLAT_START = 6.5, PLAT_DUR = 1.2;
+  var STEP1_START = 8.0, STEP1_DUR = 0.5;
+
+  var BUBBLE_START = [8.5, 10.0, 11.5];
+  var BUBBLE_ARROW_DUR = 0.6;
+  var BUBBLE_DUR = 0.8;
+
+  var STEP2_START = 13.0, STEP2_DUR = 0.5;
+  var FLOW_START = [13.5, 14.0, 14.5, 15.0];
+  var FLOW_DUR = 0.5;
+
+  var OUT_START = 15.5, OUT_DUR = 0.8;
+
+  // ── Layout ──
+  function buildLayout() {
+    var cx = W / 2;
+    var rX = W * 0.09, rStartY = H * 0.13, rGap = H * 0.135;
+
+    var roles = [
+      { label: 'AI',      sub: 'Intelligence',           icon: '\u26A1', color: purple },
+      { label: 'DataOps', sub: 'Pipelines & Data',       icon: '\u25C6', color: cyan },
+      { label: 'Manager', sub: 'Ask Business Questions',  icon: '\u25C8', color: yellow },
+      { label: 'SecOps',  sub: 'Security & Compliance',  icon: '\u2B21', color: green },
+      { label: 'Dev',     sub: 'Architecture',           icon: '</>', color: pink }
+    ];
+    for (var i = 0; i < roles.length; i++) { roles[i].x = rX; roles[i].y = rStartY + i * rGap; }
+
+    var pW = W * 0.28, pH = H * 0.25;
+    var platform = { x: cx + W * 0.05, y: H * 0.34, w: pW, h: pH };
+
+    var bW = W * 0.23, bH = H * 0.19, bGap = W * 0.02;
+    var bTotal = bW * 3 + bGap * 2;
+    var bStartX = platform.x - bTotal / 2;
+    var bY = H * 0.63;
+    var bubbles = [
+      { label: 'INTEGRATION', color: '#4338ca',
+        items: [['</>', 'Source Code'], ['Git', 'Version'], ['Py', 'Python'], ['API', 'Services'],
+                ['React', 'Framework'], ['Helm', 'K8s Deploy'], ['Docker', 'Container'], ['Ollama', 'LLM']] },
+      { label: 'RELATIONSHIPS', color: '#059669',
+        items: [['K', 'Kafka'], ['RMQ', 'RabbitMQ'], ['Spark', 'Streaming'], ['Flink', 'Processing'],
+                ['Mongo', 'MongoDB'], ['PG', 'PostgreSQL'], ['Redis', 'Cache'], ['Air', 'Airflow']] },
+      { label: 'FULL STACK', color: '#7c3aed',
+        layers: ['Stack Topology', 'Data Pipelines', 'Observability', 'Ops Ready', 'SecOps Compliant', 'Versioning', 'CI/CD Ready'] }
+    ];
+    for (var i = 0; i < bubbles.length; i++) {
+      bubbles[i].x = bStartX + i * (bW + bGap); bubbles[i].y = bY; bubbles[i].w = bW; bubbles[i].h = bH;
+    }
+
+    var fY = H * 0.90, fSpread = W * 0.16, fBase = platform.x;
+    var flow = [
+      { label: 'Integrate',   x: fBase - fSpread * 1.5, y: fY },
+      { label: 'Assemble',    x: fBase - fSpread * 0.5, y: fY },
+      { label: 'Automate',    x: fBase + fSpread * 0.5, y: fY },
+      { label: 'Operational', x: fBase + fSpread * 1.5, y: fY }
+    ];
+
+    var outX = fBase + fSpread * 1.5 + W * 0.12;
+    var outputs = [
+      { label: 'All as Code', sub: 'GitHub / GitOps', icon: '{ }', color: purple, x: outX, y: fY - H * 0.06 },
+      { label: 'Sync to K8s', sub: 'Cloud Agnostic', icon: '\u2601', color: cyan, x: outX, y: fY + H * 0.06 }
+    ];
+
+    // Compliance gauges — right side
+    var compX = W * 0.88;
+    var compGap = H * 0.17;
+    var compCenterY = H * 0.38;
+    var compliance = [
+      { label: 'PCI-DSS', pct: 78, color: '#f59e0b', x: compX, y: compCenterY - compGap * 0.5 },
+      { label: 'HIPAA',   pct: 88, color: '#10b981', x: compX, y: compCenterY + compGap * 0.5 }
+    ];
+
+    L = { roles: roles, platform: platform, bubbles: bubbles, flow: flow, outputs: outputs, cx: platform.x, compliance: compliance };
+  }
+
+  // ── Ambient ──
+  var ambient = [];
+  for (var i = 0; i < 40; i++) ambient.push({ x: Math.random(), y: Math.random(), s: 0.5 + Math.random() * 1.5, ph: Math.random() * Math.PI * 2 });
+
+  // ── Drawing helpers ──
+  function roundRect(x, y, w, h, r) {
+    if (w < 1 || h < 1) return;
+    r = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+    ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+    ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+    ctx.closePath();
+  }
+
+  function fs(ratio) { return Math.max(8, Math.min(ratio * W, 30)); }
+
+  function bezPoint(sx,sy,mx,my,tx,ty,t) {
+    return { x:(1-t)*(1-t)*sx+2*(1-t)*t*mx+t*t*tx, y:(1-t)*(1-t)*sy+2*(1-t)*t*my+t*t*ty };
+  }
+
+  // Draw a curved arrow that "grows" from 0→progress (0-1)
+  function drawGrowingArrow(sx, sy, tx, ty, color, bendX, bendY, progress) {
+    if (progress <= 0) return;
+    var mx = (sx+tx)/2 + (bendX||0);
+    var my = (sy+ty)/2 + (bendY||0);
+
+    // Draw path up to progress point
+    ctx.beginPath();
+    ctx.moveTo(sx, sy);
+    var steps = Math.floor(progress * 40);
+    for (var i = 1; i <= steps; i++) {
+      var t = (i / 40);
+      if (t > progress) t = progress;
+      var p = bezPoint(sx,sy,mx,my,tx,ty,t);
+      ctx.lineTo(p.x, p.y);
+    }
+    ctx.strokeStyle = rgba(color, 0.4);
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+
+    // Glowing head at the tip
+    var tip = bezPoint(sx,sy,mx,my,tx,ty, progress);
+    var g = ctx.createRadialGradient(tip.x, tip.y, 0, tip.x, tip.y, 14);
+    g.addColorStop(0, rgba(color, 0.8));
+    g.addColorStop(1, 'transparent');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(tip.x, tip.y, 14, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(tip.x, tip.y, 3, 0, Math.PI*2);
+    ctx.fillStyle = color; ctx.fill();
+
+    // Arrowhead when fully drawn
+    if (progress >= 0.98) {
+      var ap = bezPoint(sx,sy,mx,my,tx,ty, 0.95);
+      var ang = Math.atan2(ty - ap.y, tx - ap.x);
+      ctx.beginPath();
+      ctx.moveTo(tx, ty);
+      ctx.lineTo(tx - 10*Math.cos(ang-0.35), ty - 10*Math.sin(ang-0.35));
+      ctx.lineTo(tx - 10*Math.cos(ang+0.35), ty - 10*Math.sin(ang+0.35));
+      ctx.closePath();
+      ctx.fillStyle = rgba(color, 0.6);
+      ctx.fill();
+    }
+  }
+
+  // Subtle travelling spark on a completed arrow (looping)
+  function drawArrowSpark(sx,sy,tx,ty,color,bendX,bendY) {
+    var mx = (sx+tx)/2 + (bendX||0);
+    var my = (sy+ty)/2 + (bendY||0);
+    var t = ((frame * 0.008) % 1);
+    var p = bezPoint(sx,sy,mx,my,tx,ty, t);
+    var g = ctx.createRadialGradient(p.x,p.y,0, p.x,p.y, 8);
+    g.addColorStop(0, rgba(color, 0.5));
+    g.addColorStop(1, 'transparent');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(p.x,p.y, 8, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(p.x,p.y, 2, 0, Math.PI*2);
+    ctx.fillStyle = color; ctx.fill();
+  }
+
+  // Draw a role card
+  function drawRoleCard(role, alpha, slideX) {
+    var cardW = W * 0.12, cardH = H * 0.065;
+    var rx = role.x - cardW/2 + slideX;
+    var ry = role.y - cardH/2;
+
+    ctx.save(); ctx.globalAlpha = alpha;
+
+    // Glow
+    var cg = ctx.createRadialGradient(role.x+slideX, role.y, 0, role.x+slideX, role.y, cardW*0.9);
+    cg.addColorStop(0, rgba(role.color, 0.06)); cg.addColorStop(1, 'transparent');
+    ctx.fillStyle = cg; ctx.beginPath(); ctx.arc(role.x+slideX, role.y, cardW*0.9, 0, Math.PI*2); ctx.fill();
+
+    // Card
+    roundRect(rx, ry, cardW, cardH, 12);
+    ctx.fillStyle = rgba(cardBg, 0.92); ctx.fill();
+    ctx.strokeStyle = rgba(role.color, 0.4); ctx.lineWidth = 2; ctx.stroke();
+
+    // Accent line
+    ctx.beginPath(); ctx.moveTo(rx+12, ry); ctx.lineTo(rx+cardW-12, ry);
+    ctx.strokeStyle = role.color; ctx.lineWidth = 3; ctx.stroke();
+
+    // Icon
+    ctx.font = '600 ' + fs(0.013) + 'px "Fira Code", monospace';
+    ctx.fillStyle = role.color; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText(role.icon, rx+10, ry+cardH*0.37);
+
+    // Label
+    ctx.font = '700 ' + fs(0.0105) + 'px "Fira Code", monospace';
+    ctx.fillStyle = white;
+    ctx.fillText(role.label, rx+10+W*0.023, ry+cardH*0.33);
+
+    // Sub
+    ctx.font = '400 ' + fs(0.007) + 'px "Fira Code", monospace';
+    ctx.fillStyle = rgba(role.color, 0.7);
+    ctx.fillText(role.sub, rx+10+W*0.023, ry+cardH*0.66);
+
+    ctx.restore();
+    return { cardRight: rx + cardW, cy: role.y };
+  }
+
+  // Draw step label with fade
+  function drawStepLabel(x, y, num, text, alpha) {
+    if (alpha <= 0) return;
+    ctx.save(); ctx.globalAlpha = alpha * 0.7;
+    ctx.font = '600 ' + fs(0.008) + 'px "Fira Code", monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = rgba(yellow, 0.6);
+    ctx.fillText('step ' + num, x, y - 10);
+    ctx.font = '400 ' + fs(0.006) + 'px "Fira Code", monospace';
+    ctx.fillStyle = rgba(dim, 0.5);
+    ctx.fillText(text, x, y + 6);
+    ctx.restore();
+  }
+
+  // ════════════════════════════════
+  //  MAIN DRAW
+  // ════════════════════════════════
+  function draw() {
+    if (!W || !H || !L.roles) return;
+    ctx.clearRect(0, 0, W, H);
+    frame++;
+
+    var P = L.platform;
+    var cardW = W * 0.12;
+
+    // ── Grid ──
+    ctx.strokeStyle = 'rgba(139,92,246,0.018)'; ctx.lineWidth = 1;
+    for (var gx = 0; gx < W; gx += 60) { ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,H); ctx.stroke(); }
+    for (var gy = 0; gy < H; gy += 60) { ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(W,gy); ctx.stroke(); }
+
+    // ── Ambient (always) ──
+    for (var ai = 0; ai < ambient.length; ai++) {
+      var a = ambient[ai];
+      var ap = 0.08 + Math.sin(frame*0.012 + a.ph)*0.08;
+      ctx.beginPath(); ctx.arc(a.x*W, a.y*H, a.s, 0, Math.PI*2);
+      ctx.fillStyle = rgba(purple, ap); ctx.fill();
+    }
+
+    // ════════════════════════════════
+    //  TITLE (0.0 - 1.0s)
+    // ════════════════════════════════
+    var titleA = ease(0.0, 1.0);
+    if (titleA > 0) {
+      ctx.save(); ctx.globalAlpha = titleA;
+      ctx.font = '700 ' + fs(0.022) + 'px "Fira Code", monospace';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      var tg = ctx.createLinearGradient(W*0.3, 0, W*0.7, 0);
+      tg.addColorStop(0, purple); tg.addColorStop(0.35, cyan); tg.addColorStop(0.65, green); tg.addColorStop(1, yellow);
+      ctx.fillStyle = tg;
+      ctx.fillText('Stacktic Framework', L.cx, H*0.03);
+      ctx.restore();
+    }
+
+    // ════════════════════════════════
+    //  ROLE CARDS (1.0s - 6.0s, one per second)
+    // ════════════════════════════════
+    for (var ri = 0; ri < L.roles.length; ri++) {
+      var roleA = ease(ROLE_START[ri], ROLE_DUR);
+      if (roleA <= 0) continue;
+
+      var slideX = (1 - roleA) * -60;
+      var info = drawRoleCard(L.roles[ri], roleA, slideX);
+
+      // Arrow grows from card → platform
+      var arrowProg = ease(ROLE_START[ri] + ARROW_DELAY, ARROW_DUR);
+      if (arrowProg > 0) {
+        var asx = info.cardRight;
+        var asy = info.cy;
+        var atx = P.x - P.w/2;
+        var aty = P.y - P.h*0.3 + ri * P.h*0.15;
+        var bendAmt = (aty - asy) * 0.2;
+        drawGrowingArrow(asx, asy, atx, aty, L.roles[ri].color, 30, bendAmt, arrowProg);
+
+        // After arrow is complete, show subtle looping spark
+        if (arrowProg >= 1) {
+          drawArrowSpark(asx, asy, atx, aty, L.roles[ri].color, 30, bendAmt);
+        }
+      }
+    }
+
+    // ════════════════════════════════
+    //  STEP 01 LABEL
+    // ════════════════════════════════
+    var s1a = ease(STEP1_START, STEP1_DUR);
+    if (s1a > 0) {
+      var midX = (L.roles[2].x + cardW/2 + P.x - P.w/2) / 2;
+      drawStepLabel(midX, L.roles[2].y, '01', 'connect to platform', s1a);
+    }
+
+    // ════════════════════════════════
+    //  STACKTIC PLATFORM (6.5s)
+    // ════════════════════════════════
+    var pa = ease(PLAT_START, PLAT_DUR);
+    if (pa > 0) {
+      ctx.save(); ctx.globalAlpha = pa;
+      var px = P.x - P.w/2, py = P.y - P.h/2;
+
+      // Scale-in effect
+      var scale = 0.85 + pa * 0.15;
+      ctx.translate(P.x, P.y);
+      ctx.scale(scale, scale);
+      ctx.translate(-P.x, -P.y);
+
+      // Glow
+      var pg = ctx.createRadialGradient(P.x, P.y, 0, P.x, P.y, P.w*0.75);
+      pg.addColorStop(0, rgba(indigo, 0.08*pa)); pg.addColorStop(1, 'transparent');
+      ctx.fillStyle = pg; ctx.beginPath(); ctx.arc(P.x, P.y, P.w*0.75, 0, Math.PI*2); ctx.fill();
+
+      // Body
+      roundRect(px, py, P.w, P.h, 16); ctx.fillStyle = deep; ctx.fill();
+
+      // Animated border
+      roundRect(px, py, P.w, P.h, 16);
+      var borderColors = [purple, cyan, green, yellow, pink];
+      var bg = ctx.createLinearGradient(
+        px + P.w*Math.cos(frame*0.02), py + P.h*Math.sin(frame*0.02),
+        px + P.w*Math.cos(frame*0.02+Math.PI), py + P.h*Math.sin(frame*0.02+Math.PI)
+      );
+      var shift = (frame*0.005)%1;
+      for (var ci = 0; ci < 5; ci++) bg.addColorStop(ci/4, borderColors[Math.floor(shift*5+ci)%5]);
+      ctx.strokeStyle = bg; ctx.lineWidth = 3; ctx.stroke();
+
+      // Header
+      var hdrH = 30;
+      roundRect(px, py, P.w, hdrH, 16); ctx.fillStyle = '#1e293b'; ctx.fill();
+      ctx.fillRect(px, py+16, P.w, hdrH-16);
+
+      var dotBaseX = px+P.w-50;
+      var dotCols = ['#ef4444','#fbbf24','#10b981'];
+      for (var di = 0; di < 3; di++) { ctx.beginPath(); ctx.arc(dotBaseX+di*15, py+15, 5, 0, Math.PI*2); ctx.fillStyle = dotCols[di]; ctx.fill(); }
+
+      ctx.font = '700 ' + fs(0.011) + 'px "Fira Code", monospace';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillStyle = indigo;
+      ctx.fillText('STACKTIC', px+14, py+15);
+
+      // Interior
+      var inX = px+14, inY = py+hdrH+10, inW = P.w-28, inH = P.h-hdrH-20;
+      var gridW = inW*0.44;
+      roundRect(inX, inY, gridW, inH, 8); ctx.fillStyle = rgba('#334155', 0.55); ctx.fill();
+
+      var bsz = Math.min(gridW/4-5, inH/2-5);
+      var gridCols = ['#4338ca','#059669','#dc2626','#0891b2','#7c3aed','#ea580c','#fbbf24','#ec4899'];
+      for (var gr = 0; gr < 2; gr++) for (var gc = 0; gc < 4; gc++) {
+        var bx = inX+5+gc*(bsz+3), by = inY+5+gr*(bsz+3);
+        var pulse = 0.65 + Math.sin(frame*0.04+gr*3.5+gc*1.2)*0.35;
+        roundRect(bx,by,bsz,bsz,4); ctx.fillStyle = rgba(gridCols[gr*4+gc], pulse); ctx.fill();
+      }
+
+      var stX = inX+gridW+8, stW = inW-gridW-8;
+      roundRect(stX, inY, stW, inH, 8); ctx.fillStyle = rgba('#334155', 0.55); ctx.fill();
+      var barCols = [green, indigo, cyan, purple], barBase = [0.72,0.85,0.6,0.92];
+      for (var bi = 0; bi < 4; bi++) {
+        var barY = inY+10+bi*(inH*0.18), bw = stW-16;
+        roundRect(stX+8, barY, bw, 7, 3); ctx.fillStyle = '#1e293b'; ctx.fill();
+        var fw = barBase[bi] + Math.sin(frame*0.018+bi*2)*0.06;
+        roundRect(stX+8, barY, bw*fw, 7, 3); ctx.fillStyle = barCols[bi]; ctx.fill();
+      }
+
+      var dotPulse = 0.5 + Math.sin(frame*0.05)*0.5;
+      ctx.beginPath(); ctx.arc(stX+stW/2-22, inY+inH-12, 4, 0, Math.PI*2);
+      ctx.fillStyle = rgba(green, dotPulse+0.5); ctx.fill();
+      ctx.font = '400 ' + fs(0.0065) + 'px "Fira Code", monospace';
+      ctx.textAlign = 'left'; ctx.fillStyle = dim;
+      ctx.fillText('Active', stX+stW/2-14, inY+inH-12);
+
+      ctx.restore();
+    }
+
+    // ════════════════════════════════
+    //  BUBBLES (8.5s, 10.0s, 11.5s)
+    // ════════════════════════════════
+    var nW = W*0.085, nH = H*0.038;
+
+    for (var bi = 0; bi < L.bubbles.length; bi++) {
+      var b = L.bubbles[bi];
+
+      // Arrow from platform → bubble (grows first)
+      var arrowA = ease(BUBBLE_START[bi], BUBBLE_ARROW_DUR);
+      if (arrowA > 0) {
+        var asx = P.x + (bi-1)*P.w*0.22;
+        var asy = P.y + P.h/2;
+        var atx = b.x + b.w/2;
+        var aty = b.y;
+        drawGrowingArrow(asx, asy, atx, aty, b.color, (bi-1)*-40, 0, arrowA);
+        if (arrowA >= 1) drawArrowSpark(asx, asy, atx, aty, b.color, (bi-1)*-40, 0);
+      }
+
+      // Bubble card (appears after arrow reaches)
+      var bubA = ease(BUBBLE_START[bi] + BUBBLE_ARROW_DUR * 0.6, BUBBLE_DUR);
+      if (bubA <= 0) continue;
+
+      var slideY = (1-bubA)*40;
+      ctx.save(); ctx.globalAlpha = bubA;
+
+      // Glow
+      var gg = ctx.createRadialGradient(b.x+b.w/2, b.y+b.h/2+slideY, 0, b.x+b.w/2, b.y+b.h/2+slideY, b.w*0.6);
+      gg.addColorStop(0, rgba(b.color, 0.07)); gg.addColorStop(1, 'transparent');
+      ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(b.x+b.w/2, b.y+b.h/2+slideY, b.w*0.6, 0, Math.PI*2); ctx.fill();
+
+      // Card
+      roundRect(b.x, b.y+slideY, b.w, b.h, 14); ctx.fillStyle = b.color; ctx.fill();
+
+      // Title
+      ctx.font = '700 ' + fs(0.009) + 'px "Fira Code", monospace';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.fillStyle = white;
+      ctx.fillText(b.label, b.x+b.w/2, b.y+10+slideY);
+
+      if (b.items) {
+        var cols = 4, iW = (b.w-24)/cols, iH = (b.h-44)/2;
+        for (var ii = 0; ii < b.items.length; ii++) {
+          var col = ii%cols, row = Math.floor(ii/cols);
+          var ix = b.x+10+col*iW, iy = b.y+30+row*iH+slideY;
+          roundRect(ix,iy,iW-4,iH-4,6); ctx.fillStyle = 'rgba(255,255,255,0.14)'; ctx.fill();
+          ctx.font = '600 ' + fs(0.0085) + 'px "Fira Code", monospace';
+          ctx.fillStyle = white; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText(b.items[ii][0], ix+(iW-4)/2, iy+(iH-4)*0.38);
+          ctx.font = '400 ' + fs(0.006) + 'px "Fira Code", monospace';
+          ctx.fillStyle = 'rgba(255,255,255,0.65)';
+          ctx.fillText(b.items[ii][1], ix+(iW-4)/2, iy+(iH-4)*0.72);
+        }
+      }
+      if (b.layers) {
+        var lH = (b.h-38)/b.layers.length;
+        for (var li = 0; li < b.layers.length; li++) {
+          var ly = b.y+32+li*lH+slideY;
+          roundRect(b.x+10, ly, b.w-20, lH-2, 3);
+          ctx.fillStyle = 'rgba(255,255,255,' + (1-li*0.08) + ')'; ctx.fill();
+          ctx.font = '500 ' + fs(0.007) + 'px "Fira Code", monospace';
+          ctx.fillStyle = '#333'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText(b.layers[li], b.x+b.w/2, ly+(lH-2)/2);
+        }
+      }
+      ctx.restore();
+    }
+
+    // ════════════════════════════════
+    //  STEP 02 LABEL
+    // ════════════════════════════════
+    var s2a = ease(STEP2_START, STEP2_DUR);
+    if (s2a > 0) {
+      var genMidY = (P.y + P.h/2 + L.bubbles[1].y) / 2;
+      drawStepLabel(P.x, genMidY, '02', 'generate full stack', s2a);
+    }
+
+    // ════════════════════════════════
+    //  PROCESS FLOW (13.5s+)
+    // ════════════════════════════════
+    for (var fi = 0; fi < L.flow.length; fi++) {
+      var flowA = ease(FLOW_START[fi], FLOW_DUR);
+      if (flowA <= 0) continue;
+
+      var fn = L.flow[fi];
+      var nx = fn.x - nW/2, ny = fn.y - nH/2;
+
+      ctx.save(); ctx.globalAlpha = flowA;
+
+      // Scale-in
+      var fScale = 0.7 + flowA * 0.3;
+      ctx.translate(fn.x, fn.y); ctx.scale(fScale, fScale); ctx.translate(-fn.x, -fn.y);
+
+      // Glow
+      var ng = ctx.createRadialGradient(fn.x, fn.y, 0, fn.x, fn.y, nW*0.6);
+      ng.addColorStop(0, rgba(green, 0.1)); ng.addColorStop(1, 'transparent');
+      ctx.fillStyle = ng; ctx.beginPath(); ctx.arc(fn.x, fn.y, nW*0.6, 0, Math.PI*2); ctx.fill();
+
+      roundRect(nx, ny, nW, nH, nH/2);
+      ctx.fillStyle = rgba('#059669', 0.85 + Math.sin(frame*0.028+fi)*0.15); ctx.fill();
+
+      ctx.font = '700 ' + fs(0.0095) + 'px "Fira Code", monospace';
+      ctx.fillStyle = white; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(fn.label, fn.x, fn.y);
+
+      // Step number above
+      ctx.font = '600 ' + fs(0.006) + 'px "Fira Code", monospace';
+      ctx.fillStyle = rgba(green, 0.5);
+      ctx.textBaseline = 'bottom';
+      ctx.fillText('0' + (fi+3), fn.x, fn.y - nH/2 - 5);
+
+      ctx.restore();
+
+      // Arrow to next flow node (grows when both nodes visible)
+      if (fi < L.flow.length - 1) {
+        var nextA = ease(FLOW_START[fi+1], FLOW_DUR);
+        if (nextA > 0) {
+          var f = L.flow[fi], t = L.flow[fi+1];
+          var fasx = f.x + nW/2 + 4, fatx = t.x - nW/2 - 4;
+
+          ctx.save(); ctx.globalAlpha = nextA;
+          ctx.beginPath(); ctx.moveTo(fasx, f.y); ctx.lineTo(fatx, t.y);
+          ctx.strokeStyle = rgba(green, 0.4); ctx.lineWidth = 3; ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(fatx+6, t.y); ctx.lineTo(fatx-4, t.y-5); ctx.lineTo(fatx-4, t.y+5);
+          ctx.closePath(); ctx.fillStyle = rgba(green, 0.4); ctx.fill();
+
+          // Travelling spark
+          if (nextA >= 1) {
+            var st = ((frame * 0.012 + fi*0.3) % 1);
+            var spx = fasx + (fatx-fasx)*st;
+            var sg = ctx.createRadialGradient(spx, f.y, 0, spx, f.y, 7);
+            sg.addColorStop(0, rgba(green, 0.5)); sg.addColorStop(1, 'transparent');
+            ctx.fillStyle = sg; ctx.beginPath(); ctx.arc(spx, f.y, 7, 0, Math.PI*2); ctx.fill();
+          }
+          ctx.restore();
+        }
+      }
+
+      // Dashed line from bubble down to flow node
+      if (bi < L.bubbles.length && flowA > 0.5) {
+        var bb = L.bubbles[fi];
+        if (bb) {
+          ctx.save(); ctx.globalAlpha = (flowA - 0.5) * 2 * 0.2;
+          ctx.beginPath();
+          ctx.moveTo(bb.x + bb.w/2, bb.y + bb.h);
+          ctx.lineTo(fn.x, fn.y - nH/2 - 6);
+          ctx.strokeStyle = rgba(dim, 0.3); ctx.lineWidth = 1.5;
+          ctx.setLineDash([5,4]); ctx.stroke(); ctx.setLineDash([]);
+          ctx.restore();
+        }
+      }
+    }
+
+    // ════════════════════════════════
+    //  OUTPUTS: ALL AS CODE + K8S (15.5s)
+    // ════════════════════════════════
+    var outA = ease(OUT_START, OUT_DUR);
+    if (outA > 0 && L.outputs) {
+      ctx.save(); ctx.globalAlpha = outA;
+
+      var oCardW = W*0.10, oCardH = H*0.055;
+      var lastFlow = L.flow[L.flow.length-1];
+
+      for (var oi = 0; oi < L.outputs.length; oi++) {
+        var o = L.outputs[oi];
+        var ox = o.x - oCardW/2, oy = o.y - oCardH/2;
+
+        // Growing arrow from Operational → output
+        var oArrowProg = ease(OUT_START + oi*0.3, 0.6);
+        if (oArrowProg > 0) {
+          var oasx = lastFlow.x + nW/2 + 4;
+          var oasy = lastFlow.y;
+          var oBend = (oi===0) ? -15 : 15;
+          drawGrowingArrow(oasx, oasy, ox, o.y, o.color, 20, oBend, oArrowProg);
+          if (oArrowProg >= 1) drawArrowSpark(oasx, oasy, ox, o.y, o.color, 20, oBend);
+        }
+
+        // Card (appears after arrow)
+        var cardA = ease(OUT_START + oi*0.3 + 0.3, 0.5);
+        if (cardA <= 0) continue;
+
+        var oSlide = (1-cardA)*30;
+        ctx.save(); ctx.globalAlpha = cardA;
+
+        // Glow
+        var og = ctx.createRadialGradient(o.x, o.y+oSlide, 0, o.x, o.y+oSlide, oCardW*0.9);
+        og.addColorStop(0, rgba(o.color, 0.1)); og.addColorStop(1, 'transparent');
+        ctx.fillStyle = og; ctx.beginPath(); ctx.arc(o.x, o.y+oSlide, oCardW*0.9, 0, Math.PI*2); ctx.fill();
+
+        roundRect(ox, oy+oSlide, oCardW, oCardH, 10);
+        ctx.fillStyle = rgba(cardBg, 0.92); ctx.fill();
+        ctx.strokeStyle = rgba(o.color, 0.4); ctx.lineWidth = 2; ctx.stroke();
+
+        ctx.beginPath(); ctx.moveTo(ox+10, oy+oSlide); ctx.lineTo(ox+oCardW-10, oy+oSlide);
+        ctx.strokeStyle = o.color; ctx.lineWidth = 3; ctx.stroke();
+
+        ctx.font = '600 ' + fs(0.011) + 'px "Fira Code", monospace';
+        ctx.fillStyle = o.color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(o.icon, o.x, oy+oCardH*0.30+oSlide);
+
+        ctx.font = '700 ' + fs(0.008) + 'px "Fira Code", monospace';
+        ctx.fillStyle = white;
+        ctx.fillText(o.label, o.x, oy+oCardH*0.60+oSlide);
+
+        ctx.font = '400 ' + fs(0.006) + 'px "Fira Code", monospace';
+        ctx.fillStyle = rgba(o.color, 0.7);
+        ctx.fillText(o.sub, o.x, oy+oCardH*0.84+oSlide);
+
+        ctx.restore();
+      }
+
+      // Sync line between output cards
+      var syncA = ease(OUT_START + 1.0, 0.5);
+      if (syncA > 0) {
+        ctx.save(); ctx.globalAlpha = syncA * 0.4;
+        ctx.beginPath();
+        ctx.moveTo(L.outputs[0].x, L.outputs[0].y + oCardH/2);
+        ctx.lineTo(L.outputs[1].x, L.outputs[1].y - oCardH/2);
+        ctx.strokeStyle = rgba(cyan, 0.4); ctx.lineWidth = 1.5;
+        ctx.setLineDash([4,3]); ctx.stroke(); ctx.setLineDash([]);
+        ctx.font = '500 ' + fs(0.006) + 'px "Fira Code", monospace';
+        ctx.fillStyle = rgba(cyan, 0.6); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('sync', L.outputs[0].x + oCardW*0.55, (L.outputs[0].y+L.outputs[1].y)/2);
+        ctx.restore();
+      }
+
+      ctx.restore();
+    }
+
+    // ════════════════════════════════
+    //  COMPLIANCE GAUGES (right side, 16.0s)
+    // ════════════════════════════════
+    if (L.compliance) {
+      var compHeaderA = ease(16.0, 0.8);
+      if (compHeaderA > 0) {
+        ctx.save(); ctx.globalAlpha = compHeaderA;
+
+        // Section title
+        var compTitleX = L.compliance[0].x;
+        var compTitleY = L.compliance[0].y - H * 0.13;
+        ctx.font = '700 ' + fs(0.009) + 'px "Fira Code", monospace';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillStyle = rgba(yellow, 0.8);
+        ctx.fillText('COMPLIANCE', compTitleX, compTitleY);
+        ctx.font = '400 ' + fs(0.006) + 'px "Fira Code", monospace';
+        ctx.fillStyle = rgba(dim, 0.6);
+        ctx.fillText('Automation', compTitleX, compTitleY + 16);
+
+        ctx.restore();
+      }
+
+      for (var ci = 0; ci < L.compliance.length; ci++) {
+        var comp = L.compliance[ci];
+        var compA = ease(16.5 + ci * 0.6, 0.8);
+        if (compA <= 0) continue;
+
+        ctx.save(); ctx.globalAlpha = compA;
+
+        var gaugeR = Math.min(W * 0.04, 38);
+        var gx = comp.x, gy = comp.y;
+
+        // Glow behind gauge
+        var cgg = ctx.createRadialGradient(gx, gy, 0, gx, gy, gaugeR * 1.8);
+        cgg.addColorStop(0, rgba(comp.color, 0.08)); cgg.addColorStop(1, 'transparent');
+        ctx.fillStyle = cgg; ctx.beginPath(); ctx.arc(gx, gy, gaugeR * 1.8, 0, Math.PI * 2); ctx.fill();
+
+        // Background ring
+        ctx.beginPath();
+        ctx.arc(gx, gy, gaugeR, -Math.PI * 0.5, Math.PI * 1.5);
+        ctx.strokeStyle = rgba('#334155', 0.6);
+        ctx.lineWidth = 6;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+
+        // Animated progress ring
+        var targetAngle = (comp.pct / 100) * Math.PI * 2;
+        var currentAngle = targetAngle * compA;
+        // Add subtle pulse when fully drawn
+        if (compA >= 1) {
+          currentAngle = targetAngle + Math.sin(frame * 0.02 + ci * 2) * 0.02;
+        }
+        ctx.beginPath();
+        ctx.arc(gx, gy, gaugeR, -Math.PI * 0.5, -Math.PI * 0.5 + currentAngle);
+        ctx.strokeStyle = comp.color;
+        ctx.lineWidth = 6;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+
+        // Glowing tip at end of arc
+        if (compA > 0.3) {
+          var tipAngle = -Math.PI * 0.5 + currentAngle;
+          var tipX = gx + Math.cos(tipAngle) * gaugeR;
+          var tipY = gy + Math.sin(tipAngle) * gaugeR;
+          var tipG = ctx.createRadialGradient(tipX, tipY, 0, tipX, tipY, 10);
+          tipG.addColorStop(0, rgba(comp.color, 0.6)); tipG.addColorStop(1, 'transparent');
+          ctx.fillStyle = tipG; ctx.beginPath(); ctx.arc(tipX, tipY, 10, 0, Math.PI * 2); ctx.fill();
+        }
+
+        // Percentage text (counts up)
+        var displayPct = Math.round(comp.pct * compA);
+        ctx.font = '700 ' + fs(0.014) + 'px "Fira Code", monospace';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillStyle = white;
+        ctx.fillText(displayPct + '%', gx, gy - 2);
+
+        // Label below gauge
+        ctx.font = '600 ' + fs(0.008) + 'px "Fira Code", monospace';
+        ctx.fillStyle = comp.color;
+        ctx.fillText(comp.label, gx, gy + gaugeR + 18);
+
+        ctx.restore();
+      }
+    }
+
+    // ── Corner annotations (fade in at end) ──
+    var annA = ease(16.0, 1.0);
+    if (annA > 0) {
+      ctx.save(); ctx.globalAlpha = annA * 0.25;
+      ctx.font = '400 ' + fs(0.0075) + 'px "Fira Code", monospace';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'bottom'; ctx.fillStyle = rgba(dim, 0.4);
+      ctx.fillText('// roles \u2192 platform \u2192 generate \u2192 all-as-code \u2192 sync to agnostic K8s', 16, H-14);
+      ctx.textAlign = 'right'; ctx.fillStyle = rgba(purple, 0.4);
+      ctx.fillText('{ Stacktic }', W-16, H-14);
+      ctx.restore();
+    }
+  }
+
+  function animate() {
+    if (!vis) return;
+    draw();
+    requestAnimationFrame(animate);
+  }
+
+  if (document.readyState === 'complete') { resize(); animate(); }
+  else { window.addEventListener('load', function() { resize(); animate(); }); }
+})();
+</script>
+</body>
+</html>

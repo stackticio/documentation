@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OpenSearch Component</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 900px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #1e293b; font-size: 24px; margin: 0 0 24px 0; font-weight: 700; border-bottom: 3px solid #f59e0b; padding-bottom: 12px;">OpenSearch</h1>
+        <p style="color: #64748b; margin-bottom: 24px;">Full-text search and analytics engine with OpenSearch Dashboards. Serves as a centralized SIEM platform when the <code>siem</code> attribute is enabled, receiving security events from Falco, OPA, APISIX, Audit, Trivy, and OTEL sources across one or more stacks.</p>
+
+        <!-- Architecture -->
+        <div style="background-color: #1e293b; color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">Architecture</h2>
+            <div style="font-family: monospace; font-size: 13px; line-height: 1.8;">
+                <span style="color: #f59e0b;">OpenSearch Cluster</span> - Data nodes (StatefulSet) for indexing and search<br>
+                <span style="color: #22d3ee;">OpenSearch Dashboards</span> - Visualization UI (Deployment)<br>
+                <span style="color: #4ade80;">SIEM Bootstrap Job</span> - ArgoCD PostSync hook that imports index templates, dashboards, alerting monitors, and ISM policies<br>
+                <span style="color: #7c3aed;">Prometheus Exporter</span> - Metrics exporter for cluster health monitoring
+            </div>
+        </div>
+
+        <!-- Key Attributes -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Key Attributes</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Description</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">namespace</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>opensearch</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Kubernetes namespace for all OpenSearch resources</td>
+                    </tr>
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">admin_password</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>MyStr0ngP@ss</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Admin user password. Used by all sources (Falco, OPA, etc.) for authentication. Also used in the SIEM bootstrap job.</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code style="color: #fbbf24;">siem</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>true</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><strong>Master gate for SIEM functionality.</strong> When <code>"true"</code>, enables the entire SIEM pipeline: index templates, dashboards, alerting monitors, ISM policies, and the bootstrap job. When not set, inbound security links still populate dunders but no SIEM files are generated.</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>remote_host</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>opensearch.sre.example.com</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><strong>Cross-stack endpoint.</strong> FQDN/IP for external access to this OpenSearch instance. Used by sources in other stacks (Falco, OPA, Trivy) to connect via APISIX route or load balancer on port 443 instead of internal svc on port 9200.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- SIEM Section -->
+        <div style="background-color: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h2 style="color: #92400e; font-size: 18px; margin: 0 0 16px 0; font-weight: 700;">SIEM Platform</h2>
+            <p style="color: #78350f; font-size: 13px; margin-bottom: 16px;">When <code>siem: "true"</code>, OpenSearch becomes a centralized Security Information and Event Management (SIEM) platform. Sources from the same stack or external stacks send security events, and the bootstrap job configures everything automatically.</p>
+
+            <!-- SIEM Architecture -->
+            <div style="background-color: #1e293b; color: white; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600;">SIEM Data Flow</h3>
+                <div style="font-family: monospace; font-size: 12px; line-height: 2;">
+                    <span style="color: #ef4444;">Falco</span> (runtime threats) &rarr; Falcosidekick &rarr; <span style="color: #f59e0b;">OpenSearch</span> (<code>falco-*</code> index)<br>
+                    <span style="color: #7c3aed;">OPA</span> (policy violations) &rarr; OTEL sidecar &rarr; <span style="color: #f59e0b;">OpenSearch</span> (<code>opa*</code> index)<br>
+                    <span style="color: #22d3ee;">APISIX</span> (API gateway logs) &rarr; OTEL collector &rarr; <span style="color: #f59e0b;">OpenSearch</span> (<code>apisix-*</code> index)<br>
+                    <span style="color: #4ade80;">Audit</span> (K8s audit logs) &rarr; OTEL collector &rarr; <span style="color: #f59e0b;">OpenSearch</span> (<code>audit-*</code> index)<br>
+                    <span style="color: #fb923c;">Trivy</span> (vulnerability scans) &rarr; Trivy exporter &rarr; <span style="color: #f59e0b;">OpenSearch</span> (<code>trivy-*</code> index)<br>
+                    <span style="color: #a3a3a3;">OTEL</span> (traces/logs/metrics) &rarr; OTEL collector &rarr; <span style="color: #f59e0b;">OpenSearch</span> (<code>otel-*</code> index)
+                </div>
+            </div>
+
+            <!-- SIEM Source Links -->
+            <h3 style="color: #92400e; margin-top: 0; margin-bottom: 12px;">Inbound SIEM Links</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px;">
+                <thead>
+                    <tr style="background-color: #fde68a;">
+                        <th style="padding: 8px; border: 1px solid #fbbf24; text-align: left;">Link Type</th>
+                        <th style="padding: 8px; border: 1px solid #fbbf24; text-align: left;">Index Pattern</th>
+                        <th style="padding: 8px; border: 1px solid #fbbf24; text-align: left;">Alerting Monitor</th>
+                        <th style="padding: 8px; border: 1px solid #fbbf24; text-align: left;">Export Method</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>falco-opensearch</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>falco-*</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">falco-critical-events</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">Falcosidekick (native output)</td>
+                    </tr>
+                    <tr style="background-color: #fffbeb;">
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>opa-opensearch</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>opa*</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">opa-violation-events</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">OTEL sidecar (requires opa-otel link on OPA side)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>apisix-opensearch</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>apisix-*</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">apisix-error-events</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">OTEL collector</td>
+                    </tr>
+                    <tr style="background-color: #fffbeb;">
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>audit-opensearch</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>audit-*</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">audit-privileged-events</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">OTEL collector</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>trivy-opensearch</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>trivy-*</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">trivy-critical-vulnerabilities</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">Trivy exporter (direct to OpenSearch)</td>
+                    </tr>
+                    <tr style="background-color: #fffbeb;">
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>otel-opensearch</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;"><code>otel-*</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">&mdash;</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">OTEL collector</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Per source files generated -->
+            <h3 style="color: #92400e; margin-bottom: 12px;">Per-Source SIEM Files</h3>
+            <p style="color: #78350f; font-size: 12px; margin-bottom: 12px;">For each detected source link, the following files are generated (removed in post_gen if the link doesn't exist):</p>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px;">
+                <thead>
+                    <tr style="background-color: #fde68a;">
+                        <th style="padding: 8px; border: 1px solid #fbbf24; text-align: left;">File Pattern</th>
+                        <th style="padding: 8px; border: 1px solid #fbbf24; text-align: left;">Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a; font-family: monospace;">siem/index-template-{source}.json</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">OpenSearch index template with field mappings for the source</td>
+                    </tr>
+                    <tr style="background-color: #fffbeb;">
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a; font-family: monospace;">siem/alerting-{source}.json</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">OpenSearch alerting monitor definition (critical event detection)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a; font-family: monospace;">siem/dashboards-{source}.ndjson</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">OpenSearch Dashboards saved objects (index pattern + visualizations + dashboard)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Always generated -->
+            <h3 style="color: #92400e; margin-bottom: 12px;">Always-Generated SIEM Files</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px;">
+                <thead>
+                    <tr style="background-color: #fde68a;">
+                        <th style="padding: 8px; border: 1px solid #fbbf24; text-align: left;">File</th>
+                        <th style="padding: 8px; border: 1px solid #fbbf24; text-align: left;">Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a; font-family: monospace;">siem/ism-policy.json</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">PCI DSS ISM retention policy (applied to all SIEM indices)</td>
+                    </tr>
+                    <tr style="background-color: #fffbeb;">
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a; font-family: monospace;">siem/dashboards-pci-360.ndjson</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">Global PCI-360 Overview dashboard (cross-stack, fixed IDs)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a; font-family: monospace;">siem/dashboards-pci-overview.ndjson</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">Per-stack PCI Overview dashboard template</td>
+                    </tr>
+                    <tr style="background-color: #fffbeb;">
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a; font-family: monospace;">siem-bootstrap-job.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fde68a;">ArgoCD PostSync Job that imports all SIEM resources into OpenSearch on every sync</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Cleanup -->
+            <div style="background-color: #fef3c7; padding: 12px; border-radius: 6px; border-left: 4px solid #f59e0b;">
+                <p style="color: #92400e; font-size: 12px; margin: 0;"><strong>post_gen cleanup:</strong> If <code>siem</code> is not <code>"true"</code> or no SIEM source links exist, the entire <code>k8s/deploy/base/siem/</code> directory and <code>siem-bootstrap-job.yaml</code> are removed. Per-source files (index-template, alerting, dashboard) are removed individually when their corresponding link doesn't exist.</p>
+            </div>
+        </div>
+
+        <!-- Multi-Stack SIEM -->
+        <div style="background-color: #1e293b; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 700; color: #fbbf24;">Multi-Stack SIEM (Cross-Stack Sources)</h2>
+            <p style="color: #94a3b8; font-size: 13px; margin-bottom: 16px;">Multiple stacks can send security events to a single centralized OpenSearch instance. Each external stack that links its Falco/OPA/APISIX/Audit/Trivy components creates a cross-stack connection.</p>
+
+            <h3 style="color: #e2e8f0; font-size: 14px;">How Cross-Stack Detection Works</h3>
+            <div style="font-family: monospace; background-color: #334155; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.8; color: #cbd5e1; margin-bottom: 16px;">
+                <pre style="margin: 0; color: #cbd5e1;">pre_gen_project.py detects each inbound SIEM link:
+
+if link.component.is_referenced:
+    # External source from another stack
+    stack_name = link.component.name.replace('-falco', '')
+    # e.g., "prod-falco" &rarr; stack_name = "prod"
+    __siem_stacks[stack_name].append("falco")
+else:
+    # Local source (same stack)
+    __siem_local_sources.append("falco")</pre>
+            </div>
+
+            <h3 style="color: #e2e8f0; font-size: 14px;">Stack-Aware Dashboard Generation</h3>
+            <p style="color: #94a3b8; font-size: 12px;">post_gen_project.py generates per-stack dashboard variants with prefixed IDs and titles to prevent collisions:</p>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Stack</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Generated File</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Dashboard ID</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Title</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">sre (local)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: monospace; font-size: 11px;">dashboards-falco-sre.ndjson</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: monospace; font-size: 11px;">sre-falco-pci-dashboard</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">sre - PCI - Runtime</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">prod (external)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: monospace; font-size: 11px;">dashboards-falco-prod.ndjson</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: monospace; font-size: 11px;">prod-falco-pci-dashboard</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">prod - PCI - Runtime</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">staging (external)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: monospace; font-size: 11px;">dashboards-opa-staging.ndjson</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: monospace; font-size: 11px;">staging-opa-pci-dashboard</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">staging - PCI - Policy</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="background-color: #334155; padding: 12px; border-radius: 6px; margin-top: 12px;">
+                <p style="color: #fbbf24; font-size: 12px; margin: 0;"><strong>No collision:</strong> Each stack's dashboards have unique IDs (prefixed with stack slug). The <code>?overwrite=true</code> on import only overwrites the same stack's dashboards, not others. The global PCI-360 Overview has fixed IDs and is always safely overwritten.</p>
+            </div>
+        </div>
+
+        <!-- Bootstrap Job -->
+        <div style="background-color: #f0f9ff; border: 2px solid #0ea5e9; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #0369a1; font-size: 16px; margin: 0 0 16px 0; font-weight: 600;">SIEM Bootstrap Job</h3>
+            <p style="color: #475569; font-size: 13px; margin-bottom: 12px;">ArgoCD PostSync hook (<code>siem-bootstrap-job.yaml</code>) runs on every sync and performs:</p>
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bae6fd;">
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Step</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Action</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">API Endpoint</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">1</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Wait for OpenSearch readiness (600s timeout)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">init container: curl /_cluster/health</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">2</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Create ISM retention policy (<code>pci-dss-retention</code>)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">PUT /_plugins/_ism/policies/</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">3</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Create index templates per source</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">PUT /_index_template/{source}</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">4</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Apply ISM policy to existing indices</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">POST /_plugins/_ism/add/{source}-*</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">5</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Create alerting monitors</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">POST /_plugins/_alerting/monitors</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">6</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Create placeholder indices (<code>{source}-init</code>) if no indices exist yet</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">PUT /{source}-init</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">7</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;"><strong>Cleanup:</strong> Delete only our previously imported saved objects (extracts IDs from ndjson files + legacy ID list). Customer dashboards are never touched.</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">DELETE /api/saved_objects/{type}/{id}</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">8</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Import dashboards (per-stack + global PCI-360)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">POST /api/saved_objects/_import?overwrite=true</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- All Links -->
+        <div style="background-color: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #166534; font-size: 16px; margin: 0 0 16px 0; font-weight: 600;">All Inbound Links</h3>
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Link Type</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Dunder</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Impact</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>prometheus-opensearch</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>__prometheus</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Prometheus metrics exporter ServiceMonitor</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>falco-opensearch</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>__falco</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">SIEM: index template, alerting, dashboard for Falco events</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>opa-opensearch</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>__opa</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">SIEM: index template, alerting, dashboard for OPA violations</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>apisix-opensearch</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>__apisix_logs</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">SIEM: index template, alerting, dashboard for API gateway logs</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>audit-opensearch</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>__audit</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">SIEM: index template, alerting, dashboard for K8s audit logs</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>trivy-opensearch</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>__trivy</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">SIEM: index template, alerting, dashboard for vulnerability scans</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>otel-opensearch</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>__otel</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">SIEM: OTEL traces/logs/metrics ingestion</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>opensearch-bucket</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>__bucket</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">MinIO bucket for snapshot/backup storage</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Internal vs External Connectivity -->
+        <div style="background-color: #f3e8ff; border: 2px solid #8b5cf6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #5b21b6; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Connectivity: Internal vs External</h3>
+            <p style="color: #6b21a8; font-size: 12px; margin-bottom: 12px;">All source components (Falco, OPA, Trivy, etc.) use the same pattern to connect to OpenSearch:</p>
+
+            <div style="font-family: monospace; background-color: #e9d5ff; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 1.8; color: #1e1b4b;">
+                <strong>Internal (same stack/cluster):</strong><br>
+                &nbsp;&nbsp;endpoint: https://opensearch-cluster-master.{namespace}.svc.cluster.local:9200<br>
+                &nbsp;&nbsp;tls: skip verify<br>
+                &nbsp;&nbsp;auth: admin / {admin_password}<br>
+                <br>
+                <strong>External (cross-stack/cross-cluster):</strong><br>
+                &nbsp;&nbsp;endpoint: https://{remote_host}:443<br>
+                &nbsp;&nbsp;tls: skip verify<br>
+                &nbsp;&nbsp;auth: admin / {admin_password}<br>
+                <br>
+                <strong>Detection:</strong> <code>link.component.is_external</code> (true = external)
+            </div>
+
+            <div style="background-color: #e9d5ff; padding: 12px; border-radius: 6px; margin-top: 12px; border-left: 4px solid #7c3aed;">
+                <p style="color: #5b21b6; font-size: 12px; margin: 0;"><strong>remote_host setup:</strong> Typically exposed via an APISIX route on the SRE/central cluster. The <code>remote_host</code> attribute is the FQDN that resolves to this route (e.g., <code>opensearch.sre.stack-3.source-lab.io</code>). Port 443 is used for HTTPS through the ingress controller.</p>
+            </div>
+        </div>
+
+        <!-- Dashboard Update Procedure -->
+        <div style="background-color: #fff7ed; border: 2px solid #f97316; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #9a3412; font-size: 16px; margin: 0 0 16px 0; font-weight: 600;">Dashboard Update Procedure</h3>
+
+            <h4 style="color: #9a3412; font-size: 13px; margin: 0 0 8px 0;">How Dashboards Are Generated</h4>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px;">
+                <thead>
+                    <tr style="background-color: #fed7aa;">
+                        <th style="padding: 8px; border: 1px solid #fdba74; text-align: left;">Step</th>
+                        <th style="padding: 8px; border: 1px solid #fdba74; text-align: left;">Phase</th>
+                        <th style="padding: 8px; border: 1px solid #fdba74; text-align: left;">What Happens</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa;">1</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa;">Template</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa;">Base ndjson files in <code>siem/dashboards-{source}.ndjson</code> define saved objects with fixed IDs</td>
+                    </tr>
+                    <tr style="background-color: #fff7ed;">
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa;">2</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa;">post_gen</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa;">Copies base ndjson per linked stack, prefixes IDs with stack slug (e.g., <code>falco-pci-dashboard</code> &rarr; <code>pci-dss-stack-falco-pci-dashboard</code>), renames titles, removes base files</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa;">3</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa;">Bootstrap Job</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa;">Deletes only our previously imported saved objects (by exact ID), then imports per-stack ndjson files + PCI-360</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4 style="color: #9a3412; font-size: 13px; margin: 0 0 8px 0;">Standard Update Flow</h4>
+            <div style="font-family: monospace; background-color: #ffedd5; padding: 12px; border-radius: 6px; font-size: 12px; line-height: 2; color: #431407; margin-bottom: 16px;">
+                1. Edit base ndjson file(s) in <code>templates/opensearch/.../siem/dashboards-*.ndjson</code><br>
+                2. Regenerate stack (Stacktic build)<br>
+                3. Push to git / ArgoCD sync<br>
+                4. Bootstrap job runs automatically &mdash; cleans old objects, imports new ones
+            </div>
+
+            <h4 style="color: #9a3412; font-size: 13px; margin: 0 0 8px 0;">Why Cleanup Is Needed</h4>
+            <div style="background-color: #ffedd5; padding: 12px; border-radius: 6px; border-left: 4px solid #f97316; margin-bottom: 16px;">
+                <p style="color: #431407; font-size: 12px; margin: 0;">When dashboard IDs change between template versions, <code>?overwrite=true</code> only updates objects with the <strong>same ID</strong> &mdash; old IDs persist forever in <code>.kibana_1</code>. The bootstrap job now extracts all IDs from the ndjson files it will import (plus a hardcoded list of legacy IDs from older versions) and deletes <strong>only those exact objects</strong> before importing. Customer-created dashboards are never touched.</p>
+            </div>
+
+            <h4 style="color: #9a3412; font-size: 13px; margin: 0 0 8px 0;">Dashboard Naming Convention</h4>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #fed7aa;">
+                        <th style="padding: 8px; border: 1px solid #fdba74; text-align: left;">ID Pattern</th>
+                        <th style="padding: 8px; border: 1px solid #fdba74; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #fdba74; text-align: left;">Source</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa; font-family: monospace;">{stack}-pci-runtime</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa; font-family: monospace;">pci-dss-stack-pci-runtime</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa;">Falco</td>
+                    </tr>
+                    <tr style="background-color: #fff7ed;">
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa; font-family: monospace;">{stack}-pci-api-gw</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa; font-family: monospace;">pci-dss-stack-pci-api-gw</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa;">APISIX</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa; font-family: monospace;">{stack}-pci-policy</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa; font-family: monospace;">pci-dss-stack-pci-policy</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa;">OPA</td>
+                    </tr>
+                    <tr style="background-color: #fff7ed;">
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa; font-family: monospace;">{stack}-pci-audit</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa; font-family: monospace;">pci-dss-stack-pci-audit</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa;">K8s Audit</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa; font-family: monospace;">{stack}-pci-scan</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa; font-family: monospace;">pci-dss-stack-pci-scan</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa;">Trivy</td>
+                    </tr>
+                    <tr style="background-color: #fff7ed;">
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa; font-family: monospace;">{stack}-pci-overview</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa; font-family: monospace;">pci-dss-stack-pci-overview</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa;">Per-stack overview</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa; font-family: monospace;">pci-360-overview</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa; font-family: monospace;">pci-360-overview</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa;">Global cross-stack (fixed ID)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Force Cleanup -->
+        <div style="background-color: #fef2f2; border: 2px solid #ef4444; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #991b1b; font-size: 16px; margin: 0 0 16px 0; font-weight: 600;">Force Cleanup (Reset ISM + Delete SIEM Data)</h3>
+
+            <h4 style="color: #991b1b; font-size: 13px; margin: 0 0 8px 0;">Full Reset (Destructive &mdash; All Event Data Lost)</h4>
+            <div style="font-family: monospace; background-color: #fee2e2; padding: 12px; border-radius: 6px; font-size: 11px; line-height: 2; color: #450a0a; margin-bottom: 16px;">
+                # 1. Remove ISM policy from all SIEM indices<br>
+                curl -sk -X POST "https://localhost:9200/_plugins/_ism/remove/falco-*" ...<br>
+                curl -sk -X POST "https://localhost:9200/_plugins/_ism/remove/opa*" ...<br>
+                curl -sk -X POST "https://localhost:9200/_plugins/_ism/remove/apisix-*" ...<br>
+                curl -sk -X POST "https://localhost:9200/_plugins/_ism/remove/audit-*" ...<br>
+                curl -sk -X POST "https://localhost:9200/_plugins/_ism/remove/trivy-*" ...<br>
+                <br>
+                # 2. Delete all SIEM indices<br>
+                curl -sk -X DELETE "https://localhost:9200/falco-*" ...<br>
+                curl -sk -X DELETE "https://localhost:9200/opa*" ...<br>
+                curl -sk -X DELETE "https://localhost:9200/apisix-*" ...<br>
+                curl -sk -X DELETE "https://localhost:9200/audit-*" ...<br>
+                curl -sk -X DELETE "https://localhost:9200/trivy-*" ...<br>
+                <br>
+                # 3. ArgoCD sync &rarr; bootstrap job recreates everything
+            </div>
+
+            <h4 style="color: #991b1b; font-size: 13px; margin: 0 0 8px 0;">Re-Apply ISM Only (Non-Destructive &mdash; Data Preserved)</h4>
+            <div style="font-family: monospace; background-color: #fee2e2; padding: 12px; border-radius: 6px; font-size: 11px; line-height: 2; color: #450a0a; margin-bottom: 16px;">
+                # Remove then re-add ISM policy (per source)<br>
+                curl -sk -X POST "https://localhost:9200/_plugins/_ism/remove/falco-*" ...<br>
+                curl -sk -X POST "https://localhost:9200/_plugins/_ism/add/falco-*" -d '{"policy_id": "pci-dss-retention"}'<br>
+                <br>
+                # Verify ISM state<br>
+                curl -sk "https://localhost:9200/_plugins/_ism/explain/*?pretty" ...
+            </div>
+
+            <div style="background-color: #fee2e2; padding: 12px; border-radius: 6px; border-left: 4px solid #ef4444;">
+                <p style="color: #991b1b; font-size: 12px; margin: 0;"><strong>ISM Lifecycle:</strong> hot (0&ndash;7d, rollover at 1d/30GB) &rarr; warm (7&ndash;90d, 1 replica, force-merged) &rarr; cold (90&ndash;365d, read-only, 0 replicas) &rarr; delete (365d+). New indices automatically pick up the ISM policy via <code>ism_template</code> patterns in the policy.</p>
+            </div>
+        </div>
+
+        <!-- Ports -->
+        <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px;">
+            <h3 style="color: #166534; margin-top: 0; margin-bottom: 15px;">Ports</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Port</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Service</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Protocol</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">9200</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">OpenSearch REST API (internal)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTPS</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">9300</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">OpenSearch node-to-node transport</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTPS</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">5601</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">OpenSearch Dashboards UI</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTP</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">443</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">External access via APISIX route (cross-stack)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTPS</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</body>
+</html>

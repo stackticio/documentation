@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="280" viewBox="0 0 280 280">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f0e24"/>
+      <stop offset="100%" stop-color="#080818"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#fbbf24"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="280" height="280" rx="16" fill="url(#bg)"/>
+  <rect width="280" height="280" rx="16" fill="none" stroke="#f59e0b" stroke-opacity="0.12" stroke-width="1"/>
+
+  <circle cx="140" cy="125" r="80" fill="#f59e0b" fill-opacity="0.03"/>
+  <circle cx="140" cy="125" r="70" fill="none" stroke="#1e293b" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="140" cy="125" r="70" fill="none" stroke="url(#ring)" stroke-width="12" stroke-linecap="round" stroke-dasharray="321.1 439.82" transform="rotate(-90 140 125)"/>
+
+  <text x="140" y="118" text-anchor="middle" font-size="44" font-weight="700" fill="#ffffff" font-family="monospace">73</text>
+  <text x="175" y="118" text-anchor="middle" font-size="22" fill="#f59e0b" font-family="monospace">%</text>
+  <text x="140" y="143" text-anchor="middle" font-size="11" font-weight="500" fill="#94a3b8" fill-opacity="0.6" font-family="monospace">coverage</text>
+
+  <text x="140" y="228" text-anchor="middle" font-size="18" font-weight="700" fill="#f59e0b" font-family="monospace">PCI-DSS</text>
+  <text x="140" y="248" text-anchor="middle" font-size="9" fill="#94a3b8" fill-opacity="0.5" font-family="monospace">8 of 11 requirements</text>
+
+  <text x="140" y="272" text-anchor="middle" font-size="8" fill="#94a3b8" fill-opacity="0.25" font-family="monospace">stacktic.io</text>
+</svg>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0%" stop-color="#0f0e24"/>
+      <stop offset="100%" stop-color="#060612"/>
+    </linearGradient>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="g3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+    <linearGradient id="g4" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#fbbf24"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="720" fill="url(#bg)"/>
+
+  <!-- Subtle grid -->
+  <pattern id="dots" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+    <circle cx="20" cy="20" r="0.5" fill="#94a3b8" opacity="0.06"/>
+  </pattern>
+  <rect width="1280" height="720" fill="url(#dots)"/>
+
+  <!-- Three overlapping circles - stacks merging without borders -->
+  <!-- Stack 1 - left -->
+  <circle cx="530" cy="290" r="120" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-opacity="0.25" stroke-dasharray="6,4"/>
+  <circle cx="530" cy="290" r="120" fill="#a78bfa" opacity="0.03"/>
+  <text x="460" y="240" text-anchor="middle" font-size="10" fill="#a78bfa" opacity="0.5" font-family="monospace">stack-1</text>
+
+  <!-- Stack 2 - right -->
+  <circle cx="750" cy="290" r="120" fill="none" stroke="#22d3ee" stroke-width="1.5" stroke-opacity="0.25" stroke-dasharray="6,4"/>
+  <circle cx="750" cy="290" r="120" fill="#22d3ee" opacity="0.03"/>
+  <text x="820" y="240" text-anchor="middle" font-size="10" fill="#22d3ee" opacity="0.5" font-family="monospace">stack-2</text>
+
+  <!-- Stack 3 - bottom center -->
+  <circle cx="640" cy="380" r="120" fill="none" stroke="#34d399" stroke-width="1.5" stroke-opacity="0.25" stroke-dasharray="6,4"/>
+  <circle cx="640" cy="380" r="120" fill="#34d399" opacity="0.03"/>
+  <text x="640" y="470" text-anchor="middle" font-size="10" fill="#34d399" opacity="0.5" font-family="monospace">stack-3</text>
+
+  <!-- Intersection zones - where borders dissolve -->
+  <!-- Left-Right intersection -->
+  <ellipse cx="640" cy="290" rx="40" ry="80" fill="#818cf8" opacity="0.04"/>
+  <!-- Left-Bottom intersection -->
+  <ellipse cx="570" cy="350" rx="40" ry="60" fill="#5eead4" opacity="0.03" transform="rotate(-30 570 350)"/>
+  <!-- Right-Bottom intersection -->
+  <ellipse cx="710" cy="350" rx="40" ry="60" fill="#5eead4" opacity="0.03" transform="rotate(30 710 350)"/>
+
+  <!-- Center convergence point - the harmony -->
+  <circle cx="640" cy="320" r="35" fill="#ffffff" opacity="0.02"/>
+  <circle cx="640" cy="320" r="25" fill="#ffffff" opacity="0.03"/>
+  <circle cx="640" cy="320" r="4" fill="#ffffff" opacity="0.4"/>
+
+  <!-- Flow lines connecting stacks through center - shared logic -->
+  <!-- Stack 1 to center -->
+  <line x1="500" y1="290" x2="620" y2="315" stroke="#a78bfa" stroke-width="1" stroke-opacity="0.2"/>
+  <circle cx="560" cy="303" r="2" fill="#a78bfa" opacity="0.5"/>
+  <!-- Stack 2 to center -->
+  <line x1="780" y1="290" x2="660" y2="315" stroke="#22d3ee" stroke-width="1" stroke-opacity="0.2"/>
+  <circle cx="720" cy="303" r="2" fill="#22d3ee" opacity="0.5"/>
+  <!-- Stack 3 to center -->
+  <line x1="640" y1="410" x2="640" y2="340" stroke="#34d399" stroke-width="1" stroke-opacity="0.2"/>
+  <circle cx="640" cy="375" r="2" fill="#34d399" opacity="0.5"/>
+
+  <!-- Small nodes floating between stacks - shared components -->
+  <circle cx="590" cy="270" r="3" fill="#a78bfa" opacity="0.4"/>
+  <circle cx="690" cy="270" r="3" fill="#22d3ee" opacity="0.4"/>
+  <circle cx="580" cy="360" r="3" fill="#34d399" opacity="0.35"/>
+  <circle cx="700" cy="360" r="3" fill="#22d3ee" opacity="0.35"/>
+  <circle cx="640" cy="260" r="3" fill="#818cf8" opacity="0.3"/>
+
+  <!-- Outer subtle ring connecting all stacks -->
+  <circle cx="640" cy="320" r="200" fill="none" stroke="#94a3b8" stroke-width="0.5" stroke-opacity="0.06"/>
+
+  <!-- Small orbiting dots on outer ring -->
+  <circle cx="840" cy="320" r="2.5" fill="#f59e0b" opacity="0.35"/>
+  <circle cx="440" cy="320" r="2.5" fill="#f59e0b" opacity="0.35"/>
+  <circle cx="640" cy="120" r="2.5" fill="#f59e0b" opacity="0.35"/>
+
+  <!-- Title -->
+  <text x="640" y="575" text-anchor="middle" font-size="48" font-weight="700" fill="#ffffff" font-family="monospace" letter-spacing="4">Harmony Without Borders</text>
+
+  <!-- Subtitle -->
+  <text x="640" y="615" text-anchor="middle" font-size="14" fill="#94a3b8" opacity="0.4" font-family="monospace" letter-spacing="4">MULTI-STACK LOGIC AUTOMATION</text>
+
+  <!-- Thin line -->
+  <line x1="480" y1="550" x2="800" y2="550" stroke="#a78bfa" stroke-width="0.5" stroke-opacity="0.15"/>
+
+  <!-- stacktic.io -->
+  <text x="640" y="700" text-anchor="middle" font-size="9" fill="#94a3b8" opacity="0.15" font-family="monospace">stacktic.io</text>
+</svg>

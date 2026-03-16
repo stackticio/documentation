@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stacktic - 360 Ops Automation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Fira Code', 'Courier New', monospace;
+            background: white;
+            color: #1e293b;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            overflow-x: auto;
+        }
+        .container { width: 100%; max-width: 1400px; }
+
+        .title {
+            font-size: 32px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeIn 0.8s forwards;
+        }
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        /* Layers bar */
+        .layers-bar {
+            display: flex;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 45px;
+            opacity: 0;
+            animation: fadeIn 0.8s 0.2s forwards;
+        }
+        .layer-pill {
+            flex: 1;
+            text-align: center;
+            padding: 11px 0;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: white;
+        }
+        .lp-1 { background: #4f46e5; }
+        .lp-2 { background: #7c3aed; }
+        .lp-3 { background: #0891b2; }
+        .lp-4 { background: #059669; }
+
+        /* Flow rows */
+        .flow {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            flex-wrap: nowrap;
+            margin-bottom: 28px;
+        }
+        .flow-label {
+            width: 90px;
+            flex: 0 0 90px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+        .step {
+            flex: 0 0 auto;
+            text-align: center;
+            opacity: 0;
+            animation: slideIn 0.5s forwards;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-15px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .step-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .code {
+            background: #f8fafc;
+            padding: 10px 16px;
+            font-size: 12px;
+            color: #334155;
+            border-radius: 4px;
+            white-space: nowrap;
+            border-left: 3px solid;
+        }
+        .arrow {
+            font-size: 22px;
+            color: #cbd5e1;
+            flex: 0 0 auto;
+            opacity: 0;
+            animation: fadeIn 0.4s forwards;
+        }
+        .result {
+            flex: 0 0 auto;
+            opacity: 0;
+            animation: pop 0.5s forwards;
+        }
+        @keyframes pop {
+            from { opacity: 0; transform: scale(0.85); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .result-box {
+            border: 2px solid;
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .divider {
+            height: 1px;
+            background: #f1f5f9;
+            margin-bottom: 28px;
+            opacity: 0;
+            animation: fadeIn 0.4s forwards;
+        }
+
+        /* Colors */
+        .c1 { color: #4f46e5; } .b1 { border-color: #4f46e5; }
+        .c2 { color: #7c3aed; } .b2 { border-color: #7c3aed; }
+        .c3 { color: #0891b2; } .b3 { border-color: #0891b2; }
+        .c4 { color: #059669; } .b4 { border-color: #059669; }
+        .ca { color: #d97706; } .ba { border-color: #d97706; }
+        .rb1 { border-color: #4f46e5; color: #4f46e5; background: rgba(79,70,229,0.05); }
+        .rb2 { border-color: #7c3aed; color: #7c3aed; background: rgba(124,58,237,0.05); }
+        .rb3 { border-color: #0891b2; color: #0891b2; background: rgba(8,145,178,0.05); }
+        .rb4 { border-color: #059669; color: #059669; background: rgba(5,150,105,0.05); }
+        .rba { border-color: #d97706; color: #d97706; background: rgba(217,119,6,0.05); }
+        .rbg { border-color: #10b981; color: #10b981; background: rgba(16,185,129,0.05); }
+
+        /* Stagger - row by row */
+        .r1 .flow-label { animation-delay: 0.4s; }
+        .r1 .step:nth-of-type(1) { animation-delay: 0.5s; }
+        .r1 .arrow:nth-of-type(1) { animation-delay: 0.65s; }
+        .r1 .step:nth-of-type(2) { animation-delay: 0.8s; }
+        .r1 .arrow:nth-of-type(2) { animation-delay: 0.95s; }
+        .r1 .step:nth-of-type(3) { animation-delay: 1.1s; }
+        .r1 .arrow:nth-of-type(3) { animation-delay: 1.25s; }
+        .r1 .result { animation-delay: 1.4s; }
+
+        .r2 .flow-label { animation-delay: 0.7s; }
+        .r2 .step:nth-of-type(1) { animation-delay: 0.8s; }
+        .r2 .arrow:nth-of-type(1) { animation-delay: 0.95s; }
+        .r2 .step:nth-of-type(2) { animation-delay: 1.1s; }
+        .r2 .arrow:nth-of-type(2) { animation-delay: 1.25s; }
+        .r2 .step:nth-of-type(3) { animation-delay: 1.4s; }
+        .r2 .arrow:nth-of-type(3) { animation-delay: 1.55s; }
+        .r2 .result { animation-delay: 1.7s; }
+
+        .r3 .flow-label { animation-delay: 1.0s; }
+        .r3 .step:nth-of-type(1) { animation-delay: 1.1s; }
+        .r3 .arrow:nth-of-type(1) { animation-delay: 1.25s; }
+        .r3 .step:nth-of-type(2) { animation-delay: 1.4s; }
+        .r3 .arrow:nth-of-type(2) { animation-delay: 1.55s; }
+        .r3 .step:nth-of-type(3) { animation-delay: 1.7s; }
+        .r3 .arrow:nth-of-type(3) { animation-delay: 1.85s; }
+        .r3 .result { animation-delay: 2.0s; }
+
+        .r4 .flow-label { animation-delay: 1.3s; }
+        .r4 .step:nth-of-type(1) { animation-delay: 1.4s; }
+        .r4 .arrow:nth-of-type(1) { animation-delay: 1.55s; }
+        .r4 .step:nth-of-type(2) { animation-delay: 1.7s; }
+        .r4 .arrow:nth-of-type(2) { animation-delay: 1.85s; }
+        .r4 .step:nth-of-type(3) { animation-delay: 2.0s; }
+        .r4 .arrow:nth-of-type(3) { animation-delay: 2.15s; }
+        .r4 .result { animation-delay: 2.3s; }
+
+        .d1 { animation-delay: 0.6s; }
+        .d2 { animation-delay: 0.9s; }
+        .d3 { animation-delay: 1.2s; }
+
+        @media (max-width: 1024px) {
+            .flow { overflow-x: auto; padding: 10px 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Automate Ops, Compliance &amp; Everything Between</h1>
+
+        <div class="layers-bar">
+            <div class="layer-pill lp-1">01 PLATFORM</div>
+            <div class="layer-pill lp-2">02 CODE / GIT</div>
+            <div class="layer-pill lp-3">03 STACK (K8S)</div>
+            <div class="layer-pill lp-4">04 AI / AGENTS</div>
+        </div>
+
+        <!-- Row 1: Platform -->
+        <div class="flow r1">
+            <div class="flow-label c1">Platform</div>
+            <div class="step">
+                <div class="step-title c1">Org</div>
+                <div class="code b1">stacktic org setup --hierarchy</div>
+            </div>
+            <div class="arrow">&rarr;</div>
+            <div class="step">
+                <div class="step-title c1">Permissions</div>
+                <div class="code b1">stacktic permissions assign --by-role</div>
+            </div>
+            <div class="arrow">&rarr;</div>
+            <div class="step">
+                <div class="step-title c1">Audit</div>
+                <div class="code b1">stacktic audit --all-actions</div>
+            </div>
+            <div class="arrow">&rarr;</div>
+            <div class="result"><div class="result-box rb1">Governed</div></div>
+        </div>
+
+        <div class="divider d1"></div>
+
+        <!-- Row 2: Code / Git -->
+        <div class="flow r2">
+            <div class="flow-label c2">Code / Git</div>
+            <div class="step">
+                <div class="step-title c2">Encrypt</div>
+                <div class="code b2">stacktic secrets encrypt --sops</div>
+            </div>
+            <div class="arrow">&rarr;</div>
+            <div class="step">
+                <div class="step-title c2">Enforce</div>
+                <div class="code b2">stacktic git enforce --best-practice</div>
+            </div>
+            <div class="arrow">&rarr;</div>
+            <div class="step">
+                <div class="step-title c2">Scan</div>
+                <div class="code b2">stacktic code audit --cve --deps</div>
+            </div>
+            <div class="arrow">&rarr;</div>
+            <div class="result"><div class="result-box rb2">Secured</div></div>
+        </div>
+
+        <div class="divider d2"></div>
+
+        <!-- Row 3: Stack K8s -->
+        <div class="flow r3">
+            <div class="flow-label c3">Stack (K8s)</div>
+            <div class="step">
+                <div class="step-title c3">Policies</div>
+                <div class="code b3">stacktic opa generate --per-namespace</div>
+            </div>
+            <div class="arrow">&rarr;</div>
+            <div class="step">
+                <div class="step-title c3">Segment</div>
+                <div class="code b3">stacktic netpol apply --zero-trust</div>
+            </div>
+            <div class="arrow">&rarr;</div>
+            <div class="step">
+                <div class="step-title c3">Comply</div>
+                <div class="code b3">stacktic compliance scan --auto</div>
+            </div>
+            <div class="arrow">&rarr;</div>
+            <div class="result"><div class="result-box rb3">Enforced</div></div>
+        </div>
+
+        <div class="divider d3"></div>
+
+        <!-- Row 4: AI / Agents -->
+        <div class="flow r4">
+            <div class="flow-label c4">AI / Agents</div>
+            <div class="step">
+                <div class="step-title c4">Control</div>
+                <div class="code b4">stacktic mcp configure --guardrails</div>
+            </div>
+            <div class="arrow">&rarr;</div>
+            <div class="step">
+                <div class="step-title c4">Govern</div>
+                <div class="code b4">stacktic mcp enforce --all-agents</div>
+            </div>
+            <div class="arrow">&rarr;</div>
+            <div class="step">
+                <div class="step-title c4">Observe</div>
+                <div class="code b4">stacktic mcp audit --trace</div>
+            </div>
+            <div class="arrow">&rarr;</div>
+            <div class="result"><div class="result-box rb4">AI Governed</div></div>
+        </div>
+    </div>
+</body>
+</html>

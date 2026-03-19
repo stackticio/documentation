@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OpenBao</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 900px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #1e293b; font-size: 24px; margin: 0 0 24px 0; font-weight: 700; border-bottom: 3px solid #3b82f6; padding-bottom: 12px;">OpenBao</h1>
+        <p style="color: #64748b; margin-bottom: 24px;">Open-source secrets management platform (Vault fork). Includes automated initialization, auto-unseal CronJob, agent injector, Raft/file storage, Web UI, and ESO integration for centralized secret management.</p>
+
+        <!-- Architecture -->
+        <div style="background-color: #1e293b; color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">Architecture</h2>
+            <div style="font-family: monospace; font-size: 13px; line-height: 1.8;">
+                <span style="color: #3b82f6;">OpenBao Server</span> - Secrets engine, auth backends, policies (:8200)<br>
+                <span style="color: #22d3ee;">Agent Injector</span> - Sidecar-based secret injection into pods<br>
+                <span style="color: #a78bfa;">Init Job</span> - One-time initialization: unseal keys, admin user, KV engine, ESO policy<br>
+                <span style="color: #fbbf24;">Unseal CronJob</span> - Runs every 5 min to auto-unseal after pod restarts<br>
+                <span style="color: #4ade80;">Web UI</span> - Browser-based management interface
+            </div>
+        </div>
+
+        <!-- Attributes -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Attributes</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Where It Impacts</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">namespace</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>openbao</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">All manifests, service DNS, init-keys secret namespace</td>
+                    </tr>
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">admin_password</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>******</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Init Job: userpass admin password</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>port</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>8200</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">helm-values.yaml API listener port, init/unseal jobs VAULT_ADDR</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>replicas</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>1</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">helm-values.yaml server replicas</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>pvc_size</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>10Gi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">helm-values.yaml persistent volume claim size</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>storageclass</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>standard</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">helm-values.yaml storageClassName</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>service_type</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>ClusterIP</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">helm-values.yaml K8s service type</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>mem_request / mem_limit</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>256Mi / 512Mi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">helm-values.yaml resources.requests/limits.memory</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>cpu_request / cpu_limit</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>250m / 500m</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">helm-values.yaml resources.requests/limits.cpu</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>openbao_helm_version</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>0.25.6</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">helm/generate-yaml.sh chart version</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>openbao_app_version</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>2.5.1</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Unseal CronJob container image tag</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Init Job -->
+        <div style="background-color: #f3e8ff; border: 2px solid #8b5cf6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #5b21b6; font-size: 16px; margin: 0 0 16px 0; font-weight: 600;">Init Job (init-job.yaml)</h3>
+            <p style="color: #6b21a8; font-size: 12px; margin-bottom: 12px;">One-time Kubernetes Job that runs on first deploy to bootstrap OpenBao:</p>
+
+            <div style="background-color: #ddd6fe; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+                <div style="font-family: monospace; font-size: 11px; color: #1e1b4b; line-height: 1.8;">
+                    1. Wait for OpenBao to be reachable (30 retries, 10s interval)<br>
+                    2. Initialize OpenBao if not already initialized (key-shares=1, key-threshold=1)<br>
+                    3. Store unseal key + root token in K8s Secret (<code>{name}-init-keys</code>)<br>
+                    4. Unseal if sealed<br>
+                    5. Enable KV v2 secrets engine at <code>secret/</code><br>
+                    6. Enable userpass auth + create admin user<br>
+                    7. Create ESO read-only policy (<code>eso-read</code>) for ExternalSecret access
+                </div>
+            </div>
+
+            <div style="background-color: #e9d5ff; padding: 12px; border-radius: 6px;">
+                <strong style="color: #5b21b6; font-size: 12px;">RBAC:</strong>
+                <div style="font-family: monospace; font-size: 11px; color: #1e1b4b; margin-top: 4px; line-height: 1.6;">
+                    ServiceAccount: <code>{name}-init</code> | Role: secrets read/create/update/delete<br>
+                    <span style="color: #6b21a8;">TTL: 600s | backoffLimit: 5</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Unseal CronJob -->
+        <div style="background-color: #f3e8ff; border: 2px solid #8b5cf6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #5b21b6; font-size: 16px; margin: 0 0 16px 0; font-weight: 600;">Auto-Unseal CronJob (unseal-cronjob.yaml)</h3>
+            <p style="color: #6b21a8; font-size: 12px; margin-bottom: 12px;">Runs every 5 minutes to ensure OpenBao stays unsealed after pod restarts:</p>
+
+            <div style="background-color: #ddd6fe; padding: 12px; border-radius: 6px;">
+                <div style="font-family: monospace; font-size: 11px; color: #1e1b4b; line-height: 1.8;">
+                    1. Check if OpenBao is reachable (10s timeout, exits cleanly if not)<br>
+                    2. If sealed: reads unseal key from <code>{name}-init-keys</code> K8s Secret, unseals<br>
+                    3. If already unsealed: skips<br>
+                    <span style="color: #6b21a8;">Schedule: */5 * * * * | concurrencyPolicy: Forbid | TTL: 120s</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Links -->
+        <div style="background-color: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #166534; font-size: 16px; margin: 0 0 16px 0; font-weight: 600;">Links</h3>
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Link</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Direction</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Generated Output</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>Prometheus</strong> &rarr; OpenBao</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Inbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Enables <code>service-monitor.yaml</code> for Prometheus metrics scraping</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>Istio</strong> &rarr; OpenBao</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Inbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Enables istio-injection label on <code>namespace.yaml</code></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>ESO</strong> &rarr; OpenBao</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Inbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Triggers auto-seed Job in ESO template that populates OpenBao with all component secrets</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Generated Files -->
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #0369a1; margin-top: 0; margin-bottom: 15px;">Generated Files</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bae6fd;">
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">File</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Condition</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Content</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/namespace.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Namespace definition with optional istio-injection label</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/init-job.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Init Job: initialize, unseal, enable KV/auth, create admin, ESO policy + RBAC</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/unseal-cronjob.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">CronJob: auto-unseal every 5 min after pod restarts</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/service-monitor.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">prometheus-openbao link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ServiceMonitor for Prometheus metrics scraping</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/kustomization.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Kustomize resources + secretGenerator</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/secret/openbao.env</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Admin credentials (SOPS encrypted)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/secret/registry.json</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Container registry credentials (SOPS encrypted)</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">helm/helm-values.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Helm values: storage, HA, injector, UI, resources, listeners</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">helm/generate-yaml.sh</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Helm template rendering script</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Ports -->
+        <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #166534; margin-top: 0; margin-bottom: 15px;">Ports</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Port</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Service</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Protocol</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">8200</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">OpenBao API + Web UI</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">HTTP/HTTPS</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-weight: bold;">8201</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Cluster communication (Raft)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">TCP</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Internal Endpoints -->
+        <div style="background-color: #f0f9ff; border: 2px solid #0ea5e9; border-radius: 8px; padding: 20px;">
+            <h3 style="color: #0369a1; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Internal Endpoints</h3>
+            <div style="font-family: monospace; background-color: #e0f2fe; padding: 12px; border-radius: 6px; font-size: 13px; line-height: 1.8;">
+                <strong>API:</strong> http://{name}.{namespace}.svc:8200<br>
+                <strong>Web UI:</strong> http://{name}.{namespace}.svc:8200/ui<br>
+                <strong>Init Keys Secret:</strong> {name}-init-keys (unseal-key, root-token)
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

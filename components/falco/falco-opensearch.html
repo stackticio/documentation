@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Falco to OpenSearch Link</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 900px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #0ea5e9; margin-bottom: 20px; border-bottom: 3px solid #0ea5e9; padding-bottom: 12px;">Falco &rarr; OpenSearch Link</h1>
+        <p style="color: #64748b;"><strong>Routes Falco runtime security events to OpenSearch via Falcosidekick, and enables SIEM resources (index template, dashboard, alerting) on the OpenSearch side.</strong></p>
+
+        <!-- What This Link Does -->
+        <div style="background-color: #f0f9ff; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+            <h2 style="color: #0369a1; margin-top: 0;">What This Link Does</h2>
+
+            <h3 style="color: #0284c7;">On the Falco side:</h3>
+            <ul style="line-height: 1.8;">
+                <li>Enables Falcosidekick's Elasticsearch/OpenSearch output</li>
+                <li>Configures the OpenSearch endpoint (internal svc or external <code>remote_host</code>)</li>
+                <li>Sets authentication with <code>admin_password</code></li>
+                <li>Sets index name to <code>falco</code> with batching (5MB batch, 1s flush)</li>
+                <li>Enables JSON output format on Falco (required for structured forwarding)</li>
+                <li>Enables HTTP output to Falcosidekick</li>
+            </ul>
+
+            <h3 style="color: #0284c7;">On the OpenSearch side (<code>falco-opensearch</code> inbound link):</h3>
+            <ul style="line-height: 1.8;">
+                <li>Creates Falco index template (<code>index-template-falco.json</code>)</li>
+                <li>Creates Falco alerting monitor (<code>alerting-falco.json</code>) for Critical/Emergency/Alert events</li>
+                <li>Creates Falco dashboard (<code>dashboards-falco.ndjson</code>) in OpenSearch Dashboards</li>
+                <li>Applies PCI DSS ISM retention policy to <code>falco-*</code> indices</li>
+            </ul>
+        </div>
+
+        <!-- Cross-Stack Support -->
+        <div style="background-color: #1e293b; color: white; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">Cross-Stack (External) OpenSearch Support</h2>
+            <p style="color: #94a3b8; font-size: 13px;">Falco can export to an OpenSearch instance running in a <strong>different stack or cluster</strong>. The template automatically detects whether the target is local or external.</p>
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Scenario</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Helm Value: hostport</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Port</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><strong>Same stack</strong> (<code>is_external: false</code>)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: monospace; font-size: 11px;">https://{name}.{namespace}.svc.cluster.local</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">9200</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><strong>External stack</strong> (<code>is_external: true</code>)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: monospace; font-size: 11px;">https://{remote_host}</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">443</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="background-color: #334155; padding: 12px; border-radius: 6px; margin-top: 12px;">
+                <p style="color: #fbbf24; font-size: 12px; margin: 0;"><strong>remote_host:</strong> The FQDN or IP of the external OpenSearch endpoint. Typically an APISIX route or load balancer that proxies to the remote OpenSearch cluster. Set as an attribute on the OpenSearch component. Both scenarios use <code>checkcert: false</code> (TLS skip verify).</p>
+            </div>
+        </div>
+
+        <!-- OpenSearch Component Attributes Used -->
+        <div style="background-color: #1e293b; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+            <h2 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">OpenSearch Component Attributes Used</h2>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Source</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Usage in Falco Helm Values</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">namespace</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>__opensearch.component.attributes.namespace</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Internal endpoint construction: <code>{name}.{ns}.svc.cluster.local:9200</code></td>
+                    </tr>
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">admin_password</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>__opensearch.component.attributes.admin_password</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Falcosidekick elasticsearch.password config</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>remote_host</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>__opensearch.attributes.remote_host</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">External endpoint FQDN (only when <code>is_external: true</code>)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Helm Values Generated -->
+        <div style="background-color: #f7fafc; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+            <h2 style="color: #4a5568; margin-top: 0;">Helm Values Generated (Falcosidekick Output)</h2>
+            <div style="background-color: #edf2f7; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px;">
+                <pre style="margin: 0;">falcosidekick:
+  enabled: true
+  replicaCount: 2
+  config:
+    customfields: "stacktic_system:{system_name},stacktic_collector:falco"
+    elasticsearch:
+      # Internal (same stack):
+      hostport: "https://{name}.{namespace}.svc.cluster.local:9200"
+      # External (cross-stack):
+      hostport: "https://{remote_host}:443"
+
+      index: "falco"
+      type: "_doc"
+      minimumpriority: ""
+      suffix: "daily"
+      username: "admin"
+      password: "{admin_password}"
+      checkcert: false
+      batching:
+        enabled: true
+        batchsize: 5242880    # 5MB
+        flushinterval: 1000   # 1s
+      flattenfields: false
+      createindextemplate: false
+      numberofshards: 3
+      numberofreplicas: 1</pre>
+            </div>
+        </div>
+
+        <!-- Custom Fields -->
+        <div style="background-color: #ecfdf5; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+            <h2 style="color: #059669; margin-top: 0;">Custom Fields for Multi-Stack Filtering</h2>
+            <p style="font-size: 13px;">Falcosidekick injects custom fields into every event. These are critical for multi-stack SIEM dashboards:</p>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Field</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Value</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-family: monospace;">stacktic_system</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>{configuration.system_name}</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Identifies which stack generated the event (used for cross-stack dashboard filtering)</td>
+                    </tr>
+                    <tr style="background-color: #ecfdf5;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0; font-family: monospace;">stacktic_collector</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>falco</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Identifies the source type (falco vs opa vs trivy etc.)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- What Gets Created on OpenSearch Side -->
+        <div style="background-color: #f3e8ff; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+            <h2 style="color: #7c3aed; margin-top: 0;">What Gets Created on OpenSearch Side</h2>
+            <p style="font-size: 13px;">When OpenSearch detects the <code>falco-opensearch</code> inbound link AND <code>siem</code> attribute is <code>"true"</code>:</p>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 12px;">
+                <thead>
+                    <tr style="background-color: #e9d5ff;">
+                        <th style="padding: 8px; border: 1px solid #c4b5fd; text-align: left;">Resource</th>
+                        <th style="padding: 8px; border: 1px solid #c4b5fd; text-align: left;">File</th>
+                        <th style="padding: 8px; border: 1px solid #c4b5fd; text-align: left;">Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #e9d5ff;">Index Template</td>
+                        <td style="padding: 6px 8px; border: 1px solid #e9d5ff; font-family: monospace;">siem/index-template-falco.json</td>
+                        <td style="padding: 6px 8px; border: 1px solid #e9d5ff;">Mapping for <code>falco-*</code> index pattern</td>
+                    </tr>
+                    <tr style="background-color: #faf5ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #e9d5ff;">Alerting Monitor</td>
+                        <td style="padding: 6px 8px; border: 1px solid #e9d5ff; font-family: monospace;">siem/alerting-falco.json</td>
+                        <td style="padding: 6px 8px; border: 1px solid #e9d5ff;"><code>falco-critical-events</code> monitor searching for Critical/Emergency/Alert priority</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #e9d5ff;">Dashboard</td>
+                        <td style="padding: 6px 8px; border: 1px solid #e9d5ff; font-family: monospace;">siem/dashboards-falco.ndjson</td>
+                        <td style="padding: 6px 8px; border: 1px solid #e9d5ff;">OpenSearch Dashboards saved objects (index pattern + visualizations + dashboard)</td>
+                    </tr>
+                    <tr style="background-color: #faf5ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #e9d5ff;">ISM Policy</td>
+                        <td style="padding: 6px 8px; border: 1px solid #e9d5ff; font-family: monospace;">siem/ism-policy.json</td>
+                        <td style="padding: 6px 8px; border: 1px solid #e9d5ff;">PCI DSS retention policy applied to <code>falco-*</code> indices</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Comparison with OPA -->
+        <div style="background-color: #fff8dc; padding: 15px; margin-bottom: 15px; border-radius: 5px; border-left: 4px solid #ff8c00;">
+            <p style="color: #cc6600; font-weight: bold; margin: 0;">Falco vs OPA Export Architecture</p>
+            <ul style="color: #cc6600; margin: 10px 0 0 0; padding-left: 20px; line-height: 1.8;">
+                <li><strong>Falco:</strong> Single link (<code>falco-opensearch</code>). Falcosidekick has native OpenSearch output &mdash; no sidecar needed.</li>
+                <li><strong>OPA:</strong> Two links required (<code>opa-otel</code> + <code>opa-opensearch</code>). Gatekeeper has no native OpenSearch output &mdash; needs OTEL collector sidecar.</li>
+            </ul>
+        </div>
+
+    </div>
+
+</body>
+</html>

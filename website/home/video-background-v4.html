@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stacktic Video Background v4 — Org Security</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+    body { font-family: 'Fira Code', monospace; background: #060612; }
+    canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+(function() {
+  var canvas = document.getElementById('c');
+  var ctx = canvas.getContext('2d');
+  var dpr = window.devicePixelRatio || 1;
+  var W = 0, H = 0, frame = 0, vis = true;
+
+  function rgba(hex, a) {
+    var r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+    return 'rgba('+r+','+g+','+b+','+a+')';
+  }
+
+  var purple = '#a78bfa', cyan = '#22d3ee', green = '#34d399', yellow = '#fbbf24';
+  var indigo = '#818cf8', red = '#f87171', orange = '#fb923c', pink = '#f472b6';
+  var dim = '#94a3b8', white = '#e2e8f0';
+
+  function roundRect(x,y,w,h,r) {
+    if (w<1||h<1) return;
+    r = Math.min(r, w/2, h/2);
+    ctx.beginPath();
+    ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+    ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+    ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+    ctx.closePath();
+  }
+
+  function resize() {
+    W = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0, 800);
+    H = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0, 600);
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  // ── Org hierarchy ──
+  var orgTree = {
+    name: 'Platform Admin', role: 'admin', color: red, children: [
+      { name: 'Team Lead: AI', role: 'lead', color: purple, children: [
+        { name: 'ML Engineer', role: 'dev', color: indigo },
+        { name: 'Data Scientist', role: 'dev', color: cyan }
+      ]},
+      { name: 'Team Lead: Backend', role: 'lead', color: green, children: [
+        { name: 'Backend Dev', role: 'dev', color: green },
+        { name: 'DevOps Eng', role: 'ops', color: orange }
+      ]},
+      { name: 'Team Lead: Security', role: 'lead', color: yellow, children: [
+        { name: 'SecOps Eng', role: 'sec', color: yellow },
+        { name: 'Compliance', role: 'audit', color: pink }
+      ]}
+    ]
+  };
+
+  // ── Stack versions (rollback timeline) ──
+  var stackVersions = [
+    { ver: 'v3.2.1', date: '2026-03-13', status: 'active', color: green },
+    { ver: 'v3.2.0', date: '2026-03-10', status: 'stable', color: cyan },
+    { ver: 'v3.1.0', date: '2026-02-28', status: 'archived', color: dim },
+    { ver: 'v3.0.0', date: '2026-02-15', status: 'archived', color: dim },
+    { ver: 'v2.8.0', date: '2026-01-20', status: 'archived', color: dim },
+    { ver: 'v2.7.3', date: '2026-01-05', status: 'rollback', color: orange }
+  ];
+
+  // ── Action log ──
+  var actions = [
+    { user: 'admin@co.io', action: 'deployed stack v3.2.1', color: green, icon: '\u2713' },
+    { user: 'lead-ai@co.io', action: 'added langflow to stack', color: purple, icon: '+' },
+    { user: 'secops@co.io', action: 'enforced OPA policy: no-root', color: yellow, icon: '\u26BF' },
+    { user: 'devops@co.io', action: 'rolled back to v3.1.0', color: orange, icon: '\u21BA' },
+    { user: 'admin@co.io', action: 'granted read: backend \u2192 mongodb', color: cyan, icon: '\u26BF' },
+    { user: 'backend@co.io', action: 'created fastapi component', color: green, icon: '+' },
+    { user: 'compliance@co.io', action: 'exported SOC2 audit report', color: pink, icon: '\u2691' },
+    { user: 'admin@co.io', action: 'revoked access: extern-user', color: red, icon: '\u2717' },
+    { user: 'lead-sec@co.io', action: 'rotated SOPS keys', color: yellow, icon: '\u2699' },
+    { user: 'ml-eng@co.io', action: 'updated ollama model config', color: indigo, icon: '\u2699' },
+    { user: 'admin@co.io', action: 'snapshot: stack-v3 full backup', color: cyan, icon: '\u25A3' },
+    { user: 'devops@co.io', action: 'scaled replicas: fastapi 3\u21925', color: green, icon: '\u2191' }
+  ];
+
+  // ── Particles ──
+  var particles = [];
+  for (var i = 0; i < 50; i++) {
+    particles.push({
+      x: Math.random(), y: Math.random(),
+      s: 0.5 + Math.random() * 2,
+      ph: Math.random() * Math.PI * 2,
+      vy: -0.0003 - Math.random() * 0.0006,
+      vx: (Math.random() - 0.5) * 0.0003,
+      color: [purple, cyan, green, yellow, indigo][Math.floor(Math.random() * 5)]
+    });
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+  document.addEventListener('visibilitychange', function() { vis = !document.hidden; if (vis) animate(); });
+
+  function draw() {
+    if (!W || !H) return;
+    ctx.clearRect(0, 0, W, H);
+    frame++;
+    var centerX = W / 2, centerY = H / 2;
+
+    // ═══════════════════
+    //  BACKGROUND
+    // ═══════════════════
+    var vig = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, Math.max(W, H) * 0.7);
+    vig.addColorStop(0, '#0e0d25');
+    vig.addColorStop(0.5, '#080818');
+    vig.addColorStop(1, '#030306');
+    ctx.fillStyle = vig;
+    ctx.fillRect(0, 0, W, H);
+
+    // Fine grid
+    ctx.strokeStyle = rgba(indigo, 0.03); ctx.lineWidth = 1;
+    for (var gx = 0; gx < W; gx += 50) { ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,H); ctx.stroke(); }
+    for (var gy = 0; gy < H; gy += 50) { ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(W,gy); ctx.stroke(); }
+
+    // ═══════════════════
+    //  TOP BADGE
+    // ═══════════════════
+    ctx.save(); ctx.globalAlpha = 0.5;
+    roundRect(centerX - 140, 12, 280, 28, 14);
+    ctx.fillStyle = rgba('#0f0e24', 0.85); ctx.fill();
+    ctx.strokeStyle = rgba(indigo, 0.4); ctx.lineWidth = 1; ctx.stroke();
+    ctx.font = '600 11px "Fira Code", monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = rgba(indigo, 0.9);
+    ctx.fillText('\u2630  Organizational Security  \u2630', centerX, 26);
+    ctx.restore();
+
+    // ═══════════════════
+    //  ORG HIERARCHY TREE (left side)
+    // ═══════════════════
+    var treeX = W * 0.02;
+    var treeW = W * 0.28;
+    var treeY = H * 0.08;
+    var treeH = H * 0.55;
+
+    ctx.save(); ctx.globalAlpha = 0.6;
+
+    // Tree header
+    roundRect(treeX, treeY, treeW, 28, 8);
+    ctx.fillStyle = rgba('#111128', 0.9); ctx.fill();
+    ctx.font = '600 10px "Fira Code", monospace';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = rgba(indigo, 0.8);
+    ctx.fillText('\u2630  User Hierarchy', treeX + 12, treeY + 14);
+
+    // Draw tree nodes
+    var nodeW = treeW * 0.75, nodeH = 26;
+    var rootY = treeY + 45;
+
+    // Root
+    drawOrgNode(treeX + treeW/2 - nodeW/2, rootY, nodeW, nodeH, orgTree, 0);
+
+    // Level 1 (team leads)
+    var l1Gap = treeH * 0.22;
+    for (var c1 = 0; c1 < orgTree.children.length; c1++) {
+      var child = orgTree.children[c1];
+      var c1Y = rootY + 55;
+      var c1X = treeX + 8 + c1 * (treeW / 3);
+      var c1W = treeW / 3 - 12;
+
+      // Line from root to child
+      ctx.beginPath();
+      ctx.moveTo(treeX + treeW/2, rootY + nodeH);
+      ctx.lineTo(c1X + c1W/2, c1Y);
+      ctx.strokeStyle = rgba(child.color, 0.25); ctx.lineWidth = 1.5;
+      ctx.setLineDash([3, 3]); ctx.stroke(); ctx.setLineDash([]);
+
+      // Spark on line
+      var sparkT = ((frame * 0.008 + c1 * 0.3) % 1);
+      var sx = treeX + treeW/2 + (c1X + c1W/2 - treeX - treeW/2) * sparkT;
+      var sy = rootY + nodeH + (c1Y - rootY - nodeH) * sparkT;
+      ctx.beginPath(); ctx.arc(sx, sy, 3, 0, Math.PI*2);
+      ctx.fillStyle = rgba(child.color, 0.5); ctx.fill();
+
+      drawOrgNode(c1X, c1Y, c1W, 22, child, 1);
+
+      // Level 2 (individual users)
+      if (child.children) {
+        for (var c2 = 0; c2 < child.children.length; c2++) {
+          var leaf = child.children[c2];
+          var c2Y = c1Y + 40 + c2 * 32;
+          var c2X = c1X + 4;
+          var c2W = c1W - 8;
+
+          ctx.beginPath();
+          ctx.moveTo(c1X + c1W/2, c1Y + 22);
+          ctx.lineTo(c2X + c2W/2, c2Y);
+          ctx.strokeStyle = rgba(leaf.color, 0.15); ctx.lineWidth = 1;
+          ctx.setLineDash([2, 4]); ctx.stroke(); ctx.setLineDash([]);
+
+          drawOrgNode(c2X, c2Y, c2W, 20, leaf, 2);
+        }
+      }
+    }
+
+    ctx.restore();
+
+    // ═══════════════════
+    //  STACK VERSION TIMELINE (right side)
+    // ═══════════════════
+    var tlX = W * 0.73;
+    var tlW = W * 0.25;
+    var tlY = H * 0.08;
+
+    ctx.save(); ctx.globalAlpha = 0.6;
+
+    // Timeline header
+    roundRect(tlX, tlY, tlW, 28, 8);
+    ctx.fillStyle = rgba('#111128', 0.9); ctx.fill();
+    ctx.font = '600 10px "Fira Code", monospace';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = rgba(cyan, 0.8);
+    ctx.fillText('\u21BA  Stack Versions', tlX + 12, tlY + 14);
+
+    // Version entries
+    var vEntryH = 42;
+    var lineX = tlX + 22;
+
+    for (var vi = 0; vi < stackVersions.length; vi++) {
+      var sv = stackVersions[vi];
+      var vy = tlY + 45 + vi * vEntryH;
+      var vPulse = 0.7 + Math.sin(frame * 0.015 + vi * 0.8) * 0.15;
+
+      // Vertical timeline line
+      if (vi < stackVersions.length - 1) {
+        ctx.beginPath();
+        ctx.moveTo(lineX, vy + 10);
+        ctx.lineTo(lineX, vy + vEntryH);
+        ctx.strokeStyle = rgba(dim, 0.2); ctx.lineWidth = 2; ctx.stroke();
+      }
+
+      // Dot on timeline
+      var dotSize = vi === 0 ? 6 : 4;
+      ctx.beginPath(); ctx.arc(lineX, vy + 5, dotSize, 0, Math.PI * 2);
+      if (vi === 0) {
+        // Active version pulse
+        var activePulse = 0.5 + Math.sin(frame * 0.04) * 0.4;
+        ctx.fillStyle = rgba(sv.color, activePulse + 0.3);
+        ctx.fill();
+        var ag = ctx.createRadialGradient(lineX, vy+5, 0, lineX, vy+5, 14);
+        ag.addColorStop(0, rgba(sv.color, 0.3));
+        ag.addColorStop(1, 'transparent');
+        ctx.fillStyle = ag;
+        ctx.beginPath(); ctx.arc(lineX, vy+5, 14, 0, Math.PI*2); ctx.fill();
+      } else {
+        ctx.fillStyle = rgba(sv.color, 0.5 * vPulse); ctx.fill();
+      }
+
+      // Version label
+      ctx.font = '700 11px "Fira Code", monospace';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      ctx.fillStyle = rgba(sv.color, 0.8 * vPulse);
+      ctx.fillText(sv.ver, lineX + 14, vy + 3);
+
+      // Date
+      ctx.font = '400 8px "Fira Code", monospace';
+      ctx.fillStyle = rgba(dim, 0.5 * vPulse);
+      ctx.fillText(sv.date, lineX + 14, vy + 17);
+
+      // Status badge
+      var badgeW = 55;
+      roundRect(tlX + tlW - badgeW - 10, vy - 2, badgeW, 16, 8);
+      ctx.fillStyle = rgba(sv.color, 0.1 * vPulse); ctx.fill();
+      ctx.strokeStyle = rgba(sv.color, 0.3 * vPulse); ctx.lineWidth = 1; ctx.stroke();
+      ctx.font = '500 8px "Fira Code", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = rgba(sv.color, 0.7 * vPulse);
+      ctx.fillText(sv.status, tlX + tlW - badgeW/2 - 10, vy + 6);
+    }
+
+    ctx.restore();
+
+    // ═══════════════════
+    //  ACTION LOG (bottom center, wide)
+    // ═══════════════════
+    var logW = W * 0.6;
+    var logH = H * 0.28;
+    var logX = centerX - logW / 2;
+    var logY = H - logH - 8;
+
+    ctx.save(); ctx.globalAlpha = 0.55;
+
+    roundRect(logX, logY, logW, logH, 12);
+    ctx.fillStyle = rgba('#0a0a1a', 0.9); ctx.fill();
+    ctx.strokeStyle = rgba(indigo, 0.2); ctx.lineWidth = 1; ctx.stroke();
+
+    // Header bar
+    roundRect(logX, logY, logW, 26, 12);
+    ctx.fillStyle = rgba('#111128', 0.95); ctx.fill();
+    ctx.fillRect(logX, logY + 14, logW, 12);
+
+    var hdots = ['#ef4444','#fbbf24','#10b981'];
+    for (var di = 0; di < 3; di++) {
+      ctx.beginPath(); ctx.arc(logX + logW - 44 + di * 15, logY + 13, 4.5, 0, Math.PI*2);
+      ctx.fillStyle = hdots[di]; ctx.fill();
+    }
+
+    ctx.font = '600 10px "Fira Code", monospace';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = rgba(indigo, 0.9);
+    ctx.fillText('\u2691  Action Log — User Activity', logX + 14, logY + 13);
+
+    // Scrolling entries
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(logX + 4, logY + 28, logW - 8, logH - 34);
+    ctx.clip();
+
+    var lineH = 22;
+    var scrollOffset = (frame * 0.4) % (actions.length * lineH);
+
+    for (var ai = 0; ai < actions.length * 2; ai++) {
+      var act = actions[ai % actions.length];
+      var ay = logY + 36 + ai * lineH - scrollOffset;
+      if (ay < logY + 22 || ay > logY + logH + 5) continue;
+
+      // Icon
+      ctx.font = '600 11px "Fira Code", monospace';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      ctx.fillStyle = rgba(act.color, 0.7);
+      ctx.fillText(act.icon, logX + 14, ay);
+
+      // User
+      ctx.font = '500 9px "Fira Code", monospace';
+      ctx.fillStyle = rgba(purple, 0.7);
+      ctx.fillText(act.user, logX + 32, ay);
+
+      // Action
+      ctx.font = '400 9px "Fira Code", monospace';
+      ctx.fillStyle = rgba(act.color, 0.65);
+      ctx.fillText(act.action, logX + 170, ay);
+
+      // Timestamp (fake, cycling)
+      ctx.font = '400 8px "Fira Code", monospace';
+      ctx.fillStyle = rgba(dim, 0.35);
+      ctx.textAlign = 'right';
+      var mins = (ai * 3 + 1);
+      ctx.fillText(mins + 'm ago', logX + logW - 14, ay);
+      ctx.textAlign = 'left';
+    }
+
+    ctx.restore(); // clip
+    ctx.restore(); // alpha
+
+    // ═══════════════════
+    //  PARTICLES
+    // ═══════════════════
+    for (var pi = 0; pi < particles.length; pi++) {
+      var p = particles[pi];
+      p.x += p.vx; p.y += p.vy;
+      if (p.y < -0.03) { p.y = 1.03; p.x = Math.random(); }
+      if (p.x < -0.03) p.x = 1.03;
+      if (p.x > 1.03) p.x = -0.03;
+      var pa = 0.2 + Math.sin(frame * 0.015 + p.ph) * 0.1;
+      ctx.beginPath(); ctx.arc(p.x*W, p.y*H, p.s, 0, Math.PI*2);
+      ctx.fillStyle = rgba(p.color, pa); ctx.fill();
+    }
+
+    // ═══════════════════
+    //  PULSE WAVE
+    // ═══════════════════
+    var pPhase = (frame % 300) / 300;
+    if (pPhase < 0.6) {
+      var pR = pPhase * Math.max(W, H) * 0.8;
+      var pA = (1 - pPhase / 0.6) * 0.08;
+      ctx.beginPath(); ctx.arc(centerX, centerY, pR, 0, Math.PI * 2);
+      ctx.strokeStyle = rgba(indigo, pA); ctx.lineWidth = 1.5; ctx.stroke();
+    }
+
+    // ═══════════════════
+    //  CORNER BRACKETS
+    // ═══════════════════
+    var brA = 0.3 + Math.sin(frame * 0.012) * 0.08;
+    var brLen = 50, brOff = 16;
+    ctx.strokeStyle = rgba(indigo, brA); ctx.lineWidth = 2; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(brOff, brOff+brLen); ctx.lineTo(brOff, brOff); ctx.lineTo(brOff+brLen, brOff); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(W-brOff-brLen, brOff); ctx.lineTo(W-brOff, brOff); ctx.lineTo(W-brOff, brOff+brLen); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(brOff, H-brOff-brLen); ctx.lineTo(brOff, H-brOff); ctx.lineTo(brOff+brLen, H-brOff); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(W-brOff-brLen, H-brOff); ctx.lineTo(W-brOff, H-brOff); ctx.lineTo(W-brOff, H-brOff-brLen); ctx.stroke();
+
+    // Brand
+    ctx.save(); ctx.globalAlpha = 0.2;
+    ctx.font = '400 10px "Fira Code", monospace';
+    ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+    ctx.fillStyle = rgba(dim, 0.5);
+    ctx.fillText('stacktic.io', W - 22, H - 10);
+    ctx.restore();
+  }
+
+  function drawOrgNode(x, y, w, h, data, depth) {
+    var pulse = 0.6 + Math.sin(frame * 0.02 + x * 0.01 + y * 0.01) * 0.15;
+
+    roundRect(x, y, w, h, 6);
+    ctx.fillStyle = rgba('#0f0e24', 0.85); ctx.fill();
+    ctx.strokeStyle = rgba(data.color, 0.4 * pulse); ctx.lineWidth = 1.5; ctx.stroke();
+
+    // Top accent
+    ctx.beginPath();
+    ctx.moveTo(x + 5, y); ctx.lineTo(x + w - 5, y);
+    ctx.strokeStyle = rgba(data.color, 0.6 * pulse); ctx.lineWidth = 2; ctx.stroke();
+
+    // Name
+    var fontSize = depth === 0 ? 10 : depth === 1 ? 9 : 8;
+    ctx.font = (depth === 0 ? '700 ' : '500 ') + fontSize + 'px "Fira Code", monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = rgba(data.color, 0.85 * pulse);
+    ctx.fillText(data.name, x + w/2, y + h/2);
+
+    // Role badge
+    if (depth > 0) {
+      ctx.font = '400 7px "Fira Code", monospace';
+      ctx.fillStyle = rgba(dim, 0.4 * pulse);
+      ctx.fillText(data.role, x + w/2, y + h - 3);
+    }
+  }
+
+  function animate() {
+    if (!vis) return;
+    draw();
+    requestAnimationFrame(animate);
+  }
+
+  if (document.readyState === 'complete') { resize(); animate(); }
+  else { window.addEventListener('load', function() { resize(); animate(); }); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>External Secrets Operator (ESO)</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 900px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #1e293b; font-size: 24px; margin: 0 0 24px 0; font-weight: 700; border-bottom: 3px solid #3b82f6; padding-bottom: 12px;">External Secrets Operator (ESO)</h1>
+        <p style="color: #64748b; margin-bottom: 24px;">Syncs secrets from external providers (OpenBao/Vault, AWS, GCP, Azure) into Kubernetes Secrets. Includes ClusterSecretStore, ExternalSecret CRs, automatic rotation, and OpenBao auto-seed Job.</p>
+
+        <!-- Architecture -->
+        <div style="background-color: #1e293b; color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">Architecture</h2>
+            <div style="font-family: monospace; font-size: 13px; line-height: 1.8;">
+                <span style="color: #3b82f6;">ESO Controller</span> - Watches ExternalSecret CRs, syncs from provider<br>
+                <span style="color: #22d3ee;">ClusterSecretStore</span> - Cluster-wide backend config (Vault/AWS/GCP/Azure)<br>
+                <span style="color: #a78bfa;">ExternalSecret</span> - Per-component CR that pulls secrets from the store<br>
+                <span style="color: #fbbf24;">Seed Job</span> - One-time Job that populates OpenBao with all component secrets (conditional)<br>
+                <span style="color: #4ade80;">Webhook</span> - Validates CRs on admission
+            </div>
+        </div>
+
+        <!-- Attributes -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Attributes</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Where It Impacts</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">namespace</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>external-secrets</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">All manifests, namespace.yaml</td>
+                    </tr>
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">secret_store_provider</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>vault</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">ClusterSecretStore provider type (vault, aws, gcp, azure)</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>replicas</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>1</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">helm-values.yaml controller replicas</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>mem_request / mem_limit</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>128Mi / 256Mi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">helm-values.yaml resources.requests/limits.memory</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>cpu_request / cpu_limit</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>100m / 200m</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">helm-values.yaml resources.requests/limits.cpu</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>eso_helm_version</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>2.1.0</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">helm/generate-yaml.sh chart version</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Provider-specific attributes -->
+            <h4 style="color: #94a3b8; margin-top: 16px; margin-bottom: 8px; font-size: 12px;">Vault Provider Attributes</h4>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b; width: 30%;"><code style="color: #fbbf24;">secret_store_host</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b; width: 25%;"><code>https://openbao.sre.example.io</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">ClusterSecretStore server URL, seed Job BAO_ADDR</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>secret_store_path</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>secret</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">ClusterSecretStore KV engine path</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>secret_store_version</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>v2</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">ClusterSecretStore KV version</td>
+                    </tr>
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">secret_store_auth_token</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>******</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">eso.env token, used by ClusterSecretStore + seed Job</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4 style="color: #94a3b8; margin-top: 16px; margin-bottom: 8px; font-size: 12px;">AWS Provider Attributes</h4>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569; width: 30%;"><code>aws_region</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; width: 25%;"><code>us-east-1</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">ClusterSecretStore AWS region</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>aws_access_key / aws_secret_key</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>******</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">eso.env AWS credentials</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4 style="color: #94a3b8; margin-top: 16px; margin-bottom: 8px; font-size: 12px;">GCP Provider Attributes</h4>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569; width: 30%;"><code>gcp_project_id</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; width: 25%;"><code>my-project</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">ClusterSecretStore GCP project</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>gcp_credentials</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>******</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">eso.env GCP service account JSON</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4 style="color: #94a3b8; margin-top: 16px; margin-bottom: 8px; font-size: 12px;">Azure Provider Attributes</h4>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569; width: 30%;"><code>azure_vault_url</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; width: 25%;"><code>https://myvault.vault.azure.net</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">ClusterSecretStore Azure Key Vault URL</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>azure_tenant_id</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>abc-123</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">ClusterSecretStore Azure tenant</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>azure_client_id / azure_client_secret</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>******</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">eso.env Azure service principal credentials</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ESO Integration -->
+        <div style="background-color: #f3e8ff; border: 2px solid #8b5cf6; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #5b21b6; font-size: 16px; margin: 0 0 16px 0; font-weight: 600;">ESO Integration (Component Templates)</h3>
+            <p style="color: #6b21a8; font-size: 12px; margin-bottom: 12px;">When ESO exists in a stack, these component templates automatically switch from local K8s Secrets to ExternalSecret CRs that pull from the ClusterSecretStore:</p>
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                <thead>
+                    <tr style="background-color: #c4b5fd;">
+                        <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Component</th>
+                        <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Secrets Managed</th>
+                        <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">OpenBao Path</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #1e1b4b;">
+                    <tr>
+                        <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><strong>rabbitmq</strong></td>
+                        <td style="padding: 4px 6px; border: 1px solid #a78bfa;">erlang cookie, password</td>
+                        <td style="padding: 4px 6px; border: 1px solid #a78bfa; font-family: monospace;">secret/{name}</td>
+                    </tr>
+                    <tr style="background-color: #f3e8ff;">
+                        <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><strong>cnpg</strong></td>
+                        <td style="padding: 4px 6px; border: 1px solid #a78bfa;">admin creds + per-database creds</td>
+                        <td style="padding: 4px 6px; border: 1px solid #a78bfa; font-family: monospace;">secret/{name}, secret/{name}/{db}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><strong>mongodb</strong></td>
+                        <td style="padding: 4px 6px; border: 1px solid #a78bfa;">cluster secrets (10 keys) + per-database</td>
+                        <td style="padding: 4px 6px; border: 1px solid #a78bfa; font-family: monospace;">secret/{name}, secret/{name}/{db}</td>
+                    </tr>
+                    <tr style="background-color: #f3e8ff;">
+                        <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><strong>grafana</strong></td>
+                        <td style="padding: 4px 6px; border: 1px solid #a78bfa;">admin user/password</td>
+                        <td style="padding: 4px 6px; border: 1px solid #a78bfa; font-family: monospace;">secret/{name}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><strong>prometheus</strong></td>
+                        <td style="padding: 4px 6px; border: 1px solid #a78bfa;">SMTP + Slack alerting creds</td>
+                        <td style="padding: 4px 6px; border: 1px solid #a78bfa; font-family: monospace;">secret/{name}</td>
+                    </tr>
+                    <tr style="background-color: #f3e8ff;">
+                        <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><strong>keycloak_operator</strong></td>
+                        <td style="padding: 4px 6px; border: 1px solid #a78bfa;">DB creds, admin creds, client secret</td>
+                        <td style="padding: 4px 6px; border: 1px solid #a78bfa; font-family: monospace;">secret/{name}/db, /admin, /client</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Seed Job -->
+            <div style="margin-top: 16px; padding: 12px; background-color: #ddd6fe; border-radius: 6px;">
+                <strong style="color: #5b21b6; font-size: 12px;">OpenBao Seed Job (seed-openbao-job.yaml):</strong>
+                <div style="font-family: monospace; font-size: 11px; color: #1e1b4b; margin-top: 6px; line-height: 1.8;">
+                    <strong>Condition:</strong> Only generated when <code>external_secrets-openbao</code> link exists<br>
+                    1. Connects to OpenBao via <code>secret_store_host</code> URL (cross-cluster)<br>
+                    2. Authenticates with the same token as ClusterSecretStore<br>
+                    3. Uses <code>seed_if_missing</code> logic &mdash; skips secrets that already exist (idempotent)<br>
+                    4. Seeds all 6 component types from cookiecutter.components<br>
+                    5. Auto-deletes after 5 minutes (ttlSecondsAfterFinished: 300)<br>
+                    <span style="color: #6b21a8;">Image: quay.io/openbao/openbao:latest | backoffLimit: 3</span>
+                </div>
+            </div>
+
+            <!-- Detection mechanism -->
+            <div style="margin-top: 12px; padding: 12px; background-color: #ddd6fe; border-radius: 6px;">
+                <strong style="color: #5b21b6; font-size: 12px;">Detection Mechanism:</strong>
+                <div style="font-family: monospace; font-size: 11px; color: #1e1b4b; margin-top: 6px; line-height: 1.8;">
+                    Components detect ESO via <code>cookiecutter.components</code> &mdash; checks for <code>type == "external_secrets"</code><br>
+                    When ESO is absent, output is identical to the non-ESO flow (local K8s Secrets)
+                </div>
+            </div>
+        </div>
+
+        <!-- Links -->
+        <div style="background-color: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #166534; font-size: 16px; margin: 0 0 16px 0; font-weight: 600;">Links</h3>
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Link</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Direction</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Generated Output</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>Prometheus</strong> &rarr; ESO</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Inbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Enables <code>service-monitor.yaml</code> for metrics scraping</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>Istio</strong> &rarr; ESO</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Inbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Enables istio-injection label on <code>namespace.yaml</code></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>ESO</strong> &rarr; <strong>OpenBao</strong></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Outbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Generates <code>seed-openbao-job.yaml</code> to auto-populate OpenBao with all component secrets</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Generated Files -->
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #0369a1; margin-top: 0; margin-bottom: 15px;">Generated Files</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bae6fd;">
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">File</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Condition</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Content</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/namespace.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Namespace definition with optional istio-injection label</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/cluster-secret-store.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ClusterSecretStore CR for the selected provider (vault/aws/gcp/azure)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/service-monitor.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">prometheus-external_secrets link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">ServiceMonitor for Prometheus metrics scraping</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/seed-openbao-job.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">external_secrets-openbao link</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Seed Job: populates OpenBao with all component secrets (SOPS encrypted)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/kustomization.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Kustomize resources + secretGenerator for eso.env</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/secret/eso.env</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Provider credentials (SOPS encrypted)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/secret/registry.json</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Container registry credentials (SOPS encrypted)</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">helm/helm-values.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Helm values: replicas, resources, webhook config</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">helm/generate-yaml.sh</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Helm template rendering script</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">day2/seed-vault.sh</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Manual seed script for any Vault backend (same seed_if_missing logic)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Helm Chart -->
+        <div style="background-color: #f0f9ff; border: 2px solid #0ea5e9; border-radius: 8px; padding: 20px;">
+            <h3 style="color: #0369a1; font-size: 16px; margin: 0 0 12px 0; font-weight: 600;">Helm Chart</h3>
+            <div style="font-family: monospace; background-color: #e0f2fe; padding: 12px; border-radius: 6px; font-size: 13px; line-height: 1.8;">
+                <strong>Repo:</strong> https://charts.external-secrets.io<br>
+                <strong>Chart:</strong> external-secrets/external-secrets<br>
+                <strong>Version:</strong> 2.1.0
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

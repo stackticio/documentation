@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0%" stop-color="#0f0e24"/>
+      <stop offset="100%" stop-color="#060612"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1280" height="720" fill="url(#bg)"/>
+
+  <!-- Subtle grid -->
+  <pattern id="dots" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+    <circle cx="20" cy="20" r="0.5" fill="#94a3b8" opacity="0.06"/>
+  </pattern>
+  <rect width="1280" height="720" fill="url(#dots)"/>
+
+  <!-- Grid of cells representing microsegmented zones -->
+  <!-- The "invisible walls" are the gaps between cells -->
+
+  <!-- Row 1 -->
+  <rect x="430" y="160" width="80" height="65" rx="6" fill="#22d3ee" fill-opacity="0.04" stroke="#22d3ee" stroke-width="0.8" stroke-opacity="0.15"/>
+  <circle cx="470" cy="192" r="4" fill="#22d3ee" opacity="0.4"/>
+  <rect x="525" y="160" width="80" height="65" rx="6" fill="#a78bfa" fill-opacity="0.04" stroke="#a78bfa" stroke-width="0.8" stroke-opacity="0.15"/>
+  <circle cx="565" cy="192" r="4" fill="#a78bfa" opacity="0.4"/>
+  <rect x="620" y="160" width="80" height="65" rx="6" fill="#34d399" fill-opacity="0.04" stroke="#34d399" stroke-width="0.8" stroke-opacity="0.15"/>
+  <circle cx="660" cy="192" r="4" fill="#34d399" opacity="0.4"/>
+  <rect x="715" y="160" width="80" height="65" rx="6" fill="#22d3ee" fill-opacity="0.04" stroke="#22d3ee" stroke-width="0.8" stroke-opacity="0.12"/>
+  <circle cx="755" cy="192" r="4" fill="#22d3ee" opacity="0.3"/>
+
+  <!-- Row 2 -->
+  <rect x="430" y="240" width="80" height="65" rx="6" fill="#34d399" fill-opacity="0.04" stroke="#34d399" stroke-width="0.8" stroke-opacity="0.12"/>
+  <circle cx="470" cy="272" r="4" fill="#34d399" opacity="0.3"/>
+  <rect x="525" y="240" width="80" height="65" rx="6" fill="#22d3ee" fill-opacity="0.05" stroke="#22d3ee" stroke-width="1" stroke-opacity="0.2"/>
+  <circle cx="565" cy="272" r="5" fill="#22d3ee" opacity="0.5"/>
+  <rect x="620" y="240" width="80" height="65" rx="6" fill="#f59e0b" fill-opacity="0.04" stroke="#f59e0b" stroke-width="0.8" stroke-opacity="0.15"/>
+  <circle cx="660" cy="272" r="4" fill="#f59e0b" opacity="0.4"/>
+  <rect x="715" y="240" width="80" height="65" rx="6" fill="#a78bfa" fill-opacity="0.04" stroke="#a78bfa" stroke-width="0.8" stroke-opacity="0.12"/>
+  <circle cx="755" cy="272" r="4" fill="#a78bfa" opacity="0.3"/>
+
+  <!-- Row 3 -->
+  <rect x="430" y="320" width="80" height="65" rx="6" fill="#a78bfa" fill-opacity="0.04" stroke="#a78bfa" stroke-width="0.8" stroke-opacity="0.12"/>
+  <circle cx="470" cy="352" r="4" fill="#a78bfa" opacity="0.3"/>
+  <rect x="525" y="320" width="80" height="65" rx="6" fill="#f59e0b" fill-opacity="0.04" stroke="#f59e0b" stroke-width="0.8" stroke-opacity="0.12"/>
+  <circle cx="565" cy="352" r="4" fill="#f59e0b" opacity="0.3"/>
+  <rect x="620" y="320" width="80" height="65" rx="6" fill="#22d3ee" fill-opacity="0.04" stroke="#22d3ee" stroke-width="0.8" stroke-opacity="0.15"/>
+  <circle cx="660" cy="352" r="4" fill="#22d3ee" opacity="0.4"/>
+  <rect x="715" y="320" width="80" height="65" rx="6" fill="#34d399" fill-opacity="0.04" stroke="#34d399" stroke-width="0.8" stroke-opacity="0.15"/>
+  <circle cx="755" cy="352" r="4" fill="#34d399" opacity="0.4"/>
+
+  <!-- Allowed connections (thin solid lines between specific cells) -->
+  <line x1="510" y1="192" x2="525" y2="192" stroke="#22d3ee" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="605" y1="272" x2="620" y2="272" stroke="#22d3ee" stroke-width="1" stroke-opacity="0.2"/>
+  <line x1="565" y1="225" x2="565" y2="240" stroke="#a78bfa" stroke-width="1" stroke-opacity="0.2"/>
+  <line x1="660" y1="305" x2="660" y2="320" stroke="#22d3ee" stroke-width="1" stroke-opacity="0.2"/>
+
+  <!-- Blocked connections (red X marks in gaps - the invisible walls) -->
+  <!-- Between row1 col2 and row1 col3 -->
+  <text x="612" y="196" text-anchor="middle" font-size="10" fill="#ef4444" opacity="0.3" font-family="monospace">x</text>
+  <!-- Between row2 col1 and row2 col2 -->
+  <text x="517" y="276" text-anchor="middle" font-size="10" fill="#ef4444" opacity="0.3" font-family="monospace">x</text>
+  <!-- Between row1 col3 and row2 col3 -->
+  <text x="660" y="233" text-anchor="middle" font-size="10" fill="#ef4444" opacity="0.25" font-family="monospace">x</text>
+  <!-- Between row2 col2 and row3 col2 -->
+  <text x="565" y="313" text-anchor="middle" font-size="10" fill="#ef4444" opacity="0.25" font-family="monospace">x</text>
+  <!-- Between row3 col1 and row3 col2 -->
+  <text x="517" y="356" text-anchor="middle" font-size="10" fill="#ef4444" opacity="0.25" font-family="monospace">x</text>
+  <!-- Between row2 col3 and row2 col4 -->
+  <text x="707" y="276" text-anchor="middle" font-size="10" fill="#ef4444" opacity="0.25" font-family="monospace">x</text>
+
+  <!-- Legend - small, bottom left of grid -->
+  <line x1="445" y1="410" x2="465" y2="410" stroke="#22d3ee" stroke-width="1" stroke-opacity="0.3"/>
+  <text x="472" y="414" font-size="8" fill="#94a3b8" opacity="0.3" font-family="monospace">allowed</text>
+  <text x="545" y="414" font-size="10" fill="#ef4444" opacity="0.3" font-family="monospace">x</text>
+  <text x="558" y="414" font-size="8" fill="#94a3b8" opacity="0.3" font-family="monospace">denied</text>
+
+  <!-- Title -->
+  <text x="640" y="530" text-anchor="middle" font-size="36" font-weight="700" fill="#ffffff" font-family="monospace" letter-spacing="3">The Pattern of the Invisible Walls</text>
+
+  <!-- Subtitle -->
+  <text x="640" y="570" text-anchor="middle" font-size="14" fill="#94a3b8" opacity="0.4" font-family="monospace" letter-spacing="4">MICROSEGMENTATION AS CODE</text>
+
+  <!-- Thin line -->
+  <line x1="420" y1="505" x2="860" y2="505" stroke="#22d3ee" stroke-width="0.5" stroke-opacity="0.15"/>
+
+  <text x="640" y="700" text-anchor="middle" font-size="9" fill="#94a3b8" opacity="0.15" font-family="monospace">stacktic.io</text>
+</svg>

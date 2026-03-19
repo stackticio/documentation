@@ -38,12 +38,12 @@
                         <td style="padding: 6px 8px; border: 1px solid #f59e0b;">image_base.yaml</td>
                         <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Container image</td>
                     </tr>
-                    <!-- REQUIRED: port -->
+                    <!-- REQUIRED: ports -->
                     <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
-                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">port</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
-                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>8080</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">ports</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>http:8000:TCP</code></td>
                         <td style="padding: 6px 8px; border: 1px solid #f59e0b;">image_base.yaml, cloud.env</td>
-                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">containerPort + SERVICE_PORT</td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Multi-line, format: <code>name:port:protocol[:stream]</code></td>
                     </tr>
                     <!-- REQUIRED: user_id -->
                     <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
@@ -160,6 +160,43 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <!-- ==================== MULTI-PORT & L4/L7 ROUTING ==================== -->
+        <div style="background-color: #ecfdf5; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #10b981;">
+            <h2 style="color: #065f46; margin-top: 0; margin-bottom: 15px;">Multi-Port Networking & APISIX Routing</h2>
+            <p style="color: #047857; font-size: 12px; margin-bottom: 12px;">
+                The <code>ports</code> attribute supports multiple ports (one per line). Each port follows the format: <code>name:port:protocol[:stream]</code>
+            </p>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 15px;">
+                <thead>
+                    <tr style="background-color: #d1fae5;">
+                        <th style="padding: 8px; border: 1px solid #a7f3d0; text-align: left;">Format</th>
+                        <th style="padding: 8px; border: 1px solid #a7f3d0; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #a7f3d0; text-align: left;">Routing Type</th>
+                        <th style="padding: 8px; border: 1px solid #a7f3d0; text-align: left;">APISIX Behavior</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #a7f3d0; font-family: monospace;">name:port:protocol</td>
+                        <td style="padding: 6px 8px; border: 1px solid #a7f3d0;"><code>http:8000:TCP</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #a7f3d0;"><strong>L7 HTTP</strong></td>
+                        <td style="padding: 6px 8px; border: 1px solid #a7f3d0;">Hostname-based route + TLS + plugins</td>
+                    </tr>
+                    <tr style="background-color: #ecfdf5;">
+                        <td style="padding: 6px 8px; border: 1px solid #a7f3d0; font-family: monospace;">name:port:protocol:stream</td>
+                        <td style="padding: 6px 8px; border: 1px solid #a7f3d0;"><code>agent:50000:TCP:stream</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #a7f3d0;"><strong>L4 Stream</strong></td>
+                        <td style="padding: 6px 8px; border: 1px solid #a7f3d0;">Dedicated port on APISIX LB (no TLS/hostname)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="color: #047857; font-size: 12px; margin-bottom: 8px;"><strong>APISIX link attribute:</strong> Set <code>route_all: true</code> on the <code>apisix-image_base</code> link to route ALL ports. Without it, only the first port gets an L7 route.</p>
+            <div style="background-color: #fef3c7; padding: 10px; border-radius: 5px; border-left: 4px solid #f59e0b; margin-top: 10px;">
+                <strong style="color: #92400e;">Note:</strong>
+                <span style="font-size: 12px; color: #78350f;"> L4 stream ports must be globally unique across all image_base components linked to the same APISIX instance. All ports (L7 + L4) are exposed in the K8s Service regardless of APISIX routing.</span>
+            </div>
         </div>
 
         <!-- ==================== SECURITY FEATURES MATRIX ==================== -->

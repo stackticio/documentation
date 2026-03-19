@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trivy Component</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f6fa;">
+
+    <div style="max-width: 900px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+        <h1 style="color: #1e293b; font-size: 24px; margin: 0 0 24px 0; font-weight: 700; border-bottom: 3px solid #0ea5e9; padding-bottom: 12px;">Trivy Operator</h1>
+        <p style="color: #64748b; margin-bottom: 24px;">Kubernetes vulnerability scanner operator. Automatically scans all workloads for CVEs (VulnerabilityReports), misconfigurations (ConfigAuditReports), and exposed secrets (ExposedSecretReports). Runs as an operator that watches for new/updated pods and generates reports as CRDs.</p>
+
+        <!-- Architecture -->
+        <div style="background-color: #1e293b; color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">Architecture</h2>
+            <div style="font-family: monospace; font-size: 13px; line-height: 1.8;">
+                <span style="color: #0ea5e9;">Trivy Operator</span> - Watches pod events, triggers scans on new/updated workloads<br>
+                <span style="color: #22d3ee;">VulnerabilityReports</span> - Per-container image CVE scan results (CRD)<br>
+                <span style="color: #fbbf24;">ConfigAuditReports</span> - K8s misconfiguration findings (CRD)<br>
+                <span style="color: #4ade80;">ExposedSecretReports</span> - Hardcoded secrets detected in images (CRD)<br>
+                <span style="color: #f472b6;">OpenSearch Exporter</span> - CronJob (every 30min) pushes reports to OpenSearch via bulk API
+            </div>
+        </div>
+
+        <!-- Attributes -->
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #f8fafc; margin-top: 0; margin-bottom: 15px;">Attributes</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Description</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #78350f; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code style="color: #fbbf24;">namespace</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;"><code>trivy</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #f59e0b;">Kubernetes namespace for Trivy operator</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Links -->
+        <div style="background-color: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="color: #166534; font-size: 16px; margin: 0 0 16px 0; font-weight: 600;">Links</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Link</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Direction</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Generated Output</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>Prometheus</strong> &rarr; Trivy</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Inbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Generates <code>service-monitor.yaml</code> for Prometheus scraping</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><strong>Trivy</strong> &rarr; <strong>OpenSearch</strong></td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Outbound</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Deploys CronJob exporter that reads Trivy CRDs and pushes to OpenSearch via bulk API every 30 minutes. Supports same-stack and cross-stack (external) OpenSearch.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- OpenSearch Exporter -->
+        <div style="background-color: #f3e8ff; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+            <h2 style="color: #7c3aed; margin-top: 0;">OpenSearch Exporter (trivy-opensearch link)</h2>
+            <p style="font-size: 13px;">When linked to OpenSearch, a CronJob runs every 30 minutes and exports three report types:</p>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 12px;">
+                <thead>
+                    <tr style="background-color: #e9d5ff;">
+                        <th style="padding: 8px; border: 1px solid #c4b5fd; text-align: left;">Report Type</th>
+                        <th style="padding: 8px; border: 1px solid #c4b5fd; text-align: left;">K8s CRD</th>
+                        <th style="padding: 8px; border: 1px solid #c4b5fd; text-align: left;">Fields Exported</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #e9d5ff;"><strong>Vulnerabilities</strong></td>
+                        <td style="padding: 6px 8px; border: 1px solid #e9d5ff; font-family: monospace;">vulnerabilityreports</td>
+                        <td style="padding: 6px 8px; border: 1px solid #e9d5ff;">vulnerability_id, severity, package, installed_version, fixed_version, score, image, namespace, resource</td>
+                    </tr>
+                    <tr style="background-color: #faf5ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #e9d5ff;"><strong>Config Audit</strong></td>
+                        <td style="padding: 6px 8px; border: 1px solid #e9d5ff; font-family: monospace;">configauditreports</td>
+                        <td style="padding: 6px 8px; border: 1px solid #e9d5ff;">check_id, severity, title, description, category (only failed checks)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #e9d5ff;"><strong>Exposed Secrets</strong></td>
+                        <td style="padding: 6px 8px; border: 1px solid #e9d5ff; font-family: monospace;">exposedsecretreports</td>
+                        <td style="padding: 6px 8px; border: 1px solid #e9d5ff;">rule_id, severity, title, category, target, match</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="font-size: 12px; color: #64748b; margin-top: 12px;">All documents include <code>stacktic_system</code> field for multi-stack filtering. Index pattern: <code>trivy-YYYY.MM.DD</code>. Uses MD5-based document IDs for deduplication.</p>
+        </div>
+
+        <!-- Cross-Stack -->
+        <div style="background-color: #1e293b; color: white; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+            <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">Cross-Stack (External) OpenSearch</h2>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 12px;">
+                <thead>
+                    <tr style="background-color: #334155;">
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Scenario</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Endpoint</th>
+                        <th style="padding: 8px; border: 1px solid #475569; color: #e2e8f0; text-align: left;">Port</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #cbd5e1;">
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><strong>Same stack</strong> (<code>is_external: false</code>)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: monospace;">https://opensearch-cluster-master.{ns}.svc.cluster.local</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">9200</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><strong>External stack</strong> (<code>is_external: true</code>)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569; font-family: monospace;">https://{remote_host}</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">443</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Generated Files -->
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #0369a1; margin-top: 0; margin-bottom: 15px;">Generated Files</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bae6fd;">
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">File</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Condition</th>
+                        <th style="padding: 8px; border: 1px solid #7dd3fc; text-align: left;">Content</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/trivy-operator.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Trivy Operator Helm-generated manifests</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/trivy-opensearch-exporter.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; color: #166534; font-weight: bold;">OpenSearch linked</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">CronJob + ServiceAccount + ClusterRole + ClusterRoleBinding for exporting reports</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/crds/</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Trivy CRD definitions (VulnerabilityReport, ConfigAuditReport, etc.)</td>
+                    </tr>
+                    <tr style="background-color: #f0f9ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">k8s/deploy/base/secret/registry.json</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Always</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Docker registry credentials (SOPS encrypted)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Exporter Schedule -->
+        <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px;">
+            <h3 style="color: #166534; margin-top: 0; margin-bottom: 15px;">Exporter CronJob Details</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background-color: #bbf7d0;">
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Setting</th>
+                        <th style="padding: 8px; border: 1px solid #86efac; text-align: left;">Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Schedule</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>*/30 * * * *</code> (every 30 minutes)</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Deadline</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">300 seconds (5 min timeout)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Concurrency</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Forbid (no parallel runs)</td>
+                    </tr>
+                    <tr style="background-color: #f0fdf4;">
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Image</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;"><code>bitnami/kubectl:latest</code></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">Deduplication</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bbf7d0;">MD5-based document IDs prevent duplicate entries</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</body>
+</html>

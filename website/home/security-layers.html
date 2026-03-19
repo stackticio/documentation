@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Security & Governance Layers</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+    body {
+      font-family: 'Fira Code', 'Courier New', monospace;
+      background: #0a0a1a;
+      color: #e2e8f0;
+    }
+    canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+(function() {
+  var canvas = document.getElementById('c');
+  var ctx = canvas.getContext('2d');
+  var dpr = window.devicePixelRatio || 1;
+  var W = 0, H = 0, frame = 0, vis = true;
+  var FPS = 60;
+
+  function sec(s) { return s * FPS; }
+  function ease(startSec, durSec) {
+    var s = sec(startSec), d = sec(durSec);
+    var t = (frame - s) / d;
+    if (t <= 0) return 0;
+    if (t >= 1) return 1;
+    return 1 - Math.pow(1 - t, 3);
+  }
+
+  // Colors
+  var purple = '#a78bfa', cyan = '#22d3ee', green = '#34d399', yellow = '#fbbf24';
+  var red = '#f87171', pink = '#f472b6', indigo = '#818cf8', white = '#ffffff';
+  var dim = '#94a3b8', cardBg = '#111128', deep = '#0a0a1a';
+
+  function rgba(hex, a) {
+    var r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+    return 'rgba('+r+','+g+','+b+','+a+')';
+  }
+  function fs(ratio) { return Math.max(8, Math.min(ratio * W, 32)); }
+
+  function roundRect(x,y,w,h,r) {
+    if (w<1||h<1) return;
+    r = Math.min(r, w/2, h/2);
+    ctx.beginPath();
+    ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+    ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+    ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+    ctx.closePath();
+  }
+
+  function resize() {
+    W = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0, 800);
+    H = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0, 600);
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  document.addEventListener('visibilitychange', function() { vis = !document.hidden; if (vis) animate(); });
+
+  // Ambient particles
+  var particles = [];
+  for (var i = 0; i < 50; i++) {
+    particles.push({
+      x: Math.random(), y: Math.random(),
+      s: 0.5 + Math.random() * 2,
+      ph: Math.random() * Math.PI * 2,
+      speed: 0.0002 + Math.random() * 0.0005,
+      color: [purple, cyan, green, yellow][Math.floor(Math.random()*4)]
+    });
+  }
+
+  // Layer data
+  var layers = [
+    {
+      num: '01', title: 'Platform Level', color: '#6366f1', accent: indigo,
+      icons: [
+        { symbol: '\u2630', label: 'Org Tree' },
+        { symbol: '\u26BF', label: 'Permissions' },
+        { symbol: '\u21BA', label: 'Rollback' },
+        { symbol: '\u2691', label: 'History' }
+      ],
+      features: ['Org Hierarchy', 'User Permissions', 'Rollback Actions', 'Audit History']
+    },
+    {
+      num: '02', title: 'Code / Git Level', color: '#8b5cf6', accent: purple,
+      icons: [
+        { symbol: '</>',  label: 'Code' },
+        { symbol: '\u2B21', label: 'SOPs' },
+        { symbol: '\u2689', label: 'Secrets' },
+        { symbol: '\u2699', label: 'Audit' }
+      ],
+      features: ['SOPs Enforced', 'Env Secrets', 'Code Audit', 'Git Hooks']
+    },
+    {
+      num: '03', title: 'Stack (K8s) Level', color: '#0891b2', accent: cyan,
+      icons: [
+        { symbol: '\u2638', label: 'K8s' },
+        { symbol: '\u229E', label: 'OPA' },
+        { symbol: '\u2263', label: 'RBAC' },
+        { symbol: '\u26A0', label: 'Alerts' }
+      ],
+      features: ['OPA Policies', 'RBAC Layers', 'Microsegmentation', 'Sec Alerts']
+    },
+    {
+      num: '04', title: 'AI / Agents Level', color: '#059669', accent: green,
+      icons: [
+        { symbol: '\u2B22', label: 'AI Gov' },
+        { symbol: '\u2699', label: 'Agents' },
+        { symbol: '\u26BF', label: 'Scope' },
+        { symbol: '\u2B21', label: 'Policy' }
+      ],
+      features: ['AI Governance', 'Agent Permissions', 'Scoped Access', 'Model Policy']
+    }
+  ];
+
+  // Timeline
+  var TITLE_START = 0.0, TITLE_DUR = 1.0;
+  var SHIELD_START = 0.5, SHIELD_DUR = 1.5;
+  var LAYER_STARTS = [2.0, 3.5, 5.0, 6.5];
+  var LAYER_DUR = 1.0;
+  var ARROW_DELAY = 0.5;
+  var ARROW_DUR = 0.8;
+  var SCAN_START = 8.5;
+  var FEATURE_START = 9.0;
+
+  // ── Draw hexagon ──
+  function drawHex(x, y, r) {
+    ctx.beginPath();
+    for (var i = 0; i < 6; i++) {
+      var angle = Math.PI / 3 * i - Math.PI / 6;
+      var hx = x + r * Math.cos(angle);
+      var hy = y + r * Math.sin(angle);
+      if (i === 0) ctx.moveTo(hx, hy); else ctx.lineTo(hx, hy);
+    }
+    ctx.closePath(); ctx.stroke();
+  }
+
+  // ── Draw shield shape ──
+  function drawShield(cx, cy, size) {
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - size * 0.5);
+    ctx.quadraticCurveTo(cx + size * 0.45, cy - size * 0.4, cx + size * 0.45, cy - size * 0.1);
+    ctx.quadraticCurveTo(cx + size * 0.42, cy + size * 0.2, cx, cy + size * 0.5);
+    ctx.quadraticCurveTo(cx - size * 0.42, cy + size * 0.2, cx - size * 0.45, cy - size * 0.1);
+    ctx.quadraticCurveTo(cx - size * 0.45, cy - size * 0.4, cx, cy - size * 0.5);
+    ctx.closePath();
+    ctx.strokeStyle = rgba(cyan, 0.3); ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = rgba(indigo, 0.15); ctx.fill();
+    // Inner cross
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - size * 0.35); ctx.lineTo(cx, cy + size * 0.35);
+    ctx.strokeStyle = rgba(cyan, 0.15); ctx.lineWidth = 1; ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(cx - size * 0.3, cy - size * 0.05); ctx.lineTo(cx + size * 0.3, cy - size * 0.05);
+    ctx.stroke();
+  }
+
+  // ═══════════════════════
+  //  DRAW
+  // ═══════════════════════
+  function draw() {
+    if (!W || !H) return;
+    ctx.clearRect(0, 0, W, H);
+    frame++;
+
+    // ── Background grid ──
+    ctx.strokeStyle = 'rgba(99,102,241,0.02)'; ctx.lineWidth = 1;
+    for (var gx = 0; gx < W; gx += 50) { ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,H); ctx.stroke(); }
+    for (var gy = 0; gy < H; gy += 50) { ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(W,gy); ctx.stroke(); }
+
+    // ── Ambient particles ──
+    for (var pi = 0; pi < particles.length; pi++) {
+      var p = particles[pi];
+      p.y -= p.speed;
+      if (p.y < -0.02) { p.y = 1.02; p.x = Math.random(); }
+      var pa = 0.1 + Math.sin(frame * 0.015 + p.ph) * 0.08;
+      ctx.beginPath(); ctx.arc(p.x * W, p.y * H, p.s, 0, Math.PI * 2);
+      ctx.fillStyle = rgba(p.color, pa); ctx.fill();
+    }
+
+    // ── Hex grid background ──
+    var hexA = 0.015 + Math.sin(frame * 0.008) * 0.005;
+    ctx.strokeStyle = rgba(indigo, hexA); ctx.lineWidth = 0.5;
+    var hexSize = 40;
+    for (var hx = 0; hx < W + hexSize * 2; hx += hexSize * 1.75) {
+      for (var hy = 0; hy < H + hexSize * 2; hy += hexSize * 1.5) {
+        var offsetX = (Math.floor(hy / (hexSize * 1.5)) % 2) * hexSize * 0.875;
+        drawHex(hx + offsetX, hy, hexSize * 0.4);
+      }
+    }
+
+    // ════════════════════════
+    //  TITLE
+    // ════════════════════════
+    var titleA = ease(TITLE_START, TITLE_DUR);
+    if (titleA > 0) {
+      ctx.save(); ctx.globalAlpha = titleA;
+      ctx.font = '700 ' + fs(0.022) + 'px "Fira Code", monospace';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      var tg = ctx.createLinearGradient(W * 0.25, 0, W * 0.75, 0);
+      tg.addColorStop(0, indigo); tg.addColorStop(0.3, cyan); tg.addColorStop(0.6, green); tg.addColorStop(1, yellow);
+      ctx.fillStyle = tg;
+      ctx.fillText('SECURITY AND GOVERNANCE LAYERS', W / 2, H * 0.055);
+
+      ctx.font = '400 ' + fs(0.008) + 'px "Fira Code", monospace';
+      ctx.fillStyle = rgba(dim, 0.6);
+      ctx.fillText('Defense in Depth  //  Zero Trust  //  Automated Enforcement', W / 2, H * 0.095);
+
+      // Decorative line
+      var lineW = W * 0.35;
+      ctx.beginPath();
+      ctx.moveTo(W/2 - lineW/2, H * 0.115);
+      ctx.lineTo(W/2 + lineW/2, H * 0.115);
+      var lineGrad = ctx.createLinearGradient(W/2 - lineW/2, 0, W/2 + lineW/2, 0);
+      lineGrad.addColorStop(0, 'transparent');
+      lineGrad.addColorStop(0.3, rgba(cyan, 0.4));
+      lineGrad.addColorStop(0.7, rgba(cyan, 0.4));
+      lineGrad.addColorStop(1, 'transparent');
+      ctx.strokeStyle = lineGrad; ctx.lineWidth = 1; ctx.stroke();
+      ctx.restore();
+    }
+
+    // ════════════════════════
+    //  CENTRAL SHIELD (background)
+    // ════════════════════════
+    var shieldA = ease(SHIELD_START, SHIELD_DUR);
+    if (shieldA > 0) {
+      ctx.save();
+      ctx.globalAlpha = shieldA * (0.04 + Math.sin(frame * 0.01) * 0.015);
+      drawShield(W / 2, H * 0.52, Math.min(W, H) * 0.32);
+      ctx.restore();
+    }
+
+    // ════════════════════════
+    //  LAYER CARDS
+    // ════════════════════════
+    var cardW = W * 0.19;
+    var cardH = H * 0.58;
+    var gap = W * 0.03;
+    var totalW = cardW * 4 + gap * 3;
+    var startX = (W - totalW) / 2;
+    var cardY = H * 0.17;
+
+    for (var li = 0; li < 4; li++) {
+      var layer = layers[li];
+      var la = ease(LAYER_STARTS[li], LAYER_DUR);
+      if (la <= 0) continue;
+
+      var lx = startX + li * (cardW + gap);
+      var slideY = (1 - la) * 80;
+
+      ctx.save(); ctx.globalAlpha = la;
+
+      // Scale in
+      var sc = 0.85 + la * 0.15;
+      var ccx = lx + cardW / 2, ccy = cardY + cardH / 2 + slideY;
+      ctx.translate(ccx, ccy); ctx.scale(sc, sc); ctx.translate(-ccx, -ccy);
+
+      // Glow
+      var cg = ctx.createRadialGradient(ccx, ccy, 0, ccx, ccy, cardW * 0.8);
+      cg.addColorStop(0, rgba(layer.color, 0.08));
+      cg.addColorStop(1, 'transparent');
+      ctx.fillStyle = cg;
+      ctx.beginPath(); ctx.arc(ccx, ccy, cardW * 0.8, 0, Math.PI * 2); ctx.fill();
+
+      // Card body
+      roundRect(lx, cardY + slideY, cardW, cardH, 16);
+      ctx.fillStyle = rgba(cardBg, 0.95); ctx.fill();
+
+      // Animated border
+      roundRect(lx, cardY + slideY, cardW, cardH, 16);
+      var borderGrad = ctx.createLinearGradient(
+        lx + cardW * Math.cos(frame * 0.015 + li),
+        cardY + slideY,
+        lx + cardW * Math.cos(frame * 0.015 + li + Math.PI),
+        cardY + cardH + slideY
+      );
+      borderGrad.addColorStop(0, rgba(layer.color, 0.6));
+      borderGrad.addColorStop(0.5, rgba(layer.color, 0.15));
+      borderGrad.addColorStop(1, rgba(layer.color, 0.6));
+      ctx.strokeStyle = borderGrad; ctx.lineWidth = 2; ctx.stroke();
+
+      // Top accent
+      ctx.beginPath();
+      ctx.moveTo(lx + 16, cardY + slideY);
+      ctx.lineTo(lx + cardW - 16, cardY + slideY);
+      ctx.strokeStyle = layer.accent; ctx.lineWidth = 3; ctx.stroke();
+
+      // Large watermark number
+      ctx.font = '700 ' + fs(0.045) + 'px "Fira Code", monospace';
+      ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+      ctx.fillStyle = rgba(layer.color, 0.06);
+      ctx.fillText(layer.num, lx + cardW - 12, cardY + slideY + 8);
+
+      // Layer label
+      ctx.font = '600 ' + fs(0.008) + 'px "Fira Code", monospace';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+      ctx.fillStyle = rgba(layer.accent, 0.7);
+      ctx.fillText('LAYER ' + layer.num, lx + 16, cardY + slideY + 16);
+
+      // Title
+      ctx.font = '700 ' + fs(0.0115) + 'px "Fira Code", monospace';
+      ctx.fillStyle = white;
+      ctx.fillText(layer.title, lx + 16, cardY + slideY + 38);
+
+      // Divider
+      var divY = cardY + slideY + 60;
+      ctx.beginPath();
+      ctx.moveTo(lx + 16, divY); ctx.lineTo(lx + cardW - 16, divY);
+      ctx.strokeStyle = rgba(layer.color, 0.2); ctx.lineWidth = 1; ctx.stroke();
+
+      // Icon grid (2x2)
+      var iconSize = cardW * 0.35;
+      var iconGap = 8;
+      var iconStartX = lx + (cardW - iconSize * 2 - iconGap) / 2;
+      var iconStartY = divY + 16;
+
+      for (var ii = 0; ii < 4; ii++) {
+        var iconCol = ii % 2, iconRow = Math.floor(ii / 2);
+        var ix = iconStartX + iconCol * (iconSize + iconGap);
+        var iy = iconStartY + iconRow * (iconSize + iconGap);
+
+        roundRect(ix, iy, iconSize, iconSize, 8);
+        var pulse = 0.5 + Math.sin(frame * 0.025 + li * 1.5 + ii * 0.8) * 0.15;
+        ctx.fillStyle = rgba(layer.color, pulse * 0.15); ctx.fill();
+        ctx.strokeStyle = rgba(layer.color, pulse * 0.3); ctx.lineWidth = 1; ctx.stroke();
+
+        ctx.font = '600 ' + fs(0.014) + 'px "Fira Code", monospace';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillStyle = rgba(layer.accent, 0.9);
+        ctx.fillText(layer.icons[ii].symbol, ix + iconSize / 2, iy + iconSize * 0.4);
+
+        ctx.font = '400 ' + fs(0.0055) + 'px "Fira Code", monospace';
+        ctx.fillStyle = rgba(dim, 0.7);
+        ctx.fillText(layer.icons[ii].label, ix + iconSize / 2, iy + iconSize * 0.75);
+      }
+
+      // Features area
+      var descY = iconStartY + iconSize * 2 + iconGap + 16;
+      roundRect(lx + 12, descY, cardW - 24, cardH - (descY - cardY - slideY) - 14, 8);
+      ctx.fillStyle = rgba(layer.color, 0.04); ctx.fill();
+
+      // Animated feature list
+      for (var fi = 0; fi < layer.features.length; fi++) {
+        var fy = descY + 14 + fi * 22;
+        var fItemA = ease(FEATURE_START + li * 0.3 + fi * 0.1, 0.4);
+
+        ctx.font = '400 ' + fs(0.007) + 'px "Fira Code", monospace';
+        ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+
+        if (fItemA > 0) {
+          ctx.fillStyle = rgba(green, fItemA * 0.8);
+          ctx.fillText('\u2713', lx + 22, fy);
+        }
+        ctx.fillStyle = rgba(dim, fItemA > 0 ? 0.8 : 0.3);
+        ctx.fillText(layer.features[fi], lx + 38, fy);
+      }
+
+      // Status dot
+      var statusY = cardY + slideY + cardH - 22;
+      var dotPulse = 0.4 + Math.sin(frame * 0.04 + li) * 0.4;
+      ctx.beginPath(); ctx.arc(lx + 24, statusY, 4, 0, Math.PI * 2);
+      ctx.fillStyle = rgba(green, dotPulse + 0.3); ctx.fill();
+      ctx.font = '400 ' + fs(0.006) + 'px "Fira Code", monospace';
+      ctx.fillStyle = rgba(dim, 0.5); ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      ctx.fillText('Active', lx + 34, statusY);
+
+      ctx.restore();
+
+      // ── Arrow between layers ──
+      if (li < 3) {
+        var arrowA = ease(LAYER_STARTS[li] + ARROW_DELAY + 0.5, ARROW_DUR);
+        if (arrowA > 0) {
+          var asx = lx + cardW + 4;
+          var asy = cardY + cardH * 0.4;
+          var atx = lx + cardW + gap - 4;
+
+          ctx.save(); ctx.globalAlpha = arrowA;
+
+          // Line
+          ctx.beginPath(); ctx.moveTo(asx, asy); ctx.lineTo(asx + (atx - asx) * arrowA, asy);
+          ctx.strokeStyle = rgba(layer.accent, 0.4); ctx.lineWidth = 2.5; ctx.stroke();
+
+          // Arrowhead
+          if (arrowA >= 0.9) {
+            ctx.beginPath();
+            ctx.moveTo(atx, asy);
+            ctx.lineTo(atx - 8, asy - 5);
+            ctx.lineTo(atx - 8, asy + 5);
+            ctx.closePath();
+            ctx.fillStyle = rgba(layer.accent, 0.5); ctx.fill();
+          }
+
+          // Travelling spark
+          if (arrowA >= 1) {
+            var st = ((frame * 0.015 + li * 0.4) % 1);
+            var spx = asx + (atx - asx) * st;
+            var sg = ctx.createRadialGradient(spx, asy, 0, spx, asy, 8);
+            sg.addColorStop(0, rgba(layer.accent, 0.6));
+            sg.addColorStop(1, 'transparent');
+            ctx.fillStyle = sg; ctx.beginPath(); ctx.arc(spx, asy, 8, 0, Math.PI * 2); ctx.fill();
+          }
+
+          ctx.restore();
+        }
+      }
+    }
+
+    // ════════════════════════
+    //  SCANNING EFFECT
+    // ════════════════════════
+    var scanA = ease(SCAN_START, 1.0);
+    if (scanA > 0) {
+      var scanX = ((frame - sec(SCAN_START)) * 1.5) % (W + 200) - 100;
+      if (scanA < 1) scanX = scanA * W;
+
+      ctx.save(); ctx.globalAlpha = 0.12;
+      var scanGrad = ctx.createLinearGradient(scanX - 60, 0, scanX + 60, 0);
+      scanGrad.addColorStop(0, 'transparent');
+      scanGrad.addColorStop(0.5, rgba(cyan, 0.5));
+      scanGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = scanGrad;
+      ctx.fillRect(scanX - 60, H * 0.15, 120, H * 0.65);
+      ctx.restore();
+    }
+
+    // ════════════════════════
+    //  BOTTOM SUMMARY BAR
+    // ════════════════════════
+    var sumA = ease(FEATURE_START + 1.5, 0.8);
+    if (sumA > 0) {
+      ctx.save(); ctx.globalAlpha = sumA;
+
+      var barY = H * 0.86;
+      var barH = H * 0.10;
+
+      roundRect(W * 0.05, barY, W * 0.9, barH, 12);
+      ctx.fillStyle = rgba('#111128', 0.85); ctx.fill();
+      ctx.strokeStyle = rgba(cyan, 0.15); ctx.lineWidth = 1; ctx.stroke();
+
+      var summaryItems = [
+        { icon: '\u26E8', label: 'Defense in Depth', val: '4 Layers', color: indigo },
+        { icon: '\u2B21', label: 'Zero Trust', val: 'Every Connection', color: cyan },
+        { icon: '\u2699', label: 'Automated', val: 'Policy Enforced', color: green },
+        { icon: '\u2713', label: 'Compliance', val: 'SOC2 / HIPAA / PCI', color: yellow }
+      ];
+
+      var itemW = W * 0.9 / 4;
+      for (var si = 0; si < summaryItems.length; si++) {
+        var s = summaryItems[si];
+        var sx = W * 0.05 + si * itemW + itemW / 2;
+        var sItemA = ease(FEATURE_START + 1.5 + si * 0.2, 0.5);
+        ctx.globalAlpha = sumA * sItemA;
+
+        if (si > 0) {
+          ctx.beginPath();
+          ctx.moveTo(W * 0.05 + si * itemW, barY + 10);
+          ctx.lineTo(W * 0.05 + si * itemW, barY + barH - 10);
+          ctx.strokeStyle = rgba(dim, 0.15); ctx.lineWidth = 1; ctx.stroke();
+        }
+
+        ctx.font = '600 ' + fs(0.013) + 'px "Fira Code", monospace';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillStyle = s.color;
+        ctx.fillText(s.icon, sx, barY + barH * 0.3);
+
+        ctx.font = '700 ' + fs(0.007) + 'px "Fira Code", monospace';
+        ctx.fillStyle = white;
+        ctx.fillText(s.label, sx, barY + barH * 0.55);
+
+        ctx.font = '400 ' + fs(0.006) + 'px "Fira Code", monospace';
+        ctx.fillStyle = rgba(s.color, 0.7);
+        ctx.fillText(s.val, sx, barY + barH * 0.78);
+      }
+
+      ctx.restore();
+    }
+
+    // ── Corner branding ──
+    var annA = ease(10.0, 1.0);
+    if (annA > 0) {
+      ctx.save(); ctx.globalAlpha = annA * 0.2;
+      ctx.font = '400 ' + fs(0.007) + 'px "Fira Code", monospace';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+      ctx.fillStyle = rgba(dim, 0.4);
+      ctx.fillText('// platform \u2192 code \u2192 stack \u2192 ai  |  defense in depth', 16, H - 10);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = rgba(purple, 0.4);
+      ctx.fillText('{ Stacktic Security }', W - 16, H - 10);
+      ctx.restore();
+    }
+  }
+
+  function animate() {
+    if (!vis) return;
+    draw();
+    requestAnimationFrame(animate);
+  }
+
+  if (document.readyState === 'complete') { resize(); animate(); }
+  else { window.addEventListener('load', function() { resize(); animate(); }); }
+})();
+</script>
+</body>
+</html>

@@ -120,8 +120,59 @@
                         <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px;">(multiline)</td>
                         <td style="padding: 12px 16px; color: #94a3b8; font-size: 12px;">Upstream timeout</td>
                     </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;"><code style="color: #fca5a5;">additional_domain</code></td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">(multiline)</td>
+                        <td style="padding: 12px 16px; color: #94a3b8; font-size: 12px; border-bottom: 1px solid #334155;">Extra hosts for L7 route + TLS</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 12px 16px; border-bottom: 1px solid #334155;"><code style="color: #fca5a5;">max_body_size</code></td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px; border-bottom: 1px solid #334155;">10485760</td>
+                        <td style="padding: 12px 16px; color: #94a3b8; font-size: 12px; border-bottom: 1px solid #334155;">client-control plugin (bytes)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 12px 16px;"><code style="color: #fca5a5; font-weight: bold;">route_all</code> <span style="background-color: #22c55e; color: #0f172a; padding: 1px 6px; border-radius: 3px; font-size: 9px; font-weight: bold;">NEW</span></td>
+                        <td style="padding: 12px 16px; color: #e2e8f0; font-size: 12px;">true</td>
+                        <td style="padding: 12px 16px; color: #94a3b8; font-size: 12px;">Route ALL ports (L7 + L4). apisix-image_base only</td>
+                    </tr>
                 </tbody>
             </table>
+        </div>
+
+        <!-- image_base Multi-Port Routing -->
+        <div style="background: linear-gradient(135deg, #064e3b 0%, #065f46 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #10b981;">
+            <h2 style="color: #a7f3d0; margin: 0 0 16px 0; font-size: 18px;">image_base Multi-Port Routing (L7 + L4)</h2>
+            <p style="color: #6ee7b7; font-size: 12px; margin-bottom: 16px;">When <code style="color: #a7f3d0;">route_all: true</code> is set on an <code style="color: #a7f3d0;">apisix-image_base</code> link, routes are generated for ALL ports defined on the image_base component.</p>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px;">
+                <div style="background-color: #0f172a; padding: 16px; border-radius: 12px; border: 2px solid #34d399;">
+                    <div style="color: #34d399; font-size: 14px; font-weight: 600; margin-bottom: 8px;">L7 HTTP Routes</div>
+                    <div style="color: #e2e8f0; font-size: 12px; margin-bottom: 4px;">Port format: <code style="color: #a7f3d0;">name:port:protocol</code></div>
+                    <div style="color: #94a3b8; font-size: 11px; margin-bottom: 4px;">Example: <code>http:8000:TCP</code></div>
+                    <div style="color: #94a3b8; font-size: 11px;">Generates: ApisixUpstream + ApisixRoute (spec.http) + ApisixTls</div>
+                    <div style="color: #6ee7b7; font-size: 11px; margin-top: 6px;">First HTTP port → {subdomain}.{domain}<br>Additional → {portname}-{subdomain}.{domain}</div>
+                </div>
+                <div style="background-color: #0f172a; padding: 16px; border-radius: 12px; border: 2px solid #f59e0b;">
+                    <div style="color: #fbbf24; font-size: 14px; font-weight: 600; margin-bottom: 8px;">L4 Stream Routes</div>
+                    <div style="color: #e2e8f0; font-size: 12px; margin-bottom: 4px;">Port format: <code style="color: #fde68a;">name:port:protocol:stream</code></div>
+                    <div style="color: #94a3b8; font-size: 11px; margin-bottom: 4px;">Example: <code>agent:50000:TCP:stream</code></div>
+                    <div style="color: #94a3b8; font-size: 11px;">Generates: ApisixUpstream + ApisixRoute (spec.stream)</div>
+                    <div style="color: #fde68a; font-size: 11px; margin-top: 6px;">Dedicated port on APISIX LB<br>No hostname / TLS needed</div>
+                </div>
+            </div>
+
+            <div style="background-color: #0f172a; padding: 16px; border-radius: 12px; margin-bottom: 12px;">
+                <div style="color: #a7f3d0; font-size: 12px; font-weight: 600; margin-bottom: 8px;">Example: image_base with ports</div>
+                <pre style="color: #e2e8f0; font-size: 11px; margin: 0; font-family: monospace;">ports: |
+  http:8000:TCP          → L7 route: myapp.stack-5.domain.io
+  grpc:9090:TCP          → L7 route: grpc-myapp.stack-5.domain.io
+  agent:50000:TCP:stream → L4 stream: ingressPort 50000</pre>
+            </div>
+
+            <div style="background-color: #0f172a; padding: 12px 16px; border-radius: 8px;">
+                <span style="color: #f87171; font-size: 12px; font-weight: 600;">⚠ Important:</span>
+                <span style="color: #94a3b8; font-size: 11px;"> L4 stream ports must be globally unique across all image_base links. Stream ports auto-enable <code style="color: #fde68a;">service.stream</code> in APISIX Helm values.</span>
+            </div>
         </div>
 
         <!-- AI Gateway -->

@@ -480,6 +480,33 @@ Stacktic's **Live View** provides deep, relationship-aware insights:
 | **Network Policies** | Services can't communicate | Review policy rules |
 | **Backup Failures** | Velero errors | Check storage credentials |
 | **Monitoring Gaps** | Missing metrics | Ensure ServiceMonitor labels |
+| **APISIX TLS Handshake Failure** | HTTPS routes return TLS errors on fresh cluster | Restart APISIX ingress controller (see below) |
+
+### APISIX TLS Not Syncing on Fresh Cluster
+
+**Symptom:** All HTTPS routes return `tlsv1 alert internal error`. ApisixTls resources show `invalid apisix tls secret: failed to get secret cert-manager/wildcard-tls-secret`.
+
+**Root Cause:** On a fresh cluster, the APISIX ingress controller may start before cert-manager has finished issuing the wildcard TLS certificate. The controller caches the "secret not found" error and does not retry automatically.
+
+**Diagnosis:**
+```bash
+# Check ApisixTls sync status
+kubectl get apisixtls -n ingress-apisix -o yaml | grep -A2 "status:"
+
+# Check if the wildcard secret exists in cert-manager namespace
+kubectl get secret wildcard-tls-secret -n cert-manager
+```
+
+**Fix:**
+```bash
+# Restart the ingress controller to force re-sync
+kubectl rollout restart deployment -n ingress-apisix -l app.kubernetes.io/name=apisix-ingress-controller
+
+# Verify ApisixTls is accepted
+kubectl get apisixtls -n ingress-apisix
+```
+
+**Prevention:** On fresh clusters, ensure cert-manager is deployed and the wildcard certificate is issued before applying APISIX routes. If deploying all at once, restart the APISIX ingress controller after cert-manager is ready.
 
 ### Frequently Asked Questions
 

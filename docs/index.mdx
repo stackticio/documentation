@@ -62,50 +62,154 @@ variables, secrets, gateway routes, network policies, RBAC, scrape targets, back
   <Stat value="1" label="unit of version: the whole stack" />
 </Stats>
 
-<Figure caption="One drawing produces the repository, the cluster state and the proof — and the agent measures the running system back against the same graph.">
-<svg viewBox="0 0 900 250" role="img" aria-label="Graph to generation to cluster to evidence">
+<Figure caption="Six layers of one running system, held as a single graph. Every dot is a component, a sub-component or a link; the threads crossing between layers are the relations that generation, validation and compliance all derive from.">
+<svg viewBox="0 0 880 436" role="img" aria-label="Six layers of a running system — architecture, data, flows, source code, operations and compliance — held as one connected graph, with typed links threading between every layer">
   <defs>
-    <marker id="stkArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--stk-steel)" />
-    </marker>
+    <linearGradient id="stkPlane0" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="var(--stk-amber)" stopOpacity="0.30" /><stop offset="1" stopColor="var(--stk-amber)" stopOpacity="0.05" /></linearGradient>
+    <linearGradient id="stkPlane1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="var(--stk-blue-soft)" stopOpacity="0.30" /><stop offset="1" stopColor="var(--stk-blue-soft)" stopOpacity="0.05" /></linearGradient>
+    <linearGradient id="stkPlane2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="var(--stk-blue)" stopOpacity="0.30" /><stop offset="1" stopColor="var(--stk-blue)" stopOpacity="0.05" /></linearGradient>
+    <linearGradient id="stkPlane3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="var(--stk-blue)" stopOpacity="0.30" /><stop offset="1" stopColor="var(--stk-blue)" stopOpacity="0.05" /></linearGradient>
+    <linearGradient id="stkPlane4" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="var(--stk-blue-deep)" stopOpacity="0.30" /><stop offset="1" stopColor="var(--stk-blue-deep)" stopOpacity="0.05" /></linearGradient>
+    <linearGradient id="stkPlane5" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="var(--stk-violet)" stopOpacity="0.30" /><stop offset="1" stopColor="var(--stk-violet)" stopOpacity="0.05" /></linearGradient>
   </defs>
-
+  <g>
+    <path d="M145.7 42.8 C145.7 71.5 286.0 71.5 286.0 100.3" fill="none" stroke="var(--stk-mint)" strokeWidth="1.1" strokeOpacity="0.55" />
+    <path d="M271.7 20.8 C271.7 65.8 151.6 65.8 151.6 110.7" fill="none" stroke="var(--stk-mint)" strokeWidth="1.1" strokeOpacity="0.55" />
+    <path d="M374.6 30.2 C374.6 82.3 318.4 82.3 318.4 134.4" fill="none" stroke="var(--stk-mint)" strokeWidth="1.1" strokeOpacity="0.55" />
+    <path d="M287.2 70.4 C287.2 86.6 426.0 86.6 426.0 102.8" fill="none" stroke="var(--stk-mint)" strokeWidth="1.1" strokeOpacity="0.55" />
+    <path d="M199.6 99.5 C199.6 126.3 355.0 126.3 355.0 153.2" fill="none" stroke="var(--stk-mint)" strokeWidth="1.1" strokeOpacity="0.55" />
+    <path d="M333.6 89.7 C333.6 121.4 355.0 121.4 355.0 153.2" fill="none" stroke="var(--stk-mint)" strokeWidth="1.1" strokeOpacity="0.55" />
+    <path d="M377.9 114.2 C377.9 133.7 355.0 133.7 355.0 153.2" fill="none" stroke="var(--stk-mint)" strokeWidth="1.1" strokeOpacity="0.55" />
+    <path d="M238.3 126.2 C238.3 139.7 355.0 139.7 355.0 153.2" fill="none" stroke="var(--stk-mint)" strokeWidth="1.1" strokeOpacity="0.55" />
+    <path d="M264.1 153.3 C264.1 193.4 429.0 193.4 429.0 233.5" fill="none" stroke="var(--stk-mint)" strokeWidth="1.1" strokeOpacity="0.55" />
+    <path d="M429.0 179.3 C429.0 200.4 345.5 200.4 345.5 221.5" fill="none" stroke="var(--stk-mint)" strokeWidth="1.1" strokeOpacity="0.55" />
+    <path d="M212.0 176.4 C212.0 206.4 137.4 206.4 137.4 236.4" fill="none" stroke="var(--stk-mint)" strokeWidth="1.1" strokeOpacity="0.55" />
+    <path d="M345.5 221.5 C345.5 255.7 373.7 255.7 373.7 289.9" fill="none" stroke="var(--stk-mint)" strokeWidth="1.1" strokeOpacity="0.55" />
+    <path d="M384.0 249.8 C384.0 264.3 241.8 264.3 241.8 278.8" fill="none" stroke="var(--stk-mint)" strokeWidth="1.1" strokeOpacity="0.55" />
+    <path d="M272.4 242.1 C272.4 270.8 134.4 270.8 134.4 299.4" fill="none" stroke="var(--stk-mint)" strokeWidth="1.1" strokeOpacity="0.55" />
+    <path d="M137.4 236.4 C137.4 270.4 189.7 270.4 189.7 304.3" fill="none" stroke="var(--stk-mint)" strokeWidth="1.1" strokeOpacity="0.55" />
+    <path d="M241.8 278.8 C241.8 312.7 308.6 312.7 308.6 346.6" fill="none" stroke="var(--stk-mint)" strokeWidth="1.1" strokeOpacity="0.55" />
+    <path d="M443.5 298.2 C443.5 330.9 243.3 330.9 243.3 363.7" fill="none" stroke="var(--stk-mint)" strokeWidth="1.1" strokeOpacity="0.55" />
+    <path d="M281.4 305.7 C281.4 345.4 336.5 345.4 336.5 385.2" fill="none" stroke="var(--stk-mint)" strokeWidth="1.1" strokeOpacity="0.55" />
+    <path d="M134.4 299.4 C134.4 332.2 449.6 332.2 449.6 365.0" fill="none" stroke="var(--stk-mint)" strokeWidth="1.1" strokeOpacity="0.55" />
+  </g>
   <g fontFamily="Instrument Sans, sans-serif">
-    <rect x="8" y="55" width="180" height="108" rx="14" fill="var(--stk-panel)" stroke="var(--stk-blue)" strokeWidth="1.2" opacity="0.95" />
-    <text x="98" y="84" textAnchor="middle" fontSize="13" fontWeight="600" fill="var(--ifm-heading-color)">The graph</text>
-    <text x="98" y="106" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">components · links</text>
-    <text x="98" y="122" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">sub-components</text>
-    <text x="98" y="138" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">attributes</text>
-
-    <rect x="240" y="55" width="180" height="108" rx="14" fill="var(--stk-panel)" stroke="var(--stk-blue)" strokeWidth="1.2" />
-    <text x="330" y="84" textAnchor="middle" fontSize="13" fontWeight="600" fill="var(--ifm-heading-color)">Generation</text>
-    <text x="330" y="106" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">one render per component</text>
-    <text x="330" y="122" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">links become real config</text>
-    <text x="330" y="138" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">GitOps repository</text>
-
-    <rect x="472" y="55" width="180" height="108" rx="14" fill="var(--stk-panel)" stroke="var(--stk-mint)" strokeWidth="1.2" />
-    <text x="562" y="84" textAnchor="middle" fontSize="13" fontWeight="600" fill="var(--ifm-heading-color)">Running stack</text>
-    <text x="562" y="106" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">Kubernetes workloads</text>
-    <text x="562" y="122" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">policies · routes · secrets</text>
-    <text x="562" y="138" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">backups · autoscaling</text>
-
-    <rect x="704" y="55" width="188" height="108" rx="14" fill="var(--stk-panel)" stroke="var(--stk-amber)" strokeWidth="1.2" />
-    <text x="798" y="84" textAnchor="middle" fontSize="13" fontWeight="600" fill="var(--ifm-heading-color)">Evidence</text>
-    <text x="798" y="106" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">scans · link proofs</text>
-    <text x="798" y="122" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">hash-chained runs</text>
-    <text x="798" y="138" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">signed human position</text>
-
-    <line x1="192" y1="109" x2="234" y2="109" stroke="var(--stk-steel)" strokeWidth="1.4" markerEnd="url(#stkArrow)" />
-    <line x1="424" y1="109" x2="466" y2="109" stroke="var(--stk-steel)" strokeWidth="1.4" markerEnd="url(#stkArrow)" />
-    <line x1="656" y1="109" x2="698" y2="109" stroke="var(--stk-steel)" strokeWidth="1.4" markerEnd="url(#stkArrow)" />
-
-    <path d="M 798 175 L 798 205 L 98 205 L 98 175" fill="none" stroke="var(--stk-blue)" strokeWidth="1.2" strokeDasharray="4 4" markerEnd="url(#stkArrow)" />
-    <text x="448" y="225" textAnchor="middle" fontSize="11" fill="var(--stk-blue)">measured back against the graph that declared it</text>
-
-    <text x="98" y="38" textAnchor="middle" fontSize="10.5" fontFamily="Fira Code, monospace" fill="var(--stk-steel)">DECLARED</text>
-    <text x="330" y="38" textAnchor="middle" fontSize="10.5" fontFamily="Fira Code, monospace" fill="var(--stk-steel)">GENERATED</text>
-    <text x="562" y="38" textAnchor="middle" fontSize="10.5" fontFamily="Fira Code, monospace" fill="var(--stk-steel)">OBSERVED</text>
-    <text x="798" y="38" textAnchor="middle" fontSize="10.5" fontFamily="Fira Code, monospace" fill="var(--stk-steel)">PROVEN</text>
+    <path d="M104 46 L300 80 L496 46 L496 52 L300 86 L104 52 Z" fill="var(--stk-panel)" stroke="var(--stk-amber)" strokeOpacity="0.4" strokeWidth="1" />
+    <path d="M104 46 L300 12 L496 46 L300 80 Z" fill="url(#stkPlane0)" stroke="var(--stk-amber)" strokeWidth="2" strokeOpacity="1" />
+    <path d="M145.7 42.8 L226.3 33.7" stroke="var(--stk-amber)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M226.3 33.7 L271.7 20.8" stroke="var(--stk-amber)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M271.7 20.8 L327.6 38.9" stroke="var(--stk-amber)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M327.6 38.9 L374.6 30.2" stroke="var(--stk-amber)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M374.6 30.2 L428.3 45.0" stroke="var(--stk-amber)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M428.3 45.0 L287.2 70.4" stroke="var(--stk-amber)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M287.2 70.4 L145.7 42.8" stroke="var(--stk-amber)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <circle cx="145.7" cy="42.8" r="3" fill="var(--stk-amber)" />
+    <circle cx="226.3" cy="33.7" r="3" fill="var(--stk-amber)" />
+    <circle cx="271.7" cy="20.8" r="3" fill="var(--stk-amber)" />
+    <circle cx="327.6" cy="38.9" r="3" fill="var(--stk-amber)" />
+    <circle cx="374.6" cy="30.2" r="3" fill="var(--stk-amber)" />
+    <circle cx="428.3" cy="45.0" r="3" fill="var(--stk-amber)" />
+    <circle cx="287.2" cy="70.4" r="3" fill="var(--stk-amber)" />
+    <line x1="496" y1="46" x2="520" y2="46" stroke="var(--stk-amber)" strokeOpacity="0.5" strokeWidth="1" />
+    <text x="530" y="47" textAnchor="start" fontFamily="Fira Code, monospace" fontSize="12.5" fontWeight="600" fill="var(--ifm-heading-color)">ARCHITECTURE</text>
+    <text x="530" y="64" textAnchor="start" fontFamily="Fira Code, monospace" fontSize="9" fill="var(--stk-steel)">components · sub-components · typed links</text>
+    <path d="M104 109 L300 143 L496 109 L496 115 L300 149 L104 115 Z" fill="var(--stk-panel)" stroke="var(--stk-blue-soft)" strokeOpacity="0.4" strokeWidth="1" />
+    <path d="M104 109 L300 75 L496 109 L300 143 Z" fill="url(#stkPlane1)" stroke="var(--stk-blue-soft)" strokeWidth="1.2" strokeOpacity="0.65" />
+    <path d="M199.6 99.5 L286.0 100.3" stroke="var(--stk-blue-soft)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M286.0 100.3 L333.6 89.7" stroke="var(--stk-blue-soft)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M333.6 89.7 L426.0 102.8" stroke="var(--stk-blue-soft)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M426.0 102.8 L377.9 114.2" stroke="var(--stk-blue-soft)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M377.9 114.2 L318.4 134.4" stroke="var(--stk-blue-soft)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M318.4 134.4 L238.3 126.2" stroke="var(--stk-blue-soft)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M238.3 126.2 L151.6 110.7" stroke="var(--stk-blue-soft)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M151.6 110.7 L199.6 99.5" stroke="var(--stk-blue-soft)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <circle cx="199.6" cy="99.5" r="3" fill="var(--stk-blue-soft)" />
+    <circle cx="286.0" cy="100.3" r="3" fill="var(--stk-blue-soft)" />
+    <circle cx="333.6" cy="89.7" r="3" fill="var(--stk-blue-soft)" />
+    <circle cx="426.0" cy="102.8" r="3" fill="var(--stk-blue-soft)" />
+    <circle cx="377.9" cy="114.2" r="3" fill="var(--stk-blue-soft)" />
+    <circle cx="318.4" cy="134.4" r="3" fill="var(--stk-blue-soft)" />
+    <circle cx="238.3" cy="126.2" r="3" fill="var(--stk-blue-soft)" />
+    <circle cx="151.6" cy="110.7" r="3" fill="var(--stk-blue-soft)" />
+    <line x1="496" y1="109" x2="520" y2="109" stroke="var(--stk-blue-soft)" strokeOpacity="0.5" strokeWidth="1" />
+    <text x="530" y="110" textAnchor="start" fontFamily="Fira Code, monospace" fontSize="12.5" fontWeight="600" fill="var(--ifm-heading-color)">DATA</text>
+    <text x="530" y="127" textAnchor="start" fontFamily="Fira Code, monospace" fontSize="9" fill="var(--stk-steel)">stores · schemas · migrations</text>
+    <path d="M104 172 L300 206 L496 172 L496 178 L300 212 L104 178 Z" fill="var(--stk-panel)" stroke="var(--stk-blue)" strokeOpacity="0.4" strokeWidth="1" />
+    <path d="M104 172 L300 138 L496 172 L300 206 Z" fill="url(#stkPlane2)" stroke="var(--stk-blue)" strokeWidth="1.2" strokeOpacity="0.65" />
+    <path d="M264.1 153.3 L355.0 153.2" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M355.0 153.2 L429.0 179.3" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M429.0 179.3 L317.5 185.7" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M317.5 185.7 L212.0 176.4" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M212.0 176.4 L147.8 174.5" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M147.8 174.5 L264.1 153.3" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <circle cx="264.1" cy="153.3" r="3" fill="var(--stk-blue)" />
+    <circle cx="355.0" cy="153.2" r="3" fill="var(--stk-blue)" />
+    <circle cx="429.0" cy="179.3" r="3" fill="var(--stk-blue)" />
+    <circle cx="317.5" cy="185.7" r="3" fill="var(--stk-blue)" />
+    <circle cx="212.0" cy="176.4" r="3" fill="var(--stk-blue)" />
+    <circle cx="147.8" cy="174.5" r="3" fill="var(--stk-blue)" />
+    <line x1="496" y1="172" x2="520" y2="172" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="1" />
+    <text x="530" y="173" textAnchor="start" fontFamily="Fira Code, monospace" fontSize="12.5" fontWeight="600" fill="var(--ifm-heading-color)">FLOWS</text>
+    <text x="530" y="190" textAnchor="start" fontFamily="Fira Code, monospace" fontSize="9" fill="var(--stk-steel)">streams · queues · jobs · sensors</text>
+    <path d="M104 235 L300 269 L496 235 L496 241 L300 275 L104 241 Z" fill="var(--stk-panel)" stroke="var(--stk-blue)" strokeOpacity="0.4" strokeWidth="1" />
+    <path d="M104 235 L300 201 L496 235 L300 269 Z" fill="url(#stkPlane3)" stroke="var(--stk-blue)" strokeWidth="1.2" strokeOpacity="0.65" />
+    <path d="M345.5 221.5 L429.0 233.5" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M429.0 233.5 L384.0 249.8" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M384.0 249.8 L317.3 259.5" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M317.3 259.5 L272.4 242.1" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M272.4 242.1 L221.1 245.4" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M221.1 245.4 L137.4 236.4" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M137.4 236.4 L345.5 221.5" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <circle cx="345.5" cy="221.5" r="3" fill="var(--stk-blue)" />
+    <circle cx="429.0" cy="233.5" r="3" fill="var(--stk-blue)" />
+    <circle cx="384.0" cy="249.8" r="3" fill="var(--stk-blue)" />
+    <circle cx="317.3" cy="259.5" r="3" fill="var(--stk-blue)" />
+    <circle cx="272.4" cy="242.1" r="3" fill="var(--stk-blue)" />
+    <circle cx="221.1" cy="245.4" r="3" fill="var(--stk-blue)" />
+    <circle cx="137.4" cy="236.4" r="3" fill="var(--stk-blue)" />
+    <line x1="496" y1="235" x2="520" y2="235" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="1" />
+    <text x="530" y="236" textAnchor="start" fontFamily="Fira Code, monospace" fontSize="12.5" fontWeight="600" fill="var(--ifm-heading-color)">SOURCE CODE</text>
+    <text x="530" y="253" textAnchor="start" fontFamily="Fira Code, monospace" fontSize="9" fill="var(--stk-steel)">services · APIs · models</text>
+    <path d="M104 298 L300 332 L496 298 L496 304 L300 338 L104 304 Z" fill="var(--stk-panel)" stroke="var(--stk-blue-deep)" strokeOpacity="0.4" strokeWidth="1" />
+    <path d="M104 298 L300 264 L496 298 L300 332 Z" fill="url(#stkPlane4)" stroke="var(--stk-blue-deep)" strokeWidth="1.2" strokeOpacity="0.65" />
+    <path d="M241.8 278.8 L373.7 289.9" stroke="var(--stk-blue-deep)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M373.7 289.9 L443.5 298.2" stroke="var(--stk-blue-deep)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M443.5 298.2 L329.4 313.4" stroke="var(--stk-blue-deep)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M329.4 313.4 L281.4 305.7" stroke="var(--stk-blue-deep)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M281.4 305.7 L189.7 304.3" stroke="var(--stk-blue-deep)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M189.7 304.3 L134.4 299.4" stroke="var(--stk-blue-deep)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M134.4 299.4 L241.8 278.8" stroke="var(--stk-blue-deep)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <circle cx="241.8" cy="278.8" r="3" fill="var(--stk-blue-deep)" />
+    <circle cx="373.7" cy="289.9" r="3" fill="var(--stk-blue-deep)" />
+    <circle cx="443.5" cy="298.2" r="3" fill="var(--stk-blue-deep)" />
+    <circle cx="329.4" cy="313.4" r="3" fill="var(--stk-blue-deep)" />
+    <circle cx="281.4" cy="305.7" r="3" fill="var(--stk-blue-deep)" />
+    <circle cx="189.7" cy="304.3" r="3" fill="var(--stk-blue-deep)" />
+    <circle cx="134.4" cy="299.4" r="3" fill="var(--stk-blue-deep)" />
+    <line x1="496" y1="298" x2="520" y2="298" stroke="var(--stk-blue-deep)" strokeOpacity="0.5" strokeWidth="1" />
+    <text x="530" y="299" textAnchor="start" fontFamily="Fira Code, monospace" fontSize="12.5" fontWeight="600" fill="var(--ifm-heading-color)">OPERATIONS</text>
+    <text x="530" y="316" textAnchor="start" fontFamily="Fira Code, monospace" fontSize="9" fill="var(--stk-steel)">versions · upgrades · backups · scaling</text>
+    <path d="M104 361 L300 395 L496 361 L496 367 L300 401 L104 367 Z" fill="var(--stk-panel)" stroke="var(--stk-violet)" strokeOpacity="0.4" strokeWidth="1" />
+    <path d="M104 361 L300 327 L496 361 L300 395 Z" fill="url(#stkPlane5)" stroke="var(--stk-violet)" strokeWidth="1.2" strokeOpacity="0.65" />
+    <path d="M169.1 354.6 L308.6 346.6" stroke="var(--stk-violet)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M308.6 346.6 L356.7 342.6" stroke="var(--stk-violet)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M356.7 342.6 L449.6 365.0" stroke="var(--stk-violet)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M449.6 365.0 L393.2 373.5" stroke="var(--stk-violet)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M393.2 373.5 L336.5 385.2" stroke="var(--stk-violet)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M336.5 385.2 L285.8 387.8" stroke="var(--stk-violet)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M285.8 387.8 L243.3 363.7" stroke="var(--stk-violet)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <path d="M243.3 363.7 L169.1 354.6" stroke="var(--stk-violet)" strokeOpacity="0.5" strokeWidth="0.9" fill="none" />
+    <circle cx="169.1" cy="354.6" r="3" fill="var(--stk-violet)" />
+    <circle cx="308.6" cy="346.6" r="3" fill="var(--stk-violet)" />
+    <circle cx="356.7" cy="342.6" r="3" fill="var(--stk-violet)" />
+    <circle cx="449.6" cy="365.0" r="3" fill="var(--stk-violet)" />
+    <circle cx="393.2" cy="373.5" r="3" fill="var(--stk-violet)" />
+    <circle cx="336.5" cy="385.2" r="3" fill="var(--stk-violet)" />
+    <circle cx="285.8" cy="387.8" r="3" fill="var(--stk-violet)" />
+    <circle cx="243.3" cy="363.7" r="3" fill="var(--stk-violet)" />
+    <line x1="496" y1="361" x2="520" y2="361" stroke="var(--stk-violet)" strokeOpacity="0.5" strokeWidth="1" />
+    <text x="530" y="362" textAnchor="start" fontFamily="Fira Code, monospace" fontSize="12.5" fontWeight="600" fill="var(--ifm-heading-color)">COMPLIANCE</text>
+    <text x="530" y="379" textAnchor="start" fontFamily="Fira Code, monospace" fontSize="9" fill="var(--stk-steel)">policy · identity · evidence</text>
   </g>
 </svg>
 </Figure>

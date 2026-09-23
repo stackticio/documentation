@@ -1,0 +1,962 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stacktic — Slide 02 · Day two is where it gets complicated</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b1330; --panel:#16204a; --ink:#f2f5ff; --body:#b6c1e2; --soft:#8b97bf; --faint:#6b78a3;
+  --line:rgba(150,175,235,.20); --line2:rgba(150,175,235,.34);
+  --gold:#fbbf24; --sky:#38bdf8; --indigo:#818cf8; --violet:#a78bfa;
+  --amber:#f59e0b; --emerald:#34d399; --rose:#fb7185; --red:#ff4d6d;
+  --disp:"Sora",system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;min-width:0}
+html,body{height:100%}
+body{background:
+   radial-gradient(120% 90% at 50% -20%,#1c2a63 0%,transparent 62%),
+   radial-gradient(80% 70% at 110% 110%,#221a52 0%,transparent 60%),
+   var(--bg);
+  color:var(--ink);font-family:var(--disp);-webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:18px}
+
+/* ───────────────────────── slide shell ───────────────────────── */
+.slide{position:relative;width:min(1500px,96vw);aspect-ratio:16/9;max-height:84vh;border-radius:20px;overflow:hidden;
+  background:linear-gradient(165deg,#182356 0%,#111a42 52%,#16204d 100%);
+  border:1px solid var(--line);box-shadow:0 50px 120px -50px rgba(4,8,26,.9),0 0 0 1px rgba(255,255,255,.03) inset;
+  container-type:inline-size;--u:1cqw;display:flex;flex-direction:column}
+.slide::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.75;
+  background-image:linear-gradient(rgba(150,180,255,.07) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(150,180,255,.07) 1px,transparent 1px);
+  background-size:calc(var(--u)*3.2) calc(var(--u)*3.2);
+  mask-image:radial-gradient(120% 100% at 50% 45%,#000 20%,transparent 82%)}
+.slide::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:60;
+  background:radial-gradient(125% 105% at 50% 48%,transparent 62%,rgba(8,14,42,.42) 100%)}
+.pad{position:relative;z-index:5;flex:1;display:flex;flex-direction:column;
+  padding:calc(var(--u)*1.9) calc(var(--u)*2.6) calc(var(--u)*1.4)}
+
+.top{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);
+  font-size:calc(var(--u)*.8);color:var(--soft);letter-spacing:.13em;flex:none}
+.top b{color:var(--ink);font-weight:800}
+.top .acts{display:flex;gap:calc(var(--u)*.5);align-items:center}
+.top .acts i{font-style:normal;font-size:calc(var(--u)*.62);letter-spacing:.16em;font-weight:700;
+  padding:calc(var(--u)*.22) calc(var(--u)*.5);border-radius:999px;color:#5b6791;
+  border:1px solid transparent;transition:.45s}
+.top .acts i.on{color:#0a0f22;background:var(--ac);border-color:var(--ac)}
+.top .acts i.past{color:var(--soft);border-color:var(--line)}
+
+/* headline */
+.head{flex:none;margin-top:calc(var(--u)*1.1);min-height:calc(var(--u)*9.4);position:relative}
+.eb{display:inline-flex;align-items:center;gap:.6em;font-family:var(--mono);font-size:calc(var(--u)*.74);
+  font-weight:800;letter-spacing:.24em;padding:calc(var(--u)*.35) calc(var(--u)*.9);border-radius:999px;
+  color:var(--ac);background:color-mix(in srgb,var(--ac) 12%,transparent);
+  border:1px solid color-mix(in srgb,var(--ac) 34%,transparent)}
+.eb::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ac);
+  box-shadow:0 0 0 0 color-mix(in srgb,var(--ac) 70%,transparent);animation:beat 2s infinite}
+@keyframes beat{70%{box-shadow:0 0 0 calc(var(--u)*.7) transparent}100%{box-shadow:0 0 0 0 transparent}}
+h1{font-weight:800;letter-spacing:-.045em;line-height:1.03;font-size:calc(var(--u)*3.35);
+  margin-top:calc(var(--u)*.75)}
+h1 em{font-style:normal;color:var(--ac)}
+.hl{position:absolute;inset:0;opacity:0;transform:translateY(calc(var(--u)*.9));
+  transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+.hl.on{opacity:1;transform:none}
+
+/* stage + graph (same topology as slide 01) */
+.stage{position:relative;flex:1;min-height:0;margin-top:calc(var(--u)*.4)}
+#cam{position:absolute;inset:0;transform-origin:50% 50%;
+  transform:translate(var(--tx,0),var(--ty,0)) scale(var(--k,1));
+  transition:transform 1.3s cubic-bezier(.5,0,.15,1),opacity .8s,filter .8s}
+#edges{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.node{position:absolute;transform:translate(-50%,-50%);width:calc(var(--u)*10.6);
+  padding:calc(var(--u)*.55) calc(var(--u)*.68);border-radius:calc(var(--u)*.8);
+  background:linear-gradient(165deg,color-mix(in srgb,var(--c) 20%,#1a2452),#141d47);
+  border:1px solid color-mix(in srgb,var(--c) 32%,transparent);
+  box-shadow:0 calc(var(--u)*1.2) calc(var(--u)*2.4) -1.2cqw rgba(4,8,26,.7);
+  transition:opacity .5s,border-color .45s,box-shadow .45s,background .45s,filter .45s;z-index:10}
+.node .hd{display:flex;align-items:center;gap:calc(var(--u)*.38)}
+.node .dot{width:calc(var(--u)*.8);height:calc(var(--u)*.8);border-radius:calc(var(--u)*.22);flex:none;
+  background:color-mix(in srgb,var(--c) 85%,#fff);box-shadow:0 0 calc(var(--u)*.8) color-mix(in srgb,var(--c) 70%,transparent)}
+.node b{font-size:calc(var(--u)*.95);font-weight:800;letter-spacing:-.02em;line-height:1.1;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.node i{display:block;font-style:normal;font-family:var(--mono);font-size:calc(var(--u)*.52);font-weight:700;
+  letter-spacing:.1em;color:color-mix(in srgb,var(--c) 55%,var(--soft));margin-top:.28em;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+#n-app{border-color:color-mix(in srgb,var(--gold) 55%,transparent);
+  background:linear-gradient(165deg,#3a2a08,#221a34)}
+
+/* compliance chip that clips onto a node while the scan passes */
+.node .chip{position:absolute;left:calc(var(--u)*.6);bottom:calc(var(--u)*-.85);
+  font-family:var(--mono);font-size:calc(var(--u)*.5);font-weight:700;letter-spacing:.06em;
+  color:#08170f;background:var(--emerald);border-radius:calc(var(--u)*.3);
+  padding:calc(var(--u)*.1) calc(var(--u)*.36);white-space:nowrap;
+  opacity:0;transform:translateY(calc(var(--u)*-.3)) scale(.8);transition:.35s cubic-bezier(.2,1.4,.4,1)}
+.node.scanned .chip{opacity:1;transform:none}
+.node.scanned{border-color:color-mix(in srgb,var(--emerald) 55%,transparent);
+  box-shadow:0 0 calc(var(--u)*2.2) -.5cqw color-mix(in srgb,var(--emerald) 40%,transparent)}
+/* a node the upgrade puts a question over */
+.node .qm{position:absolute;right:calc(var(--u)*-.7);top:calc(var(--u)*-.9);
+  width:calc(var(--u)*1.7);height:calc(var(--u)*1.7);border-radius:50%;display:grid;place-items:center;
+  font-family:var(--disp);font-size:calc(var(--u)*1.1);font-weight:800;color:#2a1602;background:var(--amber);
+  opacity:0;transform:scale(.4);transition:.4s cubic-bezier(.2,1.5,.4,1);
+  box-shadow:0 0 calc(var(--u)*1.4) color-mix(in srgb,var(--amber) 60%,transparent)}
+.node.asking .qm{opacity:1;transform:none}
+.node.asking{border-color:var(--amber);
+  box-shadow:0 0 calc(var(--u)*2.8) -.5cqw color-mix(in srgb,var(--amber) 50%,transparent)}
+.node.unknown{filter:grayscale(1) brightness(.5)}
+.node.unknown::after{content:"?";position:absolute;inset:0;display:grid;place-items:center;
+  font-size:calc(var(--u)*2.2);font-weight:800;color:rgba(180,195,235,.5);
+  background:rgba(12,18,45,.72);border-radius:calc(var(--u)*.8)}
+.node.safe{border-color:var(--emerald);
+  box-shadow:0 0 calc(var(--u)*2.6) -.5cqw color-mix(in srgb,var(--emerald) 55%,transparent)}
+
+/* scan sweep */
+#sweep{position:absolute;top:0;bottom:0;width:calc(var(--u)*14);z-index:14;pointer-events:none;
+  left:0;opacity:0;transform:translateX(-20%);
+  background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--emerald) 26%,transparent),transparent);
+  border-right:2px solid color-mix(in srgb,var(--emerald) 75%,transparent)}
+#sweep.run{opacity:1;transform:translateX(calc(100cqw - 6cqw));transition:transform 4.6s linear,opacity .4s}
+
+/* blast rings live in the svg */
+
+/* ── generic overlay panel ── */
+.ov{position:absolute;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;
+  gap:calc(var(--u)*1.4);opacity:0;pointer-events:none;transition:.6s}
+.ov.in{opacity:1}
+.card{border-radius:calc(var(--u)*1.1);padding:calc(var(--u)*1) calc(var(--u)*1.15);
+  background:linear-gradient(165deg,color-mix(in srgb,var(--c) 16%,rgba(20,29,71,.96)),rgba(16,24,60,.96));
+  border:1px solid color-mix(in srgb,var(--c) 34%,transparent);backdrop-filter:blur(8px);
+  box-shadow:0 calc(var(--u)*2.4) calc(var(--u)*5) -2cqw rgba(4,8,26,.85)}
+.card .ch{display:flex;align-items:baseline;gap:calc(var(--u)*.6);margin-bottom:calc(var(--u)*.7)}
+.card .ch b{font-size:calc(var(--u)*1.15);font-weight:800;letter-spacing:-.02em}
+.card .ch em{font-style:normal;font-family:var(--mono);font-size:calc(var(--u)*.56);letter-spacing:.16em;
+  color:var(--c);margin-left:auto;border:1px solid color-mix(in srgb,var(--c) 40%,transparent);
+  border-radius:999px;padding:calc(var(--u)*.14) calc(var(--u)*.5)}
+.chips{display:flex;flex-wrap:wrap;gap:calc(var(--u)*.32)}
+.chips i{font-style:normal;font-family:var(--mono);font-size:calc(var(--u)*.62);font-weight:700;
+  color:var(--body);background:rgba(26,36,82,.9);border:1px solid var(--line);
+  border-radius:calc(var(--u)*.4);padding:calc(var(--u)*.2) calc(var(--u)*.46);
+  opacity:0;transform:translateY(calc(var(--u)*.4));transition:.4s}
+.chips i.in{opacity:1;transform:none}
+
+/* ── act 1 : the compliance layer stack ── */
+#lay{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);z-index:32;
+  width:calc(var(--u)*54);display:flex;flex-direction:column;gap:calc(var(--u)*.55);
+  opacity:0;pointer-events:none;transition:.5s}
+#lay.in{opacity:1}
+.layer{border-radius:calc(var(--u)*.85);padding:calc(var(--u)*.6) calc(var(--u)*.85);
+  background:linear-gradient(100deg,color-mix(in srgb,var(--c) 20%,rgba(19,27,68,.97)),rgba(16,24,60,.97));
+  border:1px solid color-mix(in srgb,var(--c) 40%,transparent);backdrop-filter:blur(8px);
+  box-shadow:0 calc(var(--u)*1.6) calc(var(--u)*3) -1.6cqw rgba(4,8,26,.8);
+  opacity:0;transform:translateX(calc(var(--u)*-4)) rotate(-1.2deg);
+  transition:.65s cubic-bezier(.2,.9,.2,1)}
+.layer.in{opacity:1;transform:none}
+.layer .lh{display:flex;align-items:baseline;gap:calc(var(--u)*.5);margin-bottom:calc(var(--u)*.4)}
+.layer .lh b{font-family:var(--mono);font-size:calc(var(--u)*.68);font-weight:800;letter-spacing:.18em;
+  color:color-mix(in srgb,var(--c) 75%,#fff)}
+.layer .lh s{text-decoration:none;margin-left:auto;font-family:var(--mono);font-size:calc(var(--u)*.6);
+  color:var(--faint)}
+.layer .chips i{font-size:calc(var(--u)*.58);padding:calc(var(--u)*.16) calc(var(--u)*.4)}
+
+/* ── act 1 : evidence grid ── */
+#ev{position:absolute;right:calc(var(--u)*1);top:50%;transform:translateY(-50%);z-index:34;
+  width:calc(var(--u)*35);border-radius:calc(var(--u)*1.1);padding:calc(var(--u)*1);
+  background:rgba(16,24,60,.97);border:1px solid var(--line2);backdrop-filter:blur(8px);
+  box-shadow:0 calc(var(--u)*2.4) calc(var(--u)*5) -2cqw rgba(4,8,26,.85);
+  opacity:0;pointer-events:none;transition:.55s}
+#ev.in{opacity:1}
+#ev .eh{display:flex;align-items:baseline;margin-bottom:calc(var(--u)*.6)}
+#ev .eh b{font-size:calc(var(--u)*1.05);font-weight:800}
+#ev .eh em{font-style:normal;margin-left:auto;font-family:var(--mono);font-size:calc(var(--u)*.56);
+  letter-spacing:.14em;color:var(--faint)}
+#grid{display:grid;grid-template-columns:repeat(14,1fr);gap:calc(var(--u)*.22)}
+#grid u{display:block;aspect-ratio:1;border-radius:calc(var(--u)*.16);text-decoration:none;
+  background:var(--cc);opacity:0;transform:scale(.3);transition:.3s}
+#grid u.in{opacity:.85;transform:none}
+#grid u.hot{opacity:1;box-shadow:0 0 calc(var(--u)*.6) var(--cc)}
+#ev .ef{margin-top:calc(var(--u)*.7);padding-top:calc(var(--u)*.55);border-top:1px solid var(--line);
+  display:flex;gap:calc(var(--u)*1)}
+#ev .ef div b{display:block;font-size:calc(var(--u)*1.7);font-weight:800;letter-spacing:-.03em;line-height:1;
+  font-variant-numeric:tabular-nums}
+#ev .ef div span{display:block;margin-top:.35em;font-family:var(--mono);font-size:calc(var(--u)*.52);
+  letter-spacing:.1em;color:var(--soft)}
+#ev .ef .a b{color:var(--sky)} #ev .ef .b b{color:var(--amber)} #ev .ef .c b{color:var(--red)}
+
+/* ── act 3 : upgrade ticket + question tally ── */
+#tick{position:absolute;left:0;top:calc(var(--u)*.2);z-index:36;
+  display:flex;flex-direction:column;align-items:flex-start;gap:calc(var(--u)*.28);
+  border-radius:calc(var(--u)*.8);padding:calc(var(--u)*.6) calc(var(--u)*.9);
+  background:rgba(16,24,60,.95);border:1px solid color-mix(in srgb,var(--amber) 40%,var(--line2));
+  backdrop-filter:blur(6px);opacity:0;transform:translateY(calc(var(--u)*-1));transition:.55s}
+#tick.in{opacity:1;transform:none}
+#tick .vrow{display:flex;align-items:center;gap:calc(var(--u)*.5)}
+#tick .v{font-family:var(--mono);font-size:calc(var(--u)*1);font-weight:800;letter-spacing:.06em}
+#tick .old{color:var(--soft);text-decoration:line-through}
+#tick .new{color:#2a1602;background:var(--amber);border-radius:calc(var(--u)*.3);
+  padding:calc(var(--u)*.1) calc(var(--u)*.42)}
+#tick .lb{font-family:var(--mono);font-size:calc(var(--u)*.6);letter-spacing:.18em;color:var(--faint)}
+
+/* ── act 4 : the reactive timeline ── */
+#tl{position:absolute;left:50%;bottom:calc(var(--u)*.4);transform:translateX(-50%);z-index:36;
+  width:calc(var(--u)*82);border-radius:calc(var(--u)*1);padding:calc(var(--u)*.95) calc(var(--u)*1.2);
+  background:rgba(16,24,60,.97);border:1px solid var(--line2);backdrop-filter:blur(8px);
+  opacity:0;pointer-events:none;transition:.55s}
+#tl.in{opacity:1}
+#tl .lane{display:flex;gap:calc(var(--u)*.3);margin-bottom:calc(var(--u)*.7)}
+#tl .lane u{flex:1;height:calc(var(--u)*.5);border-radius:99px;background:rgba(52,211,153,.16);
+  text-decoration:none;transform:scaleX(0);transform-origin:left;transition:.28s}
+#tl .lane u.in{transform:none;background:var(--emerald)}
+#tl .lane u.miss{background:rgba(150,175,235,.18)}
+#tl .rail{position:relative;height:calc(var(--u)*3.2)}
+#tl .rail::before{content:"";position:absolute;left:0;right:0;top:calc(var(--u)*1.05);height:2px;
+  background:var(--line2)}
+#tl .mk{position:absolute;top:0;transform:translateX(-50%);text-align:center;opacity:0;transition:.45s}
+#tl .mk.in{opacity:1}
+#tl .mk u{display:block;width:calc(var(--u)*1.1);height:calc(var(--u)*1.1);border-radius:50%;
+  margin:calc(var(--u)*.5) auto 0;text-decoration:none;background:var(--c);
+  box-shadow:0 0 calc(var(--u)*1.2) color-mix(in srgb,var(--c) 70%,transparent)}
+#tl .mk span{display:block;margin-top:calc(var(--u)*.35);font-family:var(--mono);
+  font-size:calc(var(--u)*.56);font-weight:700;letter-spacing:.08em;color:var(--c);white-space:nowrap}
+#tl .ft{margin-top:calc(var(--u)*.5);font-family:var(--mono);font-size:calc(var(--u)*.66);color:var(--soft)}
+#tl .ft b{color:var(--red);font-weight:800}
+
+/* ── act 5 : the calculation ── */
+#calc{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:38;
+  width:calc(var(--u)*76);border-radius:calc(var(--u)*1.2);padding:calc(var(--u)*1.05) calc(var(--u)*1.25);
+  background:linear-gradient(165deg,rgba(23,34,84,.98),rgba(15,23,58,.98));
+  border:1px solid color-mix(in srgb,var(--emerald) 34%,var(--line2));backdrop-filter:blur(10px);
+  box-shadow:0 calc(var(--u)*3) calc(var(--u)*6) -2cqw rgba(4,8,26,.9);
+  opacity:0;pointer-events:none;transition:.6s}
+#calc.in{opacity:1}
+#calc .inp{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(var(--u)*.6)}
+#calc .inp div{border-radius:calc(var(--u)*.7);padding:calc(var(--u)*.5) calc(var(--u)*.65);
+  background:rgba(26,36,82,.85);border:1px solid var(--line);
+  opacity:0;transform:translateY(calc(var(--u)*.7));transition:.5s cubic-bezier(.2,.9,.2,1)}
+#calc .inp div.in{opacity:1;transform:none}
+#calc .inp b{display:block;font-family:var(--mono);font-size:calc(var(--u)*.58);font-weight:800;
+  letter-spacing:.14em;color:var(--sky)}
+#calc .inp span{display:block;margin-top:.35em;font-size:calc(var(--u)*.8);color:var(--body)}
+#calc .arrow{height:calc(var(--u)*1.9);display:grid;place-items:center}
+#calc .arrow i{width:calc(var(--u)*.8);height:calc(var(--u)*.8);border-right:2.5px solid var(--emerald);
+  border-bottom:2.5px solid var(--emerald);transform:rotate(45deg);opacity:.25;animation:chv 1.3s infinite}
+@keyframes chv{50%{opacity:1}}
+#calc .out{display:grid;grid-template-columns:1.25fr 1fr;gap:calc(var(--u)*.9)}
+#calc .rows{display:flex;flex-direction:column;gap:calc(var(--u)*.34)}
+#calc .row{display:flex;align-items:center;gap:calc(var(--u)*.55);border-radius:calc(var(--u)*.5);
+  padding:calc(var(--u)*.34) calc(var(--u)*.6);background:rgba(26,36,82,.6);border:1px solid var(--line);
+  font-size:calc(var(--u)*.82);color:var(--body);
+  opacity:0;transform:translateX(calc(var(--u)*-1));transition:.45s}
+#calc .row.in{opacity:1;transform:none}
+#calc .row s{text-decoration:none;font-family:var(--mono);font-weight:800;font-size:calc(var(--u)*.7);
+  color:var(--emerald);flex:none}
+#calc .row.bad{border-color:color-mix(in srgb,var(--red) 45%,transparent);background:rgba(70,20,48,.55)}
+#calc .row.bad s{color:var(--red)}
+#calc .row b{color:var(--ink);font-weight:700}
+#calc .verd{border-radius:calc(var(--u)*.85);padding:calc(var(--u)*.85);display:flex;flex-direction:column;
+  justify-content:center;gap:calc(var(--u)*.3);text-align:center;
+  background:linear-gradient(160deg,rgba(52,211,153,.2),rgba(16,24,60,.7));
+  border:1px solid color-mix(in srgb,var(--emerald) 45%,transparent);
+  opacity:0;transform:scale(.9);transition:.6s cubic-bezier(.2,1.4,.4,1)}
+#calc .verd.in{opacity:1;transform:none}
+#calc .verd b{font-size:calc(var(--u)*1.5);font-weight:800;letter-spacing:-.03em;color:var(--emerald)}
+#calc .verd span{font-family:var(--mono);font-size:calc(var(--u)*.6);letter-spacing:.12em;color:var(--body)}
+#calc .verd em{font-style:normal;font-family:var(--mono);font-size:calc(var(--u)*.56);color:var(--faint)}
+
+/* HUD */
+.hud{position:absolute;left:50%;top:calc(var(--u)*.2);z-index:35;display:flex;gap:calc(var(--u)*.6);
+  opacity:0;transform:translate(-50%,calc(var(--u)*-.6));transition:.6s}
+.hud.in{opacity:1;transform:translate(-50%,0)}
+.hud div{min-width:calc(var(--u)*8.4);border-radius:calc(var(--u)*.7);padding:calc(var(--u)*.42) calc(var(--u)*.7);
+  background:rgba(20,29,71,.9);backdrop-filter:blur(6px);border:1px solid var(--line);text-align:right}
+.hud b{display:block;font-size:calc(var(--u)*1.3);font-weight:800;letter-spacing:-.03em;
+  font-variant-numeric:tabular-nums;line-height:1}
+.hud i{display:block;font-style:normal;font-family:var(--mono);font-size:calc(var(--u)*.52);
+  letter-spacing:.14em;color:var(--soft);margin-top:.4em}
+.hud div.hot{border-color:color-mix(in srgb,var(--amber) 50%,transparent)}
+.hud div.hot b{color:var(--amber)}
+.hud div.ok{border-color:color-mix(in srgb,var(--emerald) 50%,transparent)}
+.hud div.ok b{color:var(--emerald)}
+
+/* caption + footer */
+.cap{position:relative;z-index:50;flex:none;margin-top:auto;padding-top:calc(var(--u)*.9);
+  border-top:1px solid var(--line);display:flex;align-items:center;gap:calc(var(--u)*1)}
+.cap .txt{position:relative;flex:1;height:calc(var(--u)*3);font-family:var(--mono);
+  font-size:calc(var(--u)*.88);color:var(--body);line-height:1.35}
+.cap .txt span{position:absolute;left:0;right:0;top:0;opacity:0;transition:.45s}
+.cap .txt span.on{opacity:1}
+.cap .br{font-family:var(--mono);font-size:calc(var(--u)*.62);letter-spacing:.24em;color:#4f5c8a;flex:none}
+.prog{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.06);z-index:70}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--emerald),var(--amber),var(--gold))}
+.gate{position:absolute;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;
+  gap:calc(var(--u)*.8);border:0;cursor:pointer;font-family:var(--mono);font-weight:800;
+  font-size:calc(var(--u)*1.1);letter-spacing:.2em;color:var(--ink);
+  background:rgba(11,19,48,.72);backdrop-filter:blur(3px)}
+.gate[hidden]{display:none}
+.gate span{display:grid;place-items:center;width:calc(var(--u)*4);height:calc(var(--u)*4);border-radius:50%;
+  background:var(--gold);color:#1a1204;font-size:calc(var(--u)*1.4);
+  box-shadow:0 0 0 calc(var(--u)*.6) rgba(251,191,36,.22)}
+
+/* controls */
+.ctl{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;color:#8b95bb;
+  width:min(1500px,96vw)}
+.ctl button{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.1em;color:#cfd8f5;
+  background:#1a2452;border:1px solid rgba(150,175,235,.28);border-radius:8px;padding:7px 13px;cursor:pointer;
+  transition:.2s}
+.ctl button:hover{background:#243066;color:#fff}
+.ctl input[type=range]{flex:1;accent-color:#fbbf24;cursor:pointer}
+.ctl .t{font-variant-numeric:tabular-nums;color:#fbbf24;min-width:78px;text-align:right}
+.noanim *,.noanim *::before,.noanim *::after{transition:none!important;animation:none!important}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001s!important}}
+</style>
+</head>
+<body>
+
+<section class="slide" id="slide" style="--ac:var(--sky)">
+ <div class="pad">
+  <div class="top">
+    <span>{ <b>STACKTIC</b> }</span>
+    <span class="acts" id="acts"></span>
+    <span>02 / 09</span>
+  </div>
+
+  <div class="head" id="head">
+    <div class="hl" data-act="0"><span class="eb">OPERATIONS</span>
+      <h1>Writing it was day zero.<br><em>Day two never ends.</em></h1></div>
+    <div class="hl" data-act="1"><span class="eb">COMPLIANCE</span>
+      <h1>Compliance is not a document.<br><em>It is every relation, proven.</em></h1></div>
+    <div class="hl" data-act="2"><span class="eb">CONTEXT</span>
+      <h1>The assistant sees files.<br><em>The control asks about relations.</em></h1></div>
+    <div class="hl" data-act="3"><span class="eb">UPGRADES &amp; MIGRATIONS</span>
+      <h1>One version moves.<br><em>Everything downstream is a question.</em></h1></div>
+    <div class="hl" data-act="4"><span class="eb">STAGING &amp; QA</span>
+      <h1>Staging answers late.<br><em>Production asks first.</em></h1></div>
+    <div class="hl" data-act="5"><span class="eb">WHAT IF</span>
+      <h1>What if the impact were <em>calculated</em><br>before the change was made?</h1></div>
+  </div>
+
+  <div class="stage" id="stage">
+    <div id="cam">
+      <svg id="edges" viewBox="0 0 1000 450"></svg>
+      <div id="nodes"></div>
+    </div>
+    <div id="sweep"></div>
+
+    <!-- act 1 : the layers compliance spans -->
+    <div id="lay">
+      <div class="layer" style="--c:var(--violet)">
+        <div class="lh"><b>SECURITY CONFIGURATION</b><s>across 12 components</s></div>
+        <div class="chips"><i>network policies</i><i>TLS + rotation</i><i>OIDC clients</i><i>secrets &amp; SOPS</i><i>RBAC</i><i>admission</i></div>
+      </div>
+      <div class="layer" style="--c:var(--sky)">
+        <div class="lh"><b>COMPATIBILITY</b><s>every version pair</s></div>
+        <div class="chips"><i>chart versions</i><i>image digests</i><i>schema versions</i><i>client libraries</i><i>API versions</i></div>
+      </div>
+      <div class="layer" style="--c:var(--indigo)">
+        <div class="lh"><b>POLICIES</b><s>enforced, not documented</s></div>
+        <div class="chips"><i>OPA / Gatekeeper</i><i>egress rules</i><i>retention</i><i>backup schedules</i><i>exceptions</i></div>
+      </div>
+      <div class="layer" style="--c:var(--emerald)">
+        <div class="lh"><b>CONTROLS</b><s>and the evidence behind each one</s></div>
+        <div class="chips"><i>audit trail</i><i>drift detection</i><i>scan results</i><i>access reviews</i><i>evidence</i></div>
+      </div>
+    </div>
+
+    <!-- act 1 : the evidence surface -->
+    <div id="ev">
+      <div class="eh"><b>Evidence required</b><em>ISO/IEC 27001:2022 · ANNEX A</em></div>
+      <div id="grid"></div>
+      <div class="ef">
+        <div class="a"><b id="e-all">0</b><span>CONTROLS</span></div>
+        <div class="b"><b id="e-tec">0</b><span>DECIDED BY YOUR STACK</span></div>
+        <div class="c"><b id="e-evd">0</b><span>CONTINUOUSLY EVIDENCED</span></div>
+      </div>
+    </div>
+
+    <!-- act 2 : what the assistant has vs what the control needs -->
+    <div class="ov" id="ctx">
+      <div class="card" style="--c:var(--faint);width:calc(var(--u)*30)">
+        <div class="ch"><b>What the assistant has</b><em>FILE BY FILE</em></div>
+        <div class="chips" id="ctx-a">
+          <i>the open file</i><i>the repo</i><i>the diff</i>
+        </div>
+        <div style="margin-top:calc(var(--u)*.8);font-family:var(--mono);font-size:calc(var(--u)*.66);color:var(--faint)">
+          no runtime, no versions in flight,<br>no link between the two
+        </div>
+      </div>
+      <div class="card" style="--c:var(--emerald);width:calc(var(--u)*44)">
+        <div class="ch"><b>What one control asks</b><em>A.8.24 · USE OF CRYPTOGRAPHY</em></div>
+        <div class="chips" id="ctx-b">
+          <i>TLS on 6 in-cluster paths</i><i>issuer + rotation period</i><i>where each key is stored</i>
+          <i>who can read the secret</i><i>last rotation, per component</i><i>exceptions + who approved</i>
+          <i>proof it was true all quarter</i>
+        </div>
+        <div style="margin-top:calc(var(--u)*.8);font-family:var(--mono);font-size:calc(var(--u)*.66);color:var(--amber)"
+             id="ctx-note">…and it must still be true tomorrow morning</div>
+      </div>
+    </div>
+
+    <!-- act 3 : the upgrade ticket -->
+    <div id="tick">
+      <span class="lb">UPGRADE TICKET</span>
+      <div class="vrow">
+        <span class="v">kafka</span><span class="v old">3.7</span>
+        <span class="lb">&rarr;</span><span class="v new">4.0</span>
+      </div>
+      <span class="lb">ONE LINE IN ONE FILE</span>
+    </div>
+
+    <!-- act 4 : staging is downstream of the change -->
+    <div id="tl">
+      <div class="lane" id="lane"></div>
+      <div class="rail">
+        <div class="mk" id="mk1" style="left:8%;--c:var(--emerald)"><u></u><span>STAGING GREEN</span></div>
+        <div class="mk" id="mk2" style="left:33%;--c:var(--sky)"><u></u><span>APPLY TO PROD</span></div>
+        <div class="mk" id="mk3" style="left:60%;--c:var(--red)"><u></u><span>CONSUMERS STALL</span></div>
+        <div class="mk" id="mk4" style="left:84%;--c:var(--amber)"><u></u><span>ROLL BACK</span></div>
+      </div>
+      <div class="ft" id="tl-ft">47 tests green &mdash; on the 9 relations staging actually had</div>
+    </div>
+
+    <!-- act 5 : calculate it first -->
+    <div id="calc">
+      <div class="inp">
+        <div><b>CODE</b><span>what the change literally edits</span></div>
+        <div><b>METADATA</b><span>every component, version, attribute</span></div>
+        <div><b>DEPENDENCIES</b><span>who is on the other end of each link</span></div>
+        <div><b>VALIDATIONS</b><span>the rule each relation must satisfy</span></div>
+      </div>
+      <div class="arrow"><i></i></div>
+      <div class="out">
+        <div class="rows" id="crows">
+          <div class="row"><s>&#10003;</s><span><b>kafka 4.0</b> &rarr; connector 2.6 — supported</span></div>
+          <div class="row"><s>&#10003;</s><span><b>offsets</b> preserved — consumer group unchanged</span></div>
+          <div class="row bad"><s>&#10007;</s><span><b>schema registry</b> compat mode <b>BACKWARD</b> rejects the new avro record</span></div>
+          <div class="row bad"><s>&#10007;</s><span><b>3 dashboards</b> query a metric renamed in 4.0</span></div>
+          <div class="row"><s>&#10003;</s><span><b>order</b> resolved — schema, connector, brokers, dashboards</span></div>
+        </div>
+        <div class="verd" id="verd">
+          <span>BEFORE THE CHANGE</span>
+          <b>2 blockers</b>
+          <em id="verd-sub">found in metadata, not in production</em>
+        </div>
+      </div>
+    </div>
+
+    <div class="hud" id="hud">
+      <div id="h1w"><b id="h1">0</b><i id="h1l">COMPONENTS</i></div>
+      <div id="h2w"><b id="h2">0</b><i id="h2l">RELATIONS</i></div>
+      <div id="h3w"><b id="h3">0</b><i id="h3l">OPEN QUESTIONS</i></div>
+    </div>
+  </div>
+
+  <div class="cap">
+    <div class="txt" id="cap"></div>
+    <span class="br">STACKTIC 2026</span>
+  </div>
+ </div>
+ <div class="prog"><i id="prog"></i></div>
+ <button class="gate" id="gate" hidden><span>&#9654;</span>PLAY WITH NARRATION</button>
+</section>
+<audio id="vo" src="slide-2.mp3" preload="auto"></audio>
+
+<div class="ctl">
+  <button id="play">&#9199; PLAY</button>
+  <button id="rst">&#8635; RESTART</button>
+  <input type="range" id="scrub" min="0" max="53.6" step="0.05" value="0" aria-label="timeline">
+  <span class="t" id="clock">0.0 / 54s</span>
+  <span>SPACE&nbsp;play&nbsp;&nbsp;&larr;&rarr;&nbsp;act&nbsp;&nbsp;1-6&nbsp;jump</span>
+</div>
+
+<script>
+/* ═══════════════ the same system slide 01 built ═══════════════ */
+const C={app:'var(--gold)',data:'var(--sky)',msg:'var(--amber)',sec:'var(--violet)',
+         obs:'var(--emerald)',pipe:'var(--rose)',infra:'var(--indigo)'};
+
+const NODES=[
+ {id:'app',       x:500,y:225, t:'your app',       s:'PRODUCES',           k:'app',   chip:'RBAC'},
+ {id:'ingress',   x:396,y:53,  t:'ingress',        s:'ROUTING · TLS',      k:'infra', chip:'TLS 1.3'},
+ {id:'kafka',     x:604,y:53,  t:'kafka',          s:'EVENT BUS',          k:'msg',   chip:'mTLS'},
+ {id:'schema',    x:783,y:99,  t:'schema registry',s:'CONTRACTS',          k:'msg',   chip:'compat'},
+ {id:'sink',      x:886,y:179, t:'sink connector', s:'CDC · PIPELINE',     k:'pipe',  chip:'secret'},
+ {id:'warehouse', x:886,y:271, t:'warehouse',      s:'ANALYTICS DB',       k:'data',  chip:'retention'},
+ {id:'airflow',   x:783,y:351, t:'airflow',        s:'ETL · DAGs',         k:'pipe',  chip:'access'},
+ {id:'prom',      x:604,y:397, t:'prometheus',     s:'METRICS · SCALING',  k:'obs',   chip:'audit'},
+ {id:'grafana',   x:396,y:397, t:'grafana',        s:'DASHBOARDS · ALERTS',k:'obs',   chip:'SSO'},
+ {id:'redis',     x:217,y:351, t:'redis',          s:'CACHE · SESSIONS',   k:'data',  chip:'at-rest'},
+ {id:'postgres',  x:114,y:271, t:'postgres',       s:'PRIMARY DB',         k:'data',  chip:'backups'},
+ {id:'keycloak',  x:114,y:179, t:'keycloak',       s:'AUTH · OIDC',        k:'sec',   chip:'MFA'},
+ {id:'certs',     x:217,y:99,  t:'cert-manager',   s:'TLS · ROTATION',     k:'infra', chip:'rotation'}
+];
+const N=Object.fromEntries(NODES.map(n=>[n.id,n]));
+
+const EDGES=[
+ {a:'ingress',b:'app',      g:'core'},
+ {a:'app',b:'postgres',     g:'core'},
+ {a:'app',b:'redis',        g:'core'},
+ {a:'app',b:'kafka',        g:'core'},
+ {a:'app',b:'keycloak',     g:'core'},
+ {a:'app',b:'prom',         g:'core'},
+ {a:'certs',b:'ingress',    g:'cross'},
+ {a:'certs',b:'keycloak',   g:'cross'},
+ {a:'keycloak',b:'postgres',g:'cross'},
+ {a:'keycloak',b:'redis',   g:'cross'},
+ {a:'kafka',b:'schema',     g:'cross'},
+ {a:'kafka',b:'sink',       g:'cross'},
+ {a:'schema',b:'sink',      g:'cross'},
+ {a:'sink',b:'warehouse',   g:'cross'},
+ {a:'airflow',b:'warehouse',g:'cross'},
+ {a:'airflow',b:'postgres', g:'cross'},
+ {a:'prom',b:'kafka',       g:'cross'},
+ {a:'prom',b:'postgres',    g:'cross'},
+ {a:'prom',b:'grafana',     g:'cross'},
+ {a:'warehouse',b:'grafana',g:'cross'}
+];
+
+/* what each system is asked when kafka moves — one question per relation it owns */
+const QUESTIONS={
+ kafka:'broker protocol',
+ schema:'avro compatibility',
+ sink:'connector client lib',
+ app:'producer API',
+ prom:'metric names',
+ warehouse:'column types',
+ grafana:'dashboard queries',
+ airflow:'DAG retries'
+};
+
+/* cue times measured in slide-2.mp3 with ffmpeg silencedetect */
+const CAPS=[
+ [0.00, 'In operations, it gets even more complicated.'],
+ [3.67, 'Take compliance.'],
+ [5.03, 'It spans layers of security configuration, compatibility, policies and controls.'],
+ [9.50, 'And that is only the beginning —'],
+ [11.50,'you also need evidence…'],
+ [13.27,'…for hundreds of compliance requirements.'],
+ [17.46,'Today, AI usually lacks the metadata and context to continuously track all of this in day-to-day operations.'],
+ [25.02,'The same is true for migrations and version upgrades.'],
+ [28.42,'Every change introduces compatibility questions and potential impact across services and applications.'],
+ [35.48,'You can test everything in staging and surround it with heavy QA —'],
+ [39.54,'but that is still reactive.'],
+ [41.73,'What if migrations and upgrades were calculated from code, metadata, dependencies and validations — so AI understood every relationship and risk before the change was made?']
+];
+
+const ACTS=[
+ {t:0,     id:'DAY 2'},      /* "in operations it gets even more complicated" */
+ {t:3.67,  id:'COMPLIANCE'}, /* "take compliance… layers… evidence"           */
+ {t:17.46, id:'CONTEXT'},    /* "AI lacks the metadata and context"           */
+ {t:25.02, id:'UPGRADE'},    /* "the same is true for migrations"             */
+ {t:35.48, id:'REACTIVE'},   /* "staging and QA… still reactive"              */
+ {t:41.73, id:'CALCULATED'}  /* "what if it were calculated…"                 */
+];
+let TOTAL=53.59;
+
+/* ═══════════════ build ═══════════════ */
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const svg=$('#edges'), nodeLayer=$('#nodes'), stage=$('#stage');
+const NS='http://www.w3.org/2000/svg';
+
+NODES.forEach(n=>{
+  const d=document.createElement('div');
+  d.className='node'; d.id='n-'+n.id;
+  d.style.setProperty('--c',C[n.k]);
+  d.innerHTML=`<div class="hd"><span class="dot"></span><b>${n.t}</b></div><i>${n.s}</i>
+    <span class="chip">${n.chip}</span><span class="qm">?</span>`;
+  nodeLayer.appendChild(d); n.el=d; n.subEl=d.querySelector('i');
+});
+EDGES.forEach(e=>{
+  const p=document.createElementNS(NS,'path');
+  p.setAttribute('fill','none');
+  p.setAttribute('stroke', e.g==='core' ? 'rgba(251,191,36,.5)' : 'rgba(129,140,248,.32)');
+  p.setAttribute('stroke-width', e.g==='core' ? 2 : 1.4);
+  p.setAttribute('stroke-linecap','round');
+  p.style.transition='stroke .5s,stroke-width .5s,opacity .5s';
+  svg.appendChild(p); e.path=p;
+});
+const ringLayer=document.createElementNS(NS,'g'); svg.appendChild(ringLayer);
+const pLayer=document.createElementNS(NS,'g'); svg.appendChild(pLayer);
+
+/* one pixel space shared by svg + html nodes */
+function layout(){
+  const W=stage.clientWidth, H=stage.clientHeight;
+  if(!W||!H) return;
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  /* the ring is pushed down a tenth of the stage so the top strip stays free
+     for the readout and the upgrade ticket */
+  const X=x=>x/1000*W, Y=y=>(0.10+y/450*0.90)*H;
+  NODES.forEach(n=>{
+    n.px=X(n.x); n.py=Y(n.y);
+    n.el.style.left=n.px+'px'; n.el.style.top=n.py+'px';
+  });
+  EDGES.forEach(e=>{
+    const a=N[e.a], b=N[e.b];
+    const dx=b.px-a.px, dy=b.py-a.py, len=Math.hypot(dx,dy)||1;
+    const bow=(e.g==='core'?0:0.13)*len;
+    const cx=(a.px+b.px)/2-dy/len*bow, cy=(a.py+b.py)/2+dx/len*bow;
+    e.path.setAttribute('d',`M${a.px} ${a.py} Q${cx} ${cy} ${b.px} ${b.py}`);
+    e.len=e.path.getTotalLength();
+  });
+}
+layout();
+new ResizeObserver(layout).observe(stage);
+
+/* particles */
+const parts=[];
+function spawn(edge,color,speed,r,fade){
+  const c=document.createElementNS(NS,'circle');
+  c.setAttribute('r',r); c.setAttribute('fill',color); c.setAttribute('opacity','0');
+  pLayer.appendChild(c);
+  const o={edge,el:c,p:0,speed,fade}; parts.push(o); return o;
+}
+function tickParts(dt){
+  for(let i=parts.length-1;i>=0;i--){
+    const o=parts[i];
+    o.p+=o.speed*dt/o.edge.len;
+    if(o.p>=1){ if(o.fade){o.el.remove();parts.splice(i,1);continue} o.p-=1 }
+    const pt=o.edge.path.getPointAtLength(o.p*o.edge.len);
+    o.el.setAttribute('cx',pt.x); o.el.setAttribute('cy',pt.y);
+    o.el.setAttribute('opacity', o.fade ? (1-Math.abs(o.p-.5)*1.6).toFixed(2) : '.85');
+  }
+}
+let flowOn=false;
+function startFlow(){
+  if(flowOn) return; flowOn=true;
+  EDGES.forEach((e,i)=>{
+    const o=spawn(e, e.g==='core'?'#fbbf24':'#818cf8', e.g==='core'?48:32, e.g==='core'?2.8:2.1, false);
+    o.p=(i*0.11)%1;
+  });
+}
+let FAST=false;
+function pulse(edge,color,onLand){
+  if(FAST){ if(onLand) onLand(); return }
+  const o=spawn(edge,color,200,4.2,true); o.p=0;
+  if(onLand) later(edge.len/200*1000,onLand);
+}
+function edge(a,b){return EDGES.find(e=>(e.a===a&&e.b===b)||(e.a===b&&e.b===a))}
+function far(e,id){return e.a===id?e.b:e.a}
+
+/* expanding blast ring, drawn from a node */
+function ring(n,color,ms){
+  if(FAST) return;
+  const c=document.createElementNS(NS,'circle');
+  c.setAttribute('cx',n.px); c.setAttribute('cy',n.py); c.setAttribute('r',6);
+  c.setAttribute('fill','none'); c.setAttribute('stroke',color); c.setAttribute('stroke-width',2);
+  ringLayer.appendChild(c);
+  const t0=performance.now(), R=Math.max(stage.clientWidth,stage.clientHeight)*.62;
+  const go=now=>{
+    const p=Math.max(0,Math.min(1,(now-t0)/ms));
+    c.setAttribute('r',6+R*p); c.setAttribute('opacity',(1-p).toFixed(2));
+    if(p<1) requestAnimationFrame(go); else c.remove();
+  };
+  requestAnimationFrame(go);
+}
+
+/* evidence grid — ISO/IEC 27001:2022 Annex A, 93 controls in 4 themes */
+const THEMES=[
+ {n:37,c:'#818cf8'},   /* organizational */
+ {n:8, c:'#a78bfa'},   /* people         */
+ {n:14,c:'#5b6588'},   /* physical       */
+ {n:34,c:'#38bdf8'}    /* technological  */
+];
+const CELLS=[];
+THEMES.forEach(t=>{ for(let i=0;i<t.n;i++){
+  const u=document.createElement('u'); u.style.setProperty('--cc',t.c);
+  u.dataset.tec = t.c==='#38bdf8' ? '1' : '';
+  $('#grid').appendChild(u); CELLS.push(u);
+}});
+
+/* ═══════════════ chrome ═══════════════ */
+const capBox=$('#cap');
+CAPS.forEach(([t,s])=>{const el=document.createElement('span');el.textContent=s;capBox.appendChild(el)});
+const capEls=$$('#cap span');
+const actBox=$('#acts');
+ACTS.forEach(a=>{const i=document.createElement('i');i.textContent=a.id;actBox.appendChild(i)});
+const actEls=$$('#acts i');
+const AC=['var(--sky)','var(--emerald)','var(--violet)','var(--amber)','var(--red)','var(--emerald)'];
+
+/* ═══════════════ act choreography ═══════════════ */
+const timers=[];
+const later=(ms,fn)=>{ if(FAST){fn();return} timers.push(setTimeout(fn,ms)) };
+const clearLater=()=>{timers.forEach(clearTimeout);timers.length=0};
+const cam=(k,tx,ty)=>{const c=$('#cam').style;c.setProperty('--k',k);c.setProperty('--tx',tx||'0');c.setProperty('--ty',ty||'0')};
+const dim=(o,b)=>{const c=$('#cam').style;c.opacity=o;c.filter=b?`blur(${b}px) saturate(.8)`:'none'};
+function hud(a,al,b,bl,c,cl){
+  $('#h1').textContent=a; $('#h1l').textContent=al;
+  $('#h2').textContent=b; $('#h2l').textContent=bl;
+  $('#h3').textContent=c; $('#h3l').textContent=cl;
+}
+function count(el,n,ms){
+  if(FAST||!ms){el.textContent=n;return}
+  const run=el._run=(el._run||0)+1, t0=performance.now();
+  const go=now=>{ if(el._run!==run) return;
+    const p=Math.max(0,Math.min(1,(now-t0)/ms));
+    el.textContent=Math.round(n*(1-Math.pow(1-p,3)));
+    if(p<1) requestAnimationFrame(go) };
+  requestAnimationFrame(go);
+}
+const A=[];
+
+/* ── ACT 0 · the system is running. day two. ── */
+A[0]={ enter(){
+  cam(1); dim(1,0);
+  startFlow();
+  $('#hud').classList.add('in');
+  hud(NODES.length,'COMPONENTS',EDGES.length,'RELATIONS','DAY 2','AND COUNTING');
+}};
+
+/* ── ACT 1 · compliance: the layers, then the evidence ── */
+A[1]={ enter(instant){
+  const D=instant?0:1;
+  /* "take compliance" — a scan crosses the whole system, clipping a control onto every node */
+  later(D*100,()=>$('#sweep').classList.add('run'));
+  NODES.forEach(n=>{
+    const at = 250 + (n.x/1000)*4300;                 /* when the sweep reaches this node */
+    later(D*at,()=>n.el.classList.add('scanned'));
+  });
+  /* "…layers of security configuration, compatibility, policies and controls" (t+1.36s) */
+  later(D*1360,()=>{ dim(.34,3); $('#lay').classList.add('in') });
+  $$('#lay .layer').forEach((l,i)=>{
+    later(D*(1360+i*950),()=>{
+      l.classList.add('in');
+      $$('.chips i',l).forEach((c,j)=>later(D*(160+j*90),()=>c.classList.add('in')));
+    });
+  });
+  /* "and that is only the beginning" (t+5.8s) — the stack slides aside for the evidence surface */
+  later(D*5830,()=>{ $('#lay').style.transform='translate(-88%,-50%) scale(.86)' });
+  /* "you also need evidence for hundreds of compliance requirements" (t+7.8s) */
+  later(D*7830,()=>{
+    $('#ev').classList.add('in');
+    CELLS.forEach((u,i)=>later(D*(i*26),()=>u.classList.add('in')));
+    count($('#e-all'),93,D*2600);
+  });
+  later(D*10600,()=>{
+    CELLS.filter(u=>u.dataset.tec).forEach((u,i)=>later(D*(i*22),()=>u.classList.add('hot')));
+    count($('#e-tec'),34,D*1200);
+  });
+  later(D*12400,()=>{ $('#e-evd').textContent='0'; $('#h3').textContent='0';
+                      $('#h3l').textContent='EVIDENCED CONTINUOUSLY'; $('#h3w').classList.add('hot') });
+}};
+
+/* ── ACT 2 · the assistant's context vs the control's question ── */
+A[2]={ enter(instant){
+  const D=instant?0:1;
+  $('#lay').classList.remove('in'); $('#ev').classList.remove('in'); $('#sweep').classList.remove('run');
+  NODES.forEach(n=>n.el.classList.remove('scanned'));
+  dim(.3,3); cam(1);
+  $('#ctx').classList.add('in');
+  $$('#ctx-a i').forEach((c,i)=>later(D*(300+i*220),()=>c.classList.add('in')));
+  $$('#ctx-b i').forEach((c,i)=>later(D*(1200+i*430),()=>c.classList.add('in')));
+  /* the running system goes blank behind the cards — that is the missing context */
+  NODES.forEach((n,i)=>later(D*(1500+i*180),()=>n.el.classList.add('unknown')));
+  hud(3,'FILES IN CONTEXT',NODES.length+' + '+EDGES.length,'FACTS THE ANSWER NEEDS','?','CONTINUOUSLY');
+  $('#h3w').classList.add('hot');
+}};
+
+/* ── ACT 3 · one version moves: the blast radius ── */
+A[3]={ enter(instant){
+  const D=instant?0:1;
+  $('#ctx').classList.remove('in'); dim(1,0); cam(1);
+  NODES.forEach(n=>n.el.classList.remove('unknown'));   /* the system comes back into view */
+  $('#tick').classList.add('in');
+  hud(1,'LINE CHANGED',0,'SYSTEMS TOUCHED',0,'RELATIONS TO RE-VERIFY');
+  $('#h3w').classList.add('hot');
+
+  /* walk out from kafka, hop by hop, but only through systems that actually
+     have something to answer — the reach is derived, never hand-drawn */
+  const hops=[['kafka']], seen=new Set(['kafka']);
+  while(hops[hops.length-1].length){
+    const next=[];
+    hops[hops.length-1].forEach(id=>EDGES.filter(e=>e.a===id||e.b===id).forEach(e=>{
+      const o=far(e,id);
+      if(!seen.has(o) && QUESTIONS[o]){ seen.add(o); next.push(o) }
+    }));
+    if(!next.length) break;
+    hops.push(next);
+  }
+  /* the tally grows with the wave: a relation counts the moment both of its
+     ends are inside the radius, so the number on screen is always the picture */
+  const inside=new Set();
+  const arrive=id=>{
+    const n=N[id];
+    inside.add(id);
+    n.el.classList.add('asking');
+    n.subEl.textContent=QUESTIONS[id].toUpperCase()+' ?';
+    $('#h2').textContent=inside.size;
+    const open=EDGES.filter(e=>inside.has(e.a)&&inside.has(e.b));
+    open.forEach(e=>{
+      e.path.setAttribute('stroke','rgba(245,158,11,.85)'); e.path.setAttribute('stroke-width',2.4);
+    });
+    $('#h3').textContent=open.length;
+  };
+  later(D*600,()=>{ arrive('kafka'); ring(N.kafka,'#f59e0b',1500) });
+  let t=1200;
+  hops.slice(1).forEach((hop,h)=>{
+    hop.forEach((id,i)=>{
+      const at=t+i*380, from=hops[h].find(p=>edge(p,id));
+      later(D*(at-180),()=>{ if(from) pulse(edge(from,id),'#f59e0b') });
+      later(D*at,()=>arrive(id));
+    });
+    t+=hop.length*380+420;
+    later(D*(t-320),()=>ring(N.kafka,'#f59e0b',1900));
+  });
+}};
+
+/* ── ACT 4 · staging answers, but only after the change ── */
+A[4]={ enter(instant){
+  const D=instant?0:1;
+  dim(.28,3); $('#tick').classList.remove('in');
+  $('#tl').classList.add('in');
+  const lane=$('#lane');
+  if(!lane.children.length) for(let i=0;i<47;i++) lane.appendChild(document.createElement('u'));
+  [...lane.children].forEach((u,i)=>later(D*(200+i*38),()=>u.classList.add('in')));
+  hud(47,'TESTS GREEN',9,'RELATIONS IN STAGING',EDGES.length-9,'NEVER TESTED');
+  $('#h3w').classList.add('hot');
+  ['mk1','mk2','mk3','mk4'].forEach((id,i)=>later(D*(2200+i*900),()=>$('#'+id).classList.add('in')));
+  /* "but that is still reactive" (t+4.06s) */
+  later(D*4060,()=>{
+    $('#tl-ft').innerHTML='the other '+(EDGES.length-9)+' relations answered in production &mdash; <b>6 minutes after apply</b>';
+    N.sink.el.classList.add('asking'); N.grafana.el.classList.add('asking');
+  });
+}};
+
+/* ── ACT 5 · calculate the impact before the change ── */
+A[5]={ enter(instant){
+  const D=instant?0:1;
+  $('#tl').classList.remove('in'); dim(.24,3);
+  $('#calc').classList.add('in');
+  $$('#calc .inp div').forEach((d,i)=>later(D*(300+i*520),()=>d.classList.add('in')));
+  $$('#crows .row').forEach((r,i)=>later(D*(2600+i*620),()=>r.classList.add('in')));
+  later(D*6200,()=>$('#verd').classList.add('in'));
+  later(D*7000,()=>{
+    hud(EDGES.length,'RELATIONS CHECKED',2,'BLOCKERS FOUND','0','INCIDENTS');
+    $('#h3w').classList.remove('hot'); $('#h3w').classList.add('ok'); $('#h2w').classList.add('hot');
+  });
+  /* the answer lands back on the system: it is knowable before you touch it */
+  later(D*8200,()=>{
+    dim(.62,1.4);
+    NODES.forEach((n,i)=>later(D*(i*70),()=>{
+      n.el.classList.remove('asking'); n.el.classList.add('safe');
+    }));
+  });
+}};
+
+/* ═══════════════ reset + seek ═══════════════ */
+function resetScene(){
+  clearLater();
+  parts.forEach(o=>o.el.remove()); parts.length=0; flowOn=false;
+  ringLayer.textContent='';
+  document.documentElement.classList.add('noanim');
+  NODES.forEach(n=>{ n.el.className='node'; n.subEl.textContent=n.s });
+  EDGES.forEach(e=>{
+    e.path.setAttribute('stroke', e.g==='core'?'rgba(251,191,36,.5)':'rgba(129,140,248,.32)');
+    e.path.setAttribute('stroke-width', e.g==='core'?2:1.4);
+  });
+  cam(1); dim(1,0);
+  $('#sweep').classList.remove('run');
+  $('#lay').classList.remove('in'); $('#lay').style.transform='translate(-50%,-50%)';
+  $$('#lay .layer').forEach(l=>l.classList.remove('in'));
+  $$('.chips i').forEach(c=>c.classList.remove('in'));
+  $('#ev').classList.remove('in');
+  CELLS.forEach(u=>u.className='');
+  $('#e-all').textContent='0'; $('#e-tec').textContent='0'; $('#e-evd').textContent='0';
+  $('#ctx').classList.remove('in'); $('#tick').classList.remove('in');
+  $('#tl').classList.remove('in'); $$('#lane u').forEach(u=>u.classList.remove('in'));
+  $('#tl-ft').innerHTML='47 tests green &mdash; on the 9 relations staging actually had';
+  $$('#tl .mk').forEach(m=>m.classList.remove('in'));
+  $('#calc').classList.remove('in');
+  $$('#calc .inp div').forEach(d=>d.classList.remove('in'));
+  $$('#crows .row').forEach(r=>r.classList.remove('in'));
+  $('#verd').classList.remove('in');
+  $('#hud').classList.remove('in');
+  ['h1w','h2w','h3w'].forEach(id=>$('#'+id).classList.remove('hot','ok'));
+  document.body.offsetWidth;
+  document.documentElement.classList.remove('noanim');
+}
+
+let clock=0, playing=false, lastTs=0, curAct=-1, seekToken=0;
+function applyUpTo(i){
+  const token=++seekToken;
+  resetScene();
+  document.documentElement.classList.add('noanim');
+  FAST=true;
+  for(let k=0;k<i;k++) A[k].enter(true);
+  curAct=i; paintChrome(i);
+  setTimeout(()=>{
+    if(token!==seekToken) return;
+    FAST=false;
+    document.body.offsetWidth;
+    document.documentElement.classList.remove('noanim');
+    A[i].enter(false);
+  },0);
+}
+function paintChrome(i){
+  $('#slide').style.setProperty('--ac',AC[i]);
+  $$('.hl').forEach((el,k)=>el.classList.toggle('on',k===i));
+  actEls.forEach((el,k)=>{el.classList.toggle('on',k===i);el.classList.toggle('past',k<i)});
+}
+function actAt(t){let i=0;ACTS.forEach((a,k)=>{if(t>=a.t)i=k});return i}
+function paintCaption(t){
+  let idx=-1; CAPS.forEach(([ct],i)=>{if(t>=ct)idx=i});
+  capEls.forEach((el,i)=>el.classList.toggle('on',i===idx));
+}
+
+/* narration drives the clock; without the mp3 the slide runs on its own */
+const vo=$('#vo'); let useAudio=false;
+vo.addEventListener('loadedmetadata',()=>{
+  useAudio=true;
+  if(vo.duration&&isFinite(vo.duration)){ TOTAL=vo.duration; $('#scrub').max=TOTAL }
+});
+vo.addEventListener('error',()=>{useAudio=false});
+
+function frame(ts){
+  if(playing){
+    const dt=Math.min(.05,(ts-lastTs)/1000)||0;
+    clock = useAudio && !vo.paused ? vo.currentTime : Math.min(TOTAL,clock+dt);
+    const a=actAt(clock);
+    if(a!==curAct){ if(a===curAct+1){A[a].enter(false);curAct=a;paintChrome(a)} else applyUpTo(a) }
+    paintCaption(clock); readout();
+    if(clock>=TOTAL) setPlay(false);
+    tickParts(dt);
+  }
+  lastTs=ts;
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+function readout(){
+  $('#scrub').value=clock;
+  $('#clock').textContent=clock.toFixed(1)+' / '+TOTAL.toFixed(0)+'s';
+  $('#prog').style.width=(clock/TOTAL*100)+'%';
+}
+function setPlay(p){
+  playing=p; $('#play').innerHTML=p?'&#9208; PAUSE':'&#9199; PLAY';
+  if(!useAudio) return;
+  if(p){ vo.play().catch(()=>{ setPlay(false); $('#gate').hidden=false }) } else vo.pause();
+}
+function seek(t){
+  clock=Math.max(0,Math.min(TOTAL,t));
+  if(useAudio) vo.currentTime=clock;
+  applyUpTo(actAt(clock)); paintCaption(clock); readout();
+}
+function restart(){seek(0);setPlay(true)}
+$('#gate').onclick=()=>{ $('#gate').hidden=true; seek(0); setPlay(true) };
+$('#play').onclick=()=>setPlay(!playing);
+$('#rst').onclick=restart;
+$('#scrub').oninput=e=>seek(+e.target.value);
+addEventListener('keydown',e=>{
+  if(e.code==='Space'){e.preventDefault();setPlay(!playing)}
+  else if(e.key==='ArrowRight'){seek(ACTS[Math.min(ACTS.length-1,actAt(clock)+1)].t)}
+  else if(e.key==='ArrowLeft'){seek(ACTS[Math.max(0,actAt(clock)-1)].t)}
+  else if(e.key.toLowerCase()==='r'){restart()}
+  else if(/^[1-6]$/.test(e.key)){seek(ACTS[+e.key-1].t)}
+});
+
+const hash=new URLSearchParams(location.hash.slice(1));
+const start = hash.has('act') ? (ACTS[+hash.get('act')]||ACTS[0]).t
+            : hash.has('t')   ? +hash.get('t') : 0;
+let booted=false;
+function boot(){ if(booted) return; booted=true; seek(start); setPlay(!hash.has('pause')) }
+seek(start);
+vo.addEventListener('canplay',boot,{once:true});
+setTimeout(boot,1500);
+</script>
+</body></html>

@@ -106,7 +106,7 @@ export default function Home() {
 
         <section className={styles.figures}>
           <div className={styles.fig}>
-            <div className={styles.figValue}>75</div>
+            <div className={styles.figValue}>79</div>
             <div className={styles.figLabel}>component templates</div>
           </div>
           <div className={styles.fig}>

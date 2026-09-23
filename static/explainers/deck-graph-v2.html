@@ -1,0 +1,402 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stacktic — the graph is the product</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--page:#eef1f7;--card:#fff;--ink:#0c1222;--mut:#5c6785;--faint:#9aa3b8;--line:#e6e9f2;--line2:#dbe0ec;
+ --em:#10b981;--vi:#8b5cf6;--in:#6366f1;--sk:#0ea5e9;--am:#f59e0b;--ro:#f43f5e;--te:#14b8a6;
+ --d:"Sora",system-ui,sans-serif;--m:"JetBrains Mono",ui-monospace,Menlo,monospace}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:var(--page);font-family:var(--d);color:var(--ink);-webkit-font-smoothing:antialiased}
+.deck{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;height:100vh;scrollbar-width:none}.deck::-webkit-scrollbar{display:none}
+.frame{flex:0 0 100%;height:100vh;scroll-snap-align:center;display:flex;align-items:center;justify-content:center;padding:2vh 2vw}
+.slide{position:relative;width:min(1360px,96vw);aspect-ratio:16/9;max-height:95vh;border-radius:22px;overflow:hidden;background:var(--card);
+ border:1px solid var(--line);box-shadow:0 40px 100px -50px rgba(20,30,60,.45);container-type:inline-size;--u:1cqw;display:flex;flex-direction:column}
+.bg{position:absolute;inset:0;z-index:0;background:
+ radial-gradient(46% 54% at 88% 2%,color-mix(in srgb,var(--a) 16%,transparent),transparent 70%),
+ radial-gradient(40% 50% at 4% 100%,color-mix(in srgb,var(--a) 11%,transparent),transparent 70%)}
+.gx{position:absolute;inset:0;z-index:0;opacity:.5;background-image:linear-gradient(rgba(20,30,60,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(20,30,60,.04) 1px,transparent 1px);background-size:44px 44px;
+ -webkit-mask-image:radial-gradient(90% 90% at 50% 45%,#000,transparent 92%);mask-image:radial-gradient(90% 90% at 50% 45%,#000,transparent 92%)}
+.pad{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;padding:calc(var(--u)*2) calc(var(--u)*3);min-height:0}
+.top{display:flex;justify-content:space-between;align-items:center;font-family:var(--m);font-size:calc(var(--u)*.95)}
+.top .lg{letter-spacing:.12em;color:var(--mut)}.top .lg b{color:var(--ink)}
+.top .kk{letter-spacing:.26em;font-weight:800;color:var(--a)}
+.top .ix{color:var(--faint)}.top .ix b{color:var(--a)}
+h1{font-weight:800;letter-spacing:-.035em;line-height:1;font-size:calc(var(--u)*4.4);margin-top:calc(var(--u)*1.4)}
+h1 em{font-style:normal;color:var(--a)}
+.hint{margin-top:calc(var(--u)*.6);font-family:var(--m);font-size:calc(var(--u)*1.05);color:var(--mut);letter-spacing:.02em}
+.hint b{color:var(--ink)}
+.viz{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;margin-top:calc(var(--u)*1)}
+.viz svg{width:100%;height:100%;overflow:visible}
+.viz text{font-family:var(--d)}.viz .m{font-family:var(--m)}
+.bot{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:calc(var(--u)*.8);border-top:1px solid var(--line);
+ font-family:var(--m);font-size:calc(var(--u)*1);color:var(--mut)}
+.bot b{color:var(--ink)}.bot .br{color:var(--faint);letter-spacing:.14em;font-size:calc(var(--u)*.82)}
+.rise{opacity:0;transform:translateY(14px)}
+.frame.live .rise{animation:r .55s cubic-bezier(.2,.8,.25,1) both}
+.frame.live .d2{animation-delay:.1s}.frame.live .d3{animation-delay:.2s}.frame.live .d4{animation-delay:.3s}
+@keyframes r{to{opacity:1;transform:none}}
+@keyframes dash{to{stroke-dashoffset:-24}}
+.flow{stroke-dasharray:6 8;animation:dash 1.2s linear infinite}
+.nav{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:60;display:flex;gap:8px;align-items:center;
+ background:rgba(255,255,255,.93);border:1px solid var(--line2);border-radius:40px;padding:6px 11px;backdrop-filter:blur(12px);box-shadow:0 12px 30px -16px rgba(20,30,60,.45)}
+.nav button{font-family:var(--m);font-size:14px;color:var(--mut);background:none;border:0;cursor:pointer;padding:2px 7px;border-radius:8px}
+.nd{width:24px;height:24px;border-radius:7px;background:var(--page);border:1px solid var(--line2);color:var(--mut);font-family:var(--m);font-size:11px;font-weight:700;cursor:pointer}
+.nd.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+</style></head><body>
+
+<div class="deck" id="deck">
+
+<!-- 1 · THE SPINE -->
+<div class="frame"><section class="slide" style="--a:var(--vi)">
+<div class="bg"></div><div class="gx"></div><div class="pad">
+ <div class="top"><span class="lg">{ <b>STACKTIC</b> }</span><span class="kk">THE MODEL</span><span class="ix"><b>01</b> — 06</span></div>
+ <h1 class="rise">One graph. <em>Everything derives.</em></h1>
+ <div class="hint rise d2">nothing is written twice · nothing is guessed</div>
+
+ <div class="viz rise d2"><svg viewBox="0 0 1240 430" preserveAspectRatio="xMidYMid meet">
+  <defs>
+   <marker id="a1" markerWidth="8" markerHeight="8" refX="6.5" refY="3" orient="auto"><path d="M0,0 L6.6,3 L0,6 Z" fill="#8b5cf6"/></marker>
+   <marker id="a2" markerWidth="8" markerHeight="8" refX="6.5" refY="3" orient="auto"><path d="M0,0 L6.6,3 L0,6 Z" fill="#94a3c4"/></marker>
+   <marker id="a3" markerWidth="8" markerHeight="8" refX="6.5" refY="3" orient="auto"><path d="M0,0 L6.6,3 L0,6 Z" fill="#10b981"/></marker>
+   <linearGradient id="sp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b2540"/><stop offset="1" stop-color="#0b1220"/></linearGradient>
+  </defs>
+
+  <!-- inputs -->
+  <g>
+   <rect x="10" y="70" width="192" height="62" rx="14" fill="#fff" stroke="#c9cffa" stroke-width="1.6"/>
+   <circle cx="42" cy="101" r="13" fill="#eef0fe"/><path d="M36 101h12M42 95v12" stroke="#6366f1" stroke-width="2.4" stroke-linecap="round"/>
+   <text x="66" y="97" font-size="17" font-weight="800">prompt</text><text class="m" x="66" y="115" font-size="11" fill="#5c6785">any AI</text>
+
+   <rect x="10" y="176" width="192" height="62" rx="14" fill="#fff" stroke="#c9cffa" stroke-width="1.6"/>
+   <circle cx="42" cy="207" r="13" fill="#eef0fe"/><path d="M37 202l-5 5 5 5M47 202l5 5-5 5" stroke="#6366f1" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+   <text x="66" y="203" font-size="17" font-weight="800">your code</text><text class="m" x="66" y="221" font-size="11" fill="#5c6785">source metadata</text>
+
+   <rect x="10" y="282" width="192" height="62" rx="14" fill="#fff" stroke="#c9cffa" stroke-width="1.6"/>
+   <circle cx="42" cy="313" r="13" fill="#eef0fe"/><path d="M36 313l4 4 8-9" stroke="#6366f1" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+   <text x="66" y="309" font-size="17" font-weight="800">controls</text><text class="m" x="66" y="327" font-size="11" fill="#5c6785">PCI · ISO</text>
+  </g>
+  <g stroke="#8b5cf6" stroke-width="2.2" fill="none" marker-end="url(#a1)" opacity=".8">
+   <path class="flow" d="M206,101 C250,101 250,160 296,180"/>
+   <path class="flow" d="M206,207 H296"/>
+   <path class="flow" d="M206,313 C250,313 250,254 296,234"/>
+  </g>
+
+  <!-- SPINE -->
+  <rect x="300" y="52" width="250" height="326" rx="20" fill="url(#sp)"/>
+  <text class="m" x="425" y="84" text-anchor="middle" font-size="11" font-weight="800" letter-spacing="2" fill="#7dd3fc">STACK METADATA</text>
+  <text x="425" y="112" text-anchor="middle" font-size="21" font-weight="800" fill="#fff">the graph</text>
+  <g>
+   <rect x="322" y="132" width="206" height="42" rx="11" fill="rgba(125,211,252,.1)" stroke="#2f3a5e"/>
+   <text x="425" y="158" text-anchor="middle" font-size="15" font-weight="800" fill="#dbe6ff">components</text>
+   <rect x="322" y="182" width="206" height="42" rx="11" fill="rgba(125,211,252,.1)" stroke="#2f3a5e"/>
+   <text x="425" y="208" text-anchor="middle" font-size="15" font-weight="800" fill="#dbe6ff">attributes</text>
+   <rect x="322" y="232" width="206" height="42" rx="11" fill="rgba(139,92,246,.22)" stroke="#8b5cf6"/>
+   <text x="425" y="258" text-anchor="middle" font-size="15" font-weight="800" fill="#fff">links</text>
+   <rect x="322" y="282" width="206" height="42" rx="11" fill="rgba(125,211,252,.1)" stroke="#2f3a5e"/>
+   <text x="425" y="308" text-anchor="middle" font-size="15" font-weight="800" fill="#dbe6ff">versions</text>
+  </g>
+  <text class="m" x="425" y="356" text-anchor="middle" font-size="12" font-weight="800" fill="#34d399">78 blueprints · 383 link types</text>
+
+  <!-- fan out -->
+  <g stroke="#94a3c4" stroke-width="2" fill="none" marker-end="url(#a2)">
+   <path class="flow" d="M554,150 C640,150 640,60 726,60"/>
+   <path class="flow" d="M554,180 C640,180 640,124 726,124"/>
+   <path class="flow" d="M554,205 C640,205 640,188 726,188"/>
+   <path class="flow" d="M554,228 C640,228 640,252 726,252"/>
+   <path class="flow" d="M554,252 C640,252 640,316 726,316"/>
+   <path class="flow" d="M554,282 C640,282 640,380 726,380"/>
+  </g>
+  <g>
+   <rect x="730" y="34" width="230" height="52" rx="13" fill="#fff" stroke="#cfd6e6"/><text x="752" y="66" font-size="16" font-weight="800">manifests</text>
+   <rect x="730" y="98" width="230" height="52" rx="13" fill="#fff" stroke="#cfd6e6"/><text x="752" y="130" font-size="16" font-weight="800">network policies</text>
+   <rect x="730" y="162" width="230" height="52" rx="13" fill="#fff" stroke="#cfd6e6"/><text x="752" y="194" font-size="16" font-weight="800">secrets · SSO</text>
+   <rect x="730" y="226" width="230" height="52" rx="13" fill="#fff" stroke="#cfd6e6"/><text x="752" y="258" font-size="16" font-weight="800">backups</text>
+   <rect x="730" y="290" width="230" height="52" rx="13" fill="#fff" stroke="#cfd6e6"/><text x="752" y="322" font-size="16" font-weight="800">dashboards</text>
+   <rect x="730" y="354" width="230" height="52" rx="13" fill="#f2fbf7" stroke="#10b981"/><text x="752" y="386" font-size="16" font-weight="800">evidence</text>
+  </g>
+
+  <!-- cluster -->
+  <rect x="1010" y="140" width="220" height="160" rx="18" fill="#fff" stroke="#cfd6e6" stroke-width="1.6"/>
+  <text class="m" x="1120" y="172" text-anchor="middle" font-size="11" font-weight="800" letter-spacing="2" fill="#0f766e">RUNTIME</text>
+  <text x="1120" y="202" text-anchor="middle" font-size="20" font-weight="800">cluster</text>
+  <g fill="#14b8a6" opacity=".85">
+   <rect x="1044" y="222" width="34" height="34" rx="8"/><rect x="1086" y="222" width="34" height="34" rx="8"/>
+   <rect x="1128" y="222" width="34" height="34" rx="8"/><rect x="1170" y="222" width="34" height="34" rx="8"/>
+   <rect x="1044" y="262" width="34" height="22" rx="6" opacity=".5"/><rect x="1086" y="262" width="34" height="22" rx="6" opacity=".5"/>
+   <rect x="1128" y="262" width="34" height="22" rx="6" opacity=".5"/><rect x="1170" y="262" width="34" height="22" rx="6" opacity=".5"/>
+  </g>
+  <g stroke="#94a3c4" stroke-width="2" fill="none" marker-end="url(#a2)"><path class="flow" d="M964,190 C990,190 990,210 1006,214"/></g>
+
+  <!-- evidence loop back -->
+  <path id="lp" d="M1120,304 V404 Q1120,420 1100,420 H445 Q425,420 425,400 V386" fill="none" stroke="#10b981" stroke-width="2.4" stroke-dasharray="7 7" marker-end="url(#a3)"><animate attributeName="stroke-dashoffset" from="0" to="-28" dur="1.1s" repeatCount="indefinite"/></path>
+  <circle r="5" fill="#10b981"><animateMotion dur="3.4s" repeatCount="indefinite"><mpath href="#lp"/></animateMotion></circle>
+  <rect x="620" y="404" width="300" height="32" rx="16" fill="#e8faf3" stroke="#10b981" stroke-opacity=".5"/>
+  <text class="m" x="770" y="425" text-anchor="middle" font-size="13" font-weight="800" fill="#047857">agent scans → evidence → graph</text>
+ </svg></div>
+
+ <div class="bot"><span>change the graph — <b>everything downstream re-derives</b></span><span class="br">STACKTIC · 2026</span></div>
+</div></section></div>
+
+<!-- 2 · ONE LINK -->
+<div class="frame"><section class="slide" style="--a:var(--sk)">
+<div class="bg"></div><div class="gx"></div><div class="pad">
+ <div class="top"><span class="lg">{ <b>STACKTIC</b> }</span><span class="kk">RELATIONSHIPS</span><span class="ix"><b>02</b> — 06</span></div>
+ <h1 class="rise">One link. <em>Nine artifacts.</em></h1>
+ <div class="hint rise d2">you declare <b>A → B</b> · the rest is generated</div>
+
+ <div class="viz rise d2"><svg viewBox="0 0 1240 420" preserveAspectRatio="xMidYMid meet">
+  <defs><marker id="b1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#0ea5e9"/></marker>
+   <marker id="b2" markerWidth="7" markerHeight="7" refX="5.6" refY="2.6" orient="auto"><path d="M0,0 L5.4,2.6 L0,5.2 Z" fill="#c3cbe0"/></marker></defs>
+
+  <!-- A -> B -->
+  <rect x="60" y="150" width="210" height="96" rx="18" fill="#fff" stroke="#0ea5e9" stroke-width="2"/>
+  <text class="m" x="165" y="182" text-anchor="middle" font-size="11" font-weight="800" letter-spacing="2" fill="#0284c7">COMPONENT A</text>
+  <text x="165" y="215" text-anchor="middle" font-size="24" font-weight="800">api</text>
+
+  <path class="flow" d="M276,198 H454" stroke="#0ea5e9" stroke-width="3.2" fill="none" marker-end="url(#b1)"/>
+  <rect x="300" y="150" width="132" height="30" rx="15" fill="#e6f6fe" stroke="#0ea5e9" stroke-opacity=".5"/>
+  <text class="m" x="366" y="170" text-anchor="middle" font-size="13" font-weight="800" fill="#0284c7">api—db</text>
+
+  <rect x="460" y="150" width="210" height="96" rx="18" fill="#fff" stroke="#0ea5e9" stroke-width="2"/>
+  <text class="m" x="565" y="182" text-anchor="middle" font-size="11" font-weight="800" letter-spacing="2" fill="#0284c7">COMPONENT B</text>
+  <text x="565" y="215" text-anchor="middle" font-size="24" font-weight="800">postgres</text>
+
+  <!-- derived fan -->
+  <g stroke="#c3cbe0" stroke-width="1.8" fill="none" marker-end="url(#b2)">
+   <path d="M676,178 C740,178 740,42 802,42"/><path d="M676,184 C740,184 740,100 802,100"/><path d="M676,190 C740,190 740,158 802,158"/>
+   <path d="M676,198 C740,198 740,216 802,216"/><path d="M676,206 C740,206 740,274 802,274"/><path d="M676,212 C740,212 740,332 802,332"/>
+   <path d="M676,218 C740,218 740,390 802,390"/>
+  </g>
+  <g>
+   <rect x="806" y="20" width="196" height="44" rx="12" fill="#fff" stroke="#dde3ef"/><text x="826" y="48" font-size="15" font-weight="700">credentials</text>
+   <rect x="806" y="78" width="196" height="44" rx="12" fill="#fff" stroke="#dde3ef"/><text x="826" y="106" font-size="15" font-weight="700">TLS</text>
+   <rect x="806" y="136" width="196" height="44" rx="12" fill="#fff" stroke="#dde3ef"/><text x="826" y="164" font-size="15" font-weight="700">network policy</text>
+   <rect x="806" y="194" width="196" height="44" rx="12" fill="#fff" stroke="#dde3ef"/><text x="826" y="222" font-size="15" font-weight="700">DNS · service</text>
+   <rect x="806" y="252" width="196" height="44" rx="12" fill="#fff" stroke="#dde3ef"/><text x="826" y="280" font-size="15" font-weight="700">grants</text>
+   <rect x="806" y="310" width="196" height="44" rx="12" fill="#fff" stroke="#dde3ef"/><text x="826" y="338" font-size="15" font-weight="700">metrics</text>
+   <rect x="806" y="368" width="196" height="44" rx="12" fill="#fff" stroke="#dde3ef"/><text x="826" y="396" font-size="15" font-weight="700">backup rule</text>
+  </g>
+
+  <!-- rotate demo -->
+  <rect x="1036" y="140" width="196" height="140" rx="16" fill="#fdf3e7" stroke="#f59e0b"/>
+  <text class="m" x="1134" y="172" text-anchor="middle" font-size="11" font-weight="800" letter-spacing="1.6" fill="#b45309">CHANGE ONE</text>
+  <text x="1134" y="204" text-anchor="middle" font-size="19" font-weight="800">rotate</text>
+  <text x="1134" y="230" text-anchor="middle" font-size="19" font-weight="800">password</text>
+  <text class="m" x="1134" y="260" text-anchor="middle" font-size="12" font-weight="800" fill="#b45309">→ all 7 re-derive</text>
+ </svg></div>
+
+ <div class="bot"><span>the link is the unit of truth — <b>not the file</b></span><span class="br">STACKTIC · 2026</span></div>
+</div></section></div>
+
+<!-- 3 · AI ALONE vs GRAPH -->
+<div class="frame"><section class="slide" style="--a:var(--ro)">
+<div class="bg"></div><div class="gx"></div><div class="pad">
+ <div class="top"><span class="lg">{ <b>STACKTIC</b> }</span><span class="kk">WHAT EACH SEES</span><span class="ix"><b>03</b> — 06</span></div>
+ <h1 class="rise">AI sees <em>one node.</em></h1>
+ <div class="hint rise d2">the blast radius is the whole graph</div>
+
+ <div class="viz rise d2"><svg viewBox="0 0 1240 400" preserveAspectRatio="xMidYMid meet">
+  <g stroke="#e2e6f0" stroke-width="1.6" fill="none">
+   <path d="M120,90 L250,60 M250,60 L390,110 M120,90 L200,210 M200,210 L340,180 M340,180 L470,240 M250,60 L340,180 M200,210 L300,330 M300,330 L440,320 M470,240 L440,320 M120,300 L200,210 M120,300 L300,330"/>
+  </g>
+  <g fill="#e2e6f0"><circle cx="120" cy="90" r="14"/><circle cx="250" cy="60" r="14"/><circle cx="390" cy="110" r="14"/><circle cx="200" cy="210" r="14"/><circle cx="470" cy="240" r="14"/><circle cx="300" cy="330" r="14"/><circle cx="440" cy="320" r="14"/><circle cx="120" cy="300" r="14"/></g>
+  <circle cx="340" cy="180" r="26" fill="#f43f5e"/><circle cx="340" cy="180" r="38" fill="none" stroke="#f43f5e" stroke-width="2" opacity=".4"/>
+  <text class="m" x="340" y="238" text-anchor="middle" font-size="13" font-weight="800" fill="#9f1239">the only thing it sees</text>
+  <text class="m" x="300" y="384" text-anchor="middle" font-size="14" font-weight="800" letter-spacing="2" fill="#9f1239">AI ALONE</text>
+
+  <path d="M620,40 V360" stroke="#dde3ef" stroke-width="1.5" stroke-dasharray="5 7"/>
+
+  <g stroke="#10b981" stroke-width="2" fill="none" opacity=".75">
+   <path class="flow" d="M790,90 L920,60 M920,60 L1060,110 M790,90 L870,210 M870,210 L1010,180 M1010,180 L1140,240 M920,60 L1010,180 M870,210 L970,330 M970,330 L1110,320 M1140,240 L1110,320 M790,300 L870,210 M790,300 L970,330"/>
+  </g>
+  <g fill="#10b981"><circle cx="790" cy="90" r="14"/><circle cx="920" cy="60" r="14"/><circle cx="1060" cy="110" r="14"/><circle cx="870" cy="210" r="14"/><circle cx="1140" cy="240" r="14"/><circle cx="970" cy="330" r="14"/><circle cx="1110" cy="320" r="14"/><circle cx="790" cy="300" r="14"/></g>
+  <circle cx="1010" cy="180" r="26" fill="#059669"/><circle cx="1010" cy="180" r="38" fill="none" stroke="#10b981" stroke-width="2" opacity=".5"/>
+  <text class="m" x="1010" y="238" text-anchor="middle" font-size="13" font-weight="800" fill="#047857">and everything it touches</text>
+  <text class="m" x="970" y="384" text-anchor="middle" font-size="14" font-weight="800" letter-spacing="2" fill="#047857">WITH STACKTIC</text>
+ </svg></div>
+
+ <div class="bot"><span>same model · <b>different field of view</b></span><span class="br">STACKTIC · 2026</span></div>
+</div></section></div>
+
+<!-- 4 · THE LOOP -->
+<div class="frame"><section class="slide" style="--a:var(--sk)">
+<div class="bg"></div><div class="gx"></div><div class="pad">
+ <div class="top"><span class="lg">{ <b>STACKTIC</b> }</span><span class="kk">THE LOOP</span><span class="ix"><b>04</b> — 06</span></div>
+ <h1 class="rise">Prompt in. <em>Proof out.</em></h1>
+ <div class="hint rise d2">six steps · every task · same path</div>
+
+ <div class="viz rise d2"><svg viewBox="0 0 1240 380" preserveAspectRatio="xMidYMid meet">
+  <defs><marker id="c1" markerWidth="8" markerHeight="8" refX="6.4" refY="3" orient="auto"><path d="M0,0 L6.6,3 L0,6 Z" fill="#94a3c4"/></marker>
+   <marker id="c2" markerWidth="8" markerHeight="8" refX="6.4" refY="3" orient="auto"><path d="M0,0 L6.6,3 L0,6 Z" fill="#10b981"/></marker>
+   <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b2540"/><stop offset="1" stop-color="#0b1220"/></linearGradient></defs>
+
+  <g stroke="#94a3c4" stroke-width="2.4" fill="none" marker-end="url(#c1)">
+   <path id="q1" d="M156,110 H188"/><path id="q2" d="M356,110 H388"/><path id="q3" d="M556,110 H588"/>
+   <path id="q4" d="M756,110 H788"/><path id="q5" d="M956,110 H988"/>
+  </g>
+  <g fill="#0ea5e9">
+   <circle r="4.5"><animateMotion dur="1.3s" repeatCount="indefinite"><mpath href="#q1"/></animateMotion></circle>
+   <circle r="4.5"><animateMotion dur="1.3s" repeatCount="indefinite" begin=".2s"><mpath href="#q2"/></animateMotion></circle>
+   <circle r="4.5"><animateMotion dur="1.3s" repeatCount="indefinite" begin=".4s"><mpath href="#q3"/></animateMotion></circle>
+   <circle r="4.5"><animateMotion dur="1.3s" repeatCount="indefinite" begin=".6s"><mpath href="#q4"/></animateMotion></circle>
+   <circle r="4.5"><animateMotion dur="1.3s" repeatCount="indefinite" begin=".8s"><mpath href="#q5"/></animateMotion></circle>
+  </g>
+
+  <g>
+   <rect x="24" y="62" width="132" height="96" rx="20" fill="#fff" stroke="#c9cffa" stroke-width="1.8"/>
+   <text x="90" y="118" text-anchor="middle" font-size="20" font-weight="800">prompt</text>
+   <text class="m" x="90" y="182" text-anchor="middle" font-size="12" fill="#5c6785">any AI</text>
+
+   <rect x="192" y="52" width="164" height="116" rx="20" fill="url(#cg)"/>
+   <text x="274" y="118" text-anchor="middle" font-size="20" font-weight="800" fill="#fff">stacktic</text>
+   <text class="m" x="274" y="182" text-anchor="middle" font-size="12" fill="#5c6785">graph → blueprint</text>
+
+   <rect x="392" y="62" width="164" height="96" rx="20" fill="#fff" stroke="#c9cffa" stroke-width="1.8"/>
+   <text x="474" y="118" text-anchor="middle" font-size="20" font-weight="800">code</text>
+   <text class="m" x="474" y="182" text-anchor="middle" font-size="12" fill="#5c6785">your git</text>
+
+   <rect x="592" y="62" width="164" height="96" rx="20" fill="#fff" stroke="#f5c983" stroke-width="1.8"/>
+   <text x="674" y="118" text-anchor="middle" font-size="20" font-weight="800">agent</text>
+   <text class="m" x="674" y="182" text-anchor="middle" font-size="12" fill="#5c6785">in-cluster</text>
+
+   <rect x="792" y="62" width="164" height="96" rx="20" fill="#fff" stroke="#a5e3da" stroke-width="1.8"/>
+   <text x="874" y="118" text-anchor="middle" font-size="20" font-weight="800">cluster</text>
+   <text class="m" x="874" y="182" text-anchor="middle" font-size="12" fill="#5c6785">sync</text>
+
+   <rect x="992" y="52" width="180" height="116" rx="20" fill="#f2fbf7" stroke="#10b981" stroke-width="2"/>
+   <text x="1082" y="118" text-anchor="middle" font-size="20" font-weight="800">proof</text>
+   <text class="m" x="1082" y="182" text-anchor="middle" font-size="12" fill="#047857">scored · signed</text>
+  </g>
+
+  <!-- gate -->
+  <g transform="translate(574,110)">
+   <circle r="19" fill="#fff" stroke="#f59e0b" stroke-width="2.4"/>
+   <path d="M0,-9 L8,-5.5 V1 C8,6 4,9.5 0,11 C-4,9.5 -8,6 -8,1 V-5.5 Z" fill="#f59e0b"/>
+   <text class="m" y="40" text-anchor="middle" font-size="11" font-weight="800" fill="#b45309">GATE</text>
+  </g>
+
+  <path id="lp2" d="M1082,176 V286 Q1082,304 1062,304 H110 Q90,304 90,286 V174" fill="none" stroke="#10b981" stroke-width="2.4" stroke-dasharray="7 7" marker-end="url(#c2)"><animate attributeName="stroke-dashoffset" from="0" to="-28" dur="1.1s" repeatCount="indefinite"/></path>
+  <circle r="5" fill="#10b981"><animateMotion dur="3.6s" repeatCount="indefinite"><mpath href="#lp2"/></animateMotion></circle>
+  <rect x="452" y="288" width="290" height="32" rx="16" fill="#e8faf3" stroke="#10b981" stroke-opacity=".5"/>
+  <text class="m" x="597" y="309" text-anchor="middle" font-size="13" font-weight="800" fill="#047857">state + evidence → the graph</text>
+ </svg></div>
+
+ <div class="bot"><span>nothing invented in the middle · <b>nothing unchecked at the end</b></span><span class="br">STACKTIC · 2026</span></div>
+</div></section></div>
+
+<!-- 5 · EVIDENCE -->
+<div class="frame"><section class="slide" style="--a:var(--em)">
+<div class="bg"></div><div class="gx"></div><div class="pad">
+ <div class="top"><span class="lg">{ <b>STACKTIC</b> }</span><span class="kk">AUDIT</span><span class="ix"><b>05</b> — 06</span></div>
+ <h1 class="rise">Compliance is <em>a file.</em></h1>
+ <div class="hint rise d2">not a promise · not a PDF · not a chat log</div>
+
+ <div class="viz rise d2"><svg viewBox="0 0 1240 400" preserveAspectRatio="xMidYMid meet">
+  <defs><marker id="e1" markerWidth="8" markerHeight="8" refX="6.4" refY="3" orient="auto"><path d="M0,0 L6.6,3 L0,6 Z" fill="#10b981"/></marker></defs>
+
+  <rect x="20" y="120" width="220" height="160" rx="18" fill="#fff" stroke="#cfd6e6" stroke-width="1.6"/>
+  <text class="m" x="130" y="152" text-anchor="middle" font-size="11" font-weight="800" letter-spacing="2" fill="#0f766e">RUNTIME</text>
+  <text x="130" y="186" text-anchor="middle" font-size="22" font-weight="800">cluster</text>
+  <g fill="#14b8a6" opacity=".85">
+   <rect x="46" y="206" width="36" height="36" rx="9"/><rect x="92" y="206" width="36" height="36" rx="9"/>
+   <rect x="138" y="206" width="36" height="36" rx="9"/><rect x="184" y="206" width="36" height="36" rx="9"/>
+   <rect x="46" y="248" width="36" height="20" rx="6" opacity=".5"/><rect x="92" y="248" width="36" height="20" rx="6" opacity=".5"/>
+   <rect x="138" y="248" width="36" height="20" rx="6" opacity=".5"/><rect x="184" y="248" width="36" height="20" rx="6" opacity=".5"/>
+  </g>
+
+  <path class="flow" d="M246,200 H336" stroke="#10b981" stroke-width="3" fill="none" marker-end="url(#e1)"/>
+
+  <rect x="342" y="120" width="230" height="160" rx="18" fill="#0b1220"/>
+  <text class="m" x="457" y="152" text-anchor="middle" font-size="11" font-weight="800" letter-spacing="2" fill="#7dd3fc">STACK AGENT</text>
+  <text x="457" y="188" text-anchor="middle" font-size="22" font-weight="800" fill="#fff">scan</text>
+  <g><rect x="366" y="208" width="182" height="26" rx="8" fill="rgba(125,211,252,.12)"/><text class="m" x="457" y="226" text-anchor="middle" font-size="12" font-weight="700" fill="#dbe6ff">health · security</text>
+     <rect x="366" y="240" width="182" height="26" rx="8" fill="rgba(125,211,252,.12)"/><text class="m" x="457" y="258" text-anchor="middle" font-size="12" font-weight="700" fill="#dbe6ff">PCI · ISO · drift</text></g>
+
+  <path class="flow" d="M578,200 H668" stroke="#10b981" stroke-width="3" fill="none" marker-end="url(#e1)"/>
+
+  <rect x="674" y="120" width="230" height="160" rx="18" fill="#f2fbf7" stroke="#10b981" stroke-width="2"/>
+  <text class="m" x="789" y="152" text-anchor="middle" font-size="11" font-weight="800" letter-spacing="2" fill="#047857">SCORED</text>
+  <text x="789" y="196" text-anchor="middle" font-size="44" font-weight="800" fill="#047857">94</text>
+  <text class="m" x="789" y="220" text-anchor="middle" font-size="12" fill="#41695e">per control</text>
+  <g><rect x="700" y="238" width="178" height="10" rx="5" fill="#d7f0e5"/><rect x="700" y="238" width="167" height="10" rx="5" fill="#10b981"/>
+     <rect x="700" y="254" width="178" height="10" rx="5" fill="#d7f0e5"/><rect x="700" y="254" width="142" height="10" rx="5" fill="#10b981"/></g>
+
+  <path class="flow" d="M910,200 H1000" stroke="#10b981" stroke-width="3" fill="none" marker-end="url(#e1)"/>
+
+  <rect x="1006" y="120" width="214" height="160" rx="18" fill="#fff" stroke="#cfd6e6" stroke-width="1.6"/>
+  <text class="m" x="1113" y="152" text-anchor="middle" font-size="11" font-weight="800" letter-spacing="2" fill="#5c6785">COMMITTED</text>
+  <text x="1113" y="188" text-anchor="middle" font-size="22" font-weight="800">your git</text>
+  <g stroke="#8b5cf6" stroke-width="2.4" fill="none"><circle cx="1054" cy="230" r="9"/><circle cx="1054" cy="262" r="9"/><path d="M1054,239 V253"/></g>
+  <text class="m" x="1078" y="235" font-size="12" font-weight="700" fill="#5c6785">dated</text>
+  <text class="m" x="1078" y="267" font-size="12" font-weight="700" fill="#5c6785">diffable</text>
+
+  <text class="m" x="620" y="342" text-anchor="middle" font-size="15" font-weight="800" fill="#047857">every change · not every quarter</text>
+ </svg></div>
+
+ <div class="bot"><span>the auditor gets <b>an artifact</b>, not an opinion</span><span class="br">STACKTIC · 2026</span></div>
+</div></section></div>
+
+<!-- 6 · ZERO LOCK-IN -->
+<div class="frame"><section class="slide" style="--a:var(--em)">
+<div class="bg"></div><div class="gx"></div><div class="pad">
+ <div class="top"><span class="lg">{ <b>STACKTIC</b> }</span><span class="kk">SOVEREIGNTY</span><span class="ix"><b>06</b> — 06</span></div>
+ <h1 class="rise">Open underneath. <em>Zero lock-in.</em></h1>
+ <div class="hint rise d2">one graph · every target</div>
+
+ <div class="viz rise d2"><svg viewBox="0 0 1240 400" preserveAspectRatio="xMidYMid meet">
+  <defs><marker id="f1" markerWidth="8" markerHeight="8" refX="6.4" refY="3" orient="auto"><path d="M0,0 L6.6,3 L0,6 Z" fill="#10b981"/></marker></defs>
+  <rect x="40" y="150" width="250" height="110" rx="20" fill="#0b1220"/>
+  <text class="m" x="165" y="184" text-anchor="middle" font-size="11" font-weight="800" letter-spacing="2" fill="#7dd3fc">78 OSS BLUEPRINTS</text>
+  <text x="165" y="220" text-anchor="middle" font-size="24" font-weight="800" fill="#fff">your graph</text>
+  <text class="m" x="165" y="244" text-anchor="middle" font-size="12" fill="#9fb0d8">plain YAML · your repo</text>
+
+  <g stroke="#10b981" stroke-width="2.2" fill="none" marker-end="url(#f1)" opacity=".85">
+   <path class="flow" d="M296,178 C400,178 400,42 512,42"/>
+   <path class="flow" d="M296,192 C400,192 400,116 512,116"/>
+   <path class="flow" d="M296,205 C400,205 400,190 512,190"/>
+   <path class="flow" d="M296,218 C400,218 400,264 512,264"/>
+   <path class="flow" d="M296,232 C400,232 400,338 512,338"/>
+  </g>
+  <g>
+   <rect x="518" y="18" width="240" height="48" rx="13" fill="#fff" stroke="#cfd6e6"/><text x="542" y="49" font-size="17" font-weight="700">AWS</text>
+   <rect x="518" y="92" width="240" height="48" rx="13" fill="#fff" stroke="#cfd6e6"/><text x="542" y="123" font-size="17" font-weight="700">Azure</text>
+   <rect x="518" y="166" width="240" height="48" rx="13" fill="#fff" stroke="#cfd6e6"/><text x="542" y="197" font-size="17" font-weight="700">GCP</text>
+   <rect x="518" y="240" width="240" height="48" rx="13" fill="#fff" stroke="#cfd6e6"/><text x="542" y="271" font-size="17" font-weight="700">on-premise</text>
+   <rect x="518" y="314" width="240" height="48" rx="13" fill="#fff" stroke="#cfd6e6"/><text x="542" y="345" font-size="17" font-weight="700">air-gapped</text>
+  </g>
+
+  <g>
+   <rect x="828" y="18" width="192" height="160" rx="18" fill="#f2fbf7" stroke="#10b981" stroke-width="2"/>
+   <text x="924" y="94" text-anchor="middle" font-size="52" font-weight="800" fill="#047857">−70%</text>
+   <text class="m" x="924" y="126" text-anchor="middle" font-size="14" font-weight="700" fill="#41695e">cost</text>
+
+   <rect x="1040" y="18" width="192" height="160" rx="18" fill="#eef6fe" stroke="#0ea5e9" stroke-width="2"/>
+   <text x="1136" y="94" text-anchor="middle" font-size="52" font-weight="800" fill="#0284c7">80%</text>
+   <text class="m" x="1136" y="126" text-anchor="middle" font-size="14" font-weight="700" fill="#3f5f74">faster</text>
+
+   <rect x="828" y="202" width="192" height="160" rx="18" fill="#f5f1fe" stroke="#8b5cf6" stroke-width="2"/>
+   <text x="924" y="278" text-anchor="middle" font-size="52" font-weight="800" fill="#6d3fd0">100%</text>
+   <text class="m" x="924" y="310" text-anchor="middle" font-size="14" font-weight="700" fill="#5a5074">yours</text>
+
+   <rect x="1040" y="202" width="192" height="160" rx="18" fill="#fef1f4" stroke="#f43f5e" stroke-width="2"/>
+   <text x="1136" y="278" text-anchor="middle" font-size="52" font-weight="800" fill="#be123c">0</text>
+   <text class="m" x="1136" y="310" text-anchor="middle" font-size="14" font-weight="700" fill="#7c4356">lock-in</text>
+  </g>
+ </svg></div>
+
+ <div class="bot"><span>if we vanish, <b>your stack keeps running</b> · stacktic.io</span><span class="br">STACKTIC · 2026</span></div>
+</div></section></div>
+
+</div>
+
+<div class="nav"><button id="prev">←</button><div id="dots" style="display:flex;gap:5px"></div><button id="next">→</button></div>
+<script>
+(function(){var deck=document.getElementById('deck'),F=[].slice.call(document.querySelectorAll('.frame')),D=document.getElementById('dots');
+F.forEach(function(f,i){var b=document.createElement('button');b.className='nd';b.textContent=i+1;b.onclick=function(){f.scrollIntoView({behavior:'smooth',inline:'center'})};D.appendChild(b)});
+var N=[].slice.call(D.children),c=0;
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){c=F.indexOf(e.target);e.target.classList.add('live');N.forEach(function(d,j){d.classList.toggle('on',j===c)})}})},{root:deck,threshold:.5});F.forEach(function(f){io.observe(f)});
+function go(d){c=Math.max(0,Math.min(F.length-1,c+d));F[c].scrollIntoView({behavior:'smooth',inline:'center'})}
+document.getElementById('next').onclick=function(){go(1)};document.getElementById('prev').onclick=function(){go(-1)};
+addEventListener('keydown',function(e){if(['ArrowRight','ArrowDown',' '].indexOf(e.key)>-1){e.preventDefault();go(1)}if(['ArrowLeft','ArrowUp'].indexOf(e.key)>-1){e.preventDefault();go(-1)}});
+})();
+</script></body></html>

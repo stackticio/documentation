@@ -362,3 +362,35 @@ div[class^='codeBlockContainer'] {
   .stk-hero { padding: 1.7rem 1.2rem; border-radius: 16px; }
   .markdown h1 { font-size: 2rem; }
 }
+
+/* Visual explainer link ------------------------------------------------------ */
+.stk-explainer {
+  display: flex; align-items: center; gap: 1rem;
+  margin: 1.6rem 0 2rem; padding: 1.15rem 1.3rem;
+  border: 1px solid var(--stk-hair); border-radius: 16px;
+  background:
+    radial-gradient(600px 120px at 8% 0%, rgba(77,150,255,.14), transparent 70%),
+    var(--stk-panel);
+  text-decoration: none !important; color: inherit;
+  transition: border-color .18s ease, transform .18s ease;
+}
+.stk-explainer:hover { border-color: rgba(77,150,255,.6); transform: translateY(-2px); }
+.stk-explainer-play {
+  flex: 0 0 auto; display: grid; place-items: center;
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 1px solid rgba(77,150,255,.5); color: var(--stk-blue);
+  background: var(--stk-panel-2);
+}
+.stk-explainer-text { display: block; flex: 1 1 auto; min-width: 0; }
+.stk-explainer-kicker {
+  display: block; font-family: var(--ifm-font-family-monospace);
+  font-size: .67rem; letter-spacing: .13em; text-transform: uppercase;
+  color: var(--stk-blue); margin-bottom: .3rem;
+}
+.stk-explainer-title {
+  display: block; font-weight: 600; font-size: 1.02rem;
+  color: var(--ifm-heading-color); letter-spacing: -.01em; margin-bottom: .22rem;
+}
+.stk-explainer-body { display: block; font-size: .88rem; color: var(--stk-muted); line-height: 1.5; }
+.stk-explainer-go { flex: 0 0 auto; color: var(--stk-steel); font-size: 1.1rem; }
+@media (max-width: 640px) { .stk-explainer { flex-wrap: wrap; } }

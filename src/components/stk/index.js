@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from '@docusaurus/Link';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
 export function Hero({eyebrow, title, children}) {
   return (
@@ -83,5 +84,24 @@ export function Side({tone, head, children}) {
       <div className="stk-split-head">{head}</div>
       {children}
     </div>
+  );
+}
+
+export function Explainer({href, title, slides, children}) {
+  const url = useBaseUrl(href);
+  return (
+    <a className="stk-explainer" href={url} target="_blank" rel="noopener noreferrer">
+      <span className="stk-explainer-play" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
+      </span>
+      <span className="stk-explainer-text">
+        <span className="stk-explainer-kicker">
+          Visual explainer{slides ? ` · ${slides} slides` : ''}
+        </span>
+        <span className="stk-explainer-title">{title}</span>
+        <span className="stk-explainer-body">{children}</span>
+      </span>
+      <span className="stk-explainer-go" aria-hidden="true">↗</span>
+    </a>
   );
 }

@@ -1,0 +1,1211 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stacktic — Intro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Instrument+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════════
+   STACKTIC · INTRO · 8 slides on white
+   The rule for every slide: the DIAGRAM is the slide. One headline,
+   one line under it, then the figure takes the frame — ported from
+   website-v3 at full density, still animated.
+   ═══════════════════════════════════════════════════════════════════ */
+:root{
+  --page:#fff; --card:#fff;
+  --ink:#0B1B2E; --mut:#566782; --faint:#93A2B8;
+  --line:#E6EAF2; --line2:#D8DEEA; --wash:#F6F8FC;
+  --blue:#2F6FE0;  --blue2:#4D96FF; --blueW:#EBF2FE;
+  --mint:#0F9D76;  --mint2:#6EE7B7; --mintW:#E8F8F2;
+  --amber:#B8790A; --amber2:#F9C22B; --amberW:#FEF6E4;
+  --red:#DC3A57;   --redW:#FDEDF0;
+  --plum:#7C4DEB;  --plumW:#F1ECFE;
+  --steel:#64748B; --claude:#D97757; --git:#F05032;
+  --disp:'Fraunces',Georgia,'Times New Roman',serif;
+  --sans:'Instrument Sans',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Helvetica,sans-serif;
+  --mono:'Fira Code',ui-monospace,'SF Mono',Menlo,monospace;
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001s!important;transition:none!important}}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:var(--page);font-family:var(--sans);color:var(--ink);
+  -webkit-font-smoothing:antialiased;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+
+.deck{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;height:100vh;scrollbar-width:none}
+.deck::-webkit-scrollbar{display:none}
+.frame{flex:0 0 100%;height:100vh;scroll-snap-align:center;display:flex;align-items:center;
+  justify-content:center;padding:2.2vh 2.2vw}
+.slide{position:relative;width:min(1340px,96vw);aspect-ratio:16/9;max-height:94vh;border-radius:20px;
+  overflow:hidden;background:var(--card);border:1px solid var(--line);
+  box-shadow:0 40px 90px -56px rgba(11,27,46,.45);container-type:inline-size;--u:1cqw;
+  display:flex;flex-direction:column}
+.tint{position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(46% 56% at 92% 4%,color-mix(in srgb,var(--acc) 10%,transparent),transparent 70%),
+             radial-gradient(42% 54% at 2% 100%,color-mix(in srgb,var(--acc) 6%,transparent),transparent 70%)}
+.rule{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.6;
+  background-image:linear-gradient(rgba(11,27,46,.028) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(11,27,46,.028) 1px,transparent 1px);
+  background-size:46px 46px;
+  -webkit-mask-image:radial-gradient(92% 92% at 50% 40%,#000,transparent 92%);
+  mask-image:radial-gradient(92% 92% at 50% 40%,#000,transparent 92%)}
+.pad{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;
+  padding:calc(var(--u)*1.9) calc(var(--u)*3) calc(var(--u)*1.5);min-height:0}
+
+.chrome{display:flex;justify-content:space-between;align-items:flex-start}
+.eyebrow{display:flex;align-items:center;gap:calc(var(--u)*.9);font-family:var(--mono);
+  font-size:calc(var(--u)*.96)}
+.logo{letter-spacing:.14em;color:var(--faint)}.logo b{color:var(--ink);font-weight:600}
+.tick{width:calc(var(--u)*2.4);height:1px;background:linear-gradient(90deg,var(--acc),transparent)}
+.kicker{letter-spacing:.26em;font-weight:600;color:var(--acc);text-transform:uppercase}
+.idx{font-family:var(--mono);font-size:calc(var(--u)*.96);color:var(--faint);text-align:right;
+  line-height:1.7}.idx b{color:var(--acc);font-weight:600}
+
+h1{font-family:var(--disp);font-weight:600;font-optical-sizing:auto;
+  font-variation-settings:'opsz' 120;letter-spacing:-.018em;line-height:1.04;
+  margin:calc(var(--u)*.85) 0 0;font-size:calc(var(--u)*3.15);text-wrap:balance}
+h1 em{font-style:normal;color:var(--acc)}
+h1 .sub{display:block;font-family:var(--sans);font-weight:400;color:var(--mut);
+  font-size:calc(var(--u)*1.32);margin-top:.4em;letter-spacing:-.004em;line-height:1.4;
+  text-wrap:balance;max-width:82%}
+h1 .sub b{color:var(--ink);font-weight:600}
+
+.body{position:relative;flex:1;min-height:0;display:flex;margin-top:calc(var(--u)*1)}
+.foot{display:flex;justify-content:space-between;align-items:baseline;margin-top:auto;
+  padding-top:calc(var(--u)*.8);border-top:1px solid var(--line)}
+.foot .q{font-family:var(--mono);font-size:calc(var(--u)*1);color:var(--mut)}
+.foot .q i{font-style:normal;color:var(--acc);margin-right:.55em;font-weight:600}
+.foot .q b{color:var(--ink);font-weight:600}
+.foot .brand{font-family:var(--mono);font-size:calc(var(--u)*.8);color:var(--faint);
+  letter-spacing:.12em}
+
+.rise{opacity:0;transform:translateY(14px)}
+.frame.live .rise{animation:rise .62s cubic-bezier(.2,.8,.25,1) both}
+.frame.live .d1{animation-delay:.04s}.frame.live .d2{animation-delay:.12s}
+.frame.live .d3{animation-delay:.21s}.frame.live .d4{animation-delay:.3s}
+@keyframes rise{to{opacity:1;transform:none}}
+
+svg.fig{width:100%;height:100%;display:block;overflow:visible}
+
+/* ── figure life. every slide moves. ── */
+.glow{animation:glow 3.2s ease-in-out infinite}
+@keyframes glow{0%,100%{opacity:.55}50%{opacity:1}}
+.flow{stroke-dasharray:8 7;animation:flow 1.5s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-30}}
+.pzp{animation:pzw 5.2s var(--wd,0s) ease-in-out infinite}
+@keyframes pzw{0%,58%,100%{stroke:var(--line2)}66%,84%{stroke:var(--amber2)}}
+.pzt{animation:pzt 5.2s var(--wd,0s) ease-in-out infinite}
+@keyframes pzt{0%,58%,100%{fill:#93A2B8}66%,84%{fill:#0B1B2E}}
+.bad{animation:bad 4.4s var(--bd,0s) ease-in-out infinite}
+@keyframes bad{0%,70%,100%{fill:#FBDDE3}78%,90%{fill:#F1889B}}
+.ok{animation:okp 4.4s var(--bd,0s) ease-in-out infinite}
+@keyframes okp{0%,70%,100%{fill:#D9F3E9}78%,90%{fill:#8FE0C6}}
+.mach{animation:mach 4.2s var(--md,0s) ease-in-out infinite}
+@keyframes mach{0%,58%,100%{fill:#F1F5FA;stroke:#DCE4EE}
+  68%,80%{fill:#C9F0E2;stroke:#0F9D76}}
+.stp{animation:stp 7.5s var(--sd,0s) ease-in-out infinite}
+@keyframes stp{0%,86%,100%{r:9}92%{r:12.5}}
+
+/* ops chips (slide 7) */
+.ops{display:flex;flex-wrap:wrap;gap:calc(var(--u)*.55);justify-content:center;
+  margin-top:calc(var(--u)*.8)}
+.ops span{display:inline-flex;align-items:center;gap:.55em;font-family:var(--mono);
+  font-size:calc(var(--u)*.86);color:var(--mut);padding:calc(var(--u)*.5) calc(var(--u)*.95);
+  border-radius:9px;border:1px solid var(--line2);background:#fff;
+  animation:opsR 4.2s calc(var(--i)*.42s) ease-in-out infinite}
+.ops span::before{content:'';width:calc(var(--u)*.42);height:calc(var(--u)*.42);
+  border-radius:50%;background:var(--faint);
+  animation:opsD 4.2s calc(var(--i)*.42s) ease-in-out infinite}
+@keyframes opsR{0%,62%,100%{border-color:var(--line2);color:var(--mut)}
+  70%,84%{border-color:var(--mint);color:var(--ink)}}
+@keyframes opsD{0%,62%,100%{background:var(--faint)}70%,84%{background:var(--mint)}}
+
+/* use-case cards (slide 8) */
+.uc{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(var(--u)*1.1);width:100%}
+.k{border:1px solid color-mix(in srgb,var(--t) 26%,var(--line));border-radius:calc(var(--u)*1);
+  padding:calc(var(--u)*1.05) calc(var(--u)*1.15);display:flex;flex-direction:column;
+  gap:calc(var(--u)*.34);min-height:0;
+  background:linear-gradient(165deg,color-mix(in srgb,var(--t) 6%,#fff),#fff)}
+.k .kk{font-family:var(--mono);font-size:calc(var(--u)*.78);letter-spacing:.18em;
+  text-transform:uppercase;color:var(--t);font-weight:600}
+.k h3{font-family:var(--disp);font-weight:600;font-size:calc(var(--u)*1.4);
+  letter-spacing:-.012em;line-height:1.1}
+.k svg{width:100%;height:calc(var(--u)*12);display:block;margin:calc(var(--u)*.3) 0 calc(var(--u)*.5)}
+.k p{font-size:calc(var(--u)*.92);line-height:1.42;color:var(--mut)}
+.k p b{color:var(--t);font-weight:600;font-family:var(--mono);font-size:calc(var(--u)*.78);
+  letter-spacing:.1em;text-transform:uppercase;margin-right:.3em}
+.k .rcp{margin-top:auto;font-family:var(--mono);font-size:calc(var(--u)*.72);
+  color:var(--faint);line-height:1.5;padding-top:calc(var(--u)*.55);
+  border-top:1px dashed var(--line2)}
+
+.nav{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;display:flex;
+  align-items:center;gap:9px;background:rgba(255,255,255,.94);border:1px solid var(--line2);
+  border-radius:40px;padding:6px 11px;backdrop-filter:blur(12px);
+  box-shadow:0 12px 30px -16px rgba(11,27,46,.4)}
+.nav button{font-family:var(--mono);font-size:15px;color:var(--mut);background:transparent;
+  border:none;cursor:pointer;padding:2px 8px;border-radius:8px}
+.nav button:hover{color:var(--ink);background:var(--wash)}
+.navdots{display:flex;gap:5px}
+.nd{width:25px;height:25px;border-radius:8px;background:var(--wash);border:1px solid var(--line2);
+  color:var(--mut);font-family:var(--mono);font-size:11.5px;font-weight:600;cursor:pointer;
+  transition:.2s}
+.nd:hover{color:var(--ink)}
+.nd.on{background:var(--ink);border-color:var(--ink);color:#fff}
+
+@media print{
+  @page{size:1340px 754px;margin:0}
+  .nav{display:none}
+  .deck{display:block;height:auto;overflow:visible}
+  .frame{height:auto;padding:0;page-break-after:always}
+  .slide{width:1340px;max-height:none;border-radius:0;border:0;box-shadow:none}
+  .rise{opacity:1!important;transform:none!important;animation:none!important}
+}
+@media (max-width:820px){
+  .slide{aspect-ratio:auto;height:88vh}
+  h1{font-size:calc(var(--u)*4.2)}
+  h1 .sub{font-size:calc(var(--u)*1.9);max-width:100%}
+  .uc{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<!-- 01 · THE IDEA -->
+<div class="frame"><section class="slide" style="--acc:var(--blue)">
+  <div class="tint"></div><div class="rule"></div>
+  <div class="pad">
+    <div class="chrome rise d1">
+      <div class="eyebrow"><span class="logo">{ <b>STACKTIC</b> }</span><span class="tick"></span>
+        <span class="kicker">The idea</span></div>
+      <div class="idx"><b>01</b> — 09<br><span style="color:var(--faint)">what it is</span></div>
+    </div>
+    <h1 class="rise d2">Graph the system. <em>Automate everything.</em>
+      <span class="sub">Stacktic turns every layer of a complex application into a
+        <b>connected, machine-readable graph</b> — giving AI the context to architect, secure,
+        deploy, operate and validate the entire system autonomously.</span></h1>
+    <div class="body rise d3"><svg class="fig" id="f1"></svg></div>
+    <div class="foot rise d4">
+      <span class="q"><i>→</i>Six layers · <b>one graph</b> · every relation typed, every change versioned</span>
+      <span class="brand">79 COMPONENTS · 404 TYPED RELATIONS</span></div>
+  </div>
+</section></div>
+
+<!-- 02 · THE PROBLEM -->
+<div class="frame"><section class="slide" style="--acc:var(--amber)">
+  <div class="tint"></div><div class="rule"></div>
+  <div class="pad">
+    <div class="chrome rise d1">
+      <div class="eyebrow"><span class="logo">{ <b>STACKTIC</b> }</span><span class="tick"></span>
+        <span class="kicker">The problem</span></div>
+      <div class="idx"><b>02</b> — 09<br><span style="color:var(--faint)">one real change</span></div>
+    </div>
+    <h1 class="rise d2">One prompt. <em>Look at what it actually moves.</em>
+      <span class="sub">The AI wires a service to a topic, a bucket and a database — perfectly.
+        That creates credentials, mTLS, ACLs, version compatibility, connectors and metrics
+        across <b>two git repos</b>. It answers from what it happens to know, because
+        <b>nothing graphs the whole</b>.</span></h1>
+    <div class="body rise d3"><svg class="fig" id="f2"></svg></div>
+    <div class="foot rise d4">
+      <span class="q"><i>→</i>Every item here is real. Nothing records the relations — <b>so nothing can check them.</b></span>
+      <span class="brand">THE PROBLEM</span></div>
+  </div>
+</section></div>
+
+<!-- 03 · THE COST -->
+<div class="frame"><section class="slide" style="--acc:var(--red)">
+  <div class="tint"></div><div class="rule"></div>
+  <div class="pad">
+    <div class="chrome rise d1">
+      <div class="eyebrow"><span class="logo">{ <b>STACKTIC</b> }</span><span class="tick"></span>
+        <span class="kicker">Compliance</span></div>
+      <div class="idx"><b>03</b> — 09<br><span style="color:var(--faint)">the evidence</span></div>
+    </div>
+    <h1 class="rise d2">ISO and PCI are a map of <em>required security configuration.</em>
+      <span class="sub">Kafka alone must carry mTLS, ACLs, policy, secrets, encryption, CVE
+        scanning, backup and redundancy. Every other component carries its own set —
+        <b>and every single one is a relation you must configure, validate and evidence.</b></span></h1>
+    <div class="body rise d3"><svg class="fig" id="f3"></svg></div>
+    <div class="foot rise d4">
+      <span class="q"><i>→</i>Configure it · validate it · collect the evidence · produce the report — <b>for every relation, for ever</b></span>
+      <span class="brand">ISO 27001 · PCI-DSS v4.0 · SOC 2 · HIPAA · DORA</span></div>
+  </div>
+</section></div>
+
+<!-- 06 · ONE PATH -->
+<div class="frame"><section class="slide" style="--acc:var(--mint)">
+  <div class="tint"></div><div class="rule"></div>
+  <div class="pad">
+    <div class="chrome rise d1">
+      <div class="eyebrow"><span class="logo">{ <b>STACKTIC</b> }</span><span class="tick"></span>
+        <span class="kicker">The solution</span></div>
+      <div class="idx"><b>04</b> — 09<br><span style="color:var(--faint)">the answer</span></div>
+    </div>
+    <h1 class="rise d2">Stacktic holds the graph. <em>Now one path answers all of it.</em>
+      <span class="sub">Which components, in what order, is the evidence still valid — all of it
+        <b>read off the model</b>, then generated, committed and <b>validated against reality</b>.
+        Day 0, day 1, day 2: the same five stations.</span></h1>
+    <div class="body rise d3"><svg class="fig" id="f6"></svg></div>
+    <div class="foot rise d4">
+      <span class="q"><i>→</i>Click a day. <b>Same five stations, every time</b> — that is the whole point</span>
+      <span class="brand">ONE PATH</span></div>
+  </div>
+</section></div>
+
+<!-- 05 · THE HOW -->
+<div class="frame"><section class="slide" style="--acc:var(--blue)">
+  <div class="tint"></div><div class="rule"></div>
+  <div class="pad">
+    <div class="chrome rise d1">
+      <div class="eyebrow"><span class="logo">{ <b>STACKTIC</b> }</span><span class="tick"></span>
+        <span class="kicker">Under the hood</span></div>
+      <div class="idx"><b>05</b> — 09<br><span style="color:var(--faint)">units → one graph</span></div>
+    </div>
+    <h1 class="rise d2">Open source, broken into units. <em>Then glued into one solution.</em>
+      <span class="sub">Projects that were never designed to work together become
+        <b>typed graph units</b>, each carrying its own automation. Unify 79 of them and you have
+        one graph — and <b>every operating layer is computed from it.</b></span></h1>
+    <div class="body rise d3"><svg class="fig" id="f5"></svg></div>
+    <div class="foot rise d4">
+      <span class="q"><i>→</i>Break it · unify it · glue it · <b>then everything else is derived</b> — 79 components, 50 unit types, 404 typed relations</span>
+      <span class="brand">UNDER THE HOOD</span></div>
+  </div>
+</section></div>
+
+<!-- 07 · THE VALUE -->
+<div class="frame"><section class="slide" style="--acc:var(--mint)">
+  <div class="tint"></div><div class="rule"></div>
+  <div class="pad">
+    <div class="chrome rise d1">
+      <div class="eyebrow"><span class="logo">{ <b>STACKTIC</b> }</span><span class="tick"></span>
+        <span class="kicker">The value</span></div>
+      <div class="idx"><b>06</b> — 09<br><span style="color:var(--faint)">what you get back</span></div>
+    </div>
+    <h1 class="rise d2">The <em>fastest path</em> to production — and it stays there.
+      <span class="sub">The blockers — security reviews, compliance packs, human process —
+        become automation, with <b>trust and validation all along the path</b>.</span></h1>
+    <div class="body rise d3"><svg class="fig" id="f7"></svg></div>
+    <div class="ops rise d4">
+      <span style="--i:0">upgrades</span><span style="--i:1">migrations</span>
+      <span style="--i:2">backups</span><span style="--i:3">certificates</span>
+      <span style="--i:4">scaling</span><span style="--i:5">patches</span>
+      <span style="--i:6">access</span><span style="--i:7">audit evidence</span>
+    </div>
+    <div class="foot rise d4" style="margin-top:calc(var(--u)*.8)">
+      <span class="q"><i>→</i>Evidence produced <b>while the stack changes</b> — not the week before the audit</span>
+      <span class="brand">ISO 27001 · PCI-DSS v4.0 · HIPAA · DORA · SOC 2</span></div>
+  </div>
+</section></div>
+
+<!-- 07 · THE APP FACTORY -->
+<div class="frame"><section class="slide" style="--acc:var(--plum)">
+  <div class="tint"></div><div class="rule"></div>
+  <div class="pad">
+    <div class="chrome rise d1">
+      <div class="eyebrow"><span class="logo">{ <b>STACKTIC</b> }</span><span class="tick"></span>
+        <span class="kicker">The app factory</span></div>
+      <div class="idx"><b>07</b> — 09<br><span style="color:var(--faint)">at organisation scale</span></div>
+    </div>
+    <h1 class="rise d2">One stack is a product. <em>A hundred is a factory.</em>
+      <span class="sub">Every stack the organisation runs — every team, every environment —
+        <b>versioned together, governed from one place, and rolled back in time</b>.</span></h1>
+    <div class="body rise d3"><svg class="fig" id="f8"></svg></div>
+    <div class="foot rise d4">
+      <span class="q"><i>→</i>Security reviews, approvals, environment tickets —
+        <b>automation, not a queue</b></span>
+      <span class="brand">ONE CONTROL PLANE · EVERY TEAM · EVERY ENVIRONMENT</span></div>
+  </div>
+</section></div>
+
+<!-- 08 · SOVEREIGNTY -->
+<div class="frame"><section class="slide" style="--acc:var(--amber)">
+  <div class="tint"></div><div class="rule"></div>
+  <div class="pad">
+    <div class="chrome rise d1">
+      <div class="eyebrow"><span class="logo">{ <b>STACKTIC</b> }</span><span class="tick"></span>
+        <span class="kicker">Sovereignty</span></div>
+      <div class="idx"><b>08</b> — 09<br><span style="color:var(--faint)">an architecture property</span></div>
+    </div>
+    <h1 class="rise d2">Sovereignty is an <em>architecture property</em>. Not an ideology.
+      <span class="sub">Not a romantic preference for owning hardware, and not a rejection of
+        managed services — it is <b>refusing to couple the application to them</b>. For complex,
+        regulated systems that is simply good architecture.</span></h1>
+    <div class="body rise d3"><svg class="fig" id="f9"></svg></div>
+    <div class="foot rise d4">
+      <span class="q"><i>→</i>Generated portable on <b>day 0</b> — not re-architected in year three</span>
+      <span class="brand">PORTABLE · MODULAR · INFRASTRUCTURE-AGNOSTIC</span></div>
+  </div>
+</section></div>
+
+<!-- 09 · USE CASES -->
+<div class="frame"><section class="slide" style="--acc:var(--blue)">
+  <div class="tint"></div><div class="rule"></div>
+  <div class="pad">
+    <div class="chrome rise d1">
+      <div class="eyebrow"><span class="logo">{ <b>STACKTIC</b> }</span><span class="tick"></span>
+        <span class="kicker">Use cases</span></div>
+      <div class="idx"><b>09</b> — 09<br><span style="color:var(--faint)">who runs it</span></div>
+    </div>
+    <h1 class="rise d2">The domain is <em>irrelevant.</em>
+      <span class="sub">Four teams, four industries, four completely different stacks —
+        <b>one engine</b> underneath all of them.</span></h1>
+    <div class="body rise d3"><div class="uc">
+      <div class="k" style="--t:var(--mint)"><span class="kk">ML · air-gapped</span>
+        <h3>Oil &amp; gas research</h3><svg data-uc="0"></svg>
+        <p><b>who</b>A research team with no cable to the outside.</p>
+        <p><b>what</b>Seismic and sensor data, retrained on a schedule, scored in place.</p>
+        <p><b>gets</b>An autoscaled ML pipeline on their own GPUs — latest frameworks, kept
+          current, no per-inference bill.</p>
+        <span class="rcp">airflow · kafka · spark · seaweedfs · trivy · sigstore</span></div>
+      <div class="k" style="--t:var(--blue)"><span class="kk">Private AI · sovereign</span>
+        <h3>Regulated EU hospital</h3><svg data-uc="1"></svg>
+        <p><b>who</b>Patient data that may never leave the building.</p>
+        <p><b>what</b>A private assistant, the whole workspace, and one login for both.</p>
+        <p><b>gets</b>A sovereign workspace as one generated stack — no per-seat licences,
+          no vendor, nothing leaving.</p>
+        <span class="rcp">vllm · qdrant · open-webui · keycloak · nextcloud · cnpg</span></div>
+      <div class="k" style="--t:var(--amber)"><span class="kk">Realtime · fintech</span>
+        <h3>Payments &amp; commerce</h3><svg data-uc="2"></svg>
+        <p><b>who</b>A platform where every second counts.</p>
+        <p><b>what</b>Orders and payments as events, replayable, never lost.</p>
+        <p><b>gets</b>An open, advanced platform they own and can change — none of the lock-in
+          or licence cost of a managed service.</p>
+        <span class="rcp">apisix · kafka · fastapi · cnpg · valkey · keycloak</span></div>
+      <div class="k" style="--t:var(--plum)"><span class="kk">IoT · many stacks</span>
+        <h3>Fleet operator</h3><svg data-uc="3"></svg>
+        <p><b>who</b>Three regions, three clouds, one product.</p>
+        <p><b>what</b>Thousands of edge sites feeding one core, under one model.</p>
+        <p><b>gets</b>Inter-stack relations and day-2 operations automated across every
+          region — one model, not three teams.</p>
+        <span class="rcp">kafka · crossplane · clickhouse · istio · external_dns</span></div>
+    </div></div>
+    <div class="foot rise d4">
+      <span class="q"><i>→</i>Any AI · any cloud · open source · <b>all yours</b></span>
+      <span class="brand">STACKTIC.IO</span></div>
+  </div>
+</section></div>
+
+</div>
+<div class="nav"><button id="prev">‹</button><div class="navdots" id="dots"></div>
+  <button id="next">›</button></div>
+<script>
+const NS='http://www.w3.org/2000/svg';
+const el=(n,a={},t)=>{const e=document.createElementNS(NS,n);
+  for(const k in a) if(a[k]!==null&&a[k]!==undefined) e.setAttribute(k,a[k]);
+  if(t!==undefined) e.textContent=t; return e;};
+const C={ink:'#0B1B2E',mut:'#566782',faint:'#93A2B8',line:'#E6EAF2',line2:'#D8DEEA',
+  blue:'#2F6FE0',blue2:'#4D96FF',mint:'#0F9D76',mint2:'#6EE7B7',amber:'#B8790A',
+  amber2:'#F9C22B',red:'#DC3A57',plum:'#7C4DEB',steel:'#64748B',
+  claude:'#D97757',git:'#F05032'};
+const MONO="'Fira Code',ui-monospace,monospace";
+const SANS="'Instrument Sans',system-ui,sans-serif";
+const tx=(x,y,s,o={})=>el('text',{x,y,'text-anchor':o.a||'middle',
+  'font-family':o.m?MONO:SANS,'font-size':o.fs||12,'font-weight':o.w||400,
+  fill:o.f||C.ink,'letter-spacing':o.ls||0,class:o.c||null,style:o.st||null},s);
+const box=(x,y,w,h,o={})=>el('rect',{x,y,width:w,height:h,rx:o.r??10,
+  fill:o.fill||'#fff',stroke:o.stroke||C.line,'stroke-width':o.sw||1.3,
+  'stroke-dasharray':o.dash||null,class:o.c||null,style:o.st||null});
+const fit=(s,w,h,y0)=>{s.setAttribute('viewBox','0 '+(y0||0)+' '+w+' '+h);
+  s.setAttribute('preserveAspectRatio','xMidYMid meet');};
+
+/* ══ 01 · the living graph, wide ══ */
+(function(){
+  const s=document.getElementById('f1'); if(!s) return;
+  const W=1240,H=458; fit(s,W,H);
+  const CX=430,HW=250,HH=40,TH=7,GAP=68,TOP=52;
+  const L=[
+    ['ARCHITECTURE / TOPOLOGY','components · sub-components · typed links','#F9C22B'],
+    ['DATA','stores · schemas · migrations','#8FB8FF'],
+    ['FLOWS','streams · queues · jobs · sensors','#6E9CF7'],
+    ['SOURCE CODE','services · apis · ml','#4D96FF'],
+    ['OPERATIONS','versions · upgrades · backups · scaling','#2F6FE0'],
+    ['COMPLIANCE & SECURITY','policy · identity · evidence','#7C4DEB']
+  ];
+  const Y=L.map((_,i)=>TOP+i*GAP);
+  const PT=(i,u,v)=>[CX+u*HW,Y[i]+v*HH];
+  const rnd=x=>()=>((x=(x*1103515245+12345)&0x7fffffff)/0x7fffffff);
+  const N=L.map((_,i)=>{const r=rnd(41+i*733),o=[];
+    while(o.length<8){const u=(r()*2-1)*.84,v=(r()*2-1)*.84;
+      if(Math.abs(u)+Math.abs(v)<=.88) o.push([u,v]);}
+    return o.sort((p,q)=>Math.atan2(p[1],p[0])-Math.atan2(q[1],q[0]));});
+  let d=''; const GL=[];
+  for(let i=0;i<5;i++) for(let k=0;k<8;k+=2){
+    const [x1,y1]=PT(i,N[i][k][0],N[i][k][1]);
+    const t=N[i+1][(k*3+1)%8],[x2,y2]=PT(i+1,t[0],t[1]),m=(y1+y2)/2;
+    GL.push('M'+x1+' '+y1+' C'+x1+' '+m+' '+x2+' '+m+' '+x2+' '+y2);
+  }
+  GL.forEach((p,n)=>d+='<path id="f1g'+n+'" d="'+p+'" fill="none"/>');
+  L.forEach((Lr,i)=>d+='<linearGradient id="f1f'+i+'" x1="0" y1="0" x2="1" y2="1">'+
+    '<stop offset="0" stop-color="'+Lr[2]+'" stop-opacity=".28"/>'+
+    '<stop offset="1" stop-color="'+Lr[2]+'" stop-opacity=".05"/></linearGradient>');
+  const df=el('defs'); df.innerHTML=d; s.appendChild(df);
+  GL.forEach(p=>s.appendChild(el('path',{d:p,fill:'none',stroke:C.mint,'stroke-width':1,
+    'stroke-opacity':.4})));
+  L.forEach((Lr,i)=>{
+    const y=Y[i],c=Lr[2];
+    s.appendChild(el('path',{d:'M'+(CX-HW)+' '+y+' L'+CX+' '+(y+HH)+' L'+(CX+HW)+' '+y+
+      ' L'+(CX+HW)+' '+(y+TH)+' L'+CX+' '+(y+HH+TH)+' L'+(CX-HW)+' '+(y+TH)+' Z',
+      fill:'#fff',stroke:c,'stroke-opacity':.4}));
+    s.appendChild(el('path',{d:'M'+(CX-HW)+' '+y+' L'+CX+' '+(y-HH)+' L'+(CX+HW)+' '+y+
+      ' L'+CX+' '+(y+HH)+' Z',fill:'url(#f1f'+i+')',stroke:c,
+      'stroke-width':i===0?2:1.2,'stroke-opacity':i===0?1:.65}));
+    const P=N[i].map(uv=>PT(i,uv[0],uv[1]));
+    P.forEach((p,k)=>{const q=P[(k+1)%P.length];
+      s.appendChild(el('path',{d:'M'+p[0]+' '+p[1]+' L'+q[0]+' '+q[1],stroke:c,
+        'stroke-opacity':.5,'stroke-width':.9,fill:'none'}));});
+    P.forEach(p=>s.appendChild(el('circle',{cx:p[0],cy:p[1],r:3,fill:c})));
+    s.appendChild(el('line',{x1:CX+HW,y1:y,x2:CX+HW+26,y2:y,stroke:c,'stroke-opacity':.5}));
+    s.appendChild(tx(CX+HW+36,y+1,Lr[0],{a:'start',m:1,fs:14.5,w:600,ls:.8,f:C.ink}));
+    s.appendChild(tx(CX+HW+36,y+19,Lr[1],{a:'start',m:1,fs:10,f:C.faint}));
+  });
+  GL.forEach((p,n)=>{
+    const dur=(3.4+(n%5)*.8).toFixed(2),beg=(-(n*.45)).toFixed(2);
+    const c=el('circle',{r:3.4,fill:C.mint});
+    c.innerHTML='<animateMotion dur="'+dur+'s" repeatCount="indefinite" begin="'+beg+
+      's"><mpath href="#f1g'+n+'"/></animateMotion>'+
+      '<animate attributeName="opacity" dur="'+dur+'s" begin="'+beg+
+      's" repeatCount="indefinite" values="0;1;1;0" keyTimes="0;.12;.85;1"/>';
+    s.appendChild(c);
+  });
+})();
+
+/* ══ 03 · one real change, anatomised ══
+   every artifact named here is generated by the image_base template when the
+   matching link exists: kafka-mtls-secret.yaml, topic-users.yaml (KafkaUser +
+   ACLs), external-secret.yaml, cloud.env, rbac.yaml, hpa.yaml, patches. */
+(function(){
+  const s=document.getElementById('f2'); if(!s) return;
+  const W=1240,H=440; fit(s,W,H);
+  const colH=(x,t,c2)=>s.appendChild(tx(x,20,t,{m:1,fs:10,ls:2,f:c2||C.faint}));
+  colH(130,'THE CHANGE'); colH(470,'IT TALKS TO');
+  colH(725,'THAT CREATES'); colH(1010,'AND IMPACTS');
+
+  /* the change */
+  s.appendChild(box(48,120,176,84,{r:13,stroke:C.amber2,sw:2,fill:'#FEF6E4'}));
+  s.appendChild(tx(136,155,'THE CODE',{m:1,fs:14,w:600,ls:1.2,f:C.ink}));
+  s.appendChild(tx(136,175,'written by AI · minutes',{m:1,fs:9,f:C.amber}));
+  s.appendChild(tx(136,192,'app repo · git A',{m:1,fs:9,f:C.mut}));
+
+  /* what it talks to, and the real surface each link creates */
+  const SVC=[
+    ['kafka topic',C.blue, 78,[['kafka-mtls-secret','client cert, rotated'],
+      ['KafkaUser + ACLs','who may read, who may write'],
+      ['bootstrap + schema env','and partition / version compat']]],
+    ['swbucket',  C.mint,218,[['unique access_key','one duplicate kills the filer'],
+      ['external-secret','credentials, never in git'],
+      ['endpoint + TLS env','per environment']]],
+    ['cnpg db',   C.plum,352,[['credentials secret','per service, per db'],
+      ['connection env + driver','version compatibility'],
+      ['migration + backup','schema change → both move']]]
+  ];
+  SVC.forEach(([n,c2,y,chips])=>{
+    s.appendChild(el('path',{d:'M226 162 C320 162 330 '+y+' 398 '+y,fill:'none',
+      stroke:c2,'stroke-width':1.8,'stroke-opacity':.6,class:'flow'}));
+    const w=n.length*7.4+42;
+    s.appendChild(box(400,y-16,w,32,{r:16,stroke:c2,sw:1.6}));
+    s.appendChild(el('circle',{cx:417,cy:y,r:4,fill:c2}));
+    s.appendChild(tx(429,y+4,n,{a:'start',m:1,fs:11.5,f:C.ink}));
+    chips.forEach(([a,b2],k)=>{
+      const cy=y-34+k*34;
+      s.appendChild(el('path',{d:'M'+(400+w)+' '+y+' C'+(430+w)+' '+y+' '+(450+w)+' '+cy+' 620 '+cy,
+        fill:'none',stroke:c2,'stroke-opacity':.3,'stroke-width':1,'stroke-dasharray':'3 4'}));
+      s.appendChild(box(622,cy-13,250,27,{r:7,stroke:c2,sw:1.1,
+        fill:'#fff'}));
+      s.appendChild(tx(634,cy-1,a,{a:'start',m:1,fs:9.5,w:600,f:C.ink}));
+      s.appendChild(tx(634,cy+10,b2,{a:'start',fs:8.5,f:C.faint}));
+    });
+  });
+
+  /* the blast radius: second-order, still the same one change */
+  const IMP=[['KafkaConnector sinks','the schema moved — do they still fit?',C.blue,60],
+             ['ServiceMonitor · metrics','new endpoints, or silent gaps',C.blue,124],
+             ['Grafana dashboards','built on the old labels',C.mint,188],
+             ['backup · PITR window','the new db is in it — or not',C.plum,252],
+             ['stack repo · git B','all of the above lives HERE, not in git A',C.steel,316],
+             ['other stacks','routes and consumers in other clusters',C.red,380]];
+  IMP.forEach(([a,b2,c2,y])=>{
+    s.appendChild(el('path',{d:'M874 '+(y+((y>300)?-40:0))+' C910 '+y+' 910 '+y+' 928 '+y,
+      fill:'none',stroke:c2,'stroke-opacity':.35,'stroke-width':1,'stroke-dasharray':'3 4'}));
+    s.appendChild(box(930,y-15,282,31,{r:8,stroke:c2,sw:1.1}));
+    s.appendChild(tx(942,y-1,a,{a:'start',m:1,fs:9.5,w:600,f:C.ink}));
+    s.appendChild(tx(942,y+11,b2,{a:'start',fs:8.5,f:C.faint}));
+  });
+
+  /* the two repos, and the question nobody answers */
+  s.appendChild(box(48,258,176,52,{r:11,stroke:C.line2,sw:1.4,fill:'#F6F8FC'}));
+  s.appendChild(tx(136,281,'stack repo · git B',{m:1,fs:10.5,w:600,f:C.mut}));
+  s.appendChild(tx(136,297,'the generated config',{m:1,fs:8.5,f:C.faint}));
+  s.appendChild(el('path',{d:'M136 204 V256',stroke:C.red,'stroke-width':1.4,
+    'stroke-dasharray':'4 5'}));
+  s.appendChild(el('circle',{cx:136,cy:230,r:9,fill:'#fff',stroke:C.red,'stroke-width':1.4}));
+  s.appendChild(tx(136,234,'?',{m:1,fs:11,w:600,f:C.red}));
+  s.appendChild(tx(136,336,'two repos, one change —',{fs:10.5,f:C.mut}));
+  s.appendChild(tx(136,352,'what keeps them in step?',{fs:10.5,w:600,f:C.red}));
+
+  /* the point */
+  s.appendChild(box(390,404,490,30,{r:15,stroke:C.red,sw:1.4,dash:'6 5',
+    fill:'rgba(220,58,87,.03)'}));
+  s.appendChild(el('circle',{cx:412,cy:419,r:3.6,fill:C.red}));
+  s.appendChild(tx(424,423,'NO GRAPH METADATA — nothing records these relations',
+    {a:'start',m:1,fs:10.5,w:600,f:C.red}));
+  s.appendChild(tx(1212,423,'never asked: same practice as elsewhere? the secure pattern? does compliance still hold?',
+    {a:'end',fs:10,f:C.faint}));
+})();
+
+/* ══ 03 · what compliance actually demands of ONE component ══
+   every requirement here is something the templates already generate or scan:
+   kafka-mtls-secret.yaml, topic-users.yaml (KafkaUser + ACLs), opa's 11 policy
+   units, external-secret.yaml, trivy, velero, replicas, audit→opensearch,
+   falco→opensearch. ISO/IEC 27001:2022 Annex A is 93 controls. */
+(function(){
+  const s=document.getElementById('f3'); if(!s) return;
+  const W=1240,H=444; fit(s,W,H);
+
+  /* the framework, as what it really is */
+  s.appendChild(tx(40,18,'THE FRAMEWORK',{a:'start',m:1,fs:9.5,ls:2,f:C.faint}));
+  s.appendChild(box(40,32,250,120,{r:12,stroke:C.plum,sw:1.8,fill:'#F1ECFE'}));
+  s.appendChild(tx(58,58,'ISO/IEC 27001:2022',{a:'start',m:1,fs:12.5,w:600,f:C.ink}));
+  s.appendChild(tx(274,58,'93',{a:'end',fs:22,w:600,f:C.plum}));
+  s.appendChild(el('path',{d:'M58 70 H274',stroke:C.plum,'stroke-opacity':.25}));
+  s.appendChild(tx(58,92,'PCI-DSS v4.0',{a:'start',m:1,fs:12.5,w:600,f:C.ink}));
+  s.appendChild(tx(274,92,'300+',{a:'end',fs:22,w:600,f:C.plum}));
+  s.appendChild(tx(58,120,'SOC 2 · HIPAA · DORA',{a:'start',m:1,fs:10,f:C.mut}));
+  s.appendChild(tx(58,140,'overlapping, never identical',{a:'start',fs:10,f:C.faint}));
+  s.appendChild(tx(40,180,'It is not paperwork.',{a:'start',fs:15,w:600,f:C.ink}));
+  s.appendChild(tx(40,202,'It is a map of the security',{a:'start',fs:15,w:600,f:C.plum}));
+  s.appendChild(tx(40,222,'configuration you must hold —',{a:'start',fs:15,w:600,f:C.plum}));
+  s.appendChild(tx(40,242,'on every component.',{a:'start',fs:15,w:600,f:C.plum}));
+
+  /* one component, and everything it must satisfy */
+  const CX=640,CY=222,RX=200,RY=134;
+  s.appendChild(tx(CX,18,'ONE COMPONENT · EVERYTHING IT MUST CARRY',
+    {m:1,fs:9.5,ls:2,f:C.faint}));
+  const REQ=[['mTLS',C.blue],['RBAC · ACLs',C.blue],['OPA policy',C.plum],
+             ['secrets',C.plum],['encryption',C.mint],['CVE scan',C.red],
+             ['backup',C.mint],['redundancy',C.mint],['audit log',C.amber],
+             ['network policy',C.blue]];
+  REQ.forEach(([n,c2],i)=>{
+    const a=(-90+i*36)*Math.PI/180;
+    const x=CX+Math.cos(a)*RX, y=CY+Math.sin(a)*RY;
+    s.appendChild(el('path',{d:'M'+CX+' '+CY+' L'+x+' '+y,stroke:c2,'stroke-opacity':.28,
+      'stroke-width':1.2}));
+    const w=n.length*6.1+30;
+    s.appendChild(box(x-w/2,y-13,w,26,{r:13,stroke:c2,sw:1.4,fill:'#fff'}));
+    s.appendChild(el('circle',{cx:x-w/2+13,cy:y,r:3.4,fill:c2,class:'glow',
+      st:'animation-delay:-'+(i*.5)+'s'}));
+    s.appendChild(tx(x-w/2+22,y+3.8,n,{a:'start',m:1,fs:9.6,f:C.ink}));
+  });
+  s.appendChild(el('circle',{cx:CX,cy:CY,r:46,fill:'#EBF2FE',stroke:C.blue,'stroke-width':2.2}));
+  s.appendChild(tx(CX,CY-2,'kafka',{fs:16,w:600,f:C.blue}));
+  s.appendChild(tx(CX,CY+16,'one of 79',{m:1,fs:9,f:C.mut}));
+  s.appendChild(tx(CX,392,'ten requirements — and every one is a RELATION, not a setting',
+    {fs:12.5,w:600,f:C.ink}));
+  let cx2=404;
+  [['cnpg','+ PITR, migration'],['seaweedfs','+ key uniqueness'],
+   ['opensearch','+ SIEM, IDS']].forEach(([n,e])=>{
+    const w=(n+e).length*5.3+30;
+    s.appendChild(box(cx2,406,w,24,{r:12,stroke:C.line2,sw:1.1}));
+    s.appendChild(tx(cx2+12,422,n,{a:'start',m:1,fs:9,w:600,f:C.mut}));
+    s.appendChild(tx(cx2+12+n.length*6.1+6,422,e,{a:'start',m:1,fs:9,f:C.faint}));
+    cx2+=w+8;
+  });
+  s.appendChild(tx(cx2+8,422,'… each with its own set',{a:'start',fs:10,f:C.faint}));
+
+  /* and for each one, the same four steps */
+  s.appendChild(tx(1200,18,'AND FOR EVERY ONE OF THEM',{a:'end',m:1,fs:9.5,ls:2,f:C.faint}));
+  const STEP=[['CONFIGURE','get it right in the first place',C.blue],
+              ['VALIDATE','prove it is actually in force',C.mint],
+              ['COLLECT EVIDENCE','from the live cluster, not a doc',C.amber],
+              ['AUDIT REPORT','mapped back to the control',C.plum]];
+  STEP.forEach(([n,d,c2],i)=>{
+    const y=36+i*74;
+    s.appendChild(box(900,y,300,56,{r:10,stroke:c2,sw:1.5,
+      fill:'color-mix(in srgb,'+c2+' 6%,#fff)'}));
+    s.appendChild(el('circle',{cx:924,cy:y+28,r:11,fill:'#fff',stroke:c2,'stroke-width':1.5}));
+    s.appendChild(tx(924,y+32,String(i+1),{m:1,fs:11,w:600,f:c2}));
+    s.appendChild(tx(946,y+25,n,{a:'start',m:1,fs:11.5,w:600,ls:1,f:c2}));
+    s.appendChild(tx(946,y+42,d,{a:'start',fs:10.5,f:C.mut}));
+    if(i<3) s.appendChild(el('path',{d:'M1050 '+(y+56)+' V'+(y+70)+
+      ' M1045 '+(y+64)+' L1050 '+(y+71)+' L1055 '+(y+64),fill:'none',stroke:c2,
+      'stroke-opacity':.5,'stroke-width':1.3,'stroke-linecap':'round'}));
+  });
+  s.appendChild(tx(1050,344,'× 10 requirements × 79 components',{m:1,fs:10.5,w:600,f:C.ink}));
+  s.appendChild(tx(1050,362,'× every relation between them',{m:1,fs:10.5,f:C.mut}));
+
+  /* the missing piece */
+  s.appendChild(box(40,282,300,132,{r:12,stroke:C.red,sw:2,fill:'rgba(220,58,87,.04)'}));
+  s.appendChild(tx(58,310,'Nothing maps',{a:'start',fs:16,w:600,f:C.red}));
+  s.appendChild(tx(58,332,'requirement → relation',{a:'start',m:1,fs:14,w:600,f:C.red}));
+  s.appendChild(tx(58,354,'→ component → control.',{a:'start',m:1,fs:14,w:600,f:C.red}));
+  s.appendChild(el('path',{d:'M58 370 H322',stroke:C.red,'stroke-opacity':.3}));
+  s.appendChild(tx(58,392,'So it is assembled by hand,',{a:'start',fs:12,f:C.mut}));
+  s.appendChild(tx(58,406,'once a year, from screenshots.',{a:'start',fs:12,w:600,f:C.ink}));
+})();
+
+/* ══ 04 · the day rail — the days are a control, not a picture ══ */
+(function(){
+  const s=document.getElementById('f6'); if(!s) return;
+  const W=1240,H=420; fit(s,W,H);
+  const DAYS=[['Day 0','BUILD','#B8790A'],['Day 1','SECURE','#2F6FE0'],
+              ['Day 2','LIGHTS OUT','#0F9D76']];
+  /* the same five stations tell a different story on each day */
+  const SCRIPT=[
+    {prompt:'Here is the architecture spec. Build the stack.',
+     sub:['reads the spec','generates the whole stack','commit · v1','stage is up',
+          'idle — nothing to prove yet'],
+     env:0, agent:false},
+    {prompt:'Strict security on the stage stack. ISO level.',
+     sub:['prompt: ISO security','controls on every layer','commit · v2','stage updated',
+          'validate · audit · evidence'],
+     env:0, agent:true},
+    {prompt:'A CVE landed. Patch every stack that uses it.',
+     sub:['asks in plain language','reads the graph · orders the work','commit · v3 → prod',
+          'stage ✓ then prod ✓','✓ validated · evidence filed'],
+     env:1, agent:true}];
+  const ICON={
+    claude:'M12 2v4M12 18v4M2 12h4M18 12h4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M19.1 4.9l-2.8 2.8M7.7 16.3l-2.8 2.8M13.8 7.2l1.4-3.4M8.8 20.2l1.4-3.4M16.8 13.8l3.4 1.4M3.8 8.8l3.4 1.4M16.8 10.2l3.4-1.4M3.8 15.2l3.4-1.4M13.8 16.8l1.4 3.4M8.8 3.8l1.4 3.4',
+    stk:'M12 3l8 4.5-8 4.5-8-4.5zM4 12l8 4.5 8-4.5M4 16.5L12 21l8-4.5',
+    git:'M12 2L22 12 12 22 2 12zM8.5 15.5l7-7M12 12c1.5 0 2.8 1.3 2.8 2.8',
+    k8s:'M12 2l7.8 3.8 1.9 8.4-5.4 6.8H7.7l-5.4-6.8 1.9-8.4zM12 9.4a2.6 2.6 0 1 0 0 5.2 2.6 2.6 0 0 0 0-5.2M12 8V5M15.1 9.5l2.3-1.9M15.9 12.9l2.9.7M13.7 15.6l1.3 2.7M10.3 15.6l-1.3 2.7M8.1 12.9l-2.9.7M8.9 9.5L6.6 7.6',
+    shield:'M12 2l8 3v6c0 5-3.4 9.3-8 11-4.6-1.7-8-6-8-11V5zM8.5 12l2.5 2.5 4.5-4.5'};
+  const NODES=[['Claude',C.claude,'claude'],['Stacktic',C.blue,'stk'],['Git',C.git,'git'],
+               ['Cluster',C.mint,'k8s'],['Stack Agent',C.plum,'shield']];
+  const TOPY=232,R=46,X0=120,GX=(W-240)/4;
+  const d=el('defs');
+  d.innerHTML='<path id="f6rail" d="M'+X0+' '+TOPY+' H'+(W-120)+'" fill="none"/>';
+  s.appendChild(d);
+
+  const tabs=[], TW=196, TG=18, TX0=W/2-(3*TW+2*TG)/2;
+  s.appendChild(tx(TX0-16,40,'PICK A DAY',{a:'end',m:1,fs:9,ls:2,f:C.faint}));
+  s.appendChild(el('path',{d:'M'+(TX0-12)+' 34 h8 m0 0 l-4 -4 m4 4 l-4 4',fill:'none',
+    stroke:C.faint,'stroke-width':1.2,'stroke-linecap':'round'}));
+  DAYS.forEach(([d2,k,c],i)=>{
+    const x=TX0+i*(TW+TG);
+    const g=el('g',{style:'cursor:pointer'});
+    const pill=el('rect',{x,y:8,width:TW,height:60,rx:12,fill:'#fff',
+      stroke:C.line2,'stroke-width':1.6});
+    g.appendChild(pill);
+    const t1=tx(x+TW/2,36,d2,{fs:22,w:600,f:C.mut}); g.appendChild(t1);
+    const t2=tx(x+TW/2,55,k,{m:1,fs:9.5,ls:2.4,f:C.faint}); g.appendChild(t2);
+    g.addEventListener('click',()=>{stop();show(i);});
+    g.addEventListener('mouseenter',()=>{
+      if(cur!==i){pill.setAttribute('stroke',c);pill.setAttribute('stroke-opacity','.55');}});
+    g.addEventListener('mouseleave',()=>{
+      if(cur!==i){pill.setAttribute('stroke',C.line2);pill.setAttribute('stroke-opacity','1');}});
+    s.appendChild(g); tabs.push({pill,t1,t2,c});
+  });
+
+  s.appendChild(box(320,84,600,46,{r:11,stroke:C.amber2,sw:1.6,fill:'#FFFDF6'}));
+  s.appendChild(tx(344,113,'›',{a:'start',m:1,fs:17,w:600,f:C.amber}));
+  const ptext=tx(364,112,'',{a:'start',m:1,fs:14.5,f:C.ink}); s.appendChild(ptext);
+  s.appendChild(tx(906,98,'PROMPT',{a:'end',m:1,fs:8.5,ls:2,f:C.faint}));
+  s.appendChild(el('path',{d:'M660 130 V'+(TOPY-R-14),stroke:C.amber2,'stroke-width':1.5,
+    'stroke-dasharray':'4 5'}));
+
+  s.appendChild(el('path',{d:'M'+X0+' '+TOPY+' H'+(W-120),stroke:C.line2,'stroke-width':3}));
+  const subs=[],rings=[],envs={};
+  NODES.forEach(([n,c,ic],i)=>{
+    const x=X0+i*GX;
+    if(i) s.appendChild(tx(x-GX/2,TOPY-10,'›',{m:1,fs:22,w:600,f:c}));
+    const ring=el('circle',{cx:x,cy:TOPY,r:R+9,fill:'#fff',stroke:c,
+      'stroke-opacity':.25,'stroke-width':1.5}); s.appendChild(ring); rings.push(ring);
+    s.appendChild(el('circle',{cx:x,cy:TOPY,r:R,fill:'#fff',stroke:c,'stroke-width':2.2}));
+    const g=el('g',{transform:'translate('+(x-19)+' '+(TOPY-19)+') scale(1.6)',fill:'none',
+      stroke:c,'stroke-width':1.7,'stroke-linecap':'round','stroke-linejoin':'round'});
+    g.appendChild(el('path',{d:ICON[ic]})); s.appendChild(g);
+    s.appendChild(tx(x,TOPY+R+34,n,{fs:16.5,w:600,f:C.ink}));
+    const sub=tx(x,TOPY+R+55,'',{m:1,fs:11,f:C.mut}); s.appendChild(sub); subs.push(sub);
+    if(n==='Cluster'){
+      envs.stage=box(x-62,TOPY+R+68,58,22,{r:11,stroke:C.mint,sw:1.3});
+      envs.prod =box(x+6, TOPY+R+68,52,22,{r:11,stroke:C.line2,sw:1.2});
+      s.appendChild(envs.stage); s.appendChild(envs.prod);
+      envs.stageT=tx(x-33,TOPY+R+83,'STAGE',{m:1,fs:9,ls:1,f:C.mint});
+      envs.prodT =tx(x+32,TOPY+R+83,'PROD', {m:1,fs:9,ls:1,f:C.faint});
+      s.appendChild(envs.stageT); s.appendChild(envs.prodT);
+    }
+  });
+  [0,1.9,3.8].forEach(b=>{
+    const c=el('circle',{r:6,fill:C.mint});
+    c.innerHTML='<animateMotion dur="5.6s" repeatCount="indefinite" begin="-'+b+
+      's"><mpath href="#f6rail"/></animateMotion>'+
+      '<animate attributeName="opacity" dur="5.6s" begin="-'+b+
+      's" repeatCount="indefinite" values="0;1;1;0" keyTimes="0;.06;.92;1"/>';
+    s.appendChild(c);
+  });
+
+  let cur=-1, auto=null;
+  const stop=()=>{ if(auto){clearInterval(auto); auto=null;} };
+  function show(i){
+    if(cur===i) return; cur=i;
+    const P=SCRIPT[i];
+    tabs.forEach((t,k)=>{
+      const on=k===i;
+      t.pill.setAttribute('fill',on?'color-mix(in srgb,'+t.c+' 10%,#fff)':'#fff');
+      t.pill.setAttribute('stroke',on?t.c:C.line2);
+      t.pill.setAttribute('stroke-opacity','1');
+      t.pill.setAttribute('stroke-width',on?2.4:1.6);
+      t.t1.setAttribute('fill',on?C.ink:C.mut);
+      t.t2.setAttribute('fill',on?t.c:C.faint);
+    });
+    ptext.textContent=P.prompt;
+    subs.forEach((n,k)=>n.textContent=P.sub[k]);
+    rings[4].setAttribute('stroke-opacity',P.agent?.25:.06);
+    envs.prod.setAttribute('stroke',P.env?C.mint:C.line2);
+    envs.prodT.setAttribute('fill',P.env?C.mint:C.faint);
+  }
+  show(0);
+  auto=setInterval(()=>show((cur+1)%3),6500);   /* walks itself if nobody drives */
+})();
+
+/* ══ 05 · open source → units → one graph → the layers behind it ══
+   counts from templates/impact-index.json; unit types from each component's
+   cookiecutter.json (dagster's from its pre-gen hook). */
+(function(){
+  const s=document.getElementById('f5'); if(!s) return;
+  const W=1240,H=458; fit(s,W,H);
+  const AM='#DB9B00';
+  const step=(x,w,n,t,c2)=>{
+    s.appendChild(tx(x,18,n,{a:'start',m:1,fs:9.5,w:600,ls:1.6,f:c2}));
+    s.appendChild(tx(x+22,18,t,{a:'start',m:1,fs:9.5,ls:1.6,f:C.faint}));
+  };
+  const chev=(x,y)=>s.appendChild(el('path',{d:'M'+x+' '+(y-9)+' l9 9 l-9 9',fill:'none',
+    stroke:C.line2,'stroke-width':2.4,'stroke-linecap':'round','stroke-linejoin':'round'}));
+
+  /* ── 01 · open source, as it comes ── */
+  step(40,300,'01','· OPEN SOURCE',C.steel);
+  s.appendChild(box(40,32,300,220,{r:12,stroke:C.line2,sw:1.3,fill:'#FBFCFE'}));
+  const OSS=['kafka','postgres','dagster','opa','minio','keycloak','prometheus','grafana',
+             'istio','clickhouse','rabbitmq','opensearch','velero','trivy','valkey','spark'];
+  let r0=7;const rr=()=>((r0=(r0*1103515245+12345)&0x7fffffff)/0x7fffffff);
+  /* a jittered grid — scattered to the eye, but never overlapping */
+  const SLOT=[]; for(let c=0;c<3;c++) for(let rw=0;rw<6;rw++) SLOT.push([c,rw]);
+  SLOT.sort(()=>rr()-.5);
+  OSS.forEach((n,i)=>{
+    const [c,rw]=SLOT[i], w=n.length*5.6+16;
+    const cx=52+c*96+48+(rr()-.5)*14, y=42+rw*33+(rr()-.5)*7;
+    const x=Math.max(48,Math.min(332-w,cx-w/2));
+    s.appendChild(box(x,y,w,20,{r:10,stroke:'#C9D3E2',sw:1,fill:'#fff'}));
+    s.appendChild(tx(x+w/2,y+14,n,{m:1,fs:8.8,f:C.mut}));
+  });
+  s.appendChild(tx(190,270,'79 projects. Excellent, and unrelated.',{fs:11.5,w:600,f:C.ink}));
+  s.appendChild(tx(190,285,'nothing knows anything about anything else',{fs:10,f:C.faint}));
+  chev(352,142);
+
+  /* ── 02 · broken into logical units, each with its automation ── */
+  step(392,290,'02','· BROKEN INTO GRAPH UNITS',C.blue);
+  s.appendChild(box(392,32,300,220,{r:12,stroke:C.blue,sw:1.4,fill:'rgba(47,111,224,.02)'}));
+  const BRK=[
+    ['dagster', AM,      ['code_location','asset','job','sensor']],
+    ['kafka',   C.blue2, ['topic','bridge','node_pool']],
+    ['rabbitmq',C.plum,  ['exchange','queue']],
+    ['fastmcp', C.mint,  ['agent','ai_task']]];
+  BRK.forEach(([n,c2,subs],i)=>{
+    const cw=146, ch=108;
+    const x=402+(i%2)*152, y=42+Math.floor(i/2)*112;
+    s.appendChild(box(x,y,cw,26,{r:8,stroke:'#C6D2E2',sw:1.3,fill:'#fff'}));
+    s.appendChild(tx(x+cw/2,y+18,n,{fs:12.5,w:600,f:C.ink}));
+    s.appendChild(el('path',{d:'M'+(x+cw/2)+' '+(y+27)+' V'+(y+35),stroke:c2,
+      'stroke-width':1.2,'stroke-opacity':.6}));
+    subs.forEach((u,k)=>{
+      const uy=y+36+k*18;
+      s.appendChild(box(x+8,uy,cw-16,16,{r:8,stroke:c2,sw:1.1,fill:'#fff'}));
+      s.appendChild(el('circle',{cx:x+18,cy:uy+8,r:2.6,fill:c2}));
+      s.appendChild(tx(x+26,uy+11.5,u,{a:'start',m:1,fs:8.4,f:C.ink}));
+    });
+  });
+  s.appendChild(tx(542,270,'every component becomes its own logical units',
+    {fs:11.5,w:600,f:C.ink}));
+  s.appendChild(tx(542,285,'50 typed unit types across the catalogue',{fs:10,f:C.faint}));
+  chev(704,142);
+
+  /* ── 03 · glued into one graph ── */
+  step(744,456,'03','· UNIFIED INTO ONE GRAPH',C.mint);
+  s.appendChild(box(744,32,456,220,{r:12,stroke:C.mint,sw:1.6,
+    fill:'rgba(15,157,118,.02)'}));
+  const FAM=[C.blue2,C.plum,C.mint,AM,C.steel,C.red];
+  const GN=[];
+  let r1=91;const r2=()=>((r1=(r1*1103515245+12345)&0x7fffffff)/0x7fffffff);
+  for(let i=0;i<22;i++){
+    const a=i*2.399, rad=.28+.72*Math.sqrt(r2());
+    GN.push([972+Math.cos(a)*rad*186, 142+Math.sin(a)*rad*84, FAM[i%FAM.length]]);
+  }
+  GN.forEach(([x,y],i)=>{
+    for(let k=1;k<=2;k++){
+      const j=(i*3+k*5)%GN.length; if(j===i) continue;
+      s.appendChild(el('path',{d:'M'+x+' '+y+' L'+GN[j][0]+' '+GN[j][1],
+        stroke:GN[j][2],'stroke-opacity':.24,'stroke-width':1}));
+    }
+  });
+  GN.forEach(([x,y,c2])=>{
+    s.appendChild(el('circle',{cx:x,cy:y,r:6,fill:'#fff',stroke:c2,'stroke-width':1.8}));
+    s.appendChild(el('circle',{cx:x,cy:y,r:2.6,fill:c2}));
+  });
+  s.appendChild(tx(972,270,'79 projects glued into one solution',{fs:12.5,w:600,f:C.ink}));
+  s.appendChild(tx(972,285,'404 typed relations — every edge generated, never written',
+    {fs:10,f:C.faint}));
+
+  /* ── behind all of it: the metadata layers ── */
+  const TOP=326, SKEW=26, LW=880, LX=250;
+  s.appendChild(tx(40,TOP+34,'BEHIND',{a:'start',m:1,fs:11,w:600,ls:1.8,f:C.blue}));
+  s.appendChild(tx(40,TOP+52,'ALL OF IT',{a:'start',m:1,fs:11,w:600,ls:1.8,f:C.blue}));
+  s.appendChild(tx(40,TOP+76,'the metadata',{a:'start',fs:11,f:C.mut}));
+  s.appendChild(tx(40,TOP+91,'layers, computed',{a:'start',fs:11,f:C.mut}));
+  s.appendChild(tx(40,TOP+106,'from the graph',{a:'start',fs:11,w:600,f:C.ink}));
+  [452,760,1068].forEach(x=>s.appendChild(el('path',
+    {d:'M'+x+' 296 V'+(TOP-8)+' M'+(x-5)+' '+(TOP-16)+' L'+x+' '+(TOP-7)+' L'+(x+5)+' '+(TOP-16),
+     fill:'none',stroke:C.mint,'stroke-opacity':.5,'stroke-width':1.4,
+     'stroke-linecap':'round'})));
+  const LAY=[['DAY-2 OPS','migrations · upgrades · backups · scaling',AM],
+             ['HEALTH','probes · metrics · alerts',C.mint],
+             ['VERSIONING','snapshots · rollback · compatibility',C.blue],
+             ['COMPLIANCE','controls · evidence · audit trail',C.plum],
+             ['SECOPS','cve · policy · secrets · mTLS',C.red]];
+  LAY.forEach(([n,items,c2],i)=>{
+    const y=TOP+i*22, x=LX+ (LAY.length-1-i)*SKEW;
+    /* a plate, not a bar: skewed and offset so the five read as a stack */
+    s.appendChild(el('path',{d:'M'+x+' '+y+' L'+(x+LW)+' '+y+' L'+(x+LW-SKEW)+' '+(y+20)+
+      ' L'+(x-SKEW)+' '+(y+20)+' Z',fill:'color-mix(in srgb,'+c2+' 9%,#fff)',
+      stroke:c2,'stroke-width':1.3,'stroke-opacity':.85}));
+    s.appendChild(tx(x+16,y+14.5,n,{a:'start',m:1,fs:9.4,w:600,ls:1.3,f:c2}));
+    s.appendChild(tx(x+LW-30,y+14.5,items,{a:'end',m:1,fs:8.8,f:C.mut}));
+  });
+  s.appendChild(tx(640,TOP+126,'… and every other operating layer, derived the same way — never maintained beside it',
+    {fs:10.5,f:C.faint}));
+})();
+
+/* ══ 07 · the dark factory ══ */
+(function(){
+  const s=document.getElementById('f7'); if(!s) return;
+  const W=1240,H=372,CX=620,CY=186,R=150; fit(s,W,H);
+  const ST=[['WRITE','your AI',C.amber],['ASSEMBLE','the whole stack',C.blue],
+            ['VALIDATE','compliance + evidence',C.plum],['SHIP','to production',C.mint],
+            ['OPERATE','for ever',C.mint]];
+  const A=i=>(-90+i*72)*Math.PI/180,P=(a,r)=>[CX+Math.cos(a)*r,CY+Math.sin(a)*r];
+  ST.forEach((st,i)=>{
+    const [x0,y0]=P(A(i),R),[x1,y1]=P(A(i+1),R),last=i===4;
+    s.appendChild(el('path',{d:'M'+x0+' '+y0+' A'+R+' '+R+' 0 0 1 '+x1+' '+y1,fill:'none',
+      stroke:st[2],'stroke-width':last?3.4:1.8,'stroke-opacity':last?.9:.45,
+      'stroke-linecap':'round','stroke-dasharray':last?'13 8':'4 8',
+      class:last?'flow':null}));
+  });
+  const d=el('defs');
+  d.innerHTML='<path id="f7ring" fill="none" d="M'+CX+' '+(CY-R)+
+    ' a '+R+' '+R+' 0 1 1 -.1 0"/>';
+  s.appendChild(d);
+  const orb=el('circle',{r:7,fill:C.mint});
+  orb.innerHTML='<animateMotion dur="8s" repeatCount="indefinite">'+
+    '<mpath href="#f7ring"/></animateMotion>';
+  s.appendChild(orb);
+  ST.forEach((st,i)=>{
+    const a=A(i),[x,y]=P(a,R);
+    const dot=el('circle',{cx:x,cy:y,r:9,fill:'#fff',stroke:st[2],'stroke-width':2.4,
+      class:'stp'});
+    dot.style.setProperty('--sd',(i*1.5)+'s'); s.appendChild(dot);
+    const cos=Math.cos(a),sin=Math.sin(a);
+    let an='middle',off=0; if(cos>.3){an='start';off=18;}else if(cos<-.3){an='end';off=-18;}
+    const dy=sin<-.3?-14:(sin>.3?26:5);
+    const [lx,ly]=P(a,R+18);
+    s.appendChild(tx(lx+off,ly+dy,st[0],{a:an,m:1,fs:13.5,w:600,ls:1.2,f:C.ink}));
+    s.appendChild(tx(lx+off,ly+dy+17,st[1],{a:an,m:1,fs:9.5,f:C.mut}));
+  });
+  const CO=6,RO=4,cw=31,ch=26,gp=7;
+  const gw=CO*cw+(CO-1)*gp,gh=RO*ch+(RO-1)*gp,gx=CX-gw/2,gy=CY-gh/2-8;
+  for(let r=0;r<RO;r++) for(let c=0;c<CO;c++){
+    const m=el('rect',{x:gx+c*(cw+gp),y:gy+r*(ch+gp),width:cw,height:ch,rx:5,
+      fill:'#F1F5FA',stroke:'#DCE4EE','stroke-width':1,class:'mach'});
+    m.style.setProperty('--md',((c*.28)+(r*.17)).toFixed(2)+'s');
+    s.appendChild(m);
+  }
+  s.appendChild(tx(CX,gy+gh+22,'YOUR PRODUCTION',{m:1,fs:9.5,ls:2.4,f:C.mint}));
+  s.appendChild(tx(CX,gy+gh+38,'RUNNING · UNATTENDED',{m:1,fs:8.5,ls:1.6,f:C.faint}));
+  /* the four values stand around the loop — each tied to the arc that earns it */
+  const VAL=[
+    [190,CY-72,'FASTEST PATH',C.mint,'no security queue, no compliance pack,','no human process in the way'],
+    [190,CY+64,'TRUSTED',C.blue,'validated and evidenced','all along the path'],
+    [1050,CY-72,'BUILT TO CHANGE',C.amber,'adopt new tech, drop legacy —','no rebuild, no migration project'],
+    [1050,CY+64,'SOVEREIGN',C.plum,'agnostic · open source ·','a stack per customer · all yours']];
+  VAL.forEach(([x,y,t,c,l1,l2])=>{
+    s.appendChild(el('path',{d:'M'+(x-92)+' '+(y-26)+' H'+(x+92),stroke:c,
+      'stroke-opacity':.5,'stroke-width':2}));
+    s.appendChild(tx(x,y-8,t,{m:1,fs:12,w:600,ls:2,f:c}));
+    s.appendChild(tx(x,y+12,l1,{fs:11.5,f:C.mut}));
+    s.appendChild(tx(x,y+28,l2,{fs:11.5,f:C.mut}));
+  });
+})();
+
+/* ══ 08 · one mini topology per case ══ */
+(function(){
+  const MINIS=[
+    {c:'#0F9D76',n:[['archive',30,24],['sensors',30,64],['airflow',105,44],
+      ['spark',180,24],['store',180,64]],
+     e:[[0,2],[1,2],[2,3],[3,4]],x:['no route out',232,44]},
+    {c:'#2F6FE0',n:[['users',30,24],['open-webui',105,24],['vllm',185,24],
+      ['keycloak',68,64],['qdrant',150,64]],
+     e:[[0,1],[1,2],[3,1],[1,4],[4,2]]},
+    {c:'#B8790A',n:[['apisix',30,44],['fastapi',100,24],['kafka',100,64],
+      ['cnpg',175,24],['valkey',175,64]],
+     e:[[0,1],[1,2],[1,3],[2,4]]},
+    {c:'#7C4DEB',n:[['eu-1',30,20],['us-1',30,44],['ap-1',30,68],['core',120,44],
+      ['clickhouse',200,44]],
+     e:[[0,3],[1,3],[2,3],[3,4]]}
+  ];
+  document.querySelectorAll('svg[data-uc]').forEach(sv=>{
+    const M=MINIS[+sv.dataset.uc]; fit(sv,260,88);
+    M.e.forEach(([a,b],i)=>{
+      const A2=M.n[a],B2=M.n[b];
+      sv.appendChild(el('path',{d:'M'+A2[1]+' '+A2[2]+' L'+B2[1]+' '+B2[2],
+        stroke:M.c,'stroke-opacity':.45,'stroke-width':1.2,class:'flow',
+        style:'animation-delay:-'+(i*.4)+'s','stroke-dasharray':'4 4'}));
+    });
+    M.n.forEach(([n,x,y],i)=>{
+      sv.appendChild(el('circle',{cx:x,cy:y,r:4.5,fill:i===Math.floor(M.n.length/2)?M.c:'#fff',
+        stroke:M.c,'stroke-width':1.5}));
+      sv.appendChild(tx(x,y+15,n,{m:1,fs:8,f:'#566782'}));
+    });
+    if(M.x){sv.appendChild(tx(M.x[1],M.x[2],'⊘',{fs:14,f:'#DC3A57'}));
+      sv.appendChild(tx(M.x[1],M.x[2]+15,M.x[0],{m:1,fs:7,f:'#DC3A57'}));}
+  });
+})();
+
+/* ══ deck nav ══ */
+/* ══ 07 · THE APP FACTORY — the whole estate on one floor ══
+   Four teams down the left, three environments across, every cell a
+   real stack with its own composition and version. One timeline under
+   all of it, one control plane beside it, and the queue that used to
+   sit between a team and production crossed out at the bottom. */
+(function(){
+  const s=document.getElementById('f8'); if(!s) return;
+  const W=1240,H=452; fit(s,W,H);
+  const COL=[232,466,700], CW=224, ROWY=[60,122,184,246], CH=52;
+  const ENV=['DEV','STAGE','PRODUCTION'];
+  const TEAM=[
+    ['PLATFORM',    [104,78,120,64], ['v4.3-rc','v4.2.0','v4.2.0']],
+    ['PAYMENTS',    [86,116,70],     ['v2.9.1','v2.9.0','v2.8.7']],
+    ['DATA & ML',    [120,64,96,84],  ['v7.1.0','v7.0.2','v7.0.2']],
+    ['RESEARCH',    [72,104],        ['v1.4.0','v1.3.0','v1.3.0']]
+  ];
+  const LAYC=['#F9C22B','#4D96FF','#2F6FE0','#7C4DEB'];
+  const STATE=[['building',C.amber],['validating',C.blue],['healthy',C.mint]];
+
+  let d='<marker id="afa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" '+
+    'markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="'+C.plum+'"/></marker>'+
+    '<marker id="afb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" '+
+    'markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="'+C.amber+'"/></marker>'+
+    '<linearGradient id="afp" x1="0" y1="0" x2="0" y2="1">'+
+    '<stop offset="0" stop-color="#F1ECFE"/><stop offset="1" stop-color="#FBFAFF"/></linearGradient>';
+  const df=el('defs'); df.innerHTML=d; s.appendChild(df);
+
+  /* ── zone labels ── */
+  s.appendChild(tx(0,10,'HIERARCHY',{a:'start',m:1,fs:8.6,ls:2.2,f:C.faint}));
+  ENV.forEach((e,i)=>s.appendChild(tx(COL[i]+CW/2,10,e,
+    {m:1,fs:8.6,ls:2.2,f:i===2?C.mint:C.faint,w:600})));
+  s.appendChild(tx(1240,10,'ONE CONTROL PLANE',{a:'end',m:1,fs:8.6,ls:2.2,f:C.plum}));
+
+  /* the production column is the one everybody is waiting on */
+  s.appendChild(box(COL[2]-10,20,CW+20,282,{r:12,fill:'#F1FBF7',stroke:C.mint,sw:1.3}));
+
+  /* ── the org, and the teams hanging off it ── */
+  s.appendChild(box(0,20,208,26,{r:8,fill:C.ink,stroke:'none',sw:0}));
+  s.appendChild(tx(104,37,'THE ORGANISATION',{m:1,fs:9,w:600,ls:1.6,f:'#fff'}));
+  s.appendChild(el('path',{d:'M16 46 L16 '+(ROWY[3]+CH/2),stroke:C.plum2,'stroke-width':1.4,
+    fill:'none'}));
+  TEAM.forEach((t,r)=>{
+    const cy=ROWY[r]+CH/2;
+    s.appendChild(el('path',{d:'M16 '+cy+' L34 '+cy,stroke:C.plum2,'stroke-width':1.4}));
+    s.appendChild(box(34,cy-13,174,26,{r:8,fill:'url(#afp)',stroke:C.plum,sw:1.3}));
+    s.appendChild(tx(46,cy+4,t[0],{a:'start',m:1,fs:9,w:600,ls:.8,f:C.plum}));
+    s.appendChild(el('circle',{cx:196,cy:cy,r:3.2,fill:C.plum2,class:'glow',
+      style:'animation-delay:'+(r*.4)+'s'}));
+  });
+  s.appendChild(tx(0,322,'ONE ORG · MANY TEAMS',{a:'start',m:1,fs:8,ls:1.2,f:C.mut}));
+
+  /* ── the floor: every team's stack, in every environment ── */
+  TEAM.forEach((t,r)=>{
+    const y=ROWY[r];
+    COL.forEach((x,c)=>{
+      const prod=c===2;
+      s.appendChild(box(x,y,CW,CH,{r:10,fill:'#fff',stroke:prod?C.mint:C.line2,
+        sw:prod?1.5:1.2}));
+      /* the stack itself — a different shape for every team */
+      t[1].forEach((w,j)=>s.appendChild(el('rect',{x:x+12,y:y+9+j*10,width:w,height:6,rx:3,
+        fill:LAYC[j%4],'fill-opacity':prod?.95:.62})));
+      s.appendChild(tx(x+CW-12,y+21,t[2][c],{a:'end',m:1,fs:8.6,w:600,f:C.ink}));
+      s.appendChild(el('circle',{cx:x+CW-12-STATE[c][0].length*4.6-8,cy:y+34,r:3,
+        fill:STATE[c][1]}));
+      s.appendChild(tx(x+CW-12,y+37,STATE[c][0],{a:'end',m:1,fs:7.6,f:STATE[c][1]}));
+    });
+    /* promotion — the same unit moving right, not a rebuild */
+    [0,1].forEach(c=>s.appendChild(el('line',{x1:COL[c]+CW+2,y1:y+CH/2,x2:COL[c+1]-4,
+      y2:y+CH/2,stroke:C.plum,'stroke-width':2.2,'marker-end':'url(#afa)',
+      class:'flow','stroke-dasharray':'6 5'})));
+  });
+
+  /* and everything the slide has no room to draw */
+  s.appendChild(box(232,306,692,24,{r:8,fill:'#fff',stroke:C.line2,sw:1.2,dash:'6 5'}));
+  s.appendChild(tx(578,322,'…AND EVERY OTHER STACK IN THE ORGANISATION, THE SAME WAY',
+    {m:1,fs:8.4,w:600,ls:1.4,f:C.faint}));
+
+  /* ── the control plane ── */
+  const RX=950, RW=290;
+  const RAIL=[
+    ['VERSION CONTROL','every stack on one timeline',C.blue],
+    ['ROLLBACK IN TIME','any stack, any point',C.amber],
+    ['HIERARCHY CONTROL','policy inherited downward',C.plum],
+    ['COMPLIANCE ANALYTICS','posture across the estate',C.mint],
+    ['STANDARDISATION','one way to build, everywhere',C.steel],
+    ['MCP ON EVERY STACK','the whole estate, AI-addressable',C.claude]
+  ];
+  RAIL.forEach((r,i)=>{
+    const y=20+i*47;
+    s.appendChild(box(RX,y,RW,41,{r:9,fill:'#fff',stroke:C.line2,sw:1.2}));
+    s.appendChild(el('rect',{x:RX,y:y,width:3.4,height:41,rx:1.7,fill:r[2]}));
+    s.appendChild(tx(RX+14,y+18,r[0],{a:'start',m:1,fs:9,w:600,ls:.7,f:C.ink}));
+    s.appendChild(tx(RX+14,y+32,r[1],{a:'start',m:1,fs:7.8,f:C.mut}));
+  });
+
+  /* ── one timeline under the whole floor ── */
+  s.appendChild(el('line',{x1:0,y1:344,x2:W,y2:344,stroke:C.line}));
+  s.appendChild(tx(0,360,'ONE TIMELINE UNDER THE WHOLE FLOOR',
+    {a:'start',m:1,fs:8.6,ls:2.2,f:C.blue}));
+  const TY=396, TX0=8, TX1=560, V=['v4.0','v4.1','v4.2','v4.3','v4.4','now'];
+  s.appendChild(el('line',{x1:TX0,y1:TY,x2:TX1,y2:TY,stroke:C.line2,'stroke-width':1.6}));
+  V.forEach((v,i)=>{
+    const x=TX0+i*((TX1-TX0)/(V.length-1)), on=i===2;
+    s.appendChild(el('circle',{cx:x,cy:TY,r:on?6:4.2,fill:on?C.amber:'#fff',
+      stroke:on?C.amber:C.line2,'stroke-width':1.6,class:i===5?'stp':null}));
+    s.appendChild(tx(x,TY+18,v,{m:1,fs:8,f:on?C.amber:C.faint,w:on?600:400}));
+  });
+  s.appendChild(el('path',{d:'M'+TX1+' '+(TY-14)+' C '+(TX1-120)+' '+(TY-44)+', '+
+    (TX0+280)+' '+(TY-44)+', '+(TX0+2*((TX1-TX0)/5))+' '+(TY-12),
+    fill:'none',stroke:C.amber,'stroke-width':1.8,'marker-end':'url(#afb)',
+    'stroke-dasharray':'6 5',class:'flow'}));
+  s.appendChild(tx(TX0+2*((TX1-TX0)/5),TY+34,'ROLL THE WHOLE ESTATE BACK',
+    {m:1,fs:8.6,w:600,ls:1.2,f:C.amber}));
+
+  /* ── and what the organisation stops queueing for ── */
+  s.appendChild(tx(640,360,'WHAT THE ORGANISATION STOPS WAITING FOR',
+    {a:'start',m:1,fs:8.6,ls:2.2,f:C.red}));
+  const BLOCK=['SECURITY REVIEW','APPROVAL QUEUE','ENVIRONMENT TICKETS','PLATFORM BACKLOG'];
+  BLOCK.forEach((b,i)=>{
+    const w=(600-3*8)/4, x=640+i*(w+8), y=372;
+    s.appendChild(box(x,y,w,24,{r:8,fill:C.redW,stroke:'#F6C2CD',sw:1.1}));
+    s.appendChild(tx(x+w/2,y+16,b,{m:1,fs:7.6,w:600,ls:.5,f:'#B04257'}));
+    s.appendChild(el('line',{x1:x+8,y1:y+12,x2:x+w-8,y2:y+12,stroke:C.red,'stroke-width':1.4}));
+  });
+  s.appendChild(box(640,406,600,30,{r:9,fill:C.mintW,stroke:C.mint,sw:1.5}));
+  s.appendChild(tx(940,425,'AUTOMATED — WITH THE EVIDENCE PRODUCED ON THE WAY',
+    {m:1,fs:9.4,w:600,ls:1.5,f:C.mint}));
+})();
+
+/* ══ 08 · SOVEREIGNTY — portability, drawn rather than claimed ══
+   The same application graph is rendered three times, node for node,
+   over three substrates that share nothing. What changes sits below
+   the seam; what does not sits above it. */
+(function(){
+  const s=document.getElementById('f9'); if(!s) return;
+  const W=1240,H=396; fit(s,W,H);
+  const PW=400, PX=[0,420,840], PY=28, PH=222;
+
+  const df=el('defs'); df.innerHTML=
+    '<marker id="sva" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" '+
+    'orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="'+C.mint+'"/></marker>';
+  s.appendChild(df);
+
+  /* the one application — identical geometry in every panel */
+  const AN=[[52,20],[136,6],[228,22],[312,14],[92,56],[192,60],[284,54]];
+  const AE=[[0,1],[1,2],[2,3],[0,4],[1,4],[2,5],[3,6],[4,5],[5,6],[1,5]];
+
+  const SUB=[
+    ['PUBLIC CLOUD',C.blue,
+      ['managed database','provider object storage','hosted model API','provider IAM']],
+    ['PRIVATE DATACENTRE',C.steel,
+      ['self-hosted database','local object store','private model weights','own identity']],
+    ['AIR-GAPPED · IN-REGION',C.plum,
+      ['in-region database','encrypted local store','on-prem weights','isolated identity']]
+  ];
+
+  s.appendChild(tx(0,12,'ONE APPLICATION ARCHITECTURE',{a:'start',m:1,fs:8.6,ls:2.2,f:C.ink,w:600}));
+  s.appendChild(tx(W,12,'THREE SUBSTRATES THAT SHARE NOTHING',{a:'end',m:1,fs:8.6,ls:2.2,f:C.faint}));
+
+  SUB.forEach((p,i)=>{
+    const x=PX[i], c=p[1];
+    s.appendChild(box(x,PY,PW,PH,{r:12,fill:'#fff',stroke:C.line2,sw:1.3}));
+
+    /* above the seam — identical, every time */
+    s.appendChild(box(x+10,PY+10,PW-20,96,{r:9,fill:'#FBFCFE',stroke:C.line,sw:1.1}));
+    s.appendChild(tx(x+20,PY+24,'THE APPLICATION',{a:'start',m:1,fs:7.6,ls:1.6,f:C.faint}));
+    s.appendChild(tx(x+PW-20,PY+24,'identical',{a:'end',m:1,fs:7.6,ls:1,f:C.mint,w:600}));
+    const gx=x+30, gy=PY+38;
+    AE.forEach(e=>s.appendChild(el('line',{x1:gx+AN[e[0]][0],y1:gy+AN[e[0]][1],
+      x2:gx+AN[e[1]][0],y2:gy+AN[e[1]][1],stroke:C.blue,'stroke-opacity':.42,
+      'stroke-width':1})));
+    AN.forEach((n,k)=>s.appendChild(el('circle',{cx:gx+n[0],cy:gy+n[1],r:4.2,
+      fill:['#F9C22B','#4D96FF','#2F6FE0','#7C4DEB','#4D96FF','#2F6FE0','#0F9D76'][k]})));
+
+    /* the seam — the coupling that is deliberately absent */
+    s.appendChild(el('line',{x1:x+10,y1:PY+118,x2:x+PW-10,y2:PY+118,stroke:C.line2,
+      'stroke-width':1.2,'stroke-dasharray':'5 5'}));
+    s.appendChild(box(x+PW/2-52,PY+110,104,17,{r:8.5,fill:'#fff',stroke:C.line2,sw:1}));
+    s.appendChild(tx(x+PW/2,PY+122,'NOT COUPLED',{m:1,fs:7.4,ls:1.3,f:C.mut,w:600}));
+
+    /* below the seam — everything that is allowed to differ */
+    s.appendChild(box(x+10,PY+134,PW-20,26,{r:8,fill:c,stroke:'none',sw:0}));
+    s.appendChild(tx(x+PW/2,PY+151,p[0],{m:1,fs:9.4,w:600,ls:1.4,f:'#fff'}));
+    p[2].forEach((t,j)=>{
+      const y=PY+166+j*13;
+      s.appendChild(el('circle',{cx:x+22,cy:y+3,r:2.4,fill:c}));
+      s.appendChild(tx(x+32,y+6,t,{a:'start',m:1,fs:7.8,f:C.mut}));
+    });
+  });
+
+  /* the sentence the slide exists to make */
+  s.appendChild(el('line',{x1:0,y1:270,x2:W,y2:270,stroke:C.line}));
+  s.appendChild(tx(W/2,290,'Managed services are welcome. Coupling your architecture to them is not.',
+    {fs:15,f:C.ink,w:500,st:"font-family:'Fraunces',Georgia,serif"}));
+
+  /* what that buys, and when it is decided */
+  const LY=312;
+  s.appendChild(tx(0,LY,'AND THAT IS WHAT IT SOLVES — WITHOUT A MIGRATION',
+    {a:'start',m:1,fs:8.6,ls:2.2,f:C.mint}));
+  const SOLVE=['VENDOR LOCK-IN','TOPOLOGY PORTABILITY','DATA CONTROL',
+    'REGULATORY CONSTRAINTS','LICENSING EXPOSURE','INFRASTRUCTURE COST'];
+  SOLVE.forEach((t,i)=>{
+    const w=(610-2*8)/3, x=i%3*(w+8), y=LY+12+Math.floor(i/3)*34;
+    s.appendChild(box(x,y,w,28,{r:9,fill:C.mintW,stroke:C.mint,sw:1.2}));
+    s.appendChild(tx(x+w/2,y+18,t,{m:1,fs:8.4,w:600,ls:.7,f:C.mint}));
+  });
+
+  s.appendChild(tx(650,LY,'AND WHEN IT GETS DECIDED',{a:'start',m:1,fs:8.6,ls:2.2,f:C.faint}));
+  s.appendChild(box(650,LY+12,268,28,{r:9,fill:C.redW,stroke:'#F6C2CD',sw:1.2}));
+  s.appendChild(tx(784,LY+30,'RE-ARCHITECTED IN YEAR THREE',{m:1,fs:8.4,w:600,ls:.7,f:'#B04257'}));
+  s.appendChild(el('line',{x1:658,y1:LY+26,x2:910,y2:LY+26,stroke:C.red,'stroke-width':1.4}));
+  s.appendChild(el('line',{x1:926,y1:LY+26,x2:958,y2:LY+26,stroke:C.mint,'stroke-width':2,
+    'marker-end':'url(#sva)'}));
+  s.appendChild(box(972,LY+12,268,28,{r:9,fill:C.mintW,stroke:C.mint,sw:1.5}));
+  s.appendChild(tx(1106,LY+30,'GENERATED ON DAY 0',{m:1,fs:8.4,w:600,ls:.7,f:C.mint}));
+  s.appendChild(tx(650,LY+58,'Change infrastructure, storage, databases, models or providers —',
+    {a:'start',fs:11.5,f:C.mut}));
+  s.appendChild(tx(650,LY+76,'the application does not change. Nor does its compliance evidence.',
+    {a:'start',fs:11.5,f:C.ink,w:500}));
+})();
+
+const frames=[...document.querySelectorAll('.frame')],
+      dots=document.getElementById('dots');
+frames.forEach((f,i)=>{const b=document.createElement('button');b.className='nd';
+  b.textContent=i+1;b.onclick=()=>f.scrollIntoView({behavior:'smooth',inline:'center'});
+  dots.appendChild(b);});
+const nds=[...dots.children];let cur=0;
+const mark=()=>{nds.forEach((d,i)=>d.classList.toggle('on',i===cur));
+  frames.forEach((f,i)=>f.classList.toggle('live',i===cur));};
+frames.forEach(f=>new IntersectionObserver(es=>{es.forEach(e=>{
+  if(e.isIntersecting){cur=frames.indexOf(e.target);mark();}});},
+  {threshold:.55}).observe(f));
+const go=n=>{const t=Math.max(0,Math.min(frames.length-1,cur+n));
+  frames[t].scrollIntoView({behavior:'smooth',inline:'center'});};
+document.getElementById('prev').onclick=()=>go(-1);
+document.getElementById('next').onclick=()=>go(1);
+addEventListener('keydown',e=>{
+  if(['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)){e.preventDefault();go(1);}
+  if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();go(-1);}});
+mark();
+
+</script>
+</body></html>

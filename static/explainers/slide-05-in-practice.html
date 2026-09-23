@@ -1,0 +1,817 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stacktic — Slide 05 · How it looks in practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b1330; --ink:#f2f5ff; --body:#b6c1e2; --soft:#8b97bf; --faint:#6b78a3;
+  --line:rgba(150,175,235,.20); --line2:rgba(150,175,235,.34);
+  --gold:#fbbf24; --sky:#38bdf8; --indigo:#818cf8; --violet:#a78bfa;
+  --amber:#f59e0b; --emerald:#34d399; --rose:#fb7185; --red:#ff4d6d;
+  --disp:"Sora",system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;min-width:0}
+html,body{height:100%}
+body{background:
+   radial-gradient(120% 90% at 50% -20%,#1c2a63 0%,transparent 62%),
+   radial-gradient(80% 70% at 110% 110%,#221a52 0%,transparent 60%),
+   var(--bg);
+  color:var(--ink);font-family:var(--disp);-webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:18px}
+
+.slide{position:relative;width:min(1500px,96vw);aspect-ratio:16/9;max-height:84vh;border-radius:20px;overflow:hidden;
+  background:linear-gradient(165deg,#182356 0%,#111a42 52%,#16204d 100%);
+  border:1px solid var(--line);box-shadow:0 50px 120px -50px rgba(4,8,26,.9),0 0 0 1px rgba(255,255,255,.03) inset;
+  container-type:inline-size;--u:1cqw;display:flex;flex-direction:column}
+.slide::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.7;
+  background-image:linear-gradient(rgba(150,180,255,.06) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(150,180,255,.06) 1px,transparent 1px);
+  background-size:calc(var(--u)*3.2) calc(var(--u)*3.2);
+  mask-image:radial-gradient(120% 100% at 50% 45%,#000 20%,transparent 82%)}
+.slide::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:60;
+  background:radial-gradient(125% 105% at 50% 48%,transparent 62%,rgba(8,14,42,.42) 100%)}
+.pad{position:relative;z-index:5;flex:1;display:flex;flex-direction:column;
+  padding:calc(var(--u)*1.7) calc(var(--u)*2.2) calc(var(--u)*1.2)}
+
+.top{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);
+  font-size:calc(var(--u)*.78);color:var(--soft);letter-spacing:.13em;flex:none}
+.top b{color:var(--ink);font-weight:800}
+.top .acts{display:flex;gap:calc(var(--u)*.4);align-items:center}
+.top .acts i{font-style:normal;font-size:calc(var(--u)*.56);letter-spacing:.14em;font-weight:700;
+  padding:calc(var(--u)*.2) calc(var(--u)*.44);border-radius:999px;color:#5b6791;
+  border:1px solid transparent;transition:.45s}
+.top .acts i.on{color:#0a0f22;background:var(--ac);border-color:var(--ac)}
+.top .acts i.past{color:var(--soft);border-color:var(--line)}
+
+.head{flex:none;margin-top:calc(var(--u)*.8);min-height:calc(var(--u)*7.4);position:relative}
+.eb{display:inline-flex;align-items:center;gap:.6em;font-family:var(--mono);font-size:calc(var(--u)*.68);
+  font-weight:800;letter-spacing:.22em;padding:calc(var(--u)*.3) calc(var(--u)*.8);border-radius:999px;
+  color:var(--ac);background:color-mix(in srgb,var(--ac) 12%,transparent);
+  border:1px solid color-mix(in srgb,var(--ac) 34%,transparent)}
+.eb::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--ac);
+  box-shadow:0 0 0 0 color-mix(in srgb,var(--ac) 70%,transparent);animation:beat 2s infinite}
+@keyframes beat{70%{box-shadow:0 0 0 calc(var(--u)*.7) transparent}100%{box-shadow:0 0 0 0 transparent}}
+h1{font-weight:800;letter-spacing:-.045em;line-height:1.03;font-size:calc(var(--u)*2.7);
+  margin-top:calc(var(--u)*.55)}
+h1 em{font-style:normal;color:var(--ac)}
+.hl{position:absolute;inset:0;opacity:0;transform:translateY(calc(var(--u)*.8));
+  transition:opacity .5s ease,transform .5s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+.hl.on{opacity:1;transform:none}
+
+/* ───────── three panes ───────── */
+.stage{position:relative;flex:1;min-height:0;margin-top:calc(var(--u)*.3);
+  display:grid;grid-template-columns:23fr 45fr 32fr;gap:calc(var(--u)*.9)}
+.pane{position:relative;border-radius:calc(var(--u)*.9);min-width:0;display:flex;flex-direction:column;
+  background:rgba(15,23,58,.72);border:1px solid var(--line);overflow:hidden;
+  opacity:0;transform:translateY(calc(var(--u)*.8));transition:.55s cubic-bezier(.2,.9,.2,1)}
+.pane.in{opacity:1;transform:none}
+.ph{display:flex;align-items:center;gap:calc(var(--u)*.45);flex:none;
+  padding:calc(var(--u)*.45) calc(var(--u)*.7);background:rgba(26,36,82,.75);
+  border-bottom:1px solid var(--line);font-family:var(--mono)}
+.ph u{width:calc(var(--u)*.6);height:calc(var(--u)*.6);border-radius:50%;flex:none;text-decoration:none;
+  background:var(--c);box-shadow:0 0 calc(var(--u)*.7) var(--c)}
+.ph b{font-size:calc(var(--u)*.6);font-weight:800;letter-spacing:.16em;color:color-mix(in srgb,var(--c) 65%,#fff)}
+.ph s{text-decoration:none;margin-left:auto;font-size:calc(var(--u)*.52);color:var(--faint);white-space:nowrap}
+.pb{flex:1;min-height:0;padding:calc(var(--u)*.7);display:flex;flex-direction:column;gap:calc(var(--u)*.5)}
+
+/* tabs on the design pane */
+.tabs{display:flex;gap:calc(var(--u)*.3);margin-left:calc(var(--u)*.5)}
+.tabs i{font-style:normal;font-size:calc(var(--u)*.5);font-weight:700;letter-spacing:.12em;
+  padding:calc(var(--u)*.12) calc(var(--u)*.42);border-radius:calc(var(--u)*.3);
+  color:var(--faint);border:1px solid transparent}
+.tabs i.on{color:#0b1330;background:var(--sky);border-color:var(--sky)}
+
+/* ── A · the prompt ── */
+#chat{font-family:var(--mono);font-size:calc(var(--u)*.6);line-height:1.5}
+.msg{border-radius:calc(var(--u)*.5);padding:calc(var(--u)*.42) calc(var(--u)*.55);margin-bottom:calc(var(--u)*.42);
+  opacity:0;transform:translateY(calc(var(--u)*.4));transition:.4s}
+.msg.in{opacity:1;transform:none}
+.msg.you{background:rgba(56,189,248,.13);border:1px solid color-mix(in srgb,var(--sky) 34%,transparent);color:#dbeafe}
+.msg.ai{background:rgba(26,36,82,.7);border:1px solid var(--line);color:var(--body)}
+.msg b{display:block;font-size:calc(var(--u)*.46);letter-spacing:.16em;color:var(--faint);margin-bottom:.3em}
+/* sits right under the chat, not pinned to the bottom — the strip overlays the bottom */
+.steps{display:flex;flex-direction:column;gap:calc(var(--u)*.3);margin-top:calc(var(--u)*.2)}
+.step{display:flex;align-items:center;gap:calc(var(--u)*.4);font-family:var(--mono);
+  font-size:calc(var(--u)*.54);color:var(--soft);opacity:0;transform:translateX(calc(var(--u)*-.5));
+  transition:.35s}
+.step.in{opacity:1;transform:none}
+.step u{width:calc(var(--u)*.85);height:calc(var(--u)*.85);border-radius:50%;flex:none;text-decoration:none;
+  border:1.5px solid var(--line2);display:grid;place-items:center;font-size:calc(var(--u)*.5)}
+.step.ok u{border-color:var(--emerald);background:var(--emerald);color:#08170f}
+.step.ok{color:var(--body)}
+.step.ok u::after{content:"✓"}
+.step.blocked u{border-color:var(--red);background:var(--red);color:#fff}
+.step.blocked u::after{content:"!"}
+.step.blocked{color:var(--red)}
+
+/* ── B · the design canvas ── */
+#canvas{position:relative;flex:1;min-height:0;border-radius:calc(var(--u)*.6);
+  background:
+    linear-gradient(rgba(150,180,255,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(150,180,255,.05) 1px,transparent 1px),
+    rgba(10,16,40,.5);
+  background-size:calc(var(--u)*1.6) calc(var(--u)*1.6),calc(var(--u)*1.6) calc(var(--u)*1.6),auto;
+  border:1px solid var(--line)}
+#links{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.cn{position:absolute;transform:translate(-50%,-50%) scale(var(--s,1));width:calc(var(--u)*9.4);
+  padding:calc(var(--u)*.36) calc(var(--u)*.46);border-radius:calc(var(--u)*.5);
+  background:linear-gradient(165deg,color-mix(in srgb,var(--c) 22%,#1a2452),#141d47);
+  border:1px solid color-mix(in srgb,var(--c) 40%,transparent);z-index:3;
+  opacity:0;transition:opacity .45s,transform .5s cubic-bezier(.2,1.3,.4,1),border-color .4s,box-shadow .4s}
+.cn.in{opacity:1;--s:1}
+.cn.pop{--s:1.06}
+.cn b{display:block;font-size:calc(var(--u)*.62);font-weight:800;letter-spacing:-.01em;line-height:1.15;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cn i{display:block;font-style:normal;font-family:var(--mono);font-size:calc(var(--u)*.44);font-weight:700;
+  letter-spacing:.08em;color:color-mix(in srgb,var(--c) 60%,var(--soft));margin-top:.2em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cn.ai{border-style:dashed}
+.cn.ok{box-shadow:0 0 calc(var(--u)*1.6) -.3cqw color-mix(in srgb,var(--emerald) 55%,transparent);
+  border-color:color-mix(in srgb,var(--emerald) 55%,transparent)}
+.cn .badge{position:absolute;right:calc(var(--u)*-.4);top:calc(var(--u)*-.55);font-family:var(--mono);
+  font-size:calc(var(--u)*.42);font-weight:800;letter-spacing:.06em;border-radius:999px;
+  padding:calc(var(--u)*.08) calc(var(--u)*.34);background:var(--emerald);color:#08170f;
+  opacity:0;transform:scale(.5);transition:.35s cubic-bezier(.2,1.5,.4,1)}
+.cn .badge.in{opacity:1;transform:none}
+.ll{position:absolute;transform:translate(-50%,-50%);z-index:4;font-family:var(--mono);
+  font-size:calc(var(--u)*.44);font-weight:700;letter-spacing:.04em;color:var(--gold);
+  background:rgba(11,17,44,.94);border:1px solid color-mix(in srgb,var(--gold) 34%,var(--line));
+  border-radius:calc(var(--u)*.3);padding:calc(var(--u)*.08) calc(var(--u)*.3);white-space:nowrap;
+  opacity:0;transform:translate(-50%,-50%) scale(.85);transition:.4s cubic-bezier(.2,1.4,.4,1)}
+.ll.in{opacity:1;transform:translate(-50%,-50%)}
+.ll.new{color:#2a1602;background:var(--gold);border-color:var(--gold)}
+/* the generated-from-links tray */
+.tray{position:absolute;left:calc(var(--u)*.5);right:calc(var(--u)*.5);bottom:calc(var(--u)*.4);z-index:5;
+  display:flex;align-items:center;gap:calc(var(--u)*.34);flex-wrap:wrap;
+  border-radius:calc(var(--u)*.45);padding:calc(var(--u)*.34) calc(var(--u)*.5);
+  background:rgba(11,17,44,.92);border:1px solid var(--line);
+  opacity:0;transform:translateY(calc(var(--u)*.5));transition:.5s}
+.tray.in{opacity:1;transform:none}
+.tray>b{font-family:var(--mono);font-size:calc(var(--u)*.44);font-weight:800;letter-spacing:.12em;
+  color:var(--faint);flex:none}
+.tray i{font-style:normal;font-family:var(--mono);font-size:calc(var(--u)*.46);font-weight:700;
+  color:#08170f;background:var(--emerald);border-radius:calc(var(--u)*.28);
+  padding:calc(var(--u)*.08) calc(var(--u)*.32);opacity:0;transform:scale(.6);
+  transition:.32s cubic-bezier(.2,1.6,.4,1)}
+.tray i.in{opacity:1;transform:none}
+.tray i.miss{background:transparent;color:var(--red);border:1px dashed var(--red)}
+/* blocked banner */
+.blocked{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%) scale(.9);z-index:8;
+  border-radius:calc(var(--u)*.6);padding:calc(var(--u)*.55) calc(var(--u)*.9);text-align:center;
+  background:rgba(70,16,42,.95);border:1px solid var(--red);backdrop-filter:blur(6px);
+  box-shadow:0 calc(var(--u)*1.6) calc(var(--u)*3) -1.4cqw rgba(4,8,26,.9);
+  opacity:0;transition:.4s cubic-bezier(.2,1.4,.4,1)}
+.blocked.in{opacity:1;transform:translate(-50%,-50%)}
+.blocked b{display:block;font-family:var(--mono);font-size:calc(var(--u)*.66);font-weight:800;
+  letter-spacing:.18em;color:var(--red)}
+.blocked span{display:block;margin-top:.3em;font-size:calc(var(--u)*.68);color:#ffe4ec}
+.blocked em{display:block;margin-top:.25em;font-style:normal;font-family:var(--mono);
+  font-size:calc(var(--u)*.5);color:#ff9bb3}
+
+/* ── C · stack-agent ── */
+.chk{display:flex;align-items:center;gap:calc(var(--u)*.45);font-family:var(--mono);
+  font-size:calc(var(--u)*.54);color:var(--soft);border-radius:calc(var(--u)*.4);
+  padding:calc(var(--u)*.26) calc(var(--u)*.4);background:rgba(26,36,82,.45);border:1px solid transparent;
+  opacity:0;transform:translateX(calc(var(--u)*.5));transition:.35s}
+.chk.in{opacity:1;transform:none}
+.chk u{width:calc(var(--u)*.8);height:calc(var(--u)*.8);border-radius:50%;flex:none;text-decoration:none;
+  border:1.5px solid var(--line2);display:grid;place-items:center;font-size:calc(var(--u)*.48);
+  color:transparent;transition:.3s}
+.chk.pass u{border-color:var(--emerald);background:var(--emerald);color:#08170f}
+.chk.pass u::after{content:"✓"}
+.chk.pass{color:var(--body);border-color:color-mix(in srgb,var(--emerald) 22%,transparent)}
+.chk.fail u{border-color:var(--red);background:var(--red);color:#fff}
+.chk.fail u::after{content:"✕"}
+.chk.fail{color:#ffc0cf;border-color:color-mix(in srgb,var(--red) 40%,transparent);background:rgba(70,16,42,.5)}
+.chk s{text-decoration:none;margin-left:auto;font-size:calc(var(--u)*.46);color:var(--faint);white-space:nowrap}
+.api{margin-top:auto;border-top:1px solid var(--line);padding-top:calc(var(--u)*.45);
+  font-family:var(--mono);font-size:calc(var(--u)*.48);color:var(--faint);line-height:1.6;
+  opacity:0;transition:.5s}
+.api.in{opacity:1}
+.api span{color:var(--emerald)}
+.tg{display:inline-flex;border:1px solid var(--line2);border-radius:calc(var(--u)*.3);overflow:hidden;
+  margin-left:auto}
+.tg i{font-style:normal;font-size:calc(var(--u)*.46);font-weight:700;letter-spacing:.1em;
+  padding:calc(var(--u)*.08) calc(var(--u)*.3);color:var(--faint);transition:.3s}
+.tg i.on{background:var(--emerald);color:#08170f}
+
+/* ── bottom strip ── */
+.strip{position:absolute;left:0;right:0;bottom:0;z-index:40;display:flex;gap:calc(var(--u)*.7);
+  opacity:0;pointer-events:none;transition:.5s}
+.strip.in{opacity:1}
+.sc{flex:1;border-radius:calc(var(--u)*.7);padding:calc(var(--u)*.5) calc(var(--u)*.7);
+  background:rgba(13,20,52,.97);border:1px solid color-mix(in srgb,var(--c) 36%,var(--line));
+  backdrop-filter:blur(8px);opacity:0;transform:translateY(calc(var(--u)*.7));
+  transition:.45s cubic-bezier(.2,.9,.2,1)}
+.sc.in{opacity:1;transform:none}
+.sc b{display:block;font-family:var(--mono);font-size:calc(var(--u)*.5);font-weight:800;
+  letter-spacing:.14em;color:var(--c)}
+.sc .row{display:flex;flex-wrap:wrap;gap:calc(var(--u)*.26);margin-top:calc(var(--u)*.35)}
+.sc .row i{font-style:normal;font-family:var(--mono);font-size:calc(var(--u)*.46);font-weight:700;
+  color:#0d1b2c;background:var(--c);border-radius:calc(var(--u)*.26);
+  padding:calc(var(--u)*.08) calc(var(--u)*.3);opacity:0;transform:scale(.7);
+  transition:.3s cubic-bezier(.2,1.6,.4,1)}
+.sc .row i.in{opacity:1;transform:none}
+.sc .row i.off{background:transparent;color:var(--faint);border:1px solid var(--line2)}
+.sc em{display:block;margin-top:calc(var(--u)*.35);font-style:normal;font-family:var(--mono);
+  font-size:calc(var(--u)*.48);color:var(--soft)}
+.sc em u{text-decoration:none;color:var(--ink);font-weight:800;font-variant-numeric:tabular-nums}
+
+/* caption + chrome */
+.cap{position:relative;z-index:50;flex:none;margin-top:calc(var(--u)*.7);padding-top:calc(var(--u)*.7);
+  border-top:1px solid var(--line);display:flex;align-items:center;gap:calc(var(--u)*1)}
+.cap .txt{position:relative;flex:1;height:calc(var(--u)*2.6);font-family:var(--mono);
+  font-size:calc(var(--u)*.84);color:var(--body);line-height:1.35}
+.cap .txt span{position:absolute;left:0;right:0;top:0;opacity:0;transition:.45s}
+.cap .txt span.on{opacity:1}
+.cap .br{font-family:var(--mono);font-size:calc(var(--u)*.58);letter-spacing:.24em;color:#4f5c8a;flex:none}
+.prog{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.06);z-index:70}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--sky),var(--emerald),var(--violet))}
+.gate{position:absolute;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;
+  gap:calc(var(--u)*.8);border:0;cursor:pointer;font-family:var(--mono);font-weight:800;
+  font-size:calc(var(--u)*1.1);letter-spacing:.2em;color:var(--ink);
+  background:rgba(11,19,48,.72);backdrop-filter:blur(3px)}
+.gate[hidden]{display:none}
+.gate span{display:grid;place-items:center;width:calc(var(--u)*4);height:calc(var(--u)*4);border-radius:50%;
+  background:var(--gold);color:#1a1204;font-size:calc(var(--u)*1.4);
+  box-shadow:0 0 0 calc(var(--u)*.6) rgba(251,191,36,.22)}
+.ctl{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;color:#8b95bb;
+  width:min(1500px,96vw)}
+.ctl button{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.1em;color:#cfd8f5;
+  background:#1a2452;border:1px solid rgba(150,175,235,.28);border-radius:8px;padding:7px 13px;cursor:pointer}
+.ctl button:hover{background:#243066;color:#fff}
+.ctl input[type=range]{flex:1;accent-color:#fbbf24;cursor:pointer}
+.ctl .t{font-variant-numeric:tabular-nums;color:#fbbf24;min-width:78px;text-align:right}
+.noanim *,.noanim *::before,.noanim *::after{transition:none!important;animation:none!important}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001s!important}}
+</style>
+</head>
+<body>
+
+<section class="slide" id="slide" style="--ac:var(--sky)">
+ <div class="pad">
+  <div class="top">
+    <span>{ <b>STACKTIC</b> }</span>
+    <span class="acts" id="acts"></span>
+    <span>05 / 09</span>
+  </div>
+
+  <div class="head" id="head">
+    <div class="hl" data-act="0"><span class="eb">IN PRACTICE</span>
+      <h1>One prompt.<br><em>Watch what actually gets built.</em></h1></div>
+    <div class="hl" data-act="1"><span class="eb">THE PROMPT</span>
+      <h1>“a kafka topic and a sink database”<br><em>is never just two things.</em></h1></div>
+    <div class="hl" data-act="2"><span class="eb">THE CHAIN</span>
+      <h1>Not only the code &mdash;<br><em>the whole production chain.</em></h1></div>
+    <div class="hl" data-act="3"><span class="eb">ENFORCED</span>
+      <h1>It cannot skip a step,<br><em>because the relation declares it.</em></h1></div>
+    <div class="hl" data-act="4"><span class="eb">MCP</span>
+      <h1>Every component feeds the AI.<br><em>Not one repo &mdash; the whole topology.</em></h1></div>
+    <div class="hl" data-act="5"><span class="eb">BOUNDARIES</span>
+      <h1>Full control in staging.<br><em>Read-only in production.</em></h1></div>
+    <div class="hl" data-act="6"><span class="eb">THE RESULT</span>
+      <h1>Every layer becomes<br><em>a governed AI environment.</em></h1></div>
+  </div>
+
+  <div class="stage" id="stage">
+
+    <!-- ── A · prompt ── -->
+    <div class="pane" id="pA" style="--c:var(--sky)">
+      <div class="ph"><u></u><b>VIBE CODING</b><s>THROUGH STACKTIC</s></div>
+      <div class="pb">
+        <div id="chat">
+          <div class="msg you" id="m1"><b>YOU</b><span id="ptxt"></span></div>
+          <div class="msg ai" id="m2"><b>AI · VIA STACKTIC MCP</b>
+            reading the stack model…<br>resolving what this change implies</div>
+        </div>
+        <div class="steps" id="steps">
+          <div class="step" data-s="0"><u></u>write the consumer logic</div>
+          <div class="step" data-s="1"><u></u>declare the topic</div>
+          <div class="step" data-s="2"><u></u>declare the sink database</div>
+          <div class="step" data-s="3"><u></u>schema contract</div>
+          <div class="step" data-s="4"><u></u>mTLS + network policy</div>
+          <div class="step" data-s="5"><u></u>scaling on topic lag</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── B · design canvas ── -->
+    <div class="pane" id="pB" style="--c:var(--gold)">
+      <div class="ph"><u></u><b>STACKTIC DESIGN</b>
+        <span class="tabs"><i class="on">DESIGN</i><i>METADATA</i><i>IMPACT</i></span>
+        <s id="pB-s">0 COMPONENTS · 0 RELATIONS</s></div>
+      <div class="pb" style="padding:calc(var(--u)*.5)">
+        <div id="canvas">
+          <svg id="links" viewBox="0 0 100 100"></svg>
+          <div id="nodes"></div>
+          <div id="labels"></div>
+          <div class="tray" id="tray">
+            <b>GENERATED FROM THE LINKS</b>
+            <i data-g="netpol">network policy ×7</i>
+            <i data-g="secret">canonical secrets</i>
+            <i data-g="mtls">kafka mTLS listener</i>
+            <i data-g="schema">avro · BACKWARD</i>
+            <i data-g="keda">KEDA scaler</i>
+          </div>
+          <div class="blocked" id="blocked">
+            <b>BLOCKED</b>
+            <span>topic &rarr; db declared without a schema contract</span>
+            <em>the link type carries it — it is not an optional extra</em>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── C · stack-agent ── -->
+    <div class="pane" id="pC" style="--c:var(--emerald)">
+      <div class="ph"><u></u><b>STACK-AGENT</b>
+        <span class="tg"><i class="on">UI</i><i>API</i></span></div>
+      <div class="pb">
+        <div class="chk" data-k="0"><u></u>topology resolved<s id="k0">—</s></div>
+        <div class="chk" data-k="1"><u></u>connector compatibility<s>kafka 3.7</s></div>
+        <div class="chk" data-k="2"><u></u>schema contract<s>BACKWARD</s></div>
+        <div class="chk" data-k="3"><u></u>mTLS listener<s>strimzi</s></div>
+        <div class="chk" data-k="4"><u></u>network policy<s id="k4">—</s></div>
+        <div class="chk" data-k="5"><u></u>secrets resolved<s>canonical</s></div>
+        <div class="chk" data-k="6"><u></u>autoscaling<s>topic lag</s></div>
+        <div class="api" id="api">
+          same answer in the UI or over the API<br>
+          <span>GET</span> /metadata/q &nbsp; <span>POST</span> /iso27001_scan<br>
+          evidence written back to git
+        </div>
+      </div>
+    </div>
+
+    <!-- ── bottom strip ── -->
+    <div class="strip" id="strip">
+      <div class="sc" id="s1" style="--c:var(--violet)"><b>MCP · EVERY LAYER</b>
+        <div class="row"><i>topology</i><i>links</i><i>versions</i><i>security</i><i>health</i><i>compliance</i><i>evidence</i><i>actions</i></div>
+        <em>a normal client sees <u>1</u> repo &nbsp;·&nbsp; here it reads <u id="n-lay">0</u> layers</em></div>
+      <div class="sc" id="s2" style="--c:var(--emerald)"><b>STAGING · FULL CONTROL</b>
+        <div class="row"><i>create</i><i>change</i><i>upgrade</i><i>delete</i><i>apply</i><i>rollback</i></div>
+        <em>the AI may do <u id="n-stg">0</u> of 6 actions</em></div>
+      <div class="sc" id="s3" style="--c:var(--amber)"><b>PRODUCTION · YOU DECIDE</b>
+        <div class="row"><i class="off">create</i><i class="off">change</i><i class="off">delete</i><i>read</i><i>scan</i></div>
+        <em>allowlisted: <u id="n-prd">0</u> of 5 &nbsp;·&nbsp; read-only unless you say otherwise</em></div>
+    </div>
+  </div>
+
+  <div class="cap">
+    <div class="txt" id="cap"></div>
+    <span class="br">STACKTIC 2026</span>
+  </div>
+ </div>
+ <div class="prog"><i id="prog"></i></div>
+ <button class="gate" id="gate" hidden><span>&#9654;</span>PLAY WITH NARRATION</button>
+</section>
+<audio id="vo" src="slide-5.mp3" preload="auto"></audio>
+
+<div class="ctl">
+  <button id="play">&#9199; PLAY</button>
+  <button id="rst">&#8635; RESTART</button>
+  <input type="range" id="scrub" min="0" max="68.35" step="0.05" value="0" aria-label="timeline">
+  <span class="t" id="clock">0.0 / 68s</span>
+  <span>SPACE&nbsp;play&nbsp;&nbsp;&larr;&rarr;&nbsp;act&nbsp;&nbsp;1-7&nbsp;jump</span>
+</div>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const NS='http://www.w3.org/2000/svg';
+const canvas=$('#canvas'), svg=$('#links'), nodeLayer=$('#nodes'), labLayer=$('#labels');
+
+/* ── the chain this prompt actually creates.
+      link names are the real types from the templates catalog. ── */
+const CN=[
+ {id:'app',   x:150,y:140, t:'payments-logic', s:'EXTERNAL_SOURCE_CODE', c:'var(--sky)'},
+ {id:'topic', x:420,y:140, t:'live-bids',      s:'TOPIC · KAFKA',        c:'var(--amber)'},
+ {id:'db',    x:690,y:140, t:'bids-db',        s:'DB · CNPG',            c:'var(--emerald)'},
+ {id:'reg',   x:420,y:330, t:'schema registry',s:'APICURIO',             c:'var(--violet)'},
+ {id:'keda',  x:150,y:330, t:'autoscaler',     s:'KEDA',                 c:'var(--rose)'},
+ {id:'prom',  x:690,y:330, t:'prometheus',     s:'METRICS',              c:'var(--indigo)'}
+];
+const CNI=Object.fromEntries(CN.map(n=>[n.id,n]));
+const LK=[
+ {a:'app',  b:'topic', l:'external_source_code-topic'},
+ {a:'topic',b:'db',    l:'topic-db'},
+ {a:'topic',b:'reg',   l:'topic-apicurio_schema_registry'},
+ {a:'keda', b:'topic', l:'keda-topic'},
+ {a:'prom', b:'topic', l:'prometheus-kafka'},
+ {a:'app',  b:'db',    l:'external_source_code-db', bow:-.20},   /* arcs over the topic */
+ {a:'keda', b:'db',    l:'keda-cnpg'}
+];
+
+/* cue times measured in slide-5.mp3 with ffmpeg silencedetect */
+const CAPS=[
+ [0.00, 'So how does this look in practice?'],
+ [2.62, 'Imagine you are vibe coding through Stacktic and ask the AI to create logic that requires a Kafka topic and a sink database.'],
+ [9.77, 'Instead of generating only the application code,'],
+ [11.61,'the AI follows Stacktic’s automation guides'],
+ [15.05,'and builds the full production-ready chain —'],
+ [18.43,'scaling, connector compatibility,'],
+ [21.41,'schemas,'],
+ [22.28,'mTLS, security,'],
+ [24.01,'and every configuration around it. It cannot simply skip a critical step,'],
+ [29.30,'because Stacktic understands'],
+ [31.97,'and enforces the relationships between all of them.'],
+ [37.04,'At the same time,'],
+ [38.27,'every component in the stack feeds the AI through MCP tools,'],
+ [42.60,'giving it much deeper knowledge of the topology and architecture than a normal AI client.'],
+ [48.73,'And you control the boundaries.'],
+ [50.76,'In staging, you can give AI full control.'],
+ [54.03,'In production, you can limit it to read-only or specific actions.'],
+ [58.43,'So Stacktic turns every layer of the stack into a governed AI environment —'],
+ [63.39,'with much more context, much more control,'],
+ [66.58,'and production-grade automation.']
+];
+const ACTS=[
+ {t:0,     id:'IN PRACTICE'},
+ {t:2.62,  id:'THE PROMPT'},
+ {t:9.77,  id:'THE CHAIN'},
+ {t:24.01, id:'ENFORCED'},
+ {t:37.04, id:'MCP'},
+ {t:48.73, id:'BOUNDARIES'},
+ {t:58.43, id:'GOVERNED'}
+];
+const AC=['var(--sky)','var(--sky)','var(--gold)','var(--red)','var(--violet)','var(--amber)','var(--emerald)'];
+let TOTAL=68.35;
+
+/* ── build the canvas ── */
+CN.forEach(n=>{
+  const d=document.createElement('div');
+  d.className='cn'; d.id='c-'+n.id; d.style.setProperty('--c',n.c);
+  d.innerHTML=`<b>${n.t}</b><i>${n.s}</i><span class="badge">generated</span>`;
+  nodeLayer.appendChild(d); n.el=d; n.badge=d.querySelector('.badge');
+});
+LK.forEach(k=>{
+  const p=document.createElementNS(NS,'path');
+  p.setAttribute('fill','none'); p.setAttribute('stroke','rgba(251,191,36,.55)');
+  p.setAttribute('stroke-width',1.8); p.setAttribute('stroke-linecap','round');
+  p.style.transition='stroke-dashoffset .55s cubic-bezier(.4,0,.2,1),stroke .4s,stroke-width .4s';
+  svg.appendChild(p); k.path=p;
+  const l=document.createElement('div'); l.className='ll'; l.textContent=k.l;
+  labLayer.appendChild(l); k.lab=l;
+});
+const pLayer=document.createElementNS(NS,'g'); svg.appendChild(pLayer);
+
+function layout(){
+  const W=canvas.clientWidth, H=canvas.clientHeight;
+  if(!W||!H) return;
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const X=x=>x/840*W, Y=y=>(0.04+y/420*0.86)*H;      /* room for the tray at the bottom */
+  CN.forEach(n=>{
+    n.px=X(n.x); n.py=Y(n.y);
+    n.el.style.left=n.px+'px'; n.el.style.top=n.py+'px';
+  });
+  LK.forEach(k=>{
+    const a=CNI[k.a], b=CNI[k.b];
+    const dx=b.px-a.px, dy=b.py-a.py, len=Math.hypot(dx,dy)||1;
+    const bow=(k.bow!==undefined ? k.bow : (dy===0?0:.12))*len;
+    const cx=(a.px+b.px)/2-dy/len*bow, cy=(a.py+b.py)/2+dx/len*bow;
+    k.path.setAttribute('d',`M${a.px} ${a.py} Q${cx} ${cy} ${b.px} ${b.py}`);
+    k.len=k.path.getTotalLength();
+    k.path.style.strokeDasharray=k.len;
+    k.path.style.strokeDashoffset=k.drawn?0:k.len;
+    /* a label on a straight in-row link would sit on the node it passes;
+       drop those below the line, into the empty band between the rows */
+    const m=k.path.getPointAtLength(k.len*.5);
+    const inRow = Math.abs(b.py-a.py) < H*.06 && k.bow===undefined;
+    k.lab.style.left=m.x+'px'; k.lab.style.top=(m.y + (inRow ? H*.075 : 0))+'px';
+  });
+}
+layout();
+new ResizeObserver(layout).observe(canvas);
+
+/* particles */
+const parts=[];
+function tickParts(dt){
+  for(let i=parts.length-1;i>=0;i--){
+    const o=parts[i];
+    o.p+=o.speed*dt/(o.k.len||1);
+    if(o.p>=1){ if(o.once){o.el.remove();parts.splice(i,1);continue} o.p-=1 }
+    const pt=o.k.path.getPointAtLength(o.p*o.k.len);
+    o.el.setAttribute('cx',pt.x); o.el.setAttribute('cy',pt.y);
+    o.el.setAttribute('opacity', o.once ? (1-Math.abs(o.p-.5)*1.6).toFixed(2) : '.85');
+  }
+}
+let FAST=false;
+function flowAll(){
+  if(FAST) return;
+  LK.forEach((k,i)=>{
+    if(!k.drawn) return;
+    const c=document.createElementNS(NS,'circle');
+    c.setAttribute('r',2.2); c.setAttribute('fill','#fbbf24'); c.setAttribute('opacity','0');
+    pLayer.appendChild(c);
+    parts.push({k,el:c,p:(i*.13)%1,speed:60,once:false});
+  });
+}
+
+/* ── chrome ── */
+const capBox=$('#cap');
+CAPS.forEach(([t,s])=>{const el=document.createElement('span');el.textContent=s;capBox.appendChild(el)});
+const capEls=$$('#cap span');
+ACTS.forEach(a=>{const i=document.createElement('i');i.textContent=a.id;$('#acts').appendChild(i)});
+const actEls=$$('#acts i');
+
+const timers=[];
+const later=(ms,fn)=>{ if(FAST){fn();return} timers.push(setTimeout(fn,ms)) };
+const clearLater=()=>{timers.forEach(clearTimeout);timers.length=0};
+function type(el,text,ms,cb){
+  if(FAST){ el.textContent=text; if(cb) cb(); return }
+  el.textContent=''; let i=0;
+  const step=()=>{ el.textContent=text.slice(0,++i);
+    if(i<text.length) timers.push(setTimeout(step,ms)); else if(cb) cb() };
+  step();
+}
+const STEPS=$$('#steps .step'), CHK=$$('#pC .chk');
+/* counted off the canvas itself, so replaying an act can never inflate them */
+const nLive=()=>$$('#nodes .cn.in').length;
+const lLive=()=>LK.filter(k=>k.drawn).length;
+function stat(){ $('#pB-s').textContent=nLive()+' COMPONENTS · '+lLive()+' RELATIONS' }
+/* put a component on the canvas */
+function place(id,delay){
+  later(delay,()=>{
+    const n=CNI[id]; n.el.classList.add('in','pop'); later(260,()=>n.el.classList.remove('pop'));
+    stat();
+  });
+}
+/* draw a relation and name it */
+function link(i,delay,fresh){
+  later(delay,()=>{
+    const k=LK[i]; k.drawn=true; k.path.style.strokeDashoffset=0;
+    stat();
+    later(320,()=>{ k.lab.classList.add('in'); if(fresh!==false) k.lab.classList.add('new');
+                    later(1400,()=>k.lab.classList.remove('new')) });
+  });
+}
+/* replay an earlier act instantly and IN ORDER — without forcing FAST, its nested
+   later() calls would queue as timeouts and fire after the steps that undo them */
+function replay(i){ const prev=FAST; FAST=true; A[i].enter(true); FAST=prev }
+const A=[];
+
+/* ── ACT 0 · the question ── */
+A[0]={ enter(instant){
+  const D=instant?0:1;
+  later(D*100,()=>$('#pA').classList.add('in'));
+  later(D*500,()=>$('#pB').classList.add('in'));
+  later(D*900,()=>$('#pC').classList.add('in'));
+}};
+
+/* ── ACT 1 · the prompt ── */
+A[1]={ enter(instant){
+  const D=instant?0:1;
+  ['pA','pB','pC'].forEach(p=>$('#'+p).classList.add('in'));
+  $('#m1').classList.add('in');
+  type($('#ptxt'),'add logic that consumes a kafka topic and writes to a sink database',D?30:0);
+  later(D*3200,()=>$('#m2').classList.add('in'));
+  /* the AI writes the code first — that part it is already good at */
+  later(D*4200,()=>{ STEPS[0].classList.add('in','ok'); place('app',0) });
+}};
+
+/* ── ACT 2 · the whole chain, not only the code ── */
+A[2]={ enter(instant){
+  const D=instant?0:1;
+  replay(1);
+  /* "instead of generating only the application code" → the code alone is not the change */
+  /* "follows Stacktic's automation guides" (t+1.84s) */
+  later(D*1840,()=>{ STEPS[1].classList.add('in'); place('topic',0); link(0,300) });
+  /* "builds the full production-ready chain" (t+5.28s) */
+  later(D*5280,()=>{ STEPS[1].classList.add('ok'); STEPS[2].classList.add('in');
+                     place('db',0); link(1,320); later(D*900,()=>STEPS[2].classList.add('ok')) });
+  /* "scaling, connector compatibility" (t+8.66s) */
+  later(D*8660,()=>{ STEPS[5].classList.add('in'); place('keda',0); link(3,300); link(6,700);
+                     place('prom',900); link(4,1200); later(D*1500,()=>STEPS[5].classList.add('ok')) });
+  /* "schemas" (t+11.64s) */
+  later(D*11640,()=>{ STEPS[3].classList.add('in'); place('reg',0); link(2,300) });
+  /* "mTLS, security" (t+12.51s) */
+  later(D*12510,()=>{ STEPS[4].classList.add('in'); link(5,200); flowAll() });
+}};
+
+/* ── ACT 3 · it cannot skip a step ── */
+A[3]={ enter(instant){
+  const D=instant?0:1;
+  replay(2);
+  /* the attempt: apply the chain with the contract left out */
+  later(D*400,()=>{
+    STEPS[3].classList.remove('ok'); STEPS[3].classList.add('blocked');
+    CHK.forEach((c,i)=>later(D*(i*140),()=>c.classList.add('in')));
+    later(D*700,()=>{
+      CHK[2].classList.add('fail');
+      LK[1].path.setAttribute('stroke','var(--red)'); LK[1].path.setAttribute('stroke-width',2.6);
+      LK[1].lab.style.color='#fff'; LK[1].lab.style.background='var(--red)';
+      LK[1].lab.style.borderColor='var(--red)';
+      $('#blocked').classList.add('in');
+    });
+  });
+  /* "because Stacktic understands…" (t+5.29s) — the tray shows what the links imply */
+  later(D*5290,()=>{
+    $('#blocked').classList.remove('in');
+    $('#tray').classList.add('in');
+    $$('#tray i').forEach((g,i)=>later(D*(i*260),()=>g.classList.add('in')));
+  });
+  /* "…and enforces the relationships between all of them" (t+7.96s) */
+  later(D*7960,()=>{
+    STEPS[3].classList.remove('blocked'); STEPS[3].classList.add('ok');
+    STEPS[4].classList.add('ok');
+    LK[1].path.setAttribute('stroke','rgba(251,191,36,.55)'); LK[1].path.setAttribute('stroke-width',1.8);
+    LK[1].lab.style.color=''; LK[1].lab.style.background=''; LK[1].lab.style.borderColor='';
+    CHK[2].classList.remove('fail');
+    CHK.forEach((c,i)=>later(D*(300+i*230),()=>{
+      c.classList.add('in','pass');
+      const n=CNI[['app','topic','db','reg','keda','prom'][i]];
+      if(n){ n.el.classList.add('ok'); n.badge.classList.add('in') }
+    }));
+    $('#k0').textContent=nLive()+' · '+lLive();
+    $('#k4').textContent='from '+lLive()+' links';
+    later(D*2200,()=>$('#api').classList.add('in'));
+  });
+}};
+
+/* ── ACT 4 · MCP feeds the AI from every component ── */
+A[4]={ enter(instant){
+  const D=instant?0:1;
+  replay(3);
+  later(D*1230,()=>{                                  /* "every component feeds the AI" */
+    $('#strip').classList.add('in'); $('#s1').classList.add('in');
+    $$('#s1 .row i').forEach((t,i)=>later(D*(i*170),()=>t.classList.add('in')));
+    CN.forEach((n,i)=>later(D*(i*160),()=>{
+      n.el.classList.add('pop'); later(D*280,()=>n.el.classList.remove('pop'));
+    }));
+  });
+  /* "deeper knowledge than a normal AI client" (t+5.56s) */
+  later(D*5560,()=>{
+    const el=$('#n-lay'); let v=0;
+    const n=$$('#s1 .row i').length;
+    if(FAST){ el.textContent=n; return }
+    const t0=performance.now();
+    const go=now=>{ const p=Math.max(0,Math.min(1,(now-t0)/900));
+      el.textContent=Math.round(n*p); if(p<1) requestAnimationFrame(go) };
+    requestAnimationFrame(go);
+  });
+}};
+
+/* ── ACT 5 · you set the boundaries ── */
+A[5]={ enter(instant){
+  const D=instant?0:1;
+  replay(4);
+  $('#strip').classList.add('in'); $('#s1').classList.add('in');
+  $$('#s1 .row i').forEach(t=>t.classList.add('in'));
+  $('#n-lay').textContent=$$('#s1 .row i').length;
+  /* "in staging, full control" (t+2.03s) */
+  later(D*2030,()=>{
+    $('#s2').classList.add('in');
+    $$('#s2 .row i').forEach((t,i)=>later(D*(i*180),()=>{ t.classList.add('in');
+      $('#n-stg').textContent=Math.min(6,i+1) }));
+  });
+  /* "in production, read-only or specific actions" (t+5.30s) */
+  later(D*5300,()=>{
+    $('#s3').classList.add('in');
+    $$('#s3 .row i').forEach((t,i)=>later(D*(i*180),()=>t.classList.add('in')));
+    later(D*900,()=>$('#n-prd').textContent=$$('#s3 .row i:not(.off)').length);
+  });
+}};
+
+/* ── ACT 6 · a governed AI environment ── */
+A[6]={ enter(instant){
+  const D=instant?0:1;
+  replay(5);
+  $('#s2').classList.add('in'); $('#s3').classList.add('in');
+  $$('#s2 .row i,#s3 .row i').forEach(t=>t.classList.add('in'));
+  $('#n-stg').textContent='6'; $('#n-prd').textContent=$$('#s3 .row i:not(.off)').length;
+  /* the whole board confirms itself, layer by layer */
+  later(D*400,()=>{
+    CN.forEach((n,i)=>later(D*(i*180),()=>{
+      n.el.classList.add('ok','pop'); n.badge.classList.add('in');
+      later(D*300,()=>n.el.classList.remove('pop'));
+    }));
+    LK.forEach(k=>{ k.path.setAttribute('stroke','rgba(52,211,153,.7)') });
+  });
+  later(D*4960,()=>{                                   /* "more context, more control" */
+    $$('#pC .chk').forEach(c=>c.classList.add('in','pass'));
+    $('#api').classList.add('in');
+  });
+  later(D*8150,()=>{                                   /* "production-grade automation" */
+    $('#tray').classList.add('in');
+    $$('#tray i').forEach(g=>g.classList.add('in'));
+  });
+}};
+
+/* ── reset + seek ── */
+function resetScene(){
+  clearLater();
+  parts.forEach(o=>o.el.remove()); parts.length=0;
+  document.documentElement.classList.add('noanim');
+  LK.forEach(k=>k.drawn=false);
+  $$('#nodes .cn').forEach(n=>n.classList.remove('in'));
+  stat();
+  ['pA','pB','pC'].forEach(p=>$('#'+p).classList.remove('in'));
+  $('#m1').classList.remove('in'); $('#m2').classList.remove('in'); $('#ptxt').textContent='';
+  STEPS.forEach(s=>s.className='step');
+  CN.forEach(n=>{ n.el.className='cn'; n.badge.classList.remove('in') });
+  LK.forEach(k=>{
+    k.drawn=false; k.path.style.strokeDashoffset=k.len;
+    k.path.setAttribute('stroke','rgba(251,191,36,.55)'); k.path.setAttribute('stroke-width',1.8);
+    k.lab.className='ll'; k.lab.style.color=''; k.lab.style.background=''; k.lab.style.borderColor='';
+  });
+  $('#tray').classList.remove('in'); $$('#tray i').forEach(g=>g.classList.remove('in'));
+  $('#blocked').classList.remove('in');
+  CHK.forEach(c=>c.className='chk'); $('#api').classList.remove('in');
+  $('#k0').textContent='—'; $('#k4').textContent='—';
+  $('#strip').classList.remove('in');
+  ['s1','s2','s3'].forEach(id=>$('#'+id).classList.remove('in'));
+  $$('.sc .row i').forEach(t=>t.classList.remove('in'));
+  ['n-lay','n-stg','n-prd'].forEach(id=>$('#'+id).textContent='0');
+  layout();
+  document.body.offsetWidth;
+  document.documentElement.classList.remove('noanim');
+}
+
+let clock=0, playing=false, lastTs=0, curAct=-1, seekToken=0;
+function applyUpTo(i){
+  const token=++seekToken;
+  resetScene();
+  document.documentElement.classList.add('noanim');
+  FAST=true;
+  for(let k=0;k<i;k++) A[k].enter(true);
+  curAct=i; paintChrome(i);
+  setTimeout(()=>{
+    if(token!==seekToken) return;
+    FAST=false;
+    document.body.offsetWidth;
+    document.documentElement.classList.remove('noanim');
+    layout();
+    A[i].enter(false);
+  },0);
+}
+function paintChrome(i){
+  $('#slide').style.setProperty('--ac',AC[i]);
+  $$('.hl').forEach((el,k)=>el.classList.toggle('on',k===i));
+  actEls.forEach((el,k)=>{el.classList.toggle('on',k===i);el.classList.toggle('past',k<i)});
+}
+function actAt(t){let i=0;ACTS.forEach((a,k)=>{if(t>=a.t)i=k});return i}
+function paintCaption(t){
+  let idx=-1; CAPS.forEach(([ct],i)=>{if(t>=ct)idx=i});
+  capEls.forEach((el,i)=>el.classList.toggle('on',i===idx));
+}
+
+const vo=$('#vo'); let useAudio=false;
+vo.addEventListener('loadedmetadata',()=>{
+  useAudio=true;
+  if(vo.duration&&Number.isFinite(vo.duration)){ TOTAL=vo.duration; $('#scrub').max=TOTAL }
+});
+vo.addEventListener('error',()=>{useAudio=false});
+
+function frame(ts){
+  if(playing){
+    const dt=Math.min(.05,(ts-lastTs)/1000)||0;
+    clock = useAudio && !vo.paused ? vo.currentTime : Math.min(TOTAL,clock+dt);
+    const a=actAt(clock);
+    if(a!==curAct){ if(a===curAct+1){A[a].enter(false);curAct=a;paintChrome(a)} else applyUpTo(a) }
+    paintCaption(clock); readout();
+    if(clock>=TOTAL) setPlay(false);
+    tickParts(dt);
+  }
+  lastTs=ts;
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+function readout(){
+  $('#scrub').value=clock;
+  $('#clock').textContent=clock.toFixed(1)+' / '+TOTAL.toFixed(0)+'s';
+  $('#prog').style.width=(clock/TOTAL*100)+'%';
+}
+function setPlay(p){
+  playing=p; $('#play').innerHTML=p?'&#9208; PAUSE':'&#9199; PLAY';
+  if(!useAudio) return;
+  if(p){ vo.play().catch(()=>{ setPlay(false); $('#gate').hidden=false }) } else vo.pause();
+}
+function seek(t){
+  clock=Math.max(0,Math.min(TOTAL,t));
+  if(useAudio) vo.currentTime=clock;
+  applyUpTo(actAt(clock)); paintCaption(clock); readout();
+}
+function restart(){seek(0);setPlay(true)}
+$('#gate').onclick=()=>{ $('#gate').hidden=true; seek(0); setPlay(true) };
+$('#play').onclick=()=>setPlay(!playing);
+$('#rst').onclick=restart;
+$('#scrub').oninput=e=>seek(+e.target.value);
+addEventListener('keydown',e=>{
+  if(e.code==='Space'){e.preventDefault();setPlay(!playing)}
+  else if(e.key==='ArrowRight'){seek(ACTS[Math.min(ACTS.length-1,actAt(clock)+1)].t)}
+  else if(e.key==='ArrowLeft'){seek(ACTS[Math.max(0,actAt(clock)-1)].t)}
+  else if(e.key.toLowerCase()==='r'){restart()}
+  else if(/^[1-7]$/.test(e.key)){seek(ACTS[+e.key-1].t)}
+});
+
+const hash=new URLSearchParams(location.hash.slice(1));
+const start = hash.has('act') ? (ACTS[+hash.get('act')]||ACTS[0]).t
+            : hash.has('t')   ? +hash.get('t') : 0;
+let booted=false;
+function boot(){ if(booted) return; booted=true; seek(start); setPlay(!hash.has('pause')) }
+seek(start);
+vo.addEventListener('canplay',boot,{once:true});
+setTimeout(boot,1500);
+</script>
+</body></html>

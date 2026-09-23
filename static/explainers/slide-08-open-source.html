@@ -1,0 +1,669 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stacktic — Slide 08 · Open source, no lock-in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b1330; --ink:#f2f5ff; --body:#b6c1e2; --soft:#8b97bf; --faint:#6b78a3;
+  --line:rgba(150,175,235,.20); --line2:rgba(150,175,235,.34);
+  --gold:#fbbf24; --sky:#38bdf8; --indigo:#818cf8; --violet:#a78bfa;
+  --amber:#f59e0b; --emerald:#34d399; --rose:#fb7185; --red:#ff4d6d;
+  --disp:"Sora",system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;min-width:0}
+html,body{height:100%}
+body{background:
+   radial-gradient(120% 90% at 50% -20%,#1c2a63 0%,transparent 62%),
+   radial-gradient(80% 70% at 110% 110%,#221a52 0%,transparent 60%),
+   var(--bg);
+  color:var(--ink);font-family:var(--disp);-webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:18px}
+
+.slide{position:relative;width:min(1500px,96vw);aspect-ratio:16/9;max-height:84vh;border-radius:20px;overflow:hidden;
+  background:linear-gradient(165deg,#182356 0%,#111a42 52%,#16204d 100%);
+  border:1px solid var(--line);box-shadow:0 50px 120px -50px rgba(4,8,26,.9),0 0 0 1px rgba(255,255,255,.03) inset;
+  container-type:inline-size;--u:1cqw;display:flex;flex-direction:column}
+.slide::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.7;
+  background-image:linear-gradient(rgba(150,180,255,.06) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(150,180,255,.06) 1px,transparent 1px);
+  background-size:calc(var(--u)*3.2) calc(var(--u)*3.2);
+  mask-image:radial-gradient(120% 100% at 50% 45%,#000 20%,transparent 82%)}
+.slide::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:60;
+  background:radial-gradient(125% 105% at 50% 48%,transparent 62%,rgba(8,14,42,.42) 100%)}
+.pad{position:relative;z-index:5;flex:1;display:flex;flex-direction:column;
+  padding:calc(var(--u)*1.7) calc(var(--u)*2.2) calc(var(--u)*1.2)}
+
+.top{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);
+  font-size:calc(var(--u)*.78);color:var(--soft);letter-spacing:.13em;flex:none}
+.top b{color:var(--ink);font-weight:800}
+.top .acts{display:flex;gap:calc(var(--u)*.4);align-items:center}
+.top .acts i{font-style:normal;font-size:calc(var(--u)*.56);letter-spacing:.14em;font-weight:700;
+  padding:calc(var(--u)*.2) calc(var(--u)*.44);border-radius:999px;color:#5b6791;
+  border:1px solid transparent;transition:.45s}
+.top .acts i.on{color:#0a0f22;background:var(--ac);border-color:var(--ac)}
+.top .acts i.past{color:var(--soft);border-color:var(--line)}
+
+.head{flex:none;margin-top:calc(var(--u)*.8);min-height:calc(var(--u)*8.8);position:relative}
+.eb{display:inline-flex;align-items:center;gap:.6em;font-family:var(--mono);font-size:calc(var(--u)*.68);
+  font-weight:800;letter-spacing:.22em;padding:calc(var(--u)*.3) calc(var(--u)*.8);border-radius:999px;
+  color:var(--ac);background:color-mix(in srgb,var(--ac) 12%,transparent);
+  border:1px solid color-mix(in srgb,var(--ac) 34%,transparent)}
+.eb::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--ac);
+  box-shadow:0 0 0 0 color-mix(in srgb,var(--ac) 70%,transparent);animation:beat 2s infinite}
+@keyframes beat{70%{box-shadow:0 0 0 calc(var(--u)*.7) transparent}100%{box-shadow:0 0 0 0 transparent}}
+h1{font-weight:800;letter-spacing:-.045em;line-height:1.03;font-size:calc(var(--u)*2.7);
+  margin-top:calc(var(--u)*.55)}
+h1 em{font-style:normal;color:var(--ac)}
+.hl{position:absolute;inset:0;opacity:0;transform:translateY(calc(var(--u)*.8));
+  transition:opacity .5s ease,transform .5s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+.hl.on{opacity:1;transform:none}
+
+.stage{position:relative;flex:1;min-height:0;margin-top:calc(var(--u)*.3)}
+
+/* ───────── the wall of components ───────── */
+#wall{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;
+  transition:opacity .8s,transform .9s cubic-bezier(.5,0,.15,1),filter .8s}
+#wall.back{opacity:.14;transform:scale(.97);filter:blur(1.5px)}
+#grid{flex:1;min-height:0;display:grid;align-content:center;
+  grid-template-columns:repeat(auto-fill,minmax(calc(var(--u)*7.4),1fr));
+  gap:calc(var(--u)*.34)}
+.oc{border-radius:calc(var(--u)*.42);padding:calc(var(--u)*.28) calc(var(--u)*.42);
+  background:rgba(26,36,82,.6);border:1px solid var(--line);
+  font-family:var(--mono);font-size:calc(var(--u)*.56);font-weight:700;color:var(--body);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  opacity:0;transform:translateY(calc(var(--u)*.4)) scale(.9);transition:.34s cubic-bezier(.2,1.4,.4,1)}
+.oc.in{opacity:1;transform:none}
+.oc.oss{border-color:color-mix(in srgb,var(--emerald) 30%,transparent);
+  background:linear-gradient(160deg,rgba(52,211,153,.13),rgba(26,36,82,.6))}
+.oc.cloud{border-color:color-mix(in srgb,var(--amber) 34%,transparent);
+  background:linear-gradient(160deg,rgba(245,158,11,.12),rgba(26,36,82,.6));color:#f7d9a6}
+.oc.dim{opacity:.2}
+
+/* rail under the wall */
+.rail{flex:none;height:calc(var(--u)*8.6);margin-top:calc(var(--u)*.6);position:relative}
+.claims{position:absolute;inset:0;display:flex;align-items:center;gap:calc(var(--u)*.8);
+  opacity:0;transition:.55s}
+.claims.in{opacity:1}
+.claims .cl{flex:1;border-radius:calc(var(--u)*.75);padding:calc(var(--u)*.6) calc(var(--u)*.8);
+  background:rgba(13,20,52,.9);border:1px solid color-mix(in srgb,var(--c) 36%,var(--line));
+  opacity:0;transform:translateY(calc(var(--u)*.7));transition:.5s cubic-bezier(.2,.9,.2,1)}
+.claims .cl.in{opacity:1;transform:none}
+.claims b{display:block;font-family:var(--mono);font-size:calc(var(--u)*.54);font-weight:800;
+  letter-spacing:.16em;color:var(--c)}
+.claims span{display:block;margin-top:.35em;font-size:calc(var(--u)*.82);color:var(--ink);line-height:1.3}
+.claims em{display:block;margin-top:.25em;font-style:normal;font-family:var(--mono);
+  font-size:calc(var(--u)*.5);color:var(--soft)}
+.claims u{text-decoration:none;color:var(--ink);font-weight:800;font-variant-numeric:tabular-nums}
+
+/* deploy targets + swaps */
+/* the swap row lives under the targets, not on top of them */
+.targets{position:absolute;left:0;right:0;top:0;height:calc(var(--u)*5.5);
+  display:flex;gap:calc(var(--u)*.7);align-items:stretch;opacity:0;transition:.55s}
+.targets.in{opacity:1}
+.tg{flex:1;border-radius:calc(var(--u)*.75);padding:calc(var(--u)*.55) calc(var(--u)*.7);
+  background:rgba(13,20,52,.9);border:1px dashed var(--line2);text-align:center;
+  display:flex;flex-direction:column;justify-content:center;gap:calc(var(--u)*.28);
+  opacity:0;transform:translateY(calc(var(--u)*.6));transition:.45s cubic-bezier(.2,.9,.2,1)}
+.tg.in{opacity:1;transform:none}
+.tg.landed{border-style:solid;border-color:color-mix(in srgb,var(--emerald) 45%,transparent);
+  background:linear-gradient(160deg,rgba(52,211,153,.12),rgba(13,20,52,.9))}
+.tg b{font-family:var(--mono);font-size:calc(var(--u)*.66);font-weight:800;letter-spacing:.14em;color:var(--ink)}
+.tg span{font-family:var(--mono);font-size:calc(var(--u)*.5);color:var(--faint)}
+.tg .pill{font-family:var(--mono);font-size:calc(var(--u)*.46);font-weight:700;
+  border-radius:999px;padding:calc(var(--u)*.1) calc(var(--u)*.36);align-self:center;
+  color:#08170f;background:var(--emerald);opacity:0;transform:scale(.6);transition:.35s cubic-bezier(.2,1.5,.4,1)}
+.tg.landed .pill{opacity:1;transform:none}
+
+/* swap pairs */
+.swaps{position:absolute;left:0;right:0;bottom:0;display:flex;gap:calc(var(--u)*.5);
+  justify-content:center;opacity:0;transition:.5s;z-index:4}
+.swaps.in{opacity:1}
+.sw{display:flex;align-items:center;gap:calc(var(--u)*.35);border-radius:999px;
+  padding:calc(var(--u)*.22) calc(var(--u)*.55);background:rgba(9,14,38,.95);border:1px solid var(--line2);
+  font-family:var(--mono);font-size:calc(var(--u)*.5);
+  opacity:0;transform:translateY(calc(var(--u)*.4));transition:.4s}
+.sw.in{opacity:1;transform:none}
+.sw .a{color:var(--emerald);font-weight:700}
+.sw .b{color:var(--amber);font-weight:700}
+.sw .x{color:var(--faint)}
+
+/* ───────── the comparison ───────── */
+#cmp{position:absolute;inset:0;z-index:6;display:grid;grid-template-columns:1fr 1fr;
+  align-items:center;gap:calc(var(--u)*1.4);opacity:0;pointer-events:none;transition:.6s}
+#cmp.in{opacity:1}
+.side{border-radius:calc(var(--u)*1);padding:calc(var(--u)*.85) calc(var(--u)*1);
+  background:linear-gradient(165deg,color-mix(in srgb,var(--c) 12%,rgba(16,24,60,.96)),rgba(13,20,52,.96));
+  border:1px solid color-mix(in srgb,var(--c) 34%,var(--line));backdrop-filter:blur(8px);
+  display:flex;flex-direction:column;gap:calc(var(--u)*.55);
+  opacity:0;transform:translateY(calc(var(--u)*1));transition:.6s cubic-bezier(.2,.9,.2,1)}
+.side.in{opacity:1;transform:none}
+.sh{display:flex;align-items:baseline;gap:calc(var(--u)*.5)}
+.sh b{font-size:calc(var(--u)*1.15);font-weight:800;letter-spacing:-.02em}
+.sh em{font-style:normal;margin-left:auto;font-family:var(--mono);font-size:calc(var(--u)*.5);
+  letter-spacing:.14em;color:var(--c);border:1px solid color-mix(in srgb,var(--c) 40%,transparent);
+  border-radius:999px;padding:calc(var(--u)*.1) calc(var(--u)*.42)}
+
+/* sealed box */
+.box{position:relative;border-radius:calc(var(--u)*.7);padding:calc(var(--u)*.7);
+  background:repeating-linear-gradient(135deg,rgba(255,255,255,.03) 0 8px,transparent 8px 16px),
+             rgba(10,15,38,.9);
+  border:1px solid var(--line2);display:flex;align-items:center;gap:calc(var(--u)*.6);
+  min-height:calc(var(--u)*5.4)}
+.core{flex:1;border-radius:calc(var(--u)*.5);padding:calc(var(--u)*.5);text-align:center;
+  background:rgba(52,211,153,.1);border:1px dashed color-mix(in srgb,var(--emerald) 40%,transparent);
+  transition:.6s}
+.core b{display:block;font-family:var(--mono);font-size:calc(var(--u)*.62);font-weight:800;color:var(--emerald)}
+.core span{display:block;margin-top:.25em;font-family:var(--mono);font-size:calc(var(--u)*.48);color:var(--soft)}
+.box.sealed .core{filter:grayscale(1) brightness(.55);border-style:solid}
+.lid{position:absolute;inset:0;border-radius:calc(var(--u)*.7);z-index:3;
+  background:linear-gradient(160deg,rgba(28,34,66,.97),rgba(16,20,44,.98));
+  border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;
+  gap:calc(var(--u)*.6);opacity:0;transform:scaleY(.2);transform-origin:top;transition:.6s cubic-bezier(.4,0,.2,1)}
+.lid.on{opacity:1;transform:none}
+.lid b{font-family:var(--mono);font-size:calc(var(--u)*.72);font-weight:800;letter-spacing:.2em;color:var(--body)}
+.lid u{text-decoration:none;font-size:calc(var(--u)*1.1)}
+.lid span{font-family:var(--mono);font-size:calc(var(--u)*.5);color:var(--faint)}
+
+/* modular assembly */
+.mods{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(var(--u)*.32);min-height:calc(var(--u)*5.4);
+  align-content:center}
+.mods i{font-style:normal;font-family:var(--mono);font-size:calc(var(--u)*.5);font-weight:700;
+  text-align:center;border-radius:calc(var(--u)*.35);padding:calc(var(--u)*.28) calc(var(--u)*.2);
+  background:rgba(52,211,153,.12);border:1px solid color-mix(in srgb,var(--emerald) 34%,transparent);
+  color:#d7fbec;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  opacity:0;transform:scale(.7);transition:.35s cubic-bezier(.2,1.5,.4,1)}
+.mods i.in{opacity:1;transform:none}
+.mods i s{text-decoration:none;color:var(--emerald);font-weight:800}
+.mods i.new{background:var(--emerald);color:#08170f}
+.mods i.new s{color:#065f46}
+
+.facts{display:flex;flex-direction:column;gap:calc(var(--u)*.26)}
+.fact{display:flex;align-items:center;gap:calc(var(--u)*.45);font-family:var(--mono);
+  font-size:calc(var(--u)*.56);color:var(--body);opacity:0;transform:translateX(calc(var(--u)*-.5));
+  transition:.4s}
+.fact.in{opacity:1;transform:none}
+.fact u{width:calc(var(--u)*.75);height:calc(var(--u)*.75);border-radius:50%;flex:none;text-decoration:none;
+  display:grid;place-items:center;font-size:calc(var(--u)*.46);
+  background:color-mix(in srgb,var(--c) 60%,transparent);color:#08111f;font-weight:800}
+.fact s{text-decoration:none;margin-left:auto;color:var(--faint);font-size:calc(var(--u)*.5);white-space:nowrap}
+.fact b{color:var(--ink);font-weight:700}
+
+/* the version tape */
+.tape{margin-top:calc(var(--u)*.2);border-top:1px solid var(--line);padding-top:calc(var(--u)*.5);
+  display:flex;align-items:center;gap:calc(var(--u)*.5);font-family:var(--mono);
+  font-size:calc(var(--u)*.54);opacity:0;transition:.5s}
+.tape.in{opacity:1}
+.tape .k{color:var(--faint);letter-spacing:.12em;font-size:calc(var(--u)*.48)}
+.tape .v{font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
+.tape .frozen{color:var(--faint)}
+.tape .up{color:var(--emerald)}
+.tape .stamp{margin-left:auto;font-weight:800;letter-spacing:.14em;font-size:calc(var(--u)*.5);
+  border-radius:999px;padding:calc(var(--u)*.1) calc(var(--u)*.44);
+  border:1px solid color-mix(in srgb,var(--c) 45%,transparent);color:var(--c)}
+
+/* final league bar */
+#league{position:absolute;left:0;right:0;bottom:0;z-index:8;display:grid;grid-template-columns:repeat(3,1fr);
+  gap:calc(var(--u)*.7);opacity:0;pointer-events:none;transition:.55s}
+#league.in{opacity:1}
+#league div{border-radius:calc(var(--u)*.75);padding:calc(var(--u)*.6) calc(var(--u)*.8);
+  background:rgba(9,14,38,.97);border:1px solid color-mix(in srgb,var(--c) 42%,var(--line));
+  backdrop-filter:blur(8px);opacity:0;transform:translateY(calc(var(--u)*.8));
+  transition:.5s cubic-bezier(.2,.9,.2,1)}
+#league div.in{opacity:1;transform:none}
+#league b{display:block;font-size:calc(var(--u)*1.1);font-weight:800;letter-spacing:-.02em;color:var(--c)}
+#league span{display:block;margin-top:.3em;font-family:var(--mono);font-size:calc(var(--u)*.54);
+  color:var(--body);line-height:1.35}
+
+/* caption + chrome */
+.cap{position:relative;z-index:50;flex:none;margin-top:calc(var(--u)*.7);padding-top:calc(var(--u)*.7);
+  border-top:1px solid var(--line);display:flex;align-items:center;gap:calc(var(--u)*1)}
+.cap .txt{position:relative;flex:1;height:calc(var(--u)*2.8);font-family:var(--mono);
+  font-size:calc(var(--u)*.84);color:var(--body);line-height:1.35}
+.cap .txt span{position:absolute;left:0;right:0;top:0;opacity:0;transition:.45s}
+.cap .txt span.on{opacity:1}
+.cap .br{font-family:var(--mono);font-size:calc(var(--u)*.58);letter-spacing:.24em;color:#4f5c8a;flex:none}
+.prog{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.06);z-index:70}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--emerald),var(--sky),var(--gold))}
+.gate{position:absolute;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;
+  gap:calc(var(--u)*.8);border:0;cursor:pointer;font-family:var(--mono);font-weight:800;
+  font-size:calc(var(--u)*1.1);letter-spacing:.2em;color:var(--ink);
+  background:rgba(11,19,48,.72);backdrop-filter:blur(3px)}
+.gate[hidden]{display:none}
+.gate span{display:grid;place-items:center;width:calc(var(--u)*4);height:calc(var(--u)*4);border-radius:50%;
+  background:var(--gold);color:#1a1204;font-size:calc(var(--u)*1.4);
+  box-shadow:0 0 0 calc(var(--u)*.6) rgba(251,191,36,.22)}
+.ctl{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;color:#8b95bb;
+  width:min(1500px,96vw)}
+.ctl button{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.1em;color:#cfd8f5;
+  background:#1a2452;border:1px solid rgba(150,175,235,.28);border-radius:8px;padding:7px 13px;cursor:pointer}
+.ctl button:hover{background:#243066;color:#fff}
+.ctl input[type=range]{flex:1;accent-color:#fbbf24;cursor:pointer}
+.ctl .t{font-variant-numeric:tabular-nums;color:#fbbf24;min-width:78px;text-align:right}
+.noanim *,.noanim *::before,.noanim *::after{transition:none!important;animation:none!important}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001s!important}}
+</style>
+</head>
+<body>
+
+<section class="slide" id="slide" style="--ac:var(--emerald)">
+ <div class="pad">
+  <div class="top">
+    <span>{ <b>STACKTIC</b> }</span>
+    <span class="acts" id="acts"></span>
+    <span>08 / 09</span>
+  </div>
+
+  <div class="head" id="head">
+    <div class="hl" data-act="0"><span class="eb">OPEN SOURCE</span>
+      <h1>Every part of it<br><em>is open source you already know.</em></h1></div>
+    <div class="hl" data-act="1"><span class="eb">CLOUD-AGNOSTIC</span>
+      <h1>The same stack.<br><em>Any Kubernetes, any cloud.</em></h1></div>
+    <div class="hl" data-act="2"><span class="eb">POSITIONING</span>
+      <h1>We are not competing<br>with managed services. <em>We are past them.</em></h1></div>
+    <div class="hl" data-act="3"><span class="eb">A MANAGED SERVICE</span>
+      <h1>Open source,<br><em>sealed behind an API.</em></h1></div>
+    <div class="hl" data-act="4"><span class="eb">A DIFFERENT APPROACH</span>
+      <h1>The same parts &mdash; assembled,<br><em>versioned and automated together.</em></h1></div>
+    <div class="hl" data-act="5"><span class="eb">WE OWN THE INTEGRATION</span>
+      <h1>So we can move,<br><em>while the sealed box waits.</em></h1></div>
+    <div class="hl" data-act="6"><span class="eb">A DIFFERENT LEAGUE</span>
+      <h1>Capabilities. Adaptability.<br><em>Freedom that lasts.</em></h1></div>
+  </div>
+
+  <div class="stage" id="stage">
+
+    <!-- ── the catalog wall ── -->
+    <div id="wall">
+      <div id="grid"></div>
+      <div class="rail">
+        <div class="claims" id="claims">
+          <div class="cl" style="--c:var(--emerald)"><b>PURE OPEN SOURCE</b>
+            <span>the upstream projects, not a fork</span>
+            <em><u id="n-oss">0</u> component templates in the catalog</em></div>
+          <div class="cl" style="--c:var(--sky)"><b>ZERO LOCK-IN</b>
+            <span>the output is your git repository</span>
+            <em>manifests, charts, policies &mdash; all readable</em></div>
+          <div class="cl" style="--c:var(--violet)"><b>CLOUD-AGNOSTIC</b>
+            <span>it targets Kubernetes, nothing proprietary</span>
+            <em>and cloud services where you want them</em></div>
+        </div>
+        <div class="targets" id="targets">
+          <div class="tg" data-t="0"><b>GKE</b><span>GOOGLE CLOUD</span><span class="pill">same stack</span></div>
+          <div class="tg" data-t="1"><b>EKS</b><span>AWS</span><span class="pill">same stack</span></div>
+          <div class="tg" data-t="2"><b>AKS</b><span>AZURE</span><span class="pill">same stack</span></div>
+          <div class="tg" data-t="3"><b>ON-PREM</b><span>BARE METAL · AIR-GAPPED</span><span class="pill">same stack</span></div>
+        </div>
+        <div class="swaps" id="swaps">
+          <div class="sw"><span class="a">cnpg</span><span class="x">or</span><span class="b">rds</span></div>
+          <div class="sw"><span class="a">minio · seaweedfs</span><span class="x">or</span><span class="b">s3</span></div>
+          <div class="sw"><span class="a">mongodb</span><span class="x">or</span><span class="b">documentdb</span></div>
+          <div class="sw"><span class="a">keycloak</span><span class="x">or</span><span class="b">iam</span></div>
+          <div class="sw"><span class="a">vllm · llama</span><span class="x">or</span><span class="b">openai</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── managed service vs stacktic ── -->
+    <div id="cmp">
+      <div class="side" id="sL" style="--c:var(--amber)">
+        <div class="sh"><b>A managed service</b><em>ONE VENDOR</em></div>
+        <div class="box" id="box">
+          <div class="core"><b>open source</b><span>postgres · kafka · redis…</span></div>
+          <div class="lid" id="lid"><u>🔒</u><b>API</b><span>everything else is theirs</span></div>
+        </div>
+        <div class="facts" id="fL">
+          <div class="fact"><u>·</u><span>version chosen for you</span><s>on their schedule</s></div>
+          <div class="fact"><u>·</u><span>config surface they expose</span><s>not the project's</s></div>
+          <div class="fact"><u>·</u><span>one service, not a stack</span><s>you still wire the rest</s></div>
+          <div class="fact"><u>·</u><span>leaving means <b>migrating</b></span><s>data + integration</s></div>
+        </div>
+        <div class="tape" id="tapeL">
+          <span class="k">2 YEARS LATER</span>
+          <span class="v frozen" id="vL">the version they support</span>
+          <span class="stamp">FROZEN</span>
+        </div>
+      </div>
+
+      <div class="side" id="sR" style="--c:var(--emerald)">
+        <div class="sh"><b>Stacktic</b><em>MODULAR · YOURS</em></div>
+        <div class="mods" id="mods">
+          <i data-m="0">kafka <s>3.7</s></i><i data-m="1">cnpg <s>16</s></i><i data-m="2">keycloak <s>25</s></i>
+          <i data-m="3">apisix <s>3.9</s></i><i data-m="4">redis <s>7.2</s></i><i data-m="5">grafana <s>11</s></i>
+          <i data-m="6">opa <s>1.0</s></i><i data-m="7">vllm <s>0.5</s></i>
+        </div>
+        <div class="facts" id="fR">
+          <div class="fact"><u>+</u><span>modular open source, <b>combined</b></span><s>you see every part</s></div>
+          <div class="fact"><u>+</u><span>one <b>unified snapshot</b></span><s>versions pinned together</s></div>
+          <div class="fact"><u>+</u><span>compatibility <b>checked</b>, not assumed</span><s>across the links</s></div>
+          <div class="fact"><u>+</u><span>leaving means <b>keeping the repo</b></span><s>it was always yours</s></div>
+        </div>
+        <div class="tape" id="tapeR">
+          <span class="k">2 YEARS LATER</span>
+          <span class="v up" id="vR">newer versions, newer tech</span>
+          <span class="stamp">MOVING</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── the closing three ── -->
+    <div id="league">
+      <div style="--c:var(--sky)"><b>Advanced capabilities</b>
+        <span>a whole stack of parts working together — not one service behind a port</span></div>
+      <div style="--c:var(--violet)"><b>Adaptability</b>
+        <span>a better project appears, we adopt it — because we own the integration</span></div>
+      <div style="--c:var(--emerald)"><b>Long-term freedom</b>
+        <span>open source, on your cluster, in your git — nothing to escape from later</span></div>
+    </div>
+  </div>
+
+  <div class="cap">
+    <div class="txt" id="cap"></div>
+    <span class="br">STACKTIC 2026</span>
+  </div>
+ </div>
+ <div class="prog"><i id="prog"></i></div>
+ <button class="gate" id="gate" hidden><span>&#9654;</span>PLAY WITH NARRATION</button>
+</section>
+<audio id="vo" src="slide-8.mp3" preload="auto"></audio>
+
+<div class="ctl">
+  <button id="play">&#9199; PLAY</button>
+  <button id="rst">&#8635; RESTART</button>
+  <input type="range" id="scrub" min="0" max="58.15" step="0.05" value="0" aria-label="timeline">
+  <span class="t" id="clock">0.0 / 58s</span>
+  <span>SPACE&nbsp;play&nbsp;&nbsp;&larr;&rarr;&nbsp;act&nbsp;&nbsp;1-7&nbsp;jump</span>
+</div>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+
+/* every name below is a real component template in the catalog —
+   read from templates/impact-index.json, split by what it actually is */
+const OSS=['airflow','alloy','apicurio_schema_registry','apisix','argo_cd','argo_workflows','backstage',
+ 'cassandra','cert_manager','clickhouse','cnpg','crossplane','dex','elasticsearch','external_dns',
+ 'external_secrets','falco','fastapi','fastmcp','flowise','grafana','immudb','istio','jupyterhub','k6',
+ 'kafka','keda','keycloak','keycloak_operator','kubecost','langflow','langfuse','ldap','llama','loki',
+ 'minio','mongodb','neo4j','nextcloud','nodejs','opa','open-webui','openbao','opensearch','otel',
+ 'postgresql','prometheus','python','qdrant','rabbitmq','react','redis','seaweedfs','sigstore',
+ 'sonarqube','spark','spring','stack_agent','trivy','valkey','velero','vllm'];
+/* the catalog also carries the managed equivalents — that is the point of no lock-in */
+const CLOUD=['rds','dynamodb','documentdb','s3','iam','openai'];
+
+/* cue times measured in slide-8.mp3 with ffmpeg silencedetect.
+   the split inside 15.00–20.07 is estimated — it is one unbroken phrase. */
+const CAPS=[
+ [0.00, 'It is important to emphasise that the code and the entire stack are built on pure open source — with zero vendor lock-in and a cloud-agnostic architecture.'],
+ [9.83, 'You can deploy the same stack on Kubernetes across any cloud or environment.'],
+ [15.00,'But our vision goes beyond that.'],
+ [17.00,'We are not trying to compete with managed services.'],
+ [20.51,'We are trying to provide something better.'],
+ [23.40,'A managed service is often open source wrapped behind an API.'],
+ [28.21,'Stacktic takes a different approach:'],
+ [30.61,'it combines modular open-source technologies into one versioned, compatible, automated solution.'],
+ [38.47,'Because we control how these components are integrated, we can continuously adopt newer open-source versions,'],
+ [45.43,'introduce better technologies,'],
+ [47.48,'and keep pace with the latest AI models.'],
+ [50.71,'That flexibility puts us in a different league in terms of advanced capabilities, adaptability, and long-term freedom.']
+];
+const ACTS=[
+ {t:0,     id:'OPEN SOURCE'},
+ {t:9.83,  id:'ANY CLOUD'},
+ {t:15.00, id:'POSITIONING'},
+ {t:23.40, id:'SEALED'},
+ {t:30.61, id:'ASSEMBLED'},
+ {t:38.47, id:'WE MOVE'},
+ {t:50.71, id:'LEAGUE'}
+];
+const AC=['var(--emerald)','var(--violet)','var(--gold)','var(--amber)','var(--emerald)','var(--sky)','var(--gold)'];
+let TOTAL=58.15;
+
+/* build the wall */
+const grid=$('#grid');
+const CHIPS=[];
+OSS.forEach(n=>{ const d=document.createElement('div'); d.className='oc oss'; d.textContent=n;
+                 grid.appendChild(d); CHIPS.push(d) });
+CLOUD.forEach(n=>{ const d=document.createElement('div'); d.className='oc cloud'; d.textContent=n;
+                   grid.appendChild(d); CHIPS.push(d) });
+
+/* chrome */
+const capBox=$('#cap');
+CAPS.forEach(([t,s])=>{const el=document.createElement('span');el.textContent=s;capBox.appendChild(el)});
+const capEls=$$('#cap span');
+ACTS.forEach(a=>{const i=document.createElement('i');i.textContent=a.id;$('#acts').appendChild(i)});
+const actEls=$$('#acts i');
+
+let FAST=false;
+const timers=[];
+const later=(ms,fn)=>{ if(FAST){fn();return} timers.push(setTimeout(fn,ms)) };
+const clearLater=()=>{timers.forEach(clearTimeout);timers.length=0};
+function count(el,n,ms){
+  if(FAST||!ms){el.textContent=n;return}
+  const run=el._run=(el._run||0)+1, t0=performance.now();
+  const go=now=>{ if(el._run!==run) return;
+    const p=Math.max(0,Math.min(1,(now-t0)/ms));
+    el.textContent=Math.round(n*(1-Math.pow(1-p,3)));
+    if(p<1) requestAnimationFrame(go) };
+  requestAnimationFrame(go);
+}
+function replay(i){ const prev=FAST; FAST=true; A[i].enter(true); FAST=prev }
+const A=[];
+const MODS=$$('#mods i'), FL=$$('#fL .fact'), FR=$$('#fR .fact');
+
+/* ── ACT 0 · the catalog is the product ── */
+A[0]={ enter(instant){
+  const D=instant?0:1;
+  $('#wall').classList.remove('back');
+  CHIPS.forEach((c,i)=>later(D*(80+i*95),()=>c.classList.add('in')));
+  later(D*5600,()=>{
+    $('#claims').classList.add('in');
+    $$('#claims .cl').forEach((c,i)=>later(D*(i*420),()=>c.classList.add('in')));
+    count($('#n-oss'),OSS.length+CLOUD.length,D*1400);
+  });
+}};
+
+/* ── ACT 1 · the same stack, anywhere ── */
+A[1]={ enter(instant){
+  const D=instant?0:1;
+  replay(0);
+  $('#claims').classList.remove('in');
+  later(D*250,()=>{
+    $('#targets').classList.add('in');
+    $$('#targets .tg').forEach((t,i)=>later(D*(i*260),()=>{
+      t.classList.add('in'); later(D*420,()=>t.classList.add('landed'));
+    }));
+  });
+  /* the catalog carries both sides of every choice */
+  later(D*2600,()=>{
+    $('#swaps').classList.add('in');
+    $$('#swaps .sw').forEach((s,i)=>later(D*(i*230),()=>s.classList.add('in')));
+    CHIPS.forEach(c=>{ if(!/^(cnpg|rds|minio|seaweedfs|s3|mongodb|documentdb|keycloak|iam|vllm|llama|openai)$/
+                        .test(c.textContent)) c.classList.add('dim') });
+  });
+}};
+
+/* ── ACT 2 · we are not competing with them ── */
+A[2]={ enter(instant){
+  const D=instant?0:1;
+  replay(1);
+  $('#targets').classList.remove('in'); $('#swaps').classList.remove('in');
+  CHIPS.forEach(c=>c.classList.remove('dim'));
+  $('#wall').classList.add('back');
+  later(D*400,()=>$('#cmp').classList.add('in'));
+  /* "we are not trying to compete with managed services" (t+2.0s) */
+  later(D*2000,()=>$('#sL').classList.add('in'));
+  /* "we are trying to provide something better" (t+5.5s) */
+  later(D*5510,()=>$('#sR').classList.add('in'));
+}};
+
+/* ── ACT 3 · open source, sealed behind an API ── */
+A[3]={ enter(instant){
+  const D=instant?0:1;
+  replay(2);
+  $('#cmp').classList.add('in'); $('#sL').classList.add('in'); $('#sR').classList.add('in');
+  /* the lid closes over the open-source core */
+  later(D*900,()=>{ $('#lid').classList.add('on'); $('#box').classList.add('sealed') });
+  FL.forEach((f,i)=>later(D*(1600+i*700),()=>f.classList.add('in')));
+  /* "Stacktic takes a different approach" (t+4.81s) */
+  later(D*4810,()=>MODS.forEach((m,i)=>later(D*(i*110),()=>m.classList.add('in'))));
+}};
+
+/* ── ACT 4 · assembled, versioned, automated ── */
+A[4]={ enter(instant){
+  const D=instant?0:1;
+  replay(3);
+  MODS.forEach(m=>m.classList.add('in'));
+  FR.forEach((f,i)=>later(D*(400+i*1500),()=>f.classList.add('in')));
+}};
+
+/* ── ACT 5 · we own the integration, so we can move ── */
+A[5]={ enter(instant){
+  const D=instant?0:1;
+  replay(4);
+  FR.forEach(f=>f.classList.add('in'));
+  later(D*300,()=>{ $('#tapeL').classList.add('in'); $('#tapeR').classList.add('in') });
+  /* newer open-source versions roll through the assembly */
+  const BUMPS=[['kafka','4.0'],['cnpg','17'],['keycloak','26'],['apisix','3.11'],['grafana','12'],['opa','1.2']];
+  BUMPS.forEach(([name,v],i)=>later(D*(700+i*620),()=>{
+    const m=MODS.find(x=>x.textContent.trim().startsWith(name));
+    if(m){ m.querySelector('s').textContent=v; m.classList.add('new');
+           later(D*900,()=>m.classList.remove('new')) }
+  }));
+  /* "introduce better technologies" (t+6.96s) — redis → valkey, a real swap in the catalog */
+  later(D*6960,()=>{
+    const m=MODS.find(x=>x.textContent.trim().startsWith('redis'));
+    if(m){ m.innerHTML='valkey <s>8.0</s>'; m.classList.add('new') }
+  });
+  /* "keep pace with the latest AI models" (t+9.01s) */
+  later(D*9010,()=>{
+    const m=MODS.find(x=>x.textContent.trim().startsWith('vllm'));
+    if(m){ m.innerHTML='vllm <s>+ new models</s>'; m.classList.add('new') }
+    $('#vR').textContent='newer versions · valkey · new models';
+  });
+}};
+
+/* ── ACT 6 · a different league ── */
+A[6]={ enter(instant){
+  const D=instant?0:1;
+  replay(5);
+  $('#league').classList.add('in');
+  $$('#league div').forEach((d,i)=>later(D*(300+i*900),()=>d.classList.add('in')));
+}};
+
+/* ── reset + seek ── */
+function resetScene(){
+  clearLater();
+  document.documentElement.classList.add('noanim');
+  CHIPS.forEach(c=>c.classList.remove('in','dim'));
+  $('#wall').classList.remove('back');
+  $('#claims').classList.remove('in');
+  $$('#claims .cl').forEach(c=>c.classList.remove('in'));
+  $('#n-oss').textContent='0';
+  $('#targets').classList.remove('in');
+  $$('#targets .tg').forEach(t=>t.classList.remove('in','landed'));
+  $('#swaps').classList.remove('in');
+  $$('#swaps .sw').forEach(s=>s.classList.remove('in'));
+  $('#cmp').classList.remove('in');
+  $('#sL').classList.remove('in'); $('#sR').classList.remove('in');
+  $('#lid').classList.remove('on'); $('#box').classList.remove('sealed');
+  FL.concat(FR).forEach(f=>f.classList.remove('in'));
+  MODS.forEach((m,i)=>{
+    m.classList.remove('in','new');
+    m.innerHTML=['kafka <s>3.7</s>','cnpg <s>16</s>','keycloak <s>25</s>','apisix <s>3.9</s>',
+                 'redis <s>7.2</s>','grafana <s>11</s>','opa <s>1.0</s>','vllm <s>0.5</s>'][i];
+  });
+  $('#tapeL').classList.remove('in'); $('#tapeR').classList.remove('in');
+  $('#vR').textContent='newer versions, newer tech';
+  $('#league').classList.remove('in');
+  $$('#league div').forEach(d=>d.classList.remove('in'));
+  document.body.offsetWidth;
+  document.documentElement.classList.remove('noanim');
+}
+
+let clock=0, playing=false, lastTs=0, curAct=-1, seekToken=0;
+function applyUpTo(i){
+  const token=++seekToken;
+  resetScene();
+  document.documentElement.classList.add('noanim');
+  FAST=true;
+  for(let k=0;k<i;k++) A[k].enter(true);
+  curAct=i; paintChrome(i);
+  setTimeout(()=>{
+    if(token!==seekToken) return;
+    FAST=false;
+    document.body.offsetWidth;
+    document.documentElement.classList.remove('noanim');
+    A[i].enter(false);
+  },0);
+}
+function paintChrome(i){
+  $('#slide').style.setProperty('--ac',AC[i]);
+  $$('.hl').forEach((el,k)=>el.classList.toggle('on',k===i));
+  actEls.forEach((el,k)=>{el.classList.toggle('on',k===i);el.classList.toggle('past',k<i)});
+}
+function actAt(t){let i=0;ACTS.forEach((a,k)=>{if(t>=a.t)i=k});return i}
+function paintCaption(t){
+  let idx=-1; CAPS.forEach(([ct],i)=>{if(t>=ct)idx=i});
+  capEls.forEach((el,i)=>el.classList.toggle('on',i===idx));
+}
+
+const vo=$('#vo'); let useAudio=false;
+vo.addEventListener('loadedmetadata',()=>{
+  useAudio=true;
+  if(vo.duration&&Number.isFinite(vo.duration)){ TOTAL=vo.duration; $('#scrub').max=TOTAL }
+});
+vo.addEventListener('error',()=>{useAudio=false});
+
+function frame(ts){
+  if(playing){
+    const dt=Math.min(.05,(ts-lastTs)/1000)||0;
+    clock = useAudio && !vo.paused ? vo.currentTime : Math.min(TOTAL,clock+dt);
+    const a=actAt(clock);
+    if(a!==curAct){ if(a===curAct+1){A[a].enter(false);curAct=a;paintChrome(a)} else applyUpTo(a) }
+    paintCaption(clock); readout();
+    if(clock>=TOTAL) setPlay(false);
+  }
+  lastTs=ts;
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+function readout(){
+  $('#scrub').value=clock;
+  $('#clock').textContent=clock.toFixed(1)+' / '+TOTAL.toFixed(0)+'s';
+  $('#prog').style.width=(clock/TOTAL*100)+'%';
+}
+function setPlay(p){
+  playing=p; $('#play').innerHTML=p?'&#9208; PAUSE':'&#9199; PLAY';
+  if(!useAudio) return;
+  if(p){ vo.play().catch(()=>{ setPlay(false); $('#gate').hidden=false }) } else vo.pause();
+}
+function seek(t){
+  clock=Math.max(0,Math.min(TOTAL,t));
+  if(useAudio) vo.currentTime=clock;
+  applyUpTo(actAt(clock)); paintCaption(clock); readout();
+}
+function restart(){seek(0);setPlay(true)}
+$('#gate').onclick=()=>{ $('#gate').hidden=true; seek(0); setPlay(true) };
+$('#play').onclick=()=>setPlay(!playing);
+$('#rst').onclick=restart;
+$('#scrub').oninput=e=>seek(+e.target.value);
+addEventListener('keydown',e=>{
+  if(e.code==='Space'){e.preventDefault();setPlay(!playing)}
+  else if(e.key==='ArrowRight'){seek(ACTS[Math.min(ACTS.length-1,actAt(clock)+1)].t)}
+  else if(e.key==='ArrowLeft'){seek(ACTS[Math.max(0,actAt(clock)-1)].t)}
+  else if(e.key.toLowerCase()==='r'){restart()}
+  else if(/^[1-7]$/.test(e.key)){seek(ACTS[+e.key-1].t)}
+});
+
+const hash=new URLSearchParams(location.hash.slice(1));
+const start = hash.has('act') ? (ACTS[+hash.get('act')]||ACTS[0]).t
+            : hash.has('t')   ? +hash.get('t') : 0;
+let booted=false;
+function boot(){ if(booted) return; booted=true; seek(start); setPlay(!hash.has('pause')) }
+seek(start);
+vo.addEventListener('canplay',boot,{once:true});
+setTimeout(boot,1500);
+</script>
+</body></html>

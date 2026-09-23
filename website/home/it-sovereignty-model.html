@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IT Sovereignty — Stacktic</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --sov: #1e3a5f; --accent: #667eea; --purple: #764ba2;
+      --green: #22c55e; --amber: #f59e0b; --red: #ef4444;
+      --g50: #f9fafb; --g100: #f3f4f6; --g200: #e5e7eb; --g300: #d1d5db;
+      --g400: #9ca3af; --g500: #6b7280; --g600: #4b5563; --g700: #374151;
+      --g800: #1f2937; --g900: #111827;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; min-height: 100vh; color: var(--g900); line-height: 1.5; }
+    .page { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .card { background: white; border-radius: 14px; padding: 28px; margin-bottom: 16px; }
+
+    /* Hero */
+    .hero { background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 40%, #312e81 100%); border-radius: 20px; padding: 60px 50px; margin-bottom: 20px; color: white; position: relative; overflow: hidden; }
+    .hero::after { content: ''; position: absolute; top: -50%; right: -20%; width: 600px; height: 600px; background: radial-gradient(circle, rgba(102,126,234,0.15) 0%, transparent 70%); }
+    .hero h1 { font-size: 44px; font-weight: 800; line-height: 1.15; max-width: 700px; position: relative; z-index: 1; }
+    .hero h1 span { background: linear-gradient(135deg, #667eea, #22c55e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero p { font-size: 17px; opacity: 0.8; margin-top: 16px; max-width: 600px; position: relative; z-index: 1; line-height: 1.7; }
+    .hero-badge { display: inline-block; padding: 6px 16px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 30px; font-size: 13px; font-weight: 600; margin-top: 20px; position: relative; z-index: 1; }
+
+    /* Value strip */
+    .value-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+    .value-card { background: white; border-radius: 14px; padding: 24px 20px; text-align: center; position: relative; overflow: hidden; }
+    .value-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+    .value-num { font-size: 40px; font-weight: 800; line-height: 1; }
+    .value-label { font-size: 13px; font-weight: 700; color: var(--g800); margin-top: 6px; }
+    .value-sub { font-size: 11px; color: var(--g400); margin-top: 4px; }
+
+    /* Section headers */
+    .section-head { color: rgba(255,255,255,0.5); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 12px; padding-left: 4px; }
+
+    /* Process flow */
+    .flow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+    .flow-card { background: white; border-radius: 14px; padding: 24px; position: relative; }
+    .flow-num { font-size: 48px; font-weight: 800; opacity: 0.08; position: absolute; top: 12px; right: 16px; }
+    .flow-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .flow-items { list-style: none; padding: 0; }
+    .flow-items li { font-size: 13px; color: var(--g600); padding: 4px 0; padding-left: 16px; position: relative; }
+    .flow-items li::before { content: ''; position: absolute; left: 0; top: 11px; width: 6px; height: 6px; border-radius: 50%; }
+
+    /* Responsibility */
+    .resp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-bottom: 20px; }
+    .resp-col { background: white; padding: 28px; }
+    .resp-col:first-child { border-radius: 14px 0 0 14px; border-right: 2px solid var(--g100); }
+    .resp-col:last-child { border-radius: 0 14px 14px 0; }
+    .resp-title { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+    .resp-phase { margin-bottom: 16px; }
+    .resp-phase-name { font-size: 12px; font-weight: 700; color: var(--g400); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+    .resp-item { font-size: 13px; color: var(--g700); padding: 3px 0; }
+
+    /* Qualify */
+    .qual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .qual-card { background: white; border-radius: 14px; padding: 24px; }
+    .qual-item { font-size: 13px; color: var(--g700); padding: 5px 0; padding-left: 20px; position: relative; }
+    .qual-item::before { position: absolute; left: 0; font-weight: 700; font-size: 14px; }
+
+    /* Form */
+    .q-section { padding: 20px; background: var(--g50); border-radius: 10px; margin-bottom: 16px; }
+    .q-section-title { font-size: 14px; font-weight: 700; color: var(--sov); margin-bottom: 12px; }
+    .q-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+    .q-input, .q-select, .q-textarea { width: 100%; padding: 8px 12px; border: 2px solid var(--g200); border-radius: 6px; font-size: 13px; font-family: inherit; }
+    .q-input:focus, .q-select:focus, .q-textarea:focus { outline: none; border-color: var(--accent); }
+    .q-textarea { min-height: 80px; resize: vertical; }
+    .q-label { display: block; font-weight: 600; font-size: 12px; color: var(--g600); margin-bottom: 4px; }
+    .q-hint { font-weight: 400; color: var(--g400); }
+    .q-table { width: 100%; border-collapse: collapse; }
+    .q-table td { padding: 6px; border: 1px solid var(--g200); vertical-align: top; }
+    .q-table input, .q-table select { width: 100%; padding: 5px 8px; border: 1px solid var(--g300); border-radius: 4px; font-size: 12px; }
+    .q-table-head td { font-weight: 600; color: var(--g500); font-size: 11px; text-transform: uppercase; background: var(--g100); }
+
+    @media print {
+      body { background: white; }
+      .hero { background: var(--sov) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .card, .value-card, .flow-card, .resp-col, .qual-card { box-shadow: none; border: 1px solid var(--g200); }
+      .no-print { display: none; }
+      .section-head { color: var(--sov); }
+    }
+    @media (max-width: 768px) {
+      .value-strip, .flow, .resp-grid, .qual-grid { grid-template-columns: 1fr; }
+      .tl { flex-direction: column; }
+      .hero { padding: 30px 20px; }
+      .hero h1 { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ===== HERO ===== -->
+  <div class="hero">
+    <h1>Automate your entire IT.<br><span>Own everything.</span></h1>
+    <p>We automate full IT ecosystems — CRM, ERP, Email, Docs, Analytics — connecting all components, managing operations, and handling versioning from a single platform. With full sovereignty.</p>
+    <div class="hero-badge">We are not an IT consultancy. We automate technologies.</div>
+  </div>
+
+  <!-- ===== VALUE ===== -->
+  <div class="section-head">The Impact</div>
+  <div class="value-strip">
+    <div class="value-card" style="border-top:4px solid var(--green)">
+      <div class="value-num" style="color:var(--green)">$M+</div>
+      <div class="value-label">Licensing Eliminated</div>
+      <div class="value-sub">Zero per-user SaaS fees. Enterprises save tens of millions.</div>
+    </div>
+    <div class="value-card" style="border-top:4px solid var(--accent)">
+      <div class="value-num" style="color:var(--accent)">30-40%</div>
+      <div class="value-label">Infra Cost Cut</div>
+      <div class="value-sub">Shared K8s cluster. Fixed cost. Doesn't scale with headcount.</div>
+    </div>
+    <div class="value-card" style="border-top:4px solid var(--sov)">
+      <div class="value-num" style="color:var(--sov)">Any Cloud</div>
+      <div class="value-label">Cloud Agnostic</div>
+      <div class="value-sub">Deploy or migrate your full IT to any cloud. Or on-prem.</div>
+    </div>
+    <div class="value-card" style="border-top:4px solid var(--purple)">
+      <div class="value-num" style="color:var(--purple)">100%</div>
+      <div class="value-label">Sovereignty</div>
+      <div class="value-sub">Your data. Your infrastructure. Your jurisdiction.</div>
+    </div>
+  </div>
+
+  <!-- ===== PROCESS ===== -->
+  <div class="section-head">How It Works</div>
+  <div class="flow">
+    <div class="flow-card" style="border-top:4px solid var(--sov)">
+      <div class="flow-num">01</div>
+      <div class="flow-title">We Automate</div>
+      <ul class="flow-items">
+        <li style="color:var(--g700)"><span style="position:absolute;left:0;top:11px;width:6px;height:6px;border-radius:50%;background:var(--sov)"></span>Deploy full IT stack on your infra</li>
+        <li style="color:var(--g700)"><span style="position:absolute;left:0;top:11px;width:6px;height:6px;border-radius:50%;background:var(--sov)"></span>Wire SSO, monitoring, backups</li>
+        <li style="color:var(--g700)"><span style="position:absolute;left:0;top:11px;width:6px;height:6px;border-radius:50%;background:var(--sov)"></span>Version the entire stack as one unit</li>
+        <li style="color:var(--g700)"><span style="position:absolute;left:0;top:11px;width:6px;height:6px;border-radius:50%;background:var(--sov)"></span>Operate: patches, upgrades, DR</li>
+      </ul>
+    </div>
+    <div class="flow-card" style="border-top:4px solid var(--accent)">
+      <div class="flow-num">02</div>
+      <div class="flow-title">Our IT Specialists Bridge</div>
+      <ul class="flow-items">
+        <li style="color:var(--g700)"><span style="position:absolute;left:0;top:11px;width:6px;height:6px;border-radius:50%;background:var(--accent)"></span>Gather your requirements</li>
+        <li style="color:var(--g700)"><span style="position:absolute;left:0;top:11px;width:6px;height:6px;border-radius:50%;background:var(--accent)"></span>Understand your IT processes</li>
+        <li style="color:var(--g700)"><span style="position:absolute;left:0;top:11px;width:6px;height:6px;border-radius:50%;background:var(--accent)"></span>Design solutions with OSS tools</li>
+        <li style="color:var(--g700)"><span style="position:absolute;left:0;top:11px;width:6px;height:6px;border-radius:50%;background:var(--accent)"></span>Train your teams on every tool</li>
+      </ul>
+    </div>
+    <div class="flow-card" style="border-top:4px solid var(--purple)">
+      <div class="flow-num">03</div>
+      <div class="flow-title">AI Accelerates Migration</div>
+      <ul class="flow-items">
+        <li style="color:var(--g700)"><span style="position:absolute;left:0;top:11px;width:6px;height:6px;border-radius:50%;background:var(--purple)"></span>Auto-map fields between systems</li>
+        <li style="color:var(--g700)"><span style="position:absolute;left:0;top:11px;width:6px;height:6px;border-radius:50%;background:var(--purple)"></span>Generate transformation scripts</li>
+        <li style="color:var(--g700)"><span style="position:absolute;left:0;top:11px;width:6px;height:6px;border-radius:50%;background:var(--purple)"></span>Clean and validate data</li>
+        <li style="color:var(--g700)"><span style="position:absolute;left:0;top:11px;width:6px;height:6px;border-radius:50%;background:var(--purple)"></span>Months become weeks</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===== TIMELINE ===== -->
+  <div class="section-head">How Fast</div>
+  <div class="card" style="margin-bottom:20px;padding:24px">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;text-align:center">
+      <div style="padding:20px;background:var(--g50);border-radius:10px">
+        <div style="font-size:32px;font-weight:800;color:var(--accent)">2-4 wk</div>
+        <div style="font-size:13px;font-weight:700;color:var(--g800);margin-top:4px">Greenfield</div>
+        <div style="font-size:11px;color:var(--g400)">New stack from scratch. No migration.</div>
+      </div>
+      <div style="padding:20px;background:var(--g50);border-radius:10px;border:2px solid var(--accent)">
+        <div style="font-size:32px;font-weight:800;color:var(--sov)">3-4 mo</div>
+        <div style="font-size:13px;font-weight:700;color:var(--g800);margin-top:4px">Standard Migration</div>
+        <div style="font-size:11px;color:var(--g400)">5-8 tools. Email, CRM, chat, files, wiki.</div>
+      </div>
+      <div style="padding:20px;background:var(--g50);border-radius:10px">
+        <div style="font-size:32px;font-weight:800;color:var(--amber)">5-6 mo</div>
+        <div style="font-size:13px;font-weight:700;color:var(--g800);margin-top:4px">Full Stack + ERP</div>
+        <div style="font-size:11px;color:var(--g400)">10+ tools including ERP migration.</div>
+      </div>
+    </div>
+    <div style="margin-top:14px;text-align:center;font-size:12px;color:var(--g400)">
+      Tools migrate in waves. Your team keeps working throughout — zero downtime.
+    </div>
+  </div>
+
+  <!-- ===== RESPONSIBILITIES ===== -->
+  <div class="section-head">Responsibilities</div>
+  <div class="resp-grid">
+    <div class="resp-col">
+      <div class="resp-title" style="color:var(--sov)">Stacktic</div>
+      <div class="resp-phase">
+        <div class="resp-phase-name">Discovery</div>
+        <div class="resp-item">Run workshops. Audit tools, integrations, data.</div>
+        <div class="resp-item">Score complexity. Deliver migration plan.</div>
+      </div>
+      <div class="resp-phase">
+        <div class="resp-phase-name">Deployment</div>
+        <div class="resp-item">Deploy K8s cluster + all tools automatically.</div>
+        <div class="resp-item">Wire SSO, monitoring, storage, backups.</div>
+      </div>
+      <div class="resp-phase">
+        <div class="resp-phase-name">Migration</div>
+        <div class="resp-item">Migrate data (AI-accelerated).</div>
+        <div class="resp-item">Rebuild integrations via n8n.</div>
+        <div class="resp-item">Configure tools. Train teams.</div>
+      </div>
+      <div class="resp-phase">
+        <div class="resp-phase-name">Operations (Ongoing)</div>
+        <div class="resp-item">Platform updates, patches, monitoring.</div>
+        <div class="resp-item">Version upgrades. Disaster recovery.</div>
+      </div>
+    </div>
+    <div class="resp-col">
+      <div class="resp-title" style="color:var(--amber)">Customer</div>
+      <div class="resp-phase">
+        <div class="resp-phase-name">Discovery <span style="font-weight:400;color:var(--g400)">~15 hrs total</span></div>
+        <div class="resp-item">Provide tool inventory + license reports.</div>
+        <div class="resp-item">IT lead + 2 admins attend workshops.</div>
+      </div>
+      <div class="resp-phase">
+        <div class="resp-phase-name">Deployment <span style="font-weight:400;color:var(--g400)">~2 hrs/week</span></div>
+        <div class="resp-item">Provide cloud credentials, DNS, certs.</div>
+      </div>
+      <div class="resp-phase">
+        <div class="resp-phase-name">Migration <span style="font-weight:400;color:var(--g400)">5-15 hrs/week</span></div>
+        <div class="resp-item">Appoint pilot users per tool.</div>
+        <div class="resp-item">Business owners validate workflows.</div>
+        <div class="resp-item">Communicate changes to teams.</div>
+      </div>
+      <div class="resp-phase">
+        <div class="resp-phase-name">Operations <span style="font-weight:400;color:var(--g400)">BAU</span></div>
+        <div class="resp-item">Day-to-day user support (L1).</div>
+        <div class="resp-item">Onboard/offboard via SSO.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== USE CASES ===== -->
+  <div class="section-head">Use Cases</div>
+
+  <!-- Carve-Out (expanded) -->
+  <div class="card" style="margin-bottom:12px;padding:28px;border-left:6px solid var(--amber);position:relative;overflow:hidden">
+    <div style="position:absolute;top:12px;right:20px;padding:4px 12px;background:#fef3c7;border-radius:20px;font-size:11px;font-weight:700;color:#92400e;text-transform:uppercase">Primary Use Case</div>
+    <div style="font-size:20px;font-weight:800;margin-bottom:10px">M&A Carve-Out</div>
+    <div style="font-size:14px;color:var(--g600);line-height:1.7;max-width:800px;margin-bottom:16px">
+      When a company sells a division, the carved-out entity inherits the parent's IT — oversized, over-licensed, and tied to a TSA that burns cash every month. Stacktic isolates the relevant systems, data, and infrastructure from the parent organization and stands up a right-sized, independent IT environment.
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+      <div style="padding:14px;background:var(--g50);border-radius:8px;text-align:center">
+        <div style="font-size:11px;color:var(--g400);text-transform:uppercase;font-weight:700;margin-bottom:4px">Step 1</div>
+        <div style="font-size:13px;font-weight:600;color:var(--g800)">Identify & isolate</div>
+        <div style="font-size:11px;color:var(--g500);margin-top:2px">Map which systems, data, and users belong to the carved-out entity</div>
+      </div>
+      <div style="padding:14px;background:var(--g50);border-radius:8px;text-align:center">
+        <div style="font-size:11px;color:var(--g400);text-transform:uppercase;font-weight:700;margin-bottom:4px">Step 2</div>
+        <div style="font-size:13px;font-weight:600;color:var(--g800)">Deploy sovereign stack</div>
+        <div style="font-size:11px;color:var(--g500);margin-top:2px">Independent IT on the entity's own infrastructure — fully decoupled</div>
+      </div>
+      <div style="padding:14px;background:var(--g50);border-radius:8px;text-align:center">
+        <div style="font-size:11px;color:var(--g400);text-transform:uppercase;font-weight:700;margin-bottom:4px">Step 3</div>
+        <div style="font-size:13px;font-weight:600;color:var(--g800)">Migrate & right-size</div>
+        <div style="font-size:11px;color:var(--g500);margin-top:2px">Move only the relevant data. Right-size for 300 users, not 10,000</div>
+      </div>
+      <div style="padding:14px;background:var(--g50);border-radius:8px;text-align:center">
+        <div style="font-size:11px;color:var(--g400);text-transform:uppercase;font-weight:700;margin-bottom:4px">Step 4</div>
+        <div style="font-size:13px;font-weight:600;color:var(--g800)">Exit TSA</div>
+        <div style="font-size:11px;color:var(--g500);margin-top:2px">Independent operations. TSA terminated. IT cost drops. Valuation goes up.</div>
+      </div>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:20px;font-size:12px;color:var(--g400)">
+      <span><strong>Size:</strong> 100-5,000 employees</span>
+      <span><strong>Timeline:</strong> 3-6 months</span>
+      <span><strong>Impact:</strong> TSA exit + EBITDA uplift from lower IT cost</span>
+    </div>
+  </div>
+
+  <!-- Other use cases -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
+    <div class="card" style="padding:20px;border-left:4px solid var(--sov)">
+      <div style="font-size:15px;font-weight:700;margin-bottom:6px">IT Sovereignty</div>
+      <div style="font-size:12px;color:var(--g500)">GDPR, data residency, compliance. Full control over where data lives and who accesses it.</div>
+      <div style="margin-top:8px;font-size:11px;color:var(--g400)">200-10K emp / 4-8 mo</div>
+    </div>
+    <div class="card" style="padding:20px;border-left:4px solid var(--green)">
+      <div style="font-size:15px;font-weight:700;margin-bottom:6px">Cost Reduction</div>
+      <div style="font-size:12px;color:var(--g500)">Eliminate per-user SaaS licensing. Fixed infrastructure cost regardless of headcount growth.</div>
+      <div style="margin-top:8px;font-size:11px;color:var(--g400)">200-20K emp / 3-6 mo</div>
+    </div>
+    <div class="card" style="padding:20px;border-left:4px solid var(--accent)">
+      <div style="font-size:15px;font-weight:700;margin-bottom:6px">Greenfield Build</div>
+      <div style="font-size:12px;color:var(--g500)">New entity or post-acquisition. Full IT stack from scratch. No legacy, no migration.</div>
+      <div style="margin-top:8px;font-size:11px;color:var(--g400)">50-5K emp / 2-4 weeks</div>
+    </div>
+  </div>
+
+  <!-- ===== QUALIFICATION ===== -->
+  <div class="section-head">Qualification</div>
+  <div class="qual-grid">
+    <div class="qual-card" style="border-top:4px solid var(--green)">
+      <div style="font-size:15px;font-weight:700;color:#065f46;margin-bottom:12px">Good Fit</div>
+      <div class="qual-item" style="color:#166534"><span style="position:absolute;left:0;color:var(--green);font-weight:700">+</span>100+ employees</div>
+      <div class="qual-item" style="color:#166534"><span style="position:absolute;left:0;color:var(--green);font-weight:700">+</span>IT spend > $200K/year</div>
+      <div class="qual-item" style="color:#166534"><span style="position:absolute;left:0;color:var(--green);font-weight:700">+</span>TSA deadline or compliance pressure</div>
+      <div class="qual-item" style="color:#166534"><span style="position:absolute;left:0;color:var(--green);font-weight:700">+</span>Standard IT needs (email, CRM, ERP, chat)</div>
+      <div class="qual-item" style="color:#166534"><span style="position:absolute;left:0;color:var(--green);font-weight:700">+</span>Open to open-source alternatives</div>
+      <div class="qual-item" style="color:#166534"><span style="position:absolute;left:0;color:var(--green);font-weight:700">+</span>EU / regulated industry</div>
+    </div>
+    <div class="qual-card" style="border-top:4px solid var(--red)">
+      <div style="font-size:15px;font-weight:700;color:#991b1b;margin-bottom:12px">Not a Fit</div>
+      <div class="qual-item" style="color:#991b1b"><span style="position:absolute;left:0;color:var(--red);font-weight:700">&minus;</span>Under 50 employees</div>
+      <div class="qual-item" style="color:#991b1b"><span style="position:absolute;left:0;color:var(--red);font-weight:700">&minus;</span>Deep vendor lock-in (SAP custom modules)</div>
+      <div class="qual-item" style="color:#991b1b"><span style="position:absolute;left:0;color:var(--red);font-weight:700">&minus;</span>No IT capacity and unwilling to hire</div>
+      <div class="qual-item" style="color:#991b1b"><span style="position:absolute;left:0;color:var(--red);font-weight:700">&minus;</span>Need only 1-2 tools replaced</div>
+      <div class="qual-item" style="color:#991b1b"><span style="position:absolute;left:0;color:var(--red);font-weight:700">&minus;</span>Expect 100% feature parity</div>
+      <div class="qual-item" style="color:#991b1b"><span style="position:absolute;left:0;color:var(--red);font-weight:700">&minus;</span>Timeline under 4 weeks for full migration</div>
+    </div>
+  </div>
+
+  <!-- ===== CTA ===== -->
+  <div class="card" style="margin-bottom:20px;text-align:center;padding:36px;background:linear-gradient(135deg,var(--sov),var(--purple));color:white;border:none">
+    <div style="font-size:22px;font-weight:700;margin-bottom:8px">Ready to explore?</div>
+    <div style="font-size:14px;opacity:0.8;margin-bottom:16px">Use our ROI Calculator to see the numbers for your specific situation.</div>
+    <a href="soverginty-roi.html" style="display:inline-block;padding:12px 32px;background:white;color:var(--sov);border-radius:8px;font-size:14px;font-weight:700;text-decoration:none">Open ROI Calculator</a>
+  </div>
+
+  <div style="text-align:center;padding:20px;font-size:13px;color:rgba(255,255,255,0.3)">
+    stacktic.io &mdash; info@stacktic.io
+  </div>
+
+</div>
+
+<script>
+// Print support
+document.addEventListener('keydown', function(e) {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'p') { window.print(); }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stacktic — Demo 03 · Validation by metadata</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════
+   STACKTIC · DEMO 03 — ONE WIX EMBED BLOCK
+   Height follows the content — it does NOT scroll on its own.
+
+   THE VIDEO — two ways, pick one:
+   A) set VIDEO at the bottom of this file to an .mp4 URL from the
+      Wix Media Manager (or paste a full <iframe> embed) → it plays
+      inside the frame.
+   B) leave VIDEO empty → the frame disappears, the copy goes
+      full width, and you drop a native Wix video element straight
+      underneath this embed in the Wix editor.
+   ═══════════════════════════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg:#2A2847;
+  --purple:#a78bfa; --cyan:#60d5ff; --amber:#fbbf24; --green:#34d399;
+  --red-hot:#ff4d6d;
+  --white:#fff;
+  --s2:#e2e8f0; --s3:#cbd5e1; --s4:#94a3b8; --s5:#64748b;
+  --panel:#3A3663; /* surfaces LIFT off the bg — never darker */
+  --hair:rgba(255,255,255,.07); --hair2:rgba(255,255,255,.14);
+  --font:'Fira Code',ui-monospace,'SF Mono',Menlo,monospace;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --ac:var(--green);
+}
+
+html{scrollbar-width:none;-ms-overflow-style:none}
+html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
+
+body{
+  font-family:var(--font);
+  background:var(--bg); /* flat — must match the Wix site background exactly */
+  color:var(--s2);overflow-x:hidden;-webkit-font-smoothing:antialiased;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
+}
+
+/* ── ambient field, sized to this block only ── */
+.ambient{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.ambient .motes{position:absolute;inset:-10%;
+  background-image:
+    radial-gradient(circle at 15% 25%,rgba(192,132,252,.5) 0,transparent 2px),
+    radial-gradient(circle at 75% 65%,rgba(96,213,255,.5) 0,transparent 2px),
+    radial-gradient(circle at 45% 85%,rgba(52,211,153,.5) 0,transparent 2px),
+    radial-gradient(circle at 90% 15%,rgba(251,191,36,.4) 0,transparent 2px);
+  background-size:300px 300px;animation:drift 70s linear infinite;opacity:.55}
+@keyframes drift{from{transform:translate3d(0,0,0)}to{transform:translate3d(-300px,-300px,0)}}
+.ambient .grid{position:absolute;inset:0;opacity:.45;
+  background-image:
+    linear-gradient(rgba(150,175,235,.075) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(150,175,235,.075) 1px,transparent 1px);
+  background-size:74px 74px;
+  -webkit-mask-image:radial-gradient(ellipse 74% 62% at 50% 50%,#000 25%,transparent 78%);
+  mask-image:radial-gradient(ellipse 74% 62% at 50% 50%,#000 25%,transparent 78%)}
+
+/* ══════════ block shell — content height, no forced 100vh ══════════ */
+.block{position:relative;z-index:10;padding:clamp(40px,6vw,72px) clamp(18px,5vw,56px)}
+.wrap{width:100%;max-width:1240px;margin:0 auto;
+  display:grid;grid-template-columns:.82fr 1.18fr;gap:clamp(26px,3.6vw,58px);align-items:center}
+.wrap.solo{grid-template-columns:1fr;max-width:920px;text-align:center}
+.wrap.solo .beats{text-align:left;max-width:640px;margin-left:auto;margin-right:auto}
+.wrap.solo .meta{justify-content:center}
+@media(max-width:1000px){.wrap{grid-template-columns:1fr;gap:34px}}
+
+.eb{display:inline-flex;align-items:center;gap:.65em;font-size:10px;font-weight:700;
+  letter-spacing:.3em;text-transform:uppercase;color:var(--ac);
+  padding:6px 15px;border-radius:999px;
+  background:color-mix(in srgb,var(--ac) 11%,transparent);
+  border:1px solid color-mix(in srgb,var(--ac) 32%,transparent)}
+.eb::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--ac);
+  box-shadow:0 0 0 0 color-mix(in srgb,var(--ac) 70%,transparent);animation:beat 2.2s infinite}
+@keyframes beat{70%{box-shadow:0 0 0 9px transparent}100%{box-shadow:0 0 0 0 transparent}}
+
+em{font-style:normal;color:var(--ac)}
+
+.rv{opacity:0;transform:translateY(24px);
+  transition:opacity .9s var(--ease),transform .9s var(--ease);
+  transition-delay:calc(var(--d,0)*120ms)}
+body.in .rv{opacity:1;transform:none}
+
+.copy h2{font-size:clamp(24px,2.9vw,38px);font-weight:700;line-height:1.14;
+  letter-spacing:-.045em;color:var(--white);margin-top:22px}
+.copy .lead{margin-top:18px;font-size:clamp(13px,1.15vw,15px);line-height:1.85;color:var(--s3)}
+.copy .lead b{color:var(--white);font-weight:600}
+
+.beats{list-style:none;margin-top:26px;border-left:1px solid var(--hair2);padding-left:0}
+.beats li{position:relative;padding:11px 0 11px 26px;font-size:12.5px;line-height:1.7;color:var(--s3)}
+.beats li::before{content:'';position:absolute;left:-4.5px;top:19px;width:8px;height:8px;
+  border-radius:50%;background:var(--bg);border:1.5px solid var(--ac);
+  box-shadow:0 0 10px color-mix(in srgb,var(--ac) 70%,transparent)}
+.beats li b{color:var(--white);font-weight:600}
+.beats li s{display:block;text-decoration:none;font-size:9.5px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--ac);margin-bottom:5px}
+
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
+.meta span{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--s4);
+  padding:6px 11px;border-radius:999px;border:1px solid var(--hair2);
+  background:rgba(255,255,255,.025)}
+
+/* ══════════ the video frame ══════════ */
+.player{position:relative;width:100%}
+.player[hidden]{display:none}
+.player::before{content:'';position:absolute;inset:-1px;border-radius:19px;z-index:0;
+  background:linear-gradient(140deg,color-mix(in srgb,var(--ac) 60%,transparent),
+    transparent 42%,transparent 60%,color-mix(in srgb,var(--ac) 32%,transparent));
+  opacity:.75;transition:opacity .5s}
+.player:hover::before{opacity:1}
+
+.frame{position:relative;z-index:1;border-radius:18px;overflow:hidden;
+  background:linear-gradient(165deg,color-mix(in srgb,var(--ac) 8%,rgba(58,54,99,.72)),rgba(46,43,78,.5));
+  border:1px solid var(--hair2);
+  box-shadow:0 40px 80px -52px rgba(12,10,28,.8),0 0 60px -32px color-mix(in srgb,var(--ac) 80%,transparent)}
+
+.bar{display:flex;align-items:center;gap:9px;padding:11px 15px;
+  border-bottom:1px solid var(--hair);background:rgba(255,255,255,.025)}
+.bar u{width:9px;height:9px;border-radius:50%;text-decoration:none;display:block}
+.bar u:nth-child(1){background:color-mix(in srgb,var(--red-hot) 70%,transparent)}
+.bar u:nth-child(2){background:color-mix(in srgb,var(--amber) 70%,transparent)}
+.bar u:nth-child(3){background:color-mix(in srgb,var(--green) 70%,transparent)}
+.bar span{margin-left:8px;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--s5)}
+.bar i{margin-left:auto;font-style:normal;font-size:9.5px;letter-spacing:.18em;
+  color:var(--ac);display:inline-flex;align-items:center;gap:.6em}
+.bar i::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ac);
+  box-shadow:0 0 9px var(--ac);animation:beat 2.2s infinite}
+.bar .exp{margin-left:12px;width:24px;height:24px;display:grid;place-items:center;cursor:pointer;
+  border-radius:6px;border:1px solid var(--hair2);background:rgba(255,255,255,.04);
+  color:var(--s3);transition:.3s var(--ease);flex:none}
+.bar .exp:hover{background:color-mix(in srgb,var(--ac) 18%,transparent);
+  border-color:color-mix(in srgb,var(--ac) 55%,transparent);color:var(--white)}
+.bar .exp svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round}
+
+.slot{position:relative;aspect-ratio:var(--ratio,1668/1080);width:100%;display:grid;place-items:center;
+  background:
+    radial-gradient(ellipse 70% 70% at 50% 45%,color-mix(in srgb,var(--ac) 13%,transparent),transparent 72%),
+    linear-gradient(165deg,rgba(58,54,99,.45),rgba(42,40,71,.25))}
+.slot::before{content:'';position:absolute;inset:0;opacity:.5;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(150,175,235,.06) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(150,175,235,.06) 1px,transparent 1px);
+  background-size:46px 46px;
+  -webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,#000 20%,transparent 82%);
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,#000 20%,transparent 82%)}
+.slot > iframe,.slot > video{position:absolute;inset:0;width:100%;height:100%;
+  border:0;display:block;object-fit:contain;background:#000}
+
+.ph{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:16px;
+  text-align:center;padding:20px}
+.ph .play{width:clamp(58px,6vw,76px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;
+  border:1.5px solid color-mix(in srgb,var(--ac) 55%,transparent);
+  background:color-mix(in srgb,var(--ac) 10%,transparent);animation:ring 3s ease-out infinite}
+@keyframes ring{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ac) 34%,transparent)}
+  70%,100%{box-shadow:0 0 0 26px transparent}}
+.ph .play svg{width:38%;height:38%;fill:var(--ac);margin-left:12%}
+.ph .t{font-size:10.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--ac);font-weight:700}
+.ph .d{font-size:11px;line-height:1.75;color:var(--s5);max-width:330px}
+
+.frame .cr{position:absolute;width:20px;height:20px;z-index:3;pointer-events:none;
+  border-color:color-mix(in srgb,var(--ac) 70%,transparent);border-style:solid;border-width:0}
+.frame .cr.tl{top:52px;left:14px;border-top-width:1.5px;border-left-width:1.5px;border-top-left-radius:5px}
+.frame .cr.tr{top:52px;right:14px;border-top-width:1.5px;border-right-width:1.5px;border-top-right-radius:5px}
+.frame .cr.bl{bottom:14px;left:14px;border-bottom-width:1.5px;border-left-width:1.5px;border-bottom-left-radius:5px}
+.frame .cr.br{bottom:14px;right:14px;border-bottom-width:1.5px;border-right-width:1.5px;border-bottom-right-radius:5px}
+
+.cap{font-size:10px;letter-spacing:.16em;color:var(--s5);margin-top:14px;text-align:center}
+
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .rv{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<div class="ambient" aria-hidden="true">
+  <div class="grid"></div>
+  <div class="motes"></div>
+</div>
+
+<div class="block">
+  <div class="wrap" id="wrap">
+
+    <div class="copy">
+      <span class="eb rv">Demo 03</span>
+      <h2 class="rv" style="--d:1"><em>Validation</em><br>by metadata.</h2>
+      <p class="lead rv" style="--d:2">The stack carries a description of itself. That description is not documentation — it is <b>the thing everything is checked against</b>, so what is running can be compared to what was declared.</p>
+
+      <ul class="beats rv" style="--d:3">
+        <li><s>Declare</s><b>Every layer and every relationship is recorded</b> as metadata when the stack is built.</li>
+        <li><s>Compare</s><b>The running stack is read back</b> and put next to the declaration.</li>
+        <li><s>Catch</s><b>Drift and gaps surface as findings</b> — with the layer and the relationship that caused them.</li>
+        <li><s>Trust</s><b>The answer is evidence, not opinion.</b> Same check, same result, every time.</li>
+      </ul>
+
+      <div class="meta rv" style="--d:4">
+        <span>Self-describing stack</span><span>Declared vs running</span><span>Evidence</span>
+      </div>
+    </div>
+
+    <div class="player rv" id="player" style="--d:2">
+      <div class="frame">
+        <div class="bar"><u></u><u></u><u></u><span>demo 03 · validation by metadata</span><i>PLAY</i><button class="exp" type="button" aria-label="Fullscreen" title="Fullscreen"><svg viewBox="0 0 24 24"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg></button></div>
+        <span class="cr tl"></span><span class="cr tr"></span>
+        <span class="cr bl"></span><span class="cr br"></span>
+        <div class="slot" id="slot">
+          <div class="ph">
+            <div class="play"><svg viewBox="0 0 24 24"><path d="M6 3l16 9-16 9z"/></svg></div>
+            <div class="t">Video · Demo 03</div>
+            <div class="d">Set VIDEO at the bottom of this file, or leave it empty and place a Wix video element under this embed.</div>
+          </div>
+        </div>
+      </div>
+      <div class="cap">validation by metadata · declared vs running</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   ▼▼▼  THE ONLY LINE YOU EDIT  ▼▼▼
+
+   VIDEO accepts any ONE of:
+     • an .mp4 URL copied from the Wix Media Manager
+       e.g. 'https://video.wixstatic.com/video/xxxx/1080p/mp4/file.mp4'
+     • a full <iframe …></iframe> embed code (YouTube, Vimeo, Wix)
+     • ''  → the frame is removed and the copy goes full width, so
+             you can drop a native Wix video element under this embed
+   ════════════════════════════════════════════════════════════ */
+const VIDEO = 'https://video.wixstatic.com/video/06ddae_5df7d01bdd864007bc94cee77fc9f2cd/1080p/mp4/file.mp4';
+
+const POSTER = '';   // optional: image URL shown before play (mp4 only)
+/* ▲▲▲ nothing below needs editing ▲▲▲ */
+
+(function(){
+  const slot=document.getElementById('slot');
+  const player=document.getElementById('player');
+  const src=(VIDEO||'').trim();
+
+  if(!src){
+    /* no video here — hide the frame, let the copy breathe full width */
+    player.hidden=true;
+    document.getElementById('wrap').classList.add('solo');
+  }else if(/^<\s*iframe/i.test(src)){
+    slot.innerHTML=src;
+    const f=slot.querySelector('iframe');
+    if(f){f.setAttribute('allow','autoplay; fullscreen; picture-in-picture');
+          f.setAttribute('allowfullscreen','');}
+  }else{
+    const v=document.createElement('video');
+    v.src=src; v.controls=true; v.playsInline=true; v.preload='metadata';
+    if(POSTER) v.poster=POSTER;
+    slot.innerHTML=''; slot.appendChild(v);
+  }
+})();
+
+/* reveal on entry */
+const io=new IntersectionObserver(es=>{
+  es.forEach(e=>{ if(e.isIntersecting){ document.body.classList.add('in'); io.disconnect(); } });
+},{threshold:.15});
+io.observe(document.querySelector('.block'));
+addEventListener('load',()=>setTimeout(()=>document.body.classList.add('in'),200));
+
+/* tell Wix how tall this block is, so the embed can auto-size */
+function reportHeight(){
+  const h=document.documentElement.scrollHeight;
+  try{ parent.postMessage({type:'stacktic-embed-height',height:h},'*'); }catch(e){}
+}
+addEventListener('load',reportHeight);
+addEventListener('resize',reportHeight);
+new ResizeObserver(reportHeight).observe(document.body);
+/* expand — the frame goes fullscreen, same as the Wix player's enlarge */
+document.querySelectorAll('.frame').forEach(fr=>{
+  const btn=fr.querySelector('.exp'); if(!btn) return;
+  btn.addEventListener('click',()=>{
+    const el=fr.querySelector('video')||fr;
+    if(document.fullscreenElement){document.exitFullscreen();return;}
+    (el.requestFullscreen||el.webkitRequestFullscreen||el.webkitEnterFullscreen||(()=>{})).call(el);
+  });
+});
+</script>
+</body>
+</html>

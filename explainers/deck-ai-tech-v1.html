@@ -1,0 +1,934 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stacktic — AI can write code. It cannot run a system.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --page:#eef1f7; --card:#fff; --ink:#0c1222; --mut:#5c6785; --faint:#98a1b8; --line:#e6e9f2; --line2:#dde1ec;
+  --emerald:#10b981; --violet:#8b5cf6; --indigo:#6366f1; --sky:#0ea5e9; --amber:#f59e0b; --rose:#f43f5e; --teal:#14b8a6;
+  --disp:"Sora","Inter",system-ui,-apple-system,Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001s!important;transition:none!important}}
+*{box-sizing:border-box;margin:0;min-width:0}
+html,body{height:100%;background:var(--page);font-family:var(--disp);color:var(--ink);-webkit-font-smoothing:antialiased;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.deck{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;height:100vh;scrollbar-width:none}.deck::-webkit-scrollbar{display:none}
+.frame{flex:0 0 100%;height:100vh;scroll-snap-align:center;display:flex;align-items:center;justify-content:center;padding:2.2vh 2.2vw}
+.slide{position:relative;width:min(1360px,96vw);aspect-ratio:16/9;max-height:95vh;border-radius:22px;overflow:hidden;background:var(--card);
+  border:1px solid var(--line);box-shadow:0 40px 100px -50px rgba(20,30,60,.45);container-type:inline-size;--u:1cqw;display:flex;flex-direction:column}
+.bgblob{position:absolute;inset:0;z-index:0;pointer-events:none;background:
+  radial-gradient(42% 52% at 90% 4%,color-mix(in srgb,var(--acc) 15%,transparent),transparent 70%),
+  radial-gradient(40% 52% at 4% 98%,color-mix(in srgb,var(--acc) 10%,transparent),transparent 70%);animation:blob 17s ease-in-out infinite alternate}
+@keyframes blob{to{transform:translateY(-3%) scale(1.06)}}
+.grid-tex{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.55;
+  background-image:linear-gradient(rgba(20,30,60,.038) 1px,transparent 1px),linear-gradient(90deg,rgba(20,30,60,.038) 1px,transparent 1px);
+  background-size:46px 46px;-webkit-mask-image:radial-gradient(92% 92% at 50% 40%,#000,transparent 92%);mask-image:radial-gradient(92% 92% at 50% 40%,#000,transparent 92%)}
+.pad{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;padding:calc(var(--u)*1.9) calc(var(--u)*2.9);min-height:0}
+svg.i{width:1em;height:1em;display:block;flex:none}
+
+/* chrome */
+.chrome{display:flex;justify-content:space-between;align-items:flex-start}
+.eyebrow{display:flex;align-items:center;gap:calc(var(--u)*.9);font-family:var(--mono);font-size:calc(var(--u)*1)}
+.logo{letter-spacing:.12em;color:var(--mut)}.logo b{color:var(--ink);font-weight:800}
+.tick{width:calc(var(--u)*2.6);height:1px;background:linear-gradient(90deg,var(--acc),transparent)}
+.kicker{letter-spacing:.28em;font-weight:800;color:var(--acc)}
+.idx{font-family:var(--mono);font-size:calc(var(--u)*1);color:var(--faint);text-align:right;line-height:1.7}.idx b{color:var(--acc)}
+h1{font-weight:800;letter-spacing:-.032em;line-height:1.03;margin:calc(var(--u)*.9) 0 0;font-size:calc(var(--u)*3.35);text-wrap:balance}
+h1 em{font-style:normal;color:var(--acc)}
+h1 .sub{display:block;font-weight:500;color:var(--mut);font-size:calc(var(--u)*1.55);margin-top:.3em;letter-spacing:-.005em;max-width:92ch}
+.foot{display:flex;justify-content:space-between;align-items:baseline;margin-top:auto;padding-top:calc(var(--u)*.9);border-top:1px solid var(--line)}
+.foot .q{font-family:var(--mono);font-size:calc(var(--u)*1.08);color:var(--mut)}
+.foot .q i{font-style:normal;color:var(--acc);margin-right:.5em;font-weight:800}.foot .q b{color:var(--ink)}
+.foot .brand{font-family:var(--mono);font-size:calc(var(--u)*.82);color:var(--faint);letter-spacing:.12em}
+.stage{position:relative;flex:1;min-height:0;display:flex;margin:calc(var(--u)*1.1) 0 calc(var(--u)*.5)}
+
+/* motion */
+.rise{opacity:0;transform:translateY(16px)}
+.frame.live .rise{animation:rise .6s cubic-bezier(.2,.8,.25,1) both}
+.frame.live .d1{animation-delay:.04s}.frame.live .d2{animation-delay:.12s}.frame.live .d3{animation-delay:.21s}
+.frame.live .d4{animation-delay:.3s}.frame.live .d5{animation-delay:.4s}.frame.live .d6{animation-delay:.5s}.frame.live .d7{animation-delay:.6s}
+@keyframes rise{to{opacity:1;transform:none}}
+@keyframes dash{to{stroke-dashoffset:-20}}
+@keyframes pulseRing{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--t) 42%,transparent)}50%{box-shadow:0 0 0 calc(var(--u)*1.1) transparent}}
+
+/* ============ S1 : AI writes code ============ */
+.s1{display:grid;grid-template-columns:.86fr 1.34fr;gap:calc(var(--u)*1.5);flex:1;min-height:0}
+.term{border-radius:15px;border:1px solid #232c46;background:linear-gradient(180deg,#111a2e,#0b1220);overflow:hidden;display:flex;flex-direction:column;
+  box-shadow:0 28px 60px -34px rgba(10,16,34,.9)}
+.tbar{display:flex;align-items:center;gap:.55em;padding:calc(var(--u)*.62) calc(var(--u)*1);border-bottom:1px solid #202a44;background:#0e1729}
+.tbar i{width:calc(var(--u)*.66);height:calc(var(--u)*.66);border-radius:50%;display:block}
+.tbar .t{font-family:var(--mono);font-size:calc(var(--u)*.82);color:#7f8db5;letter-spacing:.05em;margin-left:.3em}
+.tbody{flex:1;padding:calc(var(--u)*1) calc(var(--u)*1.1);font-family:var(--mono);font-size:calc(var(--u)*.96);line-height:1.75;color:#c3cde8;overflow:hidden}
+.tbody .p1{color:#8ea2d6}.tbody .cm{color:#5b6b93}.tbody .ok{color:#34d399}.tbody .no{color:#fb7185}.tbody .hi{color:#fbbf24}
+.tbody .cur{display:inline-block;width:.55em;height:1.05em;background:#34d399;vertical-align:-.18em;animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.onefile{margin-top:calc(var(--u)*.8);display:flex;align-items:center;gap:.6em;border:1px dashed #33406a;border-radius:10px;padding:calc(var(--u)*.6) calc(var(--u)*.8);background:rgba(99,102,241,.09)}
+.onefile .of{font-family:var(--mono);font-size:calc(var(--u)*.88);color:#a5b4fc}
+.onefile .ct{margin-left:auto;font-family:var(--mono);font-size:calc(var(--u)*.8);color:#fb7185;font-weight:700}
+.fails{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:calc(var(--u)*1.1)}
+.fail{position:relative;border-radius:15px;border:1px solid color-mix(in srgb,var(--rose) 22%,var(--line));overflow:hidden;
+  background:linear-gradient(158deg,color-mix(in srgb,var(--rose) 6%,var(--card)),var(--card));
+  box-shadow:0 22px 46px -32px rgba(244,63,94,.5);padding:calc(var(--u)*1) calc(var(--u)*1.1);display:flex;flex-direction:column;gap:calc(var(--u)*.45);
+  transition:transform .28s,box-shadow .28s}
+.fail:hover{transform:translateY(-5px);box-shadow:0 34px 60px -32px rgba(244,63,94,.6)}
+.fail .fn{position:absolute;right:calc(var(--u)*1);top:calc(var(--u)*.7);font-family:var(--mono);font-size:calc(var(--u)*.78);color:color-mix(in srgb,var(--rose) 55%,var(--faint));font-weight:800;letter-spacing:.14em}
+.fail .fh{display:flex;align-items:center;gap:.5em;font-weight:800;font-size:calc(var(--u)*1.24);letter-spacing:-.018em}
+.fail .fh .fi{width:calc(var(--u)*2.2);height:calc(var(--u)*2.2);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;
+  font-size:calc(var(--u)*1.25);background:linear-gradient(150deg,var(--rose),#fb7185);flex:none}
+.fail .fp{color:var(--mut);font-size:calc(var(--u)*.96);line-height:1.4}
+.fail .fp b{color:var(--ink);font-weight:800}
+.fviz{margin-top:auto;height:calc(var(--u)*7.4)}
+.fviz svg{width:100%;height:100%;overflow:visible}
+.fviz .lite{stroke:#cfd6e6;stroke-width:1.3;fill:none}
+.fviz .bad{stroke:var(--rose);stroke-width:1.7;fill:none;stroke-dasharray:3 4;animation:dash 2.4s linear infinite}
+.s1strip{margin-top:calc(var(--u)*.9);display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*1.2);flex-wrap:wrap;
+  font-family:var(--mono);font-weight:700;font-size:calc(var(--u)*1.14);color:var(--mut)}
+.s1strip b{color:var(--rose)}.s1strip .sep{color:var(--line2)}
+
+/* ============ S2 : operations ============ */
+.s2{display:grid;grid-template-rows:auto 1fr;gap:calc(var(--u)*1);flex:1;min-height:0}
+.daybar{position:relative;height:calc(var(--u)*8.6);border-radius:14px;border:1px solid var(--line2);background:var(--card);overflow:hidden;
+  box-shadow:0 18px 40px -30px rgba(20,30,60,.5);display:flex}
+.dseg{position:relative;display:flex;flex-direction:column;justify-content:center;padding:calc(var(--u)*.9) calc(var(--u)*1.2);border-right:1px solid var(--line)}
+.dseg:last-child{border-right:none}
+.dseg .dk{font-family:var(--mono);font-size:calc(var(--u)*.8);letter-spacing:.18em;font-weight:800;color:var(--t)}
+.dseg .dt{font-weight:800;font-size:calc(var(--u)*1.3);letter-spacing:-.02em;margin-top:.15em}
+.dseg .dp{font-size:calc(var(--u)*.92);color:var(--mut);margin-top:.1em}
+.dseg.covered{flex:0 0 17%;background:linear-gradient(180deg,color-mix(in srgb,var(--emerald) 12%,#fff),#fff)}
+.dseg.gap{flex:1;background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--rose) 6%,#fff) 0 12px,#fff 12px 24px)}
+.dseg .tagok,.dseg .tagno{position:absolute;right:calc(var(--u)*1.1);top:calc(var(--u)*.8);font-family:var(--mono);font-size:calc(var(--u)*.78);font-weight:800;letter-spacing:.1em;
+  border-radius:99px;padding:calc(var(--u)*.24) calc(var(--u)*.7)}
+.dseg .tagok{color:#047857;background:color-mix(in srgb,var(--emerald) 14%,#fff);border:1px solid color-mix(in srgb,var(--emerald) 34%,var(--line))}
+.dseg .tagno{color:#be123c;background:color-mix(in srgb,var(--rose) 10%,#fff);border:1px solid color-mix(in srgb,var(--rose) 32%,var(--line))}
+.opsgrid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:1fr;gap:calc(var(--u)*.9);min-height:0}
+.opc{border-radius:13px;border:1px solid var(--line2);background:var(--card);padding:calc(var(--u)*.85) calc(var(--u)*.95);
+  display:flex;flex-direction:column;gap:calc(var(--u)*.35);box-shadow:0 14px 34px -28px rgba(20,30,60,.55);transition:transform .25s,border-color .25s}
+.opc:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--t) 45%,var(--line2))}
+.opc .oh{display:flex;align-items:center;gap:.5em;font-weight:800;font-size:calc(var(--u)*1.06);letter-spacing:-.015em}
+.opc .oi{width:calc(var(--u)*1.95);height:calc(var(--u)*1.95);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:calc(var(--u)*1.1);background:var(--t);flex:none}
+.opc .op{font-size:calc(var(--u)*.88);color:var(--mut);line-height:1.35}
+.opc .ox{margin-top:auto;font-family:var(--mono);font-size:calc(var(--u)*.78);font-weight:800;letter-spacing:.06em;color:var(--rose);display:flex;align-items:center;gap:.35em}
+.opc .ox svg{font-size:calc(var(--u)*1)}
+.mism{display:flex;align-items:center;gap:calc(var(--u)*1.1);border-radius:13px;padding:calc(var(--u)*.85) calc(var(--u)*1.2);
+  background:linear-gradient(120deg,color-mix(in srgb,var(--rose) 8%,#fff),color-mix(in srgb,var(--amber) 7%,#fff));border:1px solid color-mix(in srgb,var(--rose) 22%,var(--line))}
+.mism .mv{font-weight:800;font-size:calc(var(--u)*1.85);letter-spacing:-.03em;color:var(--rose);font-variant-numeric:tabular-nums;line-height:1}
+.mism .mk{font-family:var(--mono);font-size:calc(var(--u)*.82);color:var(--mut);letter-spacing:.06em}
+.mism .msep{width:1px;height:calc(var(--u)*2.6);background:var(--line2)}
+.mism .mtxt{font-size:calc(var(--u)*1.02);color:var(--ink);font-weight:700;margin-left:auto;text-align:right}
+.mism .mtxt span{display:block;font-weight:500;color:var(--mut);font-size:calc(var(--u)*.92)}
+
+/* ============ S3 : compliance ============ */
+.s3{display:grid;grid-template-columns:1.05fr 1fr;gap:calc(var(--u)*1.5);flex:1;min-height:0}
+.cwo,.cwi{border-radius:16px;padding:calc(var(--u)*1.15) calc(var(--u)*1.3);display:flex;flex-direction:column;justify-content:space-between;gap:calc(var(--u)*.75);min-height:0}
+.cwo .ctl,.cwi .ctl{margin-top:0}
+.cwo{border:1px solid color-mix(in srgb,var(--rose) 26%,var(--line));background:linear-gradient(170deg,color-mix(in srgb,var(--rose) 6%,#fff),#fff);
+  box-shadow:0 26px 54px -36px rgba(244,63,94,.55)}
+.cwi{border:1px solid color-mix(in srgb,var(--emerald) 28%,var(--line));background:linear-gradient(170deg,color-mix(in srgb,var(--emerald) 6%,#fff),#fff);
+  box-shadow:0 26px 54px -36px rgba(16,185,129,.5)}
+.ch{display:flex;align-items:center;gap:.55em;font-family:var(--mono);font-weight:800;letter-spacing:.12em;font-size:calc(var(--u)*.94)}
+.cwo .ch{color:var(--rose)}.cwi .ch{color:#047857}
+.crow{display:flex;gap:.7em;align-items:flex-start;font-size:calc(var(--u)*1.02);line-height:1.36}
+.crow .cb{width:calc(var(--u)*1.7);height:calc(var(--u)*1.7);border-radius:6px;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:calc(var(--u)*.98);margin-top:.1em}
+.cwo .cb{background:var(--rose)}.cwi .cb{background:var(--emerald)}
+.crow b{font-weight:800}.crow span{color:var(--mut)}
+.ctl{margin-top:auto;border-radius:11px;padding:calc(var(--u)*.75) calc(var(--u)*.95);font-family:var(--mono);font-size:calc(var(--u)*.9);line-height:1.5}
+.cwo .ctl{background:color-mix(in srgb,var(--rose) 9%,#fff);border:1px solid color-mix(in srgb,var(--rose) 24%,var(--line));color:#9f1239}
+.cwi .ctl{background:color-mix(in srgb,var(--emerald) 9%,#fff);border:1px solid color-mix(in srgb,var(--emerald) 26%,var(--line));color:#065f46}
+.ctl b{font-weight:800}
+.stamps{display:flex;gap:.5em;flex-wrap:wrap}
+.stamp{font-family:var(--mono);font-size:calc(var(--u)*.82);font-weight:800;letter-spacing:.1em;border-radius:8px;padding:calc(var(--u)*.34) calc(var(--u)*.72);
+  border:1px solid var(--line2);color:var(--mut);background:#fff;display:flex;align-items:center;gap:.35em}
+.stamp.q{color:var(--rose);border-color:color-mix(in srgb,var(--rose) 34%,var(--line));background:color-mix(in srgb,var(--rose) 6%,#fff)}
+.stamp.y{color:#047857;border-color:color-mix(in srgb,var(--emerald) 36%,var(--line));background:color-mix(in srgb,var(--emerald) 8%,#fff)}
+
+/* ============ S4 : traditional vs stacktic ============ */
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:calc(var(--u)*1.2);flex:1;min-height:0;align-items:stretch}
+.lane{border-radius:16px;padding:calc(var(--u)*1.1) calc(var(--u)*1.2);display:flex;flex-direction:column;gap:calc(var(--u)*.62);min-height:0}
+.lane.bad{border:1px solid color-mix(in srgb,var(--rose) 26%,var(--line));background:linear-gradient(175deg,color-mix(in srgb,var(--rose) 6%,#fff),#fff)}
+.lane.good{border:1px solid color-mix(in srgb,var(--emerald) 28%,var(--line));background:linear-gradient(175deg,color-mix(in srgb,var(--emerald) 6%,#fff),#fff)}
+.lh{display:flex;align-items:center;gap:.55em;font-family:var(--mono);font-weight:800;letter-spacing:.12em;font-size:calc(var(--u)*.94);margin-bottom:.2em}
+.lane.bad .lh{color:var(--rose)}.lane.good .lh{color:#047857}
+.step{flex:1;display:flex;align-items:center;gap:.75em;border-radius:11px;padding:calc(var(--u)*.62) calc(var(--u)*.85);background:#fff;border:1px solid var(--line2);
+  box-shadow:0 10px 24px -20px rgba(20,30,60,.5);transition:transform .22s}
+.step:hover{transform:translateX(4px)}
+.step .sn{font-family:var(--mono);font-size:calc(var(--u)*.78);font-weight:800;color:var(--faint);width:1.6em;flex:none}
+.step .si{width:calc(var(--u)*2);height:calc(var(--u)*2);border-radius:7px;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:calc(var(--u)*1.1)}
+.lane.bad .step .si{background:linear-gradient(150deg,#fb7185,#f43f5e)}
+.lane.good .step .si{background:linear-gradient(150deg,var(--t,#10b981),color-mix(in srgb,var(--t,#10b981) 55%,#fff))}
+.step .st{min-width:0}
+.step .st b{display:block;font-weight:800;font-size:calc(var(--u)*1.04);letter-spacing:-.015em;line-height:1.15}
+.step .st span{display:block;font-family:var(--mono);font-size:calc(var(--u)*.82);color:var(--mut);margin-top:.12em}
+.step .mark{margin-left:auto;font-weight:800;font-size:calc(var(--u)*1.15);flex:none}
+.lane.bad .mark{color:var(--rose)}.lane.good .mark{color:var(--emerald)}
+.vsmid{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*.7)}
+.vsbadge{width:calc(var(--u)*4.6);height:calc(var(--u)*4.6);border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-weight:800;font-size:calc(var(--u)*1.4);color:#fff;background:linear-gradient(150deg,#0c1222,#2b3556);
+  box-shadow:0 18px 40px -18px rgba(12,18,34,.8)}
+.vsline{width:1px;flex:1;background:linear-gradient(180deg,transparent,var(--line2),transparent)}
+.outrow{display:grid;grid-template-columns:1fr auto 1fr;gap:calc(var(--u)*1.2);margin-top:calc(var(--u)*.85)}
+.out{border-radius:12px;padding:calc(var(--u)*.7) calc(var(--u)*1.1);font-weight:800;font-size:calc(var(--u)*1.18);display:flex;align-items:center;gap:.6em}
+.out.bad{background:color-mix(in srgb,var(--rose) 11%,#fff);border:1px solid color-mix(in srgb,var(--rose) 28%,var(--line));color:#9f1239}
+.out.good{background:color-mix(in srgb,var(--emerald) 11%,#fff);border:1px solid color-mix(in srgb,var(--emerald) 30%,var(--line));color:#065f46}
+.out small{margin-left:auto;font-family:var(--mono);font-weight:700;font-size:calc(var(--u)*.84);opacity:.8}
+
+/* ============ S5 : the flow ============ */
+.flowwrap{flex:1;min-height:0;display:flex;flex-direction:column;gap:calc(var(--u)*.8)}
+.flowsvg{width:100%;flex:1;min-height:0;overflow:visible}
+.flowsvg text{font-family:var(--disp)}
+.flowsvg .fmono{font-family:var(--mono)}
+.flownote{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--u)*1)}
+.fnote{border-radius:12px;border:1px solid color-mix(in srgb,var(--t) 24%,var(--line));background:linear-gradient(160deg,color-mix(in srgb,var(--t) 6%,#fff),#fff);
+  padding:calc(var(--u)*.75) calc(var(--u)*1);display:flex;gap:.7em;align-items:flex-start}
+.fnote .ni{width:calc(var(--u)*2.1);height:calc(var(--u)*2.1);border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;
+  font-size:calc(var(--u)*1.15);background:linear-gradient(150deg,var(--t),color-mix(in srgb,var(--t) 55%,#fff))}
+.fnote b{display:block;font-weight:800;font-size:calc(var(--u)*1.04);letter-spacing:-.015em}
+.fnote span{display:block;font-size:calc(var(--u)*.9);color:var(--mut);line-height:1.35;margin-top:.1em}
+
+/* ============ S6 : the engine ============ */
+.eng{display:flex;flex-direction:column;gap:calc(var(--u)*.72);flex:1;min-height:0}
+.band{position:relative;border-radius:14px;border:1px solid color-mix(in srgb,var(--t) 24%,var(--line));background:linear-gradient(165deg,color-mix(in srgb,var(--t) 6%,#fff),#fff);
+  padding:calc(var(--u)*.78) calc(var(--u)*1.1);display:flex;align-items:center;gap:calc(var(--u)*1);flex:1;min-height:0;
+  box-shadow:0 16px 38px -30px color-mix(in srgb,var(--t) 45%,rgba(20,30,60,.6))}
+.band.core{border-color:#2b3556;background:linear-gradient(150deg,#111a2e,#0b1220);box-shadow:0 26px 55px -30px rgba(10,16,34,.85);flex:1.5}
+.bandlbl{width:calc(var(--u)*15.5);flex:none;display:flex;flex-direction:column;gap:.15em}
+.bandlbl .bk{font-family:var(--mono);font-size:calc(var(--u)*.78);letter-spacing:.16em;font-weight:800;color:var(--t)}
+.bandlbl .bt{font-weight:800;font-size:calc(var(--u)*1.16);letter-spacing:-.02em;line-height:1.1}
+.band.core .bandlbl .bk{color:#7dd3fc}.band.core .bandlbl .bt{color:#fff}
+.bchips{display:flex;gap:calc(var(--u)*.6);flex-wrap:wrap;flex:1}
+.bchip{display:flex;align-items:center;gap:.45em;font-family:var(--mono);font-weight:700;font-size:calc(var(--u)*.88);color:var(--mut);
+  background:#fff;border:1px solid var(--line2);border-radius:9px;padding:calc(var(--u)*.42) calc(var(--u)*.72)}
+.bchip svg{color:var(--t);font-size:calc(var(--u)*1.05)}
+.band.core .bchip{background:rgba(255,255,255,.05);border-color:#2b3556;color:#c3cde8}
+.band.core .bchip svg{color:#7dd3fc}
+.bchip.hot{color:var(--ink);border-color:color-mix(in srgb,var(--t) 40%,var(--line2));background:color-mix(in srgb,var(--t) 8%,#fff)}
+.band.core .bchip.hot{color:#fff;border-color:#4b5b8f;background:rgba(125,211,252,.12)}
+.bcount{margin-left:auto;font-family:var(--mono);font-weight:800;font-size:calc(var(--u)*.86);letter-spacing:.06em;color:var(--t);flex:none;text-align:right;line-height:1.4}
+.band.core .bcount{color:#7dd3fc}
+.bdown{display:flex;justify-content:center;color:var(--faint);font-size:calc(var(--u)*1.2);line-height:0;height:calc(var(--u)*1.2)}
+.bdown i{font-style:normal;animation:chev 1.7s ease-in-out infinite}
+@keyframes chev{0%,100%{opacity:.2;transform:translateY(-16%)}50%{opacity:1;transform:translateY(16%)}}
+
+/* ============ S7 : ops in practice ============ */
+.opsx{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;gap:calc(var(--u)*1);flex:1;min-height:0}
+.oxcard{border-radius:14px;border:1px solid color-mix(in srgb,var(--t) 22%,var(--line));overflow:hidden;display:flex;flex-direction:column;background:#fff;
+  box-shadow:0 20px 44px -32px color-mix(in srgb,var(--t) 40%,rgba(20,30,60,.6));transition:transform .26s,box-shadow .26s}
+.oxcard:hover{transform:translateY(-5px);box-shadow:0 34px 60px -32px color-mix(in srgb,var(--t) 50%,rgba(20,30,60,.6))}
+.oxp{background:#0e1729;padding:calc(var(--u)*.7) calc(var(--u)*.95);font-family:var(--mono);font-size:calc(var(--u)*.92);color:#c3cde8;line-height:1.4}
+.oxp .pr{color:#7dd3fc;font-weight:800}
+.oxb{flex:1;padding:calc(var(--u)*.8) calc(var(--u)*.95);display:flex;flex-direction:column;gap:calc(var(--u)*.42)}
+.oxb .oh{display:flex;align-items:center;gap:.45em;font-family:var(--mono);font-weight:800;font-size:calc(var(--u)*.8);letter-spacing:.12em;color:var(--t)}
+.oxl{display:flex;align-items:flex-start;gap:.5em;font-size:calc(var(--u)*.94);line-height:1.32;color:var(--ink)}
+.oxl svg{color:var(--emerald);font-size:calc(var(--u)*1.05);margin-top:.15em;flex:none}
+.oxl span{color:var(--mut)}
+.oxf{margin-top:auto;display:flex;gap:.4em;flex-wrap:wrap;padding-top:calc(var(--u)*.4)}
+.oxf i{font-style:normal;font-family:var(--mono);font-size:calc(var(--u)*.76);font-weight:700;color:var(--mut);background:color-mix(in srgb,var(--t) 7%,#fff);
+  border:1px solid color-mix(in srgb,var(--t) 20%,var(--line));border-radius:6px;padding:calc(var(--u)*.22) calc(var(--u)*.52)}
+
+/* ============ S8 : vision ============ */
+.vis{display:grid;grid-template-columns:1.15fr 1fr;gap:calc(var(--u)*1.4);flex:1;min-height:0}
+.osswrap{border-radius:15px;border:1px solid var(--line2);background:var(--card);padding:calc(var(--u)*1) calc(var(--u)*1.1);display:flex;flex-direction:column;gap:calc(var(--u)*.7);
+  box-shadow:0 20px 46px -34px rgba(20,30,60,.55)}
+.ossgrid{display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:1fr;gap:calc(var(--u)*.5);flex:1;align-content:stretch}
+.osc{display:flex;align-items:center;justify-content:center;border-radius:9px;border:1px solid var(--line);background:linear-gradient(160deg,color-mix(in srgb,var(--t) 8%,#fff),#fff);padding:calc(var(--u)*.45) calc(var(--u)*.3);
+  text-align:center;font-family:var(--mono);font-size:calc(var(--u)*.78);font-weight:700;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  transition:transform .22s,color .22s}
+.osc:hover{transform:translateY(-3px);color:var(--ink)}
+.portwrap{display:flex;flex-direction:column;gap:calc(var(--u)*.9);min-height:0}
+.port{position:relative;flex:1;border-radius:15px;border:1px solid color-mix(in srgb,var(--emerald) 26%,var(--line));
+  background:linear-gradient(170deg,color-mix(in srgb,var(--emerald) 6%,#fff),#fff);padding:calc(var(--u)*1);display:flex;flex-direction:column;
+  box-shadow:0 20px 46px -34px rgba(16,185,129,.5)}
+.portsvg{flex:1;width:100%;overflow:visible}
+.portsvg text{font-family:var(--mono)}
+.vals{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(var(--u)*.8)}
+.val{border-radius:12px;border:1px solid color-mix(in srgb,var(--t) 26%,var(--line));background:linear-gradient(165deg,color-mix(in srgb,var(--t) 8%,#fff),#fff);
+  padding:calc(var(--u)*.7) calc(var(--u)*.85);text-align:center}
+.val .vv{font-weight:800;font-size:calc(var(--u)*2.1);letter-spacing:-.04em;color:var(--t);line-height:1;font-variant-numeric:tabular-nums}
+.val .vl{font-size:calc(var(--u)*.88);color:var(--mut);font-weight:700;margin-top:.25em;line-height:1.2}
+
+/* nav */
+.nav{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,.93);border:1px solid var(--line2);border-radius:40px;padding:7px 12px;backdrop-filter:blur(12px);
+  box-shadow:0 12px 34px -16px rgba(20,30,60,.45)}
+.nav button{font-family:var(--mono);font-size:15px;color:var(--mut);background:transparent;border:none;cursor:pointer;padding:2px 8px;border-radius:8px}
+.nav button:hover{color:var(--ink);background:var(--page)}
+.navdots{display:flex;gap:5px}
+.nd{width:26px;height:26px;border-radius:8px;background:var(--page);border:1px solid var(--line2);color:var(--mut);font-family:var(--mono);font-size:12px;font-weight:700;cursor:pointer;transition:.2s}
+.nd.on{background:var(--ink);color:#fff;border-color:var(--ink);transform:translateY(-1px)}
+:focus-visible{outline:2px solid var(--indigo);outline-offset:3px}
+@media(max-width:900px){.slide{aspect-ratio:auto;height:92vh}.s1,.s3,.vs,.vis{grid-template-columns:1fr}.vsmid{flex-direction:row}}
+</style></head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+ <linearGradient id="gem" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4285F4"/><stop offset="1" stop-color="#9B72CB"/></linearGradient>
+ <symbol id="ic-ai" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2c.7 5 3.3 7.6 8 8.3-4.7.7-7.3 3.3-8 8.3-.7-5-3.3-7.6-8-8.3 4.7-.7 7.3-3.3 8-8.3z"/></symbol>
+ <symbol id="ic-shield" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.5l7.5 2.8V11c0 4.6-3.2 7.9-7.5 9.3C7.7 18.9 4.5 15.6 4.5 11V5.3z"/><path fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M8.6 12l2.2 2.2 4.6-4.6"/></symbol>
+ <symbol id="ic-bolt" viewBox="0 0 24 24"><path fill="currentColor" d="M13 2L4 14h6l-1 8 9-12h-6z"/></symbol>
+ <symbol id="ic-k8s" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M12 2.5l8.2 4.75v9.5L12 21.5 3.8 16.75v-9.5z"/><circle cx="12" cy="12" r="2.3" fill="currentColor"/></symbol>
+ <symbol id="ic-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.4" fill="none" stroke="currentColor" stroke-width="1.7"/><path stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.2 5.2l2.1 2.1M16.7 16.7l2.1 2.1M18.8 5.2l-2.1 2.1M7.3 16.7l-2.1 2.1"/></symbol>
+ <symbol id="ic-cloud" viewBox="0 0 24 24"><path fill="currentColor" d="M7 18h9.5a3.5 3.5 0 0 0 .4-6.98A5.5 5.5 0 0 0 6.5 9.8 3.6 3.6 0 0 0 7 18z"/></symbol>
+ <symbol id="ic-layers" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3l9 5-9 5-9-5 9-5z"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M3 13l9 5 9-5"/></symbol>
+ <symbol id="ic-server" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="6.5" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="4" y="13.5" width="16" height="6.5" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="8" cy="7.2" r="1" fill="currentColor"/><circle cx="8" cy="16.7" r="1" fill="currentColor"/></symbol>
+ <symbol id="ic-db" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path fill="none" stroke="currentColor" stroke-width="1.7" d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></symbol>
+ <symbol id="ic-key" viewBox="0 0 24 24"><circle cx="8" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M11 11l7 7M15.5 15.5l2-2M17.5 17.5l2-2"/></symbol>
+ <symbol id="ic-network" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.3" fill="currentColor"/><circle cx="5" cy="18" r="2.3" fill="currentColor"/><circle cx="19" cy="18" r="2.3" fill="currentColor"/><path stroke="currentColor" stroke-width="1.6" fill="none" d="M12 7.3v3.4M11 10.5l-5 5.2M13 10.5l5 5.2"/></symbol>
+ <symbol id="ic-eye" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.6" fill="currentColor"/></symbol>
+ <symbol id="ic-badge" viewBox="0 0 24 24"><path d="M12 2l6 3v6c0 4-2.7 6.8-6 8-3.3-1.2-6-4-6-8V5z" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M9 11.5l2 2 4-4.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+ <symbol id="ic-x" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
+ <symbol id="ic-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M5 12.5l4.2 4.2L19 7"/></symbol>
+ <symbol id="ic-q" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M8.6 8.6a3.5 3.5 0 1 1 4.6 3.3c-.9.3-1.2 1-1.2 1.9v.6"/><circle cx="12" cy="18" r="1.4" fill="currentColor"/></symbol>
+ <symbol id="ic-map" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path fill="none" stroke="currentColor" stroke-width="1.6" d="M9 4v14M15 6v14"/></symbol>
+ <symbol id="ic-audit" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 13l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+ <symbol id="ic-refresh" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M20 4v4h-4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+ <symbol id="ic-back" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.3-5.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M4 4v4h4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+ <symbol id="ic-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.7"/><path fill="none" stroke="currentColor" stroke-width="1.4" d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></symbol>
+ <symbol id="ic-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="9.5" rx="2.2" fill="currentColor"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+ <symbol id="ic-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6" fill="currentColor"/><path fill="currentColor" d="M5 20c0-3.9 3.1-6.5 7-6.5s7 2.6 7 6.5z"/></symbol>
+ <symbol id="ic-puzzle" viewBox="0 0 24 24"><path fill="currentColor" d="M10 3a2 2 0 0 1 4 0v1h3a1 1 0 0 1 1 1v3h1a2 2 0 0 1 0 4h-1v3a1 1 0 0 1-1 1h-3v-1a2 2 0 0 0-4 0v1H7a1 1 0 0 1-1-1v-3H5a2 2 0 0 1 0-4h1V5a1 1 0 0 1 1-1h3z"/></symbol>
+ <symbol id="ic-code" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M8.5 7.5L4 12l4.5 4.5M15.5 7.5L20 12l-4.5 4.5"/></symbol>
+ <symbol id="ic-git" viewBox="0 0 24 24"><circle cx="7" cy="6" r="2.6" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="7" cy="18" r="2.6" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17" cy="10" r="2.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M7 8.6v6.8M14.5 11.4c-2.6 2.2-7.5.7-7.5 4"/></symbol>
+ <symbol id="ic-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M12 7v5.2l3.4 2"/></symbol>
+ <symbol id="ic-scale" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M4 15V9M4 9h6M4 9l5 5M20 9v6M20 15h-6M20 15l-5-5"/></symbol>
+ <symbol id="ic-drift" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" d="M3 8h7M14 8h7M3 16h4M11 16h10"/><circle cx="12" cy="8" r="1.6" fill="currentColor"/><circle cx="9" cy="16" r="1.6" fill="currentColor"/></symbol>
+ <symbol id="ic-save" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M4 4h12l4 4v12H4z"/><path fill="none" stroke="currentColor" stroke-width="1.8" d="M8 4v5h7M8 20v-6h8v6"/></symbol>
+ <symbol id="ic-up" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" d="M12 20V5M6 11l6-6 6 6"/></symbol>
+ <symbol id="ic-flask" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M9.5 3v6.5L4.5 18a2 2 0 0 0 1.7 3h11.6a2 2 0 0 0 1.7-3l-5-8.5V3"/><path stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M8.5 3h7M7 14h10"/></symbol>
+ <symbol id="br-claude" viewBox="0 0 24 24"><g stroke="#D97757" stroke-width="2.3" stroke-linecap="round"><path d="M12 3.5v17M3.5 12h17M5.9 5.9l12.2 12.2M18.1 5.9L5.9 18.1"/></g></symbol>
+ <symbol id="br-openai" viewBox="0 0 24 24"><g fill="#10A37F" fill-opacity=".9"><ellipse cx="12" cy="12" rx="2.9" ry="8.4"/><ellipse cx="12" cy="12" rx="2.9" ry="8.4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="2.9" ry="8.4" transform="rotate(120 12 12)"/></g></symbol>
+ <symbol id="br-gemini" viewBox="0 0 24 24"><path d="M12 2c.8 5.2 4 8.4 10 9-6 .8-9.2 4-10 9-.8-5.2-4-8.4-10-9 6-.8 9.2-4 10-9z" fill="url(#gem)"/></symbol>
+ <symbol id="br-aws" viewBox="0 0 24 24"><path d="M3 16c5 3.4 13 3.4 18 0" stroke="#FF9900" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M17.5 14l3 1-.7 3.1" stroke="#FF9900" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+ <symbol id="br-azure" viewBox="0 0 24 24"><path d="M10.5 4L4.5 19h4L13 8z" fill="#0089D6"/><path d="M12.5 9l6.5 10H9.5z" fill="#0089D6" opacity=".8"/></symbol>
+ <symbol id="br-gcp" viewBox="0 0 24 24"><circle cx="7.5" cy="7.5" r="3" fill="#4285F4"/><circle cx="16.5" cy="7.5" r="3" fill="#EA4335"/><circle cx="7.5" cy="16.5" r="3" fill="#FBBC05"/><circle cx="16.5" cy="16.5" r="3" fill="#34A853"/></symbol>
+</defs></svg>
+
+<div class="deck" id="deck">
+
+<!-- ═══════════════ 01 · AI WRITES CODE, NOT SYSTEMS ═══════════════ -->
+<div class="frame"><section class="slide" style="--acc:var(--rose)">
+ <div class="bgblob"></div><div class="grid-tex"></div>
+ <div class="pad">
+  <div class="chrome rise d1">
+   <div class="eyebrow"><span class="logo">{ <b>STACKTIC</b> }</span><span class="tick"></span><span class="kicker">THE PROBLEM</span></div>
+   <div class="idx"><b>01</b> — 08<br><span style="color:var(--faint)">ai → code</span></div>
+  </div>
+  <h1 class="rise d2">AI writes <em>code.</em> A system is not code.
+   <span class="sub">The model produces one artifact from one prompt. The system it has to live in is a graph of a hundred parts, every one of them wired, secured, versioned and proven — and re-proven after every change.</span></h1>
+
+  <div class="stage"><div class="s1">
+   <div class="term rise d2">
+    <div class="tbar"><i style="background:#f43f5e"></i><i style="background:#f59e0b"></i><i style="background:#10b981"></i><span class="t">ai client · no platform</span></div>
+    <div class="tbody">
+     <div><span class="p1">&gt;</span> build me a payment platform with a database, queue and API</div>
+     <div class="cm"># thinking…</div>
+     <div><span class="ok">✓</span> generated <span class="hi">main.py</span></div>
+     <div><span class="ok">✓</span> generated <span class="hi">deployment.yaml</span></div>
+     <div><span class="ok">✓</span> generated <span class="hi">Dockerfile</span></div>
+     <div class="cm"># done.</div>
+     <div class="no">✗ no identity  ✗ no secrets  ✗ no network policy</div>
+     <div class="no">✗ no backups  ✗ no evidence  ✗ no upgrade path</div>
+     <div><span class="p1">&gt;</span> <span class="cur"></span></div>
+     <div class="onefile"><span class="of">artifacts produced</span><span class="ct">3 files · 0 systems</span></div>
+    </div>
+   </div>
+
+   <div class="fails">
+    <div class="fail rise d3"><span class="fn">01</span>
+     <div class="fh"><span class="fi"><svg class="i"><use href="#ic-refresh"/></svg></span>Not the same twice</div>
+     <div class="fp">Same prompt, <b>different architecture</b>. What you reviewed on Monday is not what ships on Tuesday.</div>
+     <div class="fviz"><svg viewBox="0 0 200 56">
+       <rect x="2" y="21" width="30" height="14" rx="4" fill="#eef1f7" stroke="#c9d0e2"/>
+       <text x="17" y="31" font-family="ui-monospace,monospace" font-size="7.5" text-anchor="middle" fill="#5c6785">prompt</text>
+       <path class="bad" d="M34,28 C70,28 80,7 120,7"/><path class="bad" d="M34,28 C70,28 80,28 120,28"/><path class="bad" d="M34,28 C70,28 80,49 120,49"/>
+       <g fill="#fff" stroke="#f43f5e" stroke-width="1.3">
+         <rect x="122" y="1" width="62" height="12" rx="4"/><rect x="122" y="22" width="62" height="12" rx="4"/><rect x="122" y="43" width="62" height="12" rx="4"/></g>
+       <g font-family="ui-monospace,monospace" font-size="5.8" fill="#9f1239" text-anchor="middle">
+         <text x="153" y="9.4">v1 · 12 objects</text><text x="153" y="30.4">v2 · 19 objects</text><text x="153" y="51.4">v3 ·  8 objects</text></g>
+     </svg></div>
+    </div>
+
+    <div class="fail rise d4"><span class="fn">02</span>
+     <div class="fh"><span class="fi"><svg class="i"><use href="#ic-shield"/></svg></span>Nothing validated it</div>
+     <div class="fp">Generated straight to apply. <b>No gate, no policy, no proof</b> that the change is safe.</div>
+     <div class="fviz"><svg viewBox="0 0 200 56">
+       <path class="lite" d="M4,28 H196" stroke-dasharray="4 5"/>
+       <g fill="#f1f3fa" stroke="#c9d0e2" stroke-width="1.2">
+        <rect x="8" y="20" width="22" height="16" rx="5"/><rect x="44" y="20" width="22" height="16" rx="5"/><rect x="80" y="20" width="22" height="16" rx="5"/></g>
+       <g stroke="#f43f5e" stroke-width="1.6" stroke-linecap="round" opacity=".85">
+        <path d="M118,10 v12 M118,34 v12"/><path d="M113,22 h10 M113,34 h10"/></g>
+       <text x="118" y="54" font-family="ui-monospace,monospace" font-size="6" fill="#9f1239" text-anchor="middle">gate: open</text>
+       <rect x="150" y="17" width="44" height="22" rx="6" fill="#fdecef" stroke="#f43f5e" stroke-width="1.3"/>
+       <text x="172" y="31" font-family="ui-monospace,monospace" font-size="7" font-weight="700" fill="#9f1239" text-anchor="middle">PROD</text>
+     </svg></div>
+    </div>
+
+    <div class="fail rise d5"><span class="fn">03</span>
+     <div class="fh"><span class="fi"><svg class="i"><use href="#ic-badge"/></svg></span>Compliance is a guess</div>
+     <div class="fp">It can <i>describe</i> PCI. It cannot <b>prove</b> your running stack meets it, on this change, today.</div>
+     <div class="fviz"><svg viewBox="0 0 200 56">
+       <g fill="#fff" stroke="#f43f5e" stroke-width="1.3" stroke-dasharray="4 4">
+        <rect x="6" y="14" width="56" height="28" rx="7"/><rect x="72" y="14" width="56" height="28" rx="7"/><rect x="138" y="14" width="56" height="28" rx="7"/></g>
+       <g font-family="ui-monospace,monospace" font-size="9" font-weight="800" fill="#9f1239" text-anchor="middle">
+        <text x="34" y="31">PCI ?</text><text x="100" y="31">ISO ?</text><text x="166" y="31">HIPAA ?</text></g>
+       <text x="100" y="52" font-family="ui-monospace,monospace" font-size="6.2" fill="#9f1239" text-anchor="middle">no scan · no score · no artefact</text>
+     </svg></div>
+    </div>
+
+    <div class="fail rise d6"><span class="fn">04</span>
+     <div class="fh"><span class="fi"><svg class="i"><use href="#ic-network"/></svg></span>Blind to relationships</div>
+     <div class="fp">It sees the file. It cannot see the <b>383 ways</b> your components depend on each other.</div>
+     <div class="fviz"><svg viewBox="0 0 200 56">
+       <g class="lite" stroke-opacity=".65">
+        <path d="M22,12 L74,8 M74,8 L128,16 M128,16 L178,9 M22,12 L54,34 M54,34 L104,29 M104,29 L172,38 M74,8 L104,29 M128,16 L104,29 M54,34 L96,50 M96,50 L152,47 M172,38 L152,47 M22,44 L54,34 M22,44 L96,50"/></g>
+       <g fill="#cfd6e6"><circle cx="22" cy="12" r="3"/><circle cx="74" cy="8" r="3"/><circle cx="128" cy="16" r="3"/><circle cx="178" cy="9" r="3"/><circle cx="54" cy="34" r="3"/><circle cx="172" cy="38" r="3"/><circle cx="96" cy="50" r="3"/><circle cx="152" cy="47" r="3"/><circle cx="22" cy="44" r="3"/></g>
+       <circle cx="104" cy="29" r="6.5" fill="#f43f5e"/><circle cx="104" cy="29" r="10" fill="none" stroke="#f43f5e" stroke-width="1.2" opacity=".45"/>
+       <text x="104" y="31.6" font-family="ui-monospace,monospace" font-size="6.5" font-weight="800" fill="#fff" text-anchor="middle">1</text>
+     </svg></div>
+    </div>
+   </div>
+  </div></div>
+
+  <div class="s1strip rise d7">
+   <span>it generates <b>artifacts</b></span><span class="sep">·</span>
+   <span>it does not generate <b>guarantees</b></span><span class="sep">·</span>
+   <span>and it has no memory of what is <b>actually running</b></span>
+  </div>
+
+  <div class="foot rise d7"><div class="q"><i>›</i>Fine for a prototype. <b>Now try passing an audit with it.</b></div><div class="brand">STACKTIC · 2026</div></div>
+ </div>
+</section></div>
+
+<!-- ═══════════════ 02 · OPERATING WITH AI ═══════════════ -->
+<div class="frame"><section class="slide" style="--acc:var(--amber)">
+ <div class="bgblob"></div><div class="grid-tex"></div>
+ <div class="pad">
+  <div class="chrome rise d1">
+   <div class="eyebrow"><span class="logo">{ <b>STACKTIC</b> }</span><span class="tick"></span><span class="kicker">THE PROBLEM</span></div>
+   <div class="idx"><b>02</b> — 08<br><span style="color:var(--faint)">day-2</span></div>
+  </div>
+  <h1 class="rise d2">Generating is <em>day 0.</em> The cost is <em style="color:var(--rose)">day 2.</em>
+   <span class="sub">A model has no state, no memory of your cluster and no hands on it. Everything that happens <b>after</b> the first apply — the 95% — falls back on humans.</span></h1>
+
+  <div class="stage" style="flex-direction:column;gap:calc(var(--u)*1)">
+   <div class="daybar rise d2">
+    <div class="dseg covered" style="--t:var(--emerald)"><span class="tagok">AI OK</span>
+     <div class="dk">DAY 0–1</div><div class="dt">Generate &amp; deploy</div><div class="dp">scaffold, first apply</div></div>
+    <div class="dseg gap" style="--t:var(--rose)"><span class="tagno">NO OWNER</span>
+     <div class="dk">DAY 2 — THE REST OF THE SYSTEM'S LIFE</div>
+     <div class="dt">Upgrades · migrations · backups · restore · credential rotation · certificates · scaling · drift · incidents · audits · rollback</div>
+     <div class="dp">every one of them has to know the whole graph, and leave evidence behind</div></div>
+   </div>
+
+   <div class="opsgrid">
+    <div class="opc rise d3" style="--t:var(--violet)"><div class="oh"><span class="oi"><svg class="i"><use href="#ic-up"/></svg></span>Upgrade a database</div>
+     <div class="op">Postgres 16 → 17 with six services bound to it.</div>
+     <div class="ox"><svg class="i"><use href="#ic-x"/></svg>who checks all six?</div></div>
+    <div class="opc rise d3" style="--t:var(--indigo)"><div class="oh"><span class="oi"><svg class="i"><use href="#ic-key"/></svg></span>Rotate a credential</div>
+     <div class="op">One secret, consumed by every component linked to it.</div>
+     <div class="ox"><svg class="i"><use href="#ic-x"/></svg>stale in 5 places</div></div>
+    <div class="opc rise d4" style="--t:var(--sky)"><div class="oh"><span class="oi"><svg class="i"><use href="#ic-save"/></svg></span>Restore to 14:00</div>
+     <div class="op">Point-in-time recovery, tested — not a backup that was never restored.</div>
+     <div class="ox"><svg class="i"><use href="#ic-x"/></svg>untested = none</div></div>
+    <div class="opc rise d4" style="--t:var(--amber)"><div class="oh"><span class="oi"><svg class="i"><use href="#ic-drift"/></svg></span>Detect drift</div>
+     <div class="op">The cluster stopped matching what was approved.</div>
+     <div class="ox"><svg class="i"><use href="#ic-x"/></svg>nobody notices</div></div>
+    <div class="opc rise d5" style="--t:var(--teal)"><div class="oh"><span class="oi"><svg class="i"><use href="#ic-scale"/></svg></span>Scale under load</div>
+     <div class="op">Add replicas without breaking storage or quorum.</div>
+     <div class="ox"><svg class="i"><use href="#ic-x"/></svg>manual, at 3am</div></div>
+    <div class="opc rise d5" style="--t:var(--rose)"><div class="oh"><span class="oi"><svg class="i"><use href="#ic-back"/></svg></span>Roll back</div>
+     <div class="op">The whole stack to a known-good version, not one deployment.</div>
+     <div class="ox"><svg class="i"><use href="#ic-x"/></svg>no stack version</div></div>
+    <div class="opc rise d6" style="--t:var(--emerald)"><div class="oh"><span class="oi"><svg class="i"><use href="#ic-audit"/></svg></span>Answer an auditor</div>
+     <div class="op">"Show me this control, enforced, on the date of the change."</div>
+     <div class="ox"><svg class="i"><use href="#ic-x"/></svg>chat logs aren't evidence</div></div>
+    <div class="opc rise d6" style="--t:var(--violet)"><div class="oh"><span class="oi"><svg class="i"><use href="#ic-clock"/></svg></span>Survive 3am</div>
+     <div class="op">Detect, act, report — with no human awake.</div>
+     <div class="ox"><svg class="i"><use href="#ic-x"/></svg>pager duty</div></div>
+   </div>
+
+   <div class="mism rise d7">
+    <div><div class="mv">1</div><div class="mk">PROMPT</div></div>
+    <span class="msep"></span>
+    <div><div class="mv">100s</div><div class="mk">LIVE OBJECTS</div></div>
+    <span class="msep"></span>
+    <div><div class="mv">0</div><div class="mk">MEMORY OF STATE</div></div>
+    <div class="mtxt">A chat window is not an operations plane.<span>It has no view of the cluster between two prompts.</span></div>
+   </div>
+  </div>
+
+  <div class="foot rise d7"><div class="q"><i>›</i>You didn't buy a code generator. <b>You have to run this thing for years.</b></div><div class="brand">STACKTIC · 2026</div></div>
+ </div>
+</section></div>
+
+<!-- ═══════════════ 03 · COMPLIANCE ═══════════════ -->
+<div class="frame"><section class="slide" style="--acc:var(--emerald)">
+ <div class="bgblob"></div><div class="grid-tex"></div>
+ <div class="pad">
+  <div class="chrome rise d1">
+   <div class="eyebrow"><span class="logo">{ <b>STACKTIC</b> }</span><span class="tick"></span><span class="kicker">WHY IT BREAKS</span></div>
+   <div class="idx"><b>03</b> — 08<br><span style="color:var(--faint)">compliance</span></div>
+  </div>
+  <h1 class="rise d2">Compliance cannot survive a <em style="color:var(--rose)">non-deterministic</em> pipeline.
+   <span class="sub">An auditor does not ask what the model intended. They ask which control was enforced, on which change, on which date — and want the artifact. Free-form generation cannot produce that. A blueprint can.</span></h1>
+
+  <div class="stage"><div class="s3">
+   <div class="cwo rise d2">
+    <div class="ch"><svg class="i"><use href="#ic-x"/></svg>AI ALONE — WHY IT FAILS AN AUDIT</div>
+    <div class="crow"><span class="cb"><svg class="i"><use href="#ic-x"/></svg></span><span><b>The control isn't reproducible.</b> Re-run the prompt, get a different manifest. The approved version and the shipped version are not the same object.</span></div>
+    <div class="crow"><span class="cb"><svg class="i"><use href="#ic-x"/></svg></span><span><b>Controls are per-file, not per-graph.</b> TLS on one service, plaintext on the link next to it. Nothing derives the rules from the real topology.</span></div>
+    <div class="crow"><span class="cb"><svg class="i"><use href="#ic-x"/></svg></span><span><b>It's a point in time.</b> A PDF from the quarter you were audited, describing a cluster that has changed 400 times since.</span></div>
+    <div class="crow"><span class="cb"><svg class="i"><use href="#ic-x"/></svg></span><span><b>No evidence trail.</b> Prompts and chat transcripts are not audit artifacts. There is no scored, dated, signed record of the scan.</span></div>
+    <div class="crow"><span class="cb"><svg class="i"><use href="#ic-x"/></svg></span><span><b>Drift is invisible.</b> Nothing compares what is running against what was approved, so the gap only surfaces during the audit.</span></div>
+    <div class="stamps"><span class="stamp q"><svg class="i"><use href="#ic-q"/></svg>PCI DSS</span><span class="stamp q"><svg class="i"><use href="#ic-q"/></svg>ISO 27001</span><span class="stamp q"><svg class="i"><use href="#ic-q"/></svg>HIPAA</span><span class="stamp q"><svg class="i"><use href="#ic-q"/></svg>GDPR</span></div>
+    <div class="ctl">verdict: <b>"we believe we are compliant"</b><br>evidence: <b>a conversation</b></div>
+   </div>
+
+   <div class="cwi rise d3">
+    <div class="ch"><svg class="i"><use href="#ic-check"/></svg>WITH STACKTIC — COMPLIANCE BY CONSTRUCTION</div>
+    <div class="crow"><span class="cb"><svg class="i"><use href="#ic-check"/></svg></span><span><b>The control lives in the blueprint.</b> Same input renders the same manifest, byte for byte. Reviewed once, enforced on every render.</span></div>
+    <div class="crow"><span class="cb"><svg class="i"><use href="#ic-check"/></svg></span><span><b>Rules are derived from the graph.</b> Network policies, TLS, secrets and SSO come out of the declared links — not out of someone remembering to add them.</span></div>
+    <div class="crow"><span class="cb"><svg class="i"><use href="#ic-check"/></svg></span><span><b>Checked on every change,</b> not once a quarter. The gate runs before the change reaches the cluster.</span></div>
+    <div class="crow"><span class="cb"><svg class="i"><use href="#ic-check"/></svg></span><span><b>Evidence is an artifact.</b> The in-cluster agent scans the live stack, scores it, and commits the result to git — dated, diffable, exportable.</span></div>
+    <div class="crow"><span class="cb"><svg class="i"><use href="#ic-check"/></svg></span><span><b>Drift is a finding.</b> Running state is compared to the declared state continuously, and the delta is reported like any other failure.</span></div>
+    <div class="stamps"><span class="stamp y"><svg class="i"><use href="#ic-check"/></svg>PCI DSS</span><span class="stamp y"><svg class="i"><use href="#ic-check"/></svg>ISO 27001</span><span class="stamp y"><svg class="i"><use href="#ic-check"/></svg>HIPAA</span><span class="stamp y"><svg class="i"><use href="#ic-check"/></svg>GDPR</span></div>
+    <div class="ctl">verdict: <b>scored, per change, per control</b><br>evidence: <b>an artifact in your repository</b></div>
+   </div>
+  </div></div>
+
+  <div class="foot rise d7"><div class="q"><i>›</i>Security you can't reproduce isn't security. <b>It's a story.</b></div><div class="brand">STACKTIC · 2026</div></div>
+ </div>
+</section></div>
+
+<!-- ═══════════════ 04 · TRADITIONAL PROMPTING VS STACKTIC ═══════════════ -->
+<div class="frame"><section class="slide" style="--acc:var(--violet)">
+ <div class="bgblob"></div><div class="grid-tex"></div>
+ <div class="pad">
+  <div class="chrome rise d1">
+   <div class="eyebrow"><span class="logo">{ <b>STACKTIC</b> }</span><span class="tick"></span><span class="kicker">SIDE BY SIDE</span></div>
+   <div class="idx"><b>04</b> — 08<br><span style="color:var(--faint)">prompting vs blueprint</span></div>
+  </div>
+  <h1 class="rise d2">Traditional prompting <em>vs</em> Stacktic.
+   <span class="sub">Same model. Same sentence. The difference is what sits between the prompt and the cluster.</span></h1>
+
+  <div class="stage" style="flex-direction:column">
+   <div class="vs" style="flex:1;min-height:0">
+    <div class="lane bad rise d2">
+     <div class="lh"><svg class="i"><use href="#ic-ai"/></svg>TRADITIONAL PROMPTING</div>
+     <div class="step"><span class="sn">01</span><span class="si"><svg class="i"><use href="#ic-code"/></svg></span><span class="st"><b>Prompt</b><span>free text → free-form output</span></span><span class="mark">~</span></div>
+     <div class="step"><span class="sn">02</span><span class="si"><svg class="i"><use href="#ic-ai"/></svg></span><span class="st"><b>Model improvises the architecture</b><span>invented each time, from training data</span></span><span class="mark">✗</span></div>
+     <div class="step"><span class="sn">03</span><span class="si"><svg class="i"><use href="#ic-puzzle"/></svg></span><span class="st"><b>Loose YAML, unwired</b><span>no links, no policies, no secrets model</span></span><span class="mark">✗</span></div>
+     <div class="step"><span class="sn">04</span><span class="si"><svg class="i"><use href="#ic-user"/></svg></span><span class="st"><b>A human reviews it — or doesn't</b><span>the only gate is attention</span></span><span class="mark">✗</span></div>
+     <div class="step"><span class="sn">05</span><span class="si"><svg class="i"><use href="#ic-k8s"/></svg></span><span class="st"><b>kubectl apply</b><span>hope</span></span><span class="mark">✗</span></div>
+     <div class="step"><span class="sn">06</span><span class="si"><svg class="i"><use href="#ic-clock"/></svg></span><span class="st"><b>Day 2 is yours</b><span>no state, no evidence, no rollback</span></span><span class="mark">✗</span></div>
+    </div>
+
+    <div class="vsmid rise d3"><span class="vsline"></span><span class="vsbadge">VS</span><span class="vsline"></span></div>
+
+    <div class="lane good rise d3">
+     <div class="lh"><svg class="i"><use href="#ic-layers"/></svg>STACKTIC</div>
+     <div class="step" style="--t:var(--indigo)"><span class="sn">01</span><span class="si"><svg class="i"><use href="#ic-code"/></svg></span><span class="st"><b>Same prompt</b><span>via MCP or API — any model</span></span><span class="mark">✓</span></div>
+     <div class="step" style="--t:var(--violet)"><span class="sn">02</span><span class="si"><svg class="i"><use href="#ic-map"/></svg></span><span class="st"><b>Resolved against your stack graph</b><span>components, attributes, links — declared, not guessed</span></span><span class="mark">✓</span></div>
+     <div class="step" style="--t:var(--sky)"><span class="sn">03</span><span class="si"><svg class="i"><use href="#ic-layers"/></svg></span><span class="st"><b>Rendered from hardened blueprints</b><span>78 components · 383 link types · deterministic</span></span><span class="mark">✓</span></div>
+     <div class="step" style="--t:var(--amber)"><span class="sn">04</span><span class="si"><svg class="i"><use href="#ic-shield"/></svg></span><span class="st"><b>Validated before it moves</b><span>policy, compatibility, security, compliance gates</span></span><span class="mark">✓</span></div>
+     <div class="step" style="--t:var(--teal)"><span class="sn">05</span><span class="si"><svg class="i"><use href="#ic-k8s"/></svg></span><span class="st"><b>Agent syncs the cluster</b><span>declared state applied, drift reconciled</span></span><span class="mark">✓</span></div>
+     <div class="step" style="--t:var(--emerald)"><span class="sn">06</span><span class="si"><svg class="i"><use href="#ic-audit"/></svg></span><span class="st"><b>Day 2 is automated &amp; evidenced</b><span>versioned stack, rollback, scored scans in git</span></span><span class="mark">✓</span></div>
+    </div>
+   </div>
+
+   <div class="outrow rise d6">
+    <div class="out bad"><svg class="i"><use href="#ic-x"/></svg>A pile of parts you now own<small>unbounded risk</small></div>
+    <div style="width:calc(var(--u)*4.6)"></div>
+    <div class="out good"><svg class="i"><use href="#ic-check"/></svg>A running system with proof<small>bounded, reproducible</small></div>
+   </div>
+  </div>
+
+  <div class="foot rise d7"><div class="q"><i>›</i>The model didn't get smarter. <b>The path it walks got safe.</b></div><div class="brand">STACKTIC · 2026</div></div>
+ </div>
+</section></div>
+
+<!-- ═══════════════ 05 · THE FLOW ═══════════════ -->
+<div class="frame"><section class="slide" style="--acc:var(--sky)">
+ <div class="bgblob"></div><div class="grid-tex"></div>
+ <div class="pad">
+  <div class="chrome rise d1">
+   <div class="eyebrow"><span class="logo">{ <b>STACKTIC</b> }</span><span class="tick"></span><span class="kicker">THE FLOW</span></div>
+   <div class="idx"><b>05</b> — 08<br><span style="color:var(--faint)">prompt → proof</span></div>
+  </div>
+  <h1 class="rise d2">Prompt → Stacktic → code → agent → cluster → <em>validation</em> → back.
+   <span class="sub">A closed loop. Nothing is invented in the middle, nothing reaches the cluster unchecked, and the result of every change flows back so the next prompt is grounded in what is actually running.</span></h1>
+
+  <div class="stage"><div class="flowwrap">
+   <svg class="flowsvg rise d2" viewBox="0 0 1220 300" preserveAspectRatio="xMidYMid meet" role="img"
+        aria-label="A closed loop: a prompt enters Stacktic, which renders code into your git repository; an in-cluster agent syncs it to Kubernetes; validation scans the running system and writes evidence, which flows back to the AI">
+    <defs>
+     <marker id="fa" markerWidth="8" markerHeight="8" refX="6.4" refY="3" orient="auto"><path d="M0,0 L6.6,3 L0,6 Z" fill="#94a3c4"/></marker>
+     <marker id="fg" markerWidth="8" markerHeight="8" refX="6.4" refY="3" orient="auto"><path d="M0,0 L6.6,3 L0,6 Z" fill="#10b981"/></marker>
+     <linearGradient id="coreg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b2540"/><stop offset="1" stop-color="#0b1220"/></linearGradient>
+     <filter id="sf" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#1b2545" flood-opacity=".18"/></filter>
+    </defs>
+
+    <!-- connectors -->
+    <g stroke="#94a3c4" stroke-width="2.2" fill="none" marker-end="url(#fa)">
+     <path id="e1" d="M179,116 H217"/><path id="e2" d="M385,116 H423"/><path id="e3" d="M591,116 H629"/>
+     <path id="e4" d="M797,116 H835"/><path id="e5" d="M1003,116 H1041"/>
+    </g>
+    <!-- travelling packets -->
+    <g fill="#0ea5e9">
+     <circle r="4"><animateMotion dur="1.5s" repeatCount="indefinite" begin="0s"><mpath href="#e1"/></animateMotion></circle>
+     <circle r="4"><animateMotion dur="1.5s" repeatCount="indefinite" begin=".25s"><mpath href="#e2"/></animateMotion></circle>
+     <circle r="4"><animateMotion dur="1.5s" repeatCount="indefinite" begin=".5s"><mpath href="#e3"/></animateMotion></circle>
+     <circle r="4"><animateMotion dur="1.5s" repeatCount="indefinite" begin=".75s"><mpath href="#e4"/></animateMotion></circle>
+     <circle r="4"><animateMotion dur="1.5s" repeatCount="indefinite" begin="1s"><mpath href="#e5"/></animateMotion></circle>
+    </g>
+
+    <!-- return loop : validation -> prompt -->
+    <path id="loop" d="M1125,182 V244 Q1125,260 1105,260 H115 Q95,260 95,244 V180" fill="none" stroke="#10b981" stroke-width="2.4"
+          stroke-dasharray="7 7" marker-end="url(#fg)" opacity=".9"><animate attributeName="stroke-dashoffset" from="0" to="-28" dur="1.1s" repeatCount="indefinite"/></path>
+    <g fill="#10b981"><circle r="4.6"><animateMotion dur="4.2s" repeatCount="indefinite"><mpath href="#loop"/></animateMotion></circle></g>
+    <rect x="455" y="246" width="310" height="28" rx="14" fill="#e8faf3" stroke="#10b981" stroke-opacity=".5"/>
+    <text class="fmono" x="610" y="264.5" text-anchor="middle" font-size="12.5" font-weight="800" fill="#047857">state + evidence back to the AI</text>
+
+    <!-- 1 PROMPT -->
+    <g filter="url(#sf)"><rect x="11" y="70" width="168" height="92" rx="14" fill="#fff" stroke="#c7cfe4"/></g>
+    <rect x="11" y="70" width="168" height="4" rx="2" fill="#6366f1"/>
+    <text class="fmono" x="27" y="94" font-size="10" font-weight="800" letter-spacing="1.6" fill="#6366f1">01 &#183; PROMPT</text>
+    <text x="27" y="116" font-size="15" font-weight="800" fill="#0c1222">Any AI client</text>
+    <text class="fmono" x="27" y="133" font-size="9.5" fill="#5c6785">MCP &#183; REST API</text>
+    <g transform="translate(27,140) scale(.7)"><use href="#br-claude" width="20" height="20"/><use href="#br-openai" x="26" width="20" height="20"/><use href="#br-gemini" x="52" width="20" height="20"/></g>
+
+    <!-- 2 STACKTIC -->
+    <g filter="url(#sf)"><rect x="217" y="56" width="168" height="120" rx="15" fill="url(#coreg)" stroke="#2b3556"/></g>
+    <text class="fmono" x="233" y="79" font-size="10" font-weight="800" letter-spacing="1.6" fill="#7dd3fc">02 &#183; STACKTIC</text>
+    <text x="233" y="100" font-size="15" font-weight="800" fill="#fff">Blueprint engine</text>
+    <text class="fmono" x="233" y="118" font-size="9.5" fill="#9fb0d8">reads your stack graph</text>
+    <text class="fmono" x="233" y="133" font-size="9.5" fill="#9fb0d8">resolves every link</text>
+    <text class="fmono" x="233" y="148" font-size="9.5" fill="#9fb0d8">deterministic render</text>
+    <rect x="233" y="155" width="136" height="1" fill="#2b3556"/>
+    <text class="fmono" x="233" y="169" font-size="9.5" font-weight="800" fill="#34d399">78 blueprints &#183; 383 links</text>
+
+    <!-- 3 CODE -->
+    <g filter="url(#sf)"><rect x="423" y="70" width="168" height="92" rx="14" fill="#fff" stroke="#c7cfe4"/></g>
+    <rect x="423" y="70" width="168" height="4" rx="2" fill="#0ea5e9"/>
+    <text class="fmono" x="439" y="94" font-size="10" font-weight="800" letter-spacing="1.6" fill="#0284c7">03 &#183; CODE</text>
+    <text x="439" y="116" font-size="15" font-weight="800" fill="#0c1222">Your git repo</text>
+    <text class="fmono" x="439" y="133" font-size="9.5" fill="#5c6785">plain YAML &#183; kustomize</text>
+    <text class="fmono" x="439" y="148" font-size="9.5" fill="#5c6785">reviewable &#183; diffable</text>
+
+    <!-- 4 AGENT -->
+    <g filter="url(#sf)"><rect x="629" y="70" width="168" height="92" rx="14" fill="#fff" stroke="#c7cfe4"/></g>
+    <rect x="629" y="70" width="168" height="4" rx="2" fill="#f59e0b"/>
+    <text class="fmono" x="645" y="94" font-size="10" font-weight="800" letter-spacing="1.6" fill="#b45309">04 &#183; AGENT</text>
+    <text x="645" y="116" font-size="15" font-weight="800" fill="#0c1222">In-cluster agent</text>
+    <text class="fmono" x="645" y="133" font-size="9.5" fill="#5c6785">pulls declared state</text>
+    <text class="fmono" x="645" y="148" font-size="9.5" fill="#5c6785">hands, not the brain</text>
+
+    <!-- 5 CLUSTER -->
+    <g filter="url(#sf)"><rect x="835" y="70" width="168" height="92" rx="14" fill="#fff" stroke="#c7cfe4"/></g>
+    <rect x="835" y="70" width="168" height="4" rx="2" fill="#14b8a6"/>
+    <text class="fmono" x="851" y="94" font-size="10" font-weight="800" letter-spacing="1.6" fill="#0f766e">05 &#183; CLUSTER</text>
+    <text x="851" y="116" font-size="15" font-weight="800" fill="#0c1222">Sync &amp; reconcile</text>
+    <text class="fmono" x="851" y="133" font-size="9.5" fill="#5c6785">applied to Kubernetes</text>
+    <text class="fmono" x="851" y="148" font-size="9.5" fill="#5c6785">drift reconciled</text>
+
+    <!-- 6 VALIDATION -->
+    <g filter="url(#sf)"><rect x="1041" y="56" width="168" height="120" rx="15" fill="#f2fbf7" stroke="#10b981"/></g>
+    <text class="fmono" x="1057" y="79" font-size="10" font-weight="800" letter-spacing="1.6" fill="#047857">06 &#183; VALIDATION</text>
+    <text x="1057" y="100" font-size="15" font-weight="800" fill="#0c1222">Scan &#183; score &#183; sign</text>
+    <text class="fmono" x="1057" y="118" font-size="9.5" fill="#41695e">health &#183; security</text>
+    <text class="fmono" x="1057" y="133" font-size="9.5" fill="#41695e">PCI &#183; ISO &#183; HIPAA</text>
+    <text class="fmono" x="1057" y="148" font-size="9.5" fill="#41695e">evidence committed</text>
+    <circle cx="1193" cy="72" r="9" fill="#10b981"/>
+    <path d="M1188.5 72 l3 3 5.5-6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- gate marker between code and agent -->
+    <g transform="translate(610,116)">
+     <circle r="15" fill="#fff" stroke="#f59e0b" stroke-width="2"/>
+     <use href="#ic-shield" x="-8" y="-8" width="16" height="16" style="color:#f59e0b"/>
+     <text class="fmono" y="31" text-anchor="middle" font-size="9" font-weight="800" fill="#b45309">GATE</text>
+    </g>
+   </svg>
+
+   <div class="flownote">
+    <div class="fnote rise d4" style="--t:var(--violet)"><span class="ni"><svg class="i"><use href="#ic-map"/></svg></span>
+     <span><b>The brain is the graph, not the model</b><span>Stacktic answers from your declared stack — components, attributes and links — so two identical requests produce two identical renders.</span></span></div>
+    <div class="fnote rise d5" style="--t:var(--amber)"><span class="ni"><svg class="i"><use href="#ic-shield"/></svg></span>
+     <span><b>The gate is in the path, not beside it</b><span>Policy, compatibility and compliance checks run between the code and the cluster. Failing the gate means the change does not move.</span></span></div>
+    <div class="fnote rise d6" style="--t:var(--emerald)"><span class="ni"><svg class="i"><use href="#ic-back"/></svg></span>
+     <span><b>The loop closes</b><span>Scans and live state are written back as artifacts, so the next prompt starts from reality instead of from the model's imagination.</span></span></div>
+   </div>
+  </div></div>
+
+  <div class="foot rise d7"><div class="q"><i>›</i>Every arrow is deterministic. <b>That is the whole trick.</b></div><div class="brand">STACKTIC · 2026</div></div>
+ </div>
+</section></div>
+
+<!-- ═══════════════ 06 · THE ENGINE ═══════════════ -->
+<div class="frame"><section class="slide" style="--acc:var(--indigo)">
+ <div class="bgblob"></div><div class="grid-tex"></div>
+ <div class="pad">
+  <div class="chrome rise d1">
+   <div class="eyebrow"><span class="logo">{ <b>STACKTIC</b> }</span><span class="tick"></span><span class="kicker">THE SOLUTION</span></div>
+   <div class="idx"><b>06</b> — 08<br><span style="color:var(--faint)">blueprint automation</span></div>
+  </div>
+  <h1 class="rise d2">Blueprint automation <em>for AI</em> — validated, and tuned to the strictest setting.
+   <span class="sub">Hardened, pre-integrated building blocks; a declared graph instead of guesswork; gates in the path; and security defaults set to the strictest posture that still runs — every one of the failures on slide 01, closed by construction.</span></h1>
+
+  <div class="stage"><div class="eng">
+   <div class="band rise d2" style="--t:var(--indigo)">
+    <div class="bandlbl"><span class="bk">INTERFACE</span><span class="bt">Any AI, any human</span></div>
+    <div class="bchips">
+     <span class="bchip hot"><svg class="i"><use href="#br-claude"/></svg>Claude</span>
+     <span class="bchip hot"><svg class="i"><use href="#br-openai"/></svg>OpenAI</span>
+     <span class="bchip hot"><svg class="i"><use href="#br-gemini"/></svg>Gemini</span>
+     <span class="bchip"><svg class="i"><use href="#ic-code"/></svg>MCP server</span>
+     <span class="bchip"><svg class="i"><use href="#ic-network"/></svg>REST API</span>
+     <span class="bchip"><svg class="i"><use href="#ic-user"/></svg>UI &amp; CLI</span>
+    </div>
+    <div class="bcount">model-agnostic<br>no fine-tuning</div>
+   </div>
+   <div class="bdown"><i>▼</i></div>
+
+   <div class="band core rise d3" style="--t:var(--sky)">
+    <div class="bandlbl"><span class="bk">STACKTIC CORE</span><span class="bt">Graph → blueprint → gate</span></div>
+    <div class="bchips">
+     <span class="bchip hot"><svg class="i"><use href="#ic-map"/></svg>stack graph · source of truth</span>
+     <span class="bchip hot"><svg class="i"><use href="#ic-layers"/></svg>78 hardened blueprints</span>
+     <span class="bchip hot"><svg class="i"><use href="#ic-network"/></svg>383 link types resolved</span>
+     <span class="bchip"><svg class="i"><use href="#ic-gear"/></svg>hooks wire dependencies</span>
+     <span class="bchip"><svg class="i"><use href="#ic-lock"/></svg>secrets &amp; SSO derived</span>
+     <span class="bchip"><svg class="i"><use href="#ic-shield"/></svg>network policies from links</span>
+     <span class="bchip"><svg class="i"><use href="#ic-flask"/></svg>compatibility checks</span>
+     <span class="bchip"><svg class="i"><use href="#ic-save"/></svg>stack versions &amp; rollback</span>
+    </div>
+    <div class="bcount">deterministic<br>same in → same out</div>
+   </div>
+   <div class="bdown"><i>▼</i></div>
+
+   <div class="band rise d4" style="--t:var(--emerald)">
+    <div class="bandlbl"><span class="bk">OUTPUT</span><span class="bt">Code you own</span></div>
+    <div class="bchips">
+     <span class="bchip hot"><svg class="i"><use href="#ic-git"/></svg>your git repository</span>
+     <span class="bchip"><svg class="i"><use href="#ic-k8s"/></svg>plain Kubernetes YAML</span>
+     <span class="bchip"><svg class="i"><use href="#ic-layers"/></svg>kustomize overlays</span>
+     <span class="bchip"><svg class="i"><use href="#ic-key"/></svg>sealed secrets &amp; vault wiring</span>
+     <span class="bchip"><svg class="i"><use href="#ic-eye"/></svg>dashboards &amp; alerts</span>
+     <span class="bchip"><svg class="i"><use href="#ic-audit"/></svg>scored evidence files</span>
+    </div>
+    <div class="bcount">readable<br>no black box</div>
+   </div>
+   <div class="bdown"><i>▼</i></div>
+
+   <div class="band rise d5" style="--t:var(--amber)">
+    <div class="bandlbl"><span class="bk">RUNTIME</span><span class="bt">Anywhere it has to run</span></div>
+    <div class="bchips">
+     <span class="bchip"><svg class="i"><use href="#br-aws"/></svg>AWS</span>
+     <span class="bchip"><svg class="i"><use href="#br-azure"/></svg>Azure</span>
+     <span class="bchip"><svg class="i"><use href="#br-gcp"/></svg>GCP</span>
+     <span class="bchip"><svg class="i"><use href="#ic-server"/></svg>on-premise</span>
+     <span class="bchip"><svg class="i"><use href="#ic-lock"/></svg>air-gapped</span>
+     <span class="bchip"><svg class="i"><use href="#ic-globe"/></svg>sovereign / EU</span>
+    </div>
+    <div class="bcount">one blueprint<br>every target</div>
+   </div>
+  </div></div>
+
+  <div class="foot rise d7"><div class="q"><i>›</i>The AI proposes. <b>The blueprint decides. The gate proves.</b></div><div class="brand">STACKTIC · 2026</div></div>
+ </div>
+</section></div>
+
+<!-- ═══════════════ 07 · OPERATIONS IN PRACTICE ═══════════════ -->
+<div class="frame"><section class="slide" style="--acc:var(--teal)">
+ <div class="bgblob"></div><div class="grid-tex"></div>
+ <div class="pad">
+  <div class="chrome rise d1">
+   <div class="eyebrow"><span class="logo">{ <b>STACKTIC</b> }</span><span class="tick"></span><span class="kicker">DAY 2, BY PROMPT</span></div>
+   <div class="idx"><b>07</b> — 08<br><span style="color:var(--faint)">operations</span></div>
+  </div>
+  <h1 class="rise d2">Operations, as <em>one sentence each.</em>
+   <span class="sub">Not "generate me a script". The request is resolved against the live graph, rendered from the blueprint, gated, applied and evidenced — the same six steps as slide 05, every time.</span></h1>
+
+  <div class="stage"><div class="opsx">
+
+   <div class="oxcard rise d2" style="--t:var(--sky)">
+    <div class="oxp"><span class="pr">&gt;</span> add a Kafka topic for payments and sink it into Postgres</div>
+    <div class="oxb"><div class="oh"><svg class="i"><use href="#ic-check"/></svg>RESOLVED &amp; WIRED</div>
+     <div class="oxl"><svg class="i"><use href="#ic-check"/></svg><span>topic created with retention &amp; partitions from the blueprint</span></div>
+     <div class="oxl"><svg class="i"><use href="#ic-check"/></svg><span>connector version checked against the running Postgres major</span></div>
+     <div class="oxl"><svg class="i"><use href="#ic-check"/></svg><span>credentials, TLS and network policy derived from the new link</span></div>
+     <div class="oxf"><i>topic</i><i>connector</i><i>secret</i><i>netpol</i><i>servicemonitor</i></div></div>
+   </div>
+
+   <div class="oxcard rise d3" style="--t:var(--indigo)">
+    <div class="oxp"><span class="pr">&gt;</span> rotate the database password</div>
+    <div class="oxb"><div class="oh"><svg class="i"><use href="#ic-check"/></svg>PROPAGATED ACROSS THE GRAPH</div>
+     <div class="oxl"><svg class="i"><use href="#ic-check"/></svg><span>every component linked to that database re-rendered — not just the owner</span></div>
+     <div class="oxl"><svg class="i"><use href="#ic-check"/></svg><span>rollout ordered so consumers restart after the secret lands</span></div>
+     <div class="oxl"><svg class="i"><use href="#ic-check"/></svg><span>nothing left holding the old value</span></div>
+     <div class="oxf"><i>secret</i><i>links</i><i>rollout order</i></div></div>
+   </div>
+
+   <div class="oxcard rise d4" style="--t:var(--violet)">
+    <div class="oxp"><span class="pr">&gt;</span> restore the orders database to yesterday 14:00</div>
+    <div class="oxb"><div class="oh"><svg class="i"><use href="#ic-check"/></svg>POINT-IN-TIME RECOVERY</div>
+     <div class="oxl"><svg class="i"><use href="#ic-check"/></svg><span>recovery cluster spawned from the backup at the requested timestamp</span></div>
+     <div class="oxl"><svg class="i"><use href="#ic-check"/></svg><span>verified before anything is switched over</span></div>
+     <div class="oxl"><svg class="i"><use href="#ic-check"/></svg><span>the restore path is exercised, not assumed</span></div>
+     <div class="oxf"><i>pitr cluster</i><i>backup</i><i>verify</i></div></div>
+   </div>
+
+   <div class="oxcard rise d3" style="--t:var(--amber)">
+    <div class="oxp"><span class="pr">&gt;</span> upgrade Postgres to the next major</div>
+    <div class="oxb"><div class="oh"><svg class="i"><use href="#ic-check"/></svg>CHECKED BEFORE IT MOVES</div>
+     <div class="oxl"><svg class="i"><use href="#ic-check"/></svg><span>every consumer of that database evaluated for compatibility first</span></div>
+     <div class="oxl"><svg class="i"><use href="#ic-check"/></svg><span>incompatible link → the change is refused, with the reason</span></div>
+     <div class="oxl"><svg class="i"><use href="#ic-check"/></svg><span>previous stack version stays restorable</span></div>
+     <div class="oxf"><i>compat gate</i><i>stack version</i><i>rollback</i></div></div>
+   </div>
+
+   <div class="oxcard rise d4" style="--t:var(--emerald)">
+    <div class="oxp"><span class="pr">&gt;</span> prove this stack against PCI and ISO 27001</div>
+    <div class="oxb"><div class="oh"><svg class="i"><use href="#ic-check"/></svg>EVIDENCE, NOT OPINION</div>
+     <div class="oxl"><svg class="i"><use href="#ic-check"/></svg><span>the in-cluster agent scans what is actually running</span></div>
+     <div class="oxl"><svg class="i"><use href="#ic-check"/></svg><span>scored per control, with the failing objects named</span></div>
+     <div class="oxl"><svg class="i"><use href="#ic-check"/></svg><span>committed to your repository — dated and diffable</span></div>
+     <div class="oxf"><i>scan</i><i>score</i><i>artifact</i><i>git history</i></div></div>
+   </div>
+
+   <div class="oxcard rise d5" style="--t:var(--rose)">
+    <div class="oxp"><span class="pr">&gt;</span> move the whole stack to another cloud</div>
+    <div class="oxb"><div class="oh"><svg class="i"><use href="#ic-check"/></svg>RE-RENDER, DON'T REBUILD</div>
+     <div class="oxl"><svg class="i"><use href="#ic-check"/></svg><span>the graph is the asset; the target is an attribute</span></div>
+     <div class="oxl"><svg class="i"><use href="#ic-check"/></svg><span>same blueprints render for the new provider — or for no provider at all</span></div>
+     <div class="oxl"><svg class="i"><use href="#ic-check"/></svg><span>on-premise and air-gapped are targets like any other</span></div>
+     <div class="oxf"><i>re-render</i><i>portable</i><i>air-gap</i></div></div>
+   </div>
+
+  </div></div>
+
+  <div class="foot rise d7"><div class="q"><i>›</i>Same six steps, every task. <b>That's what makes it operable at 3am.</b></div><div class="brand">STACKTIC · 2026</div></div>
+ </div>
+</section></div>
+
+<!-- ═══════════════ 08 · VISION ═══════════════ -->
+<div class="frame"><section class="slide" style="--acc:var(--emerald)">
+ <div class="bgblob"></div><div class="grid-tex"></div>
+ <div class="pad">
+  <div class="chrome rise d1">
+   <div class="eyebrow"><span class="logo">{ <b>STACKTIC</b> }</span><span class="tick"></span><span class="kicker">THE VISION</span></div>
+   <div class="idx"><b>08</b> — 08<br><span style="color:var(--faint)">open · agnostic · yours</span></div>
+  </div>
+  <h1 class="rise d2">Open source underneath. <em>Zero lock-in</em> on top.
+   <span class="sub">Every building block is open source you could run without us. The output is plain code in your repository. The value we add is the wiring, the validation and the operation — never a hostage.</span></h1>
+
+  <div class="stage"><div class="vis">
+   <div class="osswrap rise d2">
+    <div class="ch" style="color:var(--indigo)"><svg class="i"><use href="#ic-puzzle"/></svg>78 PRE-INTEGRATED OPEN-SOURCE COMPONENTS</div>
+    <div class="ossgrid">
+     <div class="osc" style="--t:var(--sky)">kubernetes</div><div class="osc" style="--t:var(--indigo)">keycloak</div><div class="osc" style="--t:var(--violet)">cnpg</div>
+     <div class="osc" style="--t:var(--amber)">kafka</div><div class="osc" style="--t:var(--rose)">rabbitmq</div><div class="osc" style="--t:var(--teal)">valkey</div>
+     <div class="osc" style="--t:var(--emerald)">prometheus</div><div class="osc" style="--t:var(--amber)">grafana</div><div class="osc" style="--t:var(--sky)">loki</div>
+     <div class="osc" style="--t:var(--violet)">opensearch</div><div class="osc" style="--t:var(--indigo)">clickhouse</div><div class="osc" style="--t:var(--teal)">mongodb</div>
+     <div class="osc" style="--t:var(--rose)">mariadb</div><div class="osc" style="--t:var(--emerald)">minio</div><div class="osc" style="--t:var(--sky)">seaweedfs</div>
+     <div class="osc" style="--t:var(--amber)">apisix</div><div class="osc" style="--t:var(--violet)">istio</div><div class="osc" style="--t:var(--indigo)">cert-manager</div>
+     <div class="osc" style="--t:var(--emerald)">openbao</div><div class="osc" style="--t:var(--rose)">ext-secrets</div><div class="osc" style="--t:var(--teal)">opa</div>
+     <div class="osc" style="--t:var(--sky)">falco</div><div class="osc" style="--t:var(--amber)">trivy</div><div class="osc" style="--t:var(--violet)">sigstore</div>
+     <div class="osc" style="--t:var(--emerald)">velero</div><div class="osc" style="--t:var(--indigo)">keda</div><div class="osc" style="--t:var(--rose)">crossplane</div>
+     <div class="osc" style="--t:var(--teal)">airflow</div><div class="osc" style="--t:var(--sky)">spark</div><div class="osc" style="--t:var(--amber)">otel</div>
+     <div class="osc" style="--t:var(--violet)">vllm</div><div class="osc" style="--t:var(--emerald)">qdrant</div><div class="osc" style="--t:var(--indigo)">neo4j</div>
+     <div class="osc" style="--t:var(--rose)">langflow</div><div class="osc" style="--t:var(--teal)">nextcloud</div><div class="osc" style="--t:var(--sky)">+ 42 more</div>
+    </div>
+    <div class="ctl" style="background:color-mix(in srgb,var(--indigo) 7%,#fff);border:1px solid color-mix(in srgb,var(--indigo) 22%,var(--line));color:#3730a3;font-family:var(--mono);border-radius:11px;padding:calc(var(--u)*.7) calc(var(--u)*.95);font-size:calc(var(--u)*.9)">
+     no proprietary runtime · no agent you can't read · <b>bring your own component</b></div>
+   </div>
+
+   <div class="portwrap">
+    <div class="port rise d3">
+     <div class="ch" style="color:#047857"><svg class="i"><use href="#ic-globe"/></svg>THE SAME STACK, ANYWHERE</div>
+     <svg class="portsvg" viewBox="0 0 380 150" preserveAspectRatio="xMidYMid meet" role="img" aria-label="One blueprint renders to AWS, Azure, GCP, on-premise and air-gapped targets">
+      <defs><marker id="pa" markerWidth="7" markerHeight="7" refX="5.6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#10b981"/></marker></defs>
+      <rect x="6" y="48" width="128" height="54" rx="13" fill="#0b1220" stroke="#2b3556"/>
+      <text x="70" y="70" text-anchor="middle" font-size="11.5" font-weight="800" fill="#fff">your blueprint</text>
+      <text x="70" y="88" text-anchor="middle" font-size="8.5" fill="#7dd3fc">one source of truth</text>
+      <g stroke="#10b981" stroke-width="1.8" fill="none" marker-end="url(#pa)" opacity=".85">
+       <path id="p1" d="M138,62 C184,62 190,20 234,20"/>
+       <path id="p2" d="M138,68 C184,68 190,50 234,50"/>
+       <path id="p3" d="M138,74 C184,74 190,80 234,80"/>
+       <path id="p4" d="M138,80 C184,80 190,110 234,110"/>
+       <path id="p5" d="M138,86 C184,86 190,140 234,140"/>
+      </g>
+      <g fill="#10b981">
+       <circle r="3"><animateMotion dur="2.4s" repeatCount="indefinite" begin="0s"><mpath href="#p1"/></animateMotion></circle>
+       <circle r="3"><animateMotion dur="2.4s" repeatCount="indefinite" begin=".3s"><mpath href="#p2"/></animateMotion></circle>
+       <circle r="3"><animateMotion dur="2.4s" repeatCount="indefinite" begin=".6s"><mpath href="#p3"/></animateMotion></circle>
+       <circle r="3"><animateMotion dur="2.4s" repeatCount="indefinite" begin=".9s"><mpath href="#p4"/></animateMotion></circle>
+       <circle r="3"><animateMotion dur="2.4s" repeatCount="indefinite" begin="1.2s"><mpath href="#p5"/></animateMotion></circle>
+      </g>
+      <g fill="#fff" stroke="#cfe6dc" stroke-width="1.2">
+       <rect x="238" y="8" width="134" height="24" rx="8"/><rect x="238" y="38" width="134" height="24" rx="8"/>
+       <rect x="238" y="68" width="134" height="24" rx="8"/><rect x="238" y="98" width="134" height="24" rx="8"/>
+       <rect x="238" y="128" width="134" height="24" rx="8"/></g>
+      <g font-size="10.5" font-weight="700" fill="#0c1222">
+       <text x="272" y="24">AWS</text><text x="272" y="54">Azure</text><text x="272" y="84">GCP</text><text x="272" y="114">on-premise</text><text x="272" y="144">air-gapped</text></g>
+      <g transform="translate(248,12) scale(.7)"><use href="#br-aws" width="18" height="18"/></g>
+      <g transform="translate(248,42) scale(.7)"><use href="#br-azure" width="18" height="18"/></g>
+      <g transform="translate(248,72) scale(.7)"><use href="#br-gcp" width="18" height="18"/></g>
+      <g transform="translate(248,102) scale(.7)" style="color:#5c6785"><use href="#ic-server" width="18" height="18"/></g>
+      <g transform="translate(248,132) scale(.7)" style="color:#5c6785"><use href="#ic-lock" width="18" height="18"/></g>
+     </svg>
+    </div>
+
+    <div class="vals">
+     <div class="val rise d4" style="--t:#0b8a5f"><div class="vv">−70<span style="font-size:.6em">%</span></div><div class="vl">lower cost</div></div>
+     <div class="val rise d5" style="--t:#0889c2"><div class="vv">80<span style="font-size:.6em">%</span></div><div class="vl">faster to production</div></div>
+     <div class="val rise d6" style="--t:#7c4ddf"><div class="vv">100<span style="font-size:.6em">%</span></div><div class="vl">portable &amp; yours</div></div>
+     <div class="val rise d7" style="--t:#dc3b60"><div class="vv">0</div><div class="vl">vendor lock-in</div></div>
+    </div>
+   </div>
+  </div></div>
+
+  <div class="foot rise d7"><div class="q"><i>›</i>If we disappeared tomorrow, <b>your stack keeps running.</b> &nbsp;stacktic.io · info@stacktic.io</div><div class="brand">STACKTIC · 2026</div></div>
+ </div>
+</section></div>
+
+</div>
+
+<div class="nav">
+ <button id="prev" aria-label="previous slide">←</button>
+ <div class="navdots" id="dots"></div>
+ <button id="next" aria-label="next slide">→</button>
+</div>
+
+<script>
+(function(){
+'use strict';
+var deck=document.getElementById('deck');
+var frames=[].slice.call(document.querySelectorAll('.frame'));
+var dots=document.getElementById('dots');
+frames.forEach(function(f,i){
+  var b=document.createElement('button');b.className='nd';b.textContent=i+1;
+  b.setAttribute('aria-label','go to slide '+(i+1));
+  b.onclick=function(){f.scrollIntoView({behavior:'smooth',inline:'center'});};
+  dots.appendChild(b);
+});
+var nds=[].slice.call(dots.children);var cur=0;
+var io=new IntersectionObserver(function(es){
+  es.forEach(function(e){
+    if(e.isIntersecting){
+      cur=frames.indexOf(e.target);
+      e.target.classList.add('live');
+      nds.forEach(function(d,j){d.classList.toggle('on',j===cur);});
+    }
+  });
+},{root:deck,threshold:.5});
+frames.forEach(function(f){io.observe(f);});
+function go(d){cur=Math.max(0,Math.min(frames.length-1,cur+d));frames[cur].scrollIntoView({behavior:'smooth',inline:'center'});}
+document.getElementById('next').onclick=function(){go(1);};
+document.getElementById('prev').onclick=function(){go(-1);};
+addEventListener('keydown',function(e){
+  if(['ArrowRight','ArrowDown','PageDown',' '].indexOf(e.key)>-1){e.preventDefault();go(1);}
+  if(['ArrowLeft','ArrowUp','PageUp'].indexOf(e.key)>-1){e.preventDefault();go(-1);}
+  if(e.key==='Home'){e.preventDefault();cur=0;frames[0].scrollIntoView({behavior:'smooth',inline:'center'});}
+  if(e.key==='End'){e.preventDefault();cur=frames.length-1;frames[cur].scrollIntoView({behavior:'smooth',inline:'center'});}
+});
+})();
+</script>
+</body></html>

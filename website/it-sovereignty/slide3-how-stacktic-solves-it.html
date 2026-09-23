@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>How Stacktic Solves It</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&family=DM+Serif+Display&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{width:1440px;height:810px;overflow:hidden;font-family:'DM Sans',sans-serif;background:#080b16}
+  canvas{display:block}
+</style>
+</head>
+<body>
+<canvas id="c" width="2880" height="1620"></canvas>
+<script>
+const C=document.getElementById('c');
+C.style.width='1440px';C.style.height='810px';
+const X=C.getContext('2d');
+const W=2880,H=1620;
+
+function easeOutExpo(t){return t===1?1:1-Math.pow(2,-10*t)}
+function easeOutBack(t){const c=1.7;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2)}
+function easeInOutCubic(t){return t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}
+function easeOutElastic(t){if(t===0||t===1)return t;return Math.pow(2,-10*t)*Math.sin((t-0.075)*2*Math.PI/0.3)+1}
+function clamp01(t){return Math.max(0,Math.min(1,t))}
+function lerp(a,b,t){return a+(b-a)*t}
+function P(n,f,t){return clamp01((n-f)/(t-f))}
+
+// ─── Components ───
+const comps=[
+  {icon:'CRM',  color:'#ef4444', cat:0, gx:0},
+  {icon:'ERP',  color:'#f97316', cat:0, gx:1},
+  {icon:'MAIL', color:'#06b6d4', cat:0, gx:2},
+  {icon:'DOCS', color:'#8b5cf6', cat:0, gx:3},
+  {icon:'CHAT', color:'#3b82f6', cat:0, gx:4},
+  {icon:'VIDEO',color:'#22d3ee', cat:0, gx:5},
+  {icon:'DB',   color:'#a855f7', cat:1, gx:0},
+  {icon:'DB2',  color:'#c084fc', cat:1, gx:1},
+  {icon:'S3',   color:'#10b981', cat:1, gx:2},
+  {icon:'CACHE',color:'#ec4899', cat:1, gx:3},
+  {icon:'QUEUE',color:'#f472b6', cat:1, gx:4},
+  {icon:'GW',   color:'#f43f5e', cat:2, gx:0},
+  {icon:'SSO',  color:'#6366f1', cat:2, gx:1},
+  {icon:'TLS',  color:'#14b8a6', cat:2, gx:2},
+  {icon:'DNS',  color:'#0ea5e9', cat:2, gx:3},
+  {icon:'RBAC', color:'#8b5cf6', cat:2, gx:4},
+  {icon:'MON',  color:'#f59e0b', cat:3, gx:0},
+  {icon:'LOG',  color:'#84cc16', cat:3, gx:1},
+  {icon:'BAK',  color:'#64748b', cat:3, gx:2},
+  {icon:'VER',  color:'#06b6d4', cat:3, gx:3},
+  {icon:'LLM',  color:'#d946ef', cat:4, gx:0},
+  {icon:'VDB',  color:'#f472b6', cat:4, gx:1},
+  {icon:'RAG',  color:'#fb923c', cat:4, gx:2},
+  {icon:'MCP',  color:'#818cf8', cat:4, gx:3},
+];
+
+const layers=[
+  {name:'APPLICATIONS',color:'#818cf8',y:340,count:6},
+  {name:'DATA',        color:'#a855f7',y:550,count:5},
+  {name:'PLATFORM',    color:'#22d3ee',y:760,count:5},
+  {name:'OPERATIONS',  color:'#f59e0b',y:970,count:4},
+  {name:'AI',          color:'#d946ef',y:1170,count:4},
+];
+
+const R=34;
+comps.forEach(c=>{
+  const layer=layers[c.cat];
+  const gap=140;
+  c.orgX=W/2-(layer.count-1)*gap/2+c.gx*gap;
+  c.orgY=layer.y;
+  const a=Math.random()*Math.PI*2;
+  const r=300+Math.random()*600;
+  c.chX=W/2+Math.cos(a)*r+(Math.random()-0.5)*400;
+  c.chY=H/2+Math.sin(a)*r+(Math.random()-0.5)*300;
+  c.phase=Math.random()*Math.PI*2;
+});
+
+// ─── Relationships ───
+const relTypes=[
+  {name:'STACK TOPOLOGY',       color:'#4f46e5', pairs:[[11,0],[11,1],[11,2],[11,3],[11,4],[11,5],[6,0],[7,1],[8,3]]},
+  {name:'AUTHORIZATION',        color:'#6366f1', pairs:[[12,0],[12,1],[12,2],[12,3],[12,5],[15,11],[15,12]]},
+  {name:'API DEPENDENCIES',     color:'#f43f5e', pairs:[[11,12],[11,13],[0,9],[1,7],[2,6],[3,8],[5,10]]},
+  {name:'DATA LAYER',           color:'#a855f7', pairs:[[0,6],[1,7],[2,6],[3,8],[5,9],[1,10],[4,9]]},
+  {name:'SECURITY POLICIES',    color:'#14b8a6', pairs:[[13,11],[13,12],[15,0],[15,1],[15,6],[13,0]]},
+  {name:'OBSERVABILITY',        color:'#f59e0b', pairs:[[16,6],[16,7],[16,8],[16,11],[16,12],[16,9],[17,0],[17,1],[17,6]]},
+  {name:'OPERATIONS',           color:'#06b6d4', pairs:[[18,6],[18,7],[18,8],[19,0],[19,1],[19,6],[19,11],[19,16]]},
+  {name:'AI LAYER',             color:'#d946ef', pairs:[[20,9],[21,8],[22,6],[23,0],[23,1],[20,6]]},
+];
+
+// ─── Particles ───
+class Dot{
+  constructor(x1,y1,x2,y2,color){
+    this.x1=x1;this.y1=y1;this.x2=x2;this.y2=y2;
+    this.color=color;this.t=Math.random();this.speed=0.002+Math.random()*0.003;
+  }
+  update(){this.t=(this.t+this.speed)%1;}
+  draw(alpha){
+    const x=lerp(this.x1,this.x2,this.t),y=lerp(this.y1,this.y2,this.t);
+    X.save();X.globalAlpha=alpha*(0.4+0.6*Math.sin(this.t*Math.PI));
+    X.beginPath();X.arc(x,y,3.5,0,Math.PI*2);
+    X.fillStyle=this.color;X.shadowColor=this.color;X.shadowBlur=10;
+    X.fill();X.restore();
+  }
+}
+const dots=[];
+relTypes.forEach(rt=>{
+  rt.pairs.forEach(p=>{
+    const a=comps[p[0]],b=comps[p[1]];
+    for(let i=0;i<3;i++) dots.push(new Dot(a.orgX,a.orgY,b.orgX,b.orgY,rt.color));
+  });
+});
+
+// ─── Ops ring ───
+const opsRing=[
+  {icon:'DEPLOY',  label:'Deploy stack to any cloud',    color:'#4f46e5'},
+  {icon:'CONFIG',  label:'Auto-configure every tool',    color:'#06b6d4'},
+  {icon:'SECURE',  label:'RBAC, policies, encryption',   color:'#ef4444'},
+  {icon:'CONNECT', label:'Wire SSO, DNS, TLS, routes',   color:'#f97316'},
+  {icon:'VERSION', label:'Snapshot entire stack state',   color:'#8b5cf6'},
+  {icon:'MONITOR', label:'Alerts & dashboards per tool',  color:'#f59e0b'},
+  {icon:'UPDATE',  label:'Coordinated rolling upgrades',  color:'#10b981'},
+  {icon:'BACKUP',  label:'Automated DR & recovery',       color:'#64748b'},
+];
+opsRing.forEach((o,i)=>o.angle=i*Math.PI*2/8);
+
+// ═══════════════════════════════════════════
+// TIMELINE (slower)
+// 0-3       "What if..." text
+// 2-7       chaos tools appear
+// 5-8       STACKTIC flash (center, no header yet)
+// 7-13      chaos→order (very slow)
+// 12-14     layer boxes
+// 13-32     relationship showcase (2.5s each, 9 types)
+// 30-34     tools fade, screen clears
+// 32-46     GRAND ops ring finale
+// 44-48     final tagline
+// ═══════════════════════════════════════════
+
+let startTime=0;
+
+function frame(ts){
+  if(!startTime)startTime=ts;
+  const now=(ts-startTime)/1000;
+  X.clearRect(0,0,W,H);
+
+  // ── BG ──
+  const bg=X.createRadialGradient(W/2,H/2,200,W/2,H/2,W*0.6);
+  bg.addColorStop(0,'#0d1025');bg.addColorStop(1,'#080b16');
+  X.fillStyle=bg;X.fillRect(0,0,W,H);
+  X.save();X.globalAlpha=0.02;X.fillStyle='#4f46e5';
+  for(let gx=0;gx<W;gx+=50)for(let gy=0;gy<H;gy+=50){X.beginPath();X.arc(gx,gy,1,0,Math.PI*2);X.fill();}
+  X.restore();
+
+  const chaos2order=easeInOutCubic(P(now,7.0,13.0));
+
+  // ══ Opening question (0-5) ══
+  const q1=easeOutExpo(P(now,0,2));
+  const q1f=1-easeOutExpo(P(now,4,5.5));
+  if(q1*q1f>0.01){
+    X.save();X.globalAlpha=q1*q1f;
+    X.font='400 64px "DM Serif Display"';X.fillStyle='#64748b';
+    X.textAlign='center';X.textBaseline='middle';
+    X.fillText('What if one platform',W/2,H/2-40);
+    X.font='700 68px "DM Sans"';X.fillStyle='#e2e8f0';
+    X.fillText('automated every relationship?',W/2,H/2+50);
+    X.restore();
+  }
+
+  // ══ STACKTIC flash (5-7, fades completely by 8) ══
+  const fl=easeOutExpo(P(now,5,6.5))*(1-easeOutExpo(P(now,7,8)));
+  if(fl>0.01){
+    X.save();X.globalAlpha=fl;
+    // darken everything behind so it doesn't clash with chaos tools
+    X.fillStyle='rgba(8,11,22,0.85)';X.fillRect(0,0,W,H);
+    const grd=X.createRadialGradient(W/2,H/2,60,W/2,H/2,800);
+    grd.addColorStop(0,'rgba(79,70,229,0.25)');grd.addColorStop(1,'rgba(79,70,229,0)');
+    X.fillStyle=grd;X.fillRect(0,0,W,H);
+    X.font='800 160px "DM Sans"';X.fillStyle='#4f46e5';
+    X.textAlign='center';X.textBaseline='middle';
+    X.shadowColor='#4f46e5';X.shadowBlur=80;
+    X.fillText('STACKTIC',W/2,H/2);
+    X.shadowBlur=0;
+    X.restore();
+  }
+
+  // ══ Header (bottom-left, away from relationship labels in top-right) ══
+  const hA=easeOutExpo(P(now,13,15));
+  const hFade=1-easeOutExpo(P(now,30,32));
+  if(hA*hFade>0.01){
+    X.save();X.globalAlpha=hA*hFade*0.5;
+    X.fillStyle='#4f46e5';X.fillRect(0,H-5,W,5);
+    X.font='700 26px "DM Sans"';X.fillStyle='#4f46e5';
+    X.textAlign='left';X.textBaseline='bottom';
+    X.fillText('STACKTIC',70,H-20);
+    X.font='400 22px "DM Sans"';X.fillStyle='#475569';
+    X.fillText('automating every relationship',260,H-20);
+    X.restore();
+  }
+
+  // ══ Tools & relationships (visible 2-34) ══
+  const toolsFade=1-easeOutExpo(P(now,30,34));
+  if(now>2&&now<35){
+
+    // ambient connections
+    if(chaos2order>0.95){
+      const ambA=easeOutExpo(P(now,13,15))*0.06*toolsFade;
+      if(ambA>0.001){
+        relTypes.forEach(rt=>{rt.pairs.forEach(p=>{
+          X.save();X.globalAlpha=ambA;
+          X.beginPath();X.moveTo(comps[p[0]].orgX,comps[p[0]].orgY);
+          X.lineTo(comps[p[1]].orgX,comps[p[1]].orgY);
+          X.strokeStyle=rt.color+'50';X.lineWidth=1;X.stroke();X.restore();
+        });});
+      }
+    }
+
+    // ── Relationship showcase ──
+    const relStart=14;
+    const relDur=2.8;
+    // Only ONE label visible at a time — hard cut between types
+    relTypes.forEach((rt,ri)=>{
+      const rS=relStart+ri*relDur;
+      // lines: fade in 0-0.8s, hold, fade out last 0.5s
+      const rIn=easeOutExpo(P(now,rS,rS+0.8));
+      const rOut=1-easeOutExpo(P(now,rS+relDur-0.5,rS+relDur));
+      const rA=Math.min(rIn,rOut>0.01?rOut:1)*toolsFade;
+      if(rA<0.01)return;
+
+      // glowing lines
+      rt.pairs.forEach(p=>{
+        const a=comps[p[0]],b=comps[p[1]];
+        X.save();X.globalAlpha=rA*0.7;
+        X.beginPath();X.moveTo(a.orgX,a.orgY);X.lineTo(b.orgX,b.orgY);
+        X.strokeStyle=rt.color;X.lineWidth=3.5;
+        X.shadowColor=rt.color;X.shadowBlur=20;
+        X.stroke();X.shadowBlur=0;X.restore();
+      });
+
+      // node highlights
+      const hl=new Set();
+      rt.pairs.forEach(p=>{hl.add(p[0]);hl.add(p[1]);});
+      hl.forEach(ci=>{
+        const c=comps[ci];
+        X.save();X.globalAlpha=rA*0.5;
+        const g=X.createRadialGradient(c.orgX,c.orgY,R,c.orgX,c.orgY,R*3.5);
+        g.addColorStop(0,rt.color+'50');g.addColorStop(1,rt.color+'00');
+        X.beginPath();X.arc(c.orgX,c.orgY,R*3.5,0,Math.PI*2);X.fillStyle=g;X.fill();
+        X.restore();
+      });
+    });
+
+    // ── Label: only the CURRENT active type, no overlap ──
+    const relTotalTime=relDur*relTypes.length;
+    const relElapsed=now-relStart;
+    if(relElapsed>=0 && relElapsed<relTotalTime){
+      const activeIdx=Math.floor(relElapsed/relDur);
+      const localT=(relElapsed%relDur)/relDur; // 0→1 within this type
+      if(activeIdx>=0 && activeIdx<relTypes.length){
+        const rt=relTypes[activeIdx];
+        // fade in first 20%, hold, fade out last 15%
+        let labelA=1;
+        if(localT<0.2) labelA=easeOutExpo(localT/0.2);
+        else if(localT>0.85) labelA=1-easeOutExpo((localT-0.85)/0.15);
+        labelA*=toolsFade;
+
+        if(labelA>0.01){
+          X.save();X.globalAlpha=labelA;
+
+          // dark backing behind label so nothing bleeds through
+          const lx=W-100,ly=130;
+          X.fillStyle='rgba(8,11,22,0.7)';
+          X.beginPath();X.roundRect(lx-520,ly-40,530,80,10);X.fill();
+
+          X.font='800 48px "DM Sans"';X.fillStyle=rt.color;
+          X.textAlign='right';X.textBaseline='middle';
+          X.shadowColor=rt.color;X.shadowBlur=30;
+          X.fillText(rt.name,lx,ly);
+          X.shadowBlur=0;
+
+          // accent bar
+          X.fillStyle=rt.color;
+          const tw=X.measureText(rt.name).width;
+          X.fillRect(lx-tw,ly+32,tw,4);
+
+          X.restore();
+        }
+      }
+    }
+
+    // particles
+    if(now>15){
+      const pA=easeOutExpo(P(now,15,18))*0.8*toolsFade;
+      dots.forEach(d=>{d.update();d.draw(pA);});
+    }
+
+    // layer boxes
+    if(chaos2order>0.8){
+      const boxA=easeOutExpo(P(now,12,14))*toolsFade;
+      layers.forEach((layer,li)=>{
+        const la=boxA*easeOutExpo(P(now,12+li*0.4,13.5+li*0.4));
+        if(la<0.01)return;
+        const gap=140,startLX=W/2-(layer.count-1)*gap/2-70;
+        const bw=(layer.count-1)*gap+140;
+        X.save();X.globalAlpha=la*0.3;
+        X.beginPath();X.roundRect(startLX,layer.y-48,bw,96,12);
+        X.strokeStyle=layer.color+'40';X.lineWidth=1.5;
+        X.fillStyle=layer.color+'05';X.fill();X.stroke();
+        X.globalAlpha=la*0.45;
+        X.font='600 16px "DM Sans"';X.fillStyle=layer.color;
+        X.textAlign='left';X.textBaseline='middle';
+        X.fillText(layer.name,startLX+10,layer.y-34);
+        X.restore();
+      });
+    }
+
+    // draw nodes
+    comps.forEach((c,i)=>{
+      const iA=easeOutExpo(P(now,2+i*0.15,2.8+i*0.15));
+      const a=iA*toolsFade;
+      if(a<0.01)return;
+      const fl2=chaos2order<0.5?1-chaos2order*2:0;
+      const fx=Math.cos(now*0.4+c.phase)*12*fl2;
+      const fy=Math.sin(now*0.6+c.phase*1.3)*10*fl2;
+      const px=lerp(c.chX+fx,c.orgX,chaos2order);
+      const py=lerp(c.chY+fy,c.orgY,chaos2order);
+      X.save();X.globalAlpha=a;X.translate(px,py);
+      const glow=X.createRadialGradient(0,0,R*0.3,0,0,R*1.6);
+      glow.addColorStop(0,c.color+'18');glow.addColorStop(1,c.color+'00');
+      X.beginPath();X.arc(0,0,R*1.6,0,Math.PI*2);X.fillStyle=glow;X.fill();
+      X.beginPath();X.arc(0,0,R,0,Math.PI*2);
+      X.fillStyle=c.color+'12';X.strokeStyle=c.color+'70';X.lineWidth=2;
+      X.fill();X.stroke();
+      X.font='700 18px "DM Sans"';X.fillStyle=c.color;
+      X.textAlign='center';X.textBaseline='middle';
+      X.fillText(c.icon,0,0);
+      X.restore();
+    });
+  }
+
+  // ══════════════════════════════════════════════════
+  // GRAND OPS RING FINALE (32-46)
+  // ══════════════════════════════════════════════════
+  const ringStart=32;
+  const ringA=easeOutExpo(P(now,ringStart,ringStart+3));
+  const ringFade=1-easeOutExpo(P(now,44,47));
+  if(ringA>0.01&&ringFade>0.01){
+    const ra=ringA*ringFade;
+    const rcx=W/2,rcy=H/2;
+    const rot=now*0.12;
+
+    // ── Title ──
+    X.save();X.globalAlpha=ra;
+    X.fillStyle='#4f46e5';X.fillRect(0,0,W,5);
+    X.font='700 30px "DM Sans"';X.fillStyle='#4f46e5';
+    X.textAlign='left';X.textBaseline='top';
+    X.fillText('STACKTIC',70,24);
+    X.restore();
+
+    // ── Outer glow rings ──
+    X.save();X.globalAlpha=ra;
+
+    // 3 concentric faint rings
+    [580,480,380].forEach((r,i)=>{
+      X.beginPath();X.arc(rcx,rcy,r,0,Math.PI*2);
+      X.strokeStyle=`rgba(79,70,229,${0.04+i*0.02})`;X.lineWidth=1;X.stroke();
+    });
+
+    // spinning energy arcs on outer ring
+    for(let i=0;i<3;i++){
+      const aOff=rot*0.8+i*Math.PI*2/3;
+      X.beginPath();X.arc(rcx,rcy,580,aOff,aOff+0.5);
+      X.strokeStyle='rgba(79,70,229,0.15)';X.lineWidth=4;
+      X.shadowColor='#4f46e5';X.shadowBlur=15;X.stroke();X.shadowBlur=0;
+    }
+
+    // spinning energy arcs on middle ring
+    for(let i=0;i<4;i++){
+      const aOff=-rot*1.2+i*Math.PI/2;
+      X.beginPath();X.arc(rcx,rcy,480,aOff,aOff+0.4);
+      X.strokeStyle='rgba(99,102,241,0.12)';X.lineWidth=3;X.stroke();
+    }
+
+    // main ring
+    X.beginPath();X.arc(rcx,rcy,380,0,Math.PI*2);
+    X.strokeStyle='rgba(79,70,229,0.12)';X.lineWidth=2;X.stroke();
+
+    // spinning bright arc
+    const arcStart=rot*0.6;
+    X.beginPath();X.arc(rcx,rcy,380,arcStart,arcStart+Math.PI*0.7);
+    X.strokeStyle='#4f46e5';X.lineWidth=4;
+    X.shadowColor='#4f46e5';X.shadowBlur=25;X.stroke();X.shadowBlur=0;
+
+    // second arc opposite direction
+    const arc2=-rot*0.4;
+    X.beginPath();X.arc(rcx,rcy,380,arc2,arc2+Math.PI*0.4);
+    X.strokeStyle='rgba(99,102,241,0.5)';X.lineWidth=3;
+    X.shadowColor='#6366f1';X.shadowBlur=15;X.stroke();X.shadowBlur=0;
+
+    // ── Center hub ──
+    // large glow
+    const hubG=X.createRadialGradient(rcx,rcy,30,rcx,rcy,220);
+    hubG.addColorStop(0,'rgba(79,70,229,0.2)');hubG.addColorStop(1,'rgba(79,70,229,0)');
+    X.beginPath();X.arc(rcx,rcy,220,0,Math.PI*2);X.fillStyle=hubG;X.fill();
+
+    // hub circle
+    const hubPulse=0.95+Math.sin(now*2)*0.05;
+    X.beginPath();X.arc(rcx,rcy,90*hubPulse,0,Math.PI*2);
+    X.fillStyle='rgba(79,70,229,0.12)';
+    X.strokeStyle='#4f46e5';X.lineWidth=4;
+    X.shadowColor='#4f46e5';X.shadowBlur=30;
+    X.fill();X.stroke();X.shadowBlur=0;
+
+    // inner ring
+    X.beginPath();X.arc(rcx,rcy,60*hubPulse,0,Math.PI*2);
+    X.strokeStyle='rgba(99,102,241,0.3)';X.lineWidth=2;X.stroke();
+
+    X.font='800 40px "DM Sans"';X.fillStyle='#4f46e5';
+    X.textAlign='center';X.textBaseline='middle';
+    X.fillText('AUTO',rcx,rcy-14);X.fillText('OPS',rcx,rcy+26);
+
+    // ── Operation nodes ──
+    opsRing.forEach((op,i)=>{
+      const oDelay=ringStart+1.0+i*0.4;
+      const oA=ra*easeOutElastic(P(now,oDelay,oDelay+1.5));
+      if(oA<0.01)return;
+
+      const angle=op.angle+rot*0.2;
+      const ox=rcx+Math.cos(angle)*380;
+      const oy=rcy+Math.sin(angle)*380;
+
+      // energy connector to hub
+      X.save();X.globalAlpha=oA*0.3;
+      X.beginPath();X.moveTo(rcx,rcy);X.lineTo(ox,oy);
+      const cg=X.createLinearGradient(rcx,rcy,ox,oy);
+      cg.addColorStop(0,'#4f46e5'+'40');cg.addColorStop(1,op.color+'60');
+      X.strokeStyle=cg;X.lineWidth=2;
+      X.shadowColor=op.color;X.shadowBlur=8;X.stroke();
+      X.shadowBlur=0;X.restore();
+
+      // traveling dot on connector
+      const dotT=(now*0.4+i*0.3)%1;
+      const dx=lerp(rcx,ox,dotT),dy=lerp(rcy,oy,dotT);
+      X.save();X.globalAlpha=oA*0.6*(0.3+0.7*Math.sin(dotT*Math.PI));
+      X.beginPath();X.arc(dx,dy,4,0,Math.PI*2);
+      X.fillStyle=op.color;X.shadowColor=op.color;X.shadowBlur=12;
+      X.fill();X.shadowBlur=0;X.restore();
+
+      X.save();X.globalAlpha=oA;X.translate(ox,oy);
+
+      // node outer glow
+      const ng=X.createRadialGradient(0,0,25,0,0,80);
+      ng.addColorStop(0,op.color+'35');ng.addColorStop(1,op.color+'00');
+      X.beginPath();X.arc(0,0,80,0,Math.PI*2);X.fillStyle=ng;X.fill();
+
+      // node
+      X.beginPath();X.arc(0,0,44,0,Math.PI*2);
+      X.fillStyle=op.color+'15';X.strokeStyle=op.color;X.lineWidth=3;
+      X.shadowColor=op.color;X.shadowBlur=12;
+      X.fill();X.stroke();X.shadowBlur=0;
+
+      // icon
+      X.font='800 20px "DM Sans"';X.fillStyle=op.color;
+      X.textAlign='center';X.textBaseline='middle';
+      X.fillText(op.icon,0,0);
+
+      // label outside
+      const labelR=440;
+      const lx2=Math.cos(angle)*labelR;
+      const ly2=Math.sin(angle)*labelR;
+      X.font='600 20px "DM Sans"';X.fillStyle='#94a3b8';
+      X.textAlign=Math.cos(angle)>0?'left':'right';
+      X.textBaseline='middle';
+      X.fillText(op.label,lx2,ly2);
+
+      X.restore();
+    });
+
+    // ── Orbiting particles on outer ring ──
+    for(let i=0;i<12;i++){
+      const pa=rot*0.5+i*Math.PI*2/12;
+      const pr=575+Math.sin(now*1.5+i)*8;
+      const ppx=rcx+Math.cos(pa)*pr;
+      const ppy=rcy+Math.sin(pa)*pr;
+      X.save();X.globalAlpha=ra*0.35;
+      X.beginPath();X.arc(ppx,ppy,2.5,0,Math.PI*2);
+      X.fillStyle='#4f46e5';X.shadowColor='#4f46e5';X.shadowBlur=6;
+      X.fill();X.shadowBlur=0;X.restore();
+    }
+
+    // ── Inner orbiting particles ──
+    for(let i=0;i<8;i++){
+      const pa=-rot*0.8+i*Math.PI*2/8;
+      const pr=475+Math.sin(now*2+i)*6;
+      const ppx=rcx+Math.cos(pa)*pr;
+      const ppy=rcy+Math.sin(pa)*pr;
+      X.save();X.globalAlpha=ra*0.25;
+      X.beginPath();X.arc(ppx,ppy,2,0,Math.PI*2);
+      X.fillStyle='#6366f1';X.fill();X.restore();
+    }
+
+    X.restore();
+  }
+
+  // ══ Final tagline (46-50) ══
+  const finA=easeOutExpo(P(now,46,49));
+  if(finA>0){
+    X.save();X.globalAlpha=finA;
+    X.fillStyle='rgba(8,11,22,0.97)';X.fillRect(0,0,W,H);
+    X.fillStyle='#4f46e5';X.fillRect(0,0,W,6);
+
+    X.font='800 90px "DM Sans"';X.fillStyle='#4f46e5';
+    X.textAlign='center';X.textBaseline='middle';
+    X.shadowColor='#4f46e5';X.shadowBlur=50;
+    X.fillText('STACKTIC',W/2,H/2-100);X.shadowBlur=0;
+
+    X.font='400 56px "DM Serif Display"';X.fillStyle='#e2e8f0';
+    X.fillText('Automate your entire IT. Own everything.',W/2,H/2);
+
+    X.font='500 34px "DM Sans"';X.fillStyle='#64748b';
+    X.fillText('Every component. Every relationship. Every operation.',W/2,H/2+80);
+
+    X.beginPath();X.moveTo(W/2-350,H/2+140);X.lineTo(W/2+350,H/2+140);
+    X.strokeStyle='#4f46e5';X.lineWidth=3;X.stroke();
+
+    X.font='600 30px "DM Sans"';X.fillStyle='#4f46e5';
+    X.fillText('Your data. Your infrastructure. Your jurisdiction.',W/2,H/2+190);
+
+    X.restore();
+  }
+
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stacktic — Vision</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════
+   STACKTIC · VISION — "the same sky, different constellations"
+   Canonical tokens: #0b1330, Sora 800 display, JetBrains Mono labels.
+   00 OUR VISION — a full-bleed living sky: parallax star layers,
+      nebulae, named open-source stars; each system is a
+      constellation drawn live from the same stars
+   01 the problems we set out to solve
+   tape · our beliefs as a running manifesto strip
+   02-07 OUR BELIEFS, giant ghost numerals, one diagram each
+   08 OUR UNIQUE APPROACH — encode → link → generate → operate
+   09 OUR GOAL — the creed, set like a manifesto page
+   ═══════════════════════════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg:#2A2847; --panel:#3A3663;
+  --ink:#f4f2ff; --body:#c0bcdf; --soft:#9793c0; --faint:#7b77a6;
+  --line:rgba(175,170,230,.22); --line2:rgba(175,170,230,.36);
+  --gold:#fbbf24; --sky:#38bdf8; --indigo:#818cf8; --violet:#a78bfa;
+  --amber:#f59e0b; --emerald:#34d399; --rose:#fb7185; --red:#ff4d6d;
+  --disp:'Sora',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --ease:cubic-bezier(.19,.86,.28,1);
+}
+
+html{scroll-behavior:smooth;scrollbar-width:none;-ms-overflow-style:none}
+html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
+
+/* flat base — must match the Wix site background exactly, edge to edge */
+body{font-family:var(--disp);color:var(--body);overflow-x:hidden;
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact}
+
+/* ══════════ atmosphere: masked grid only — the mask fades it out well
+   before the page edges, so the edges stay flat #2A2847 for the Wix embed ══════════ */
+.bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bgfx .grid{position:absolute;inset:0;opacity:.55;
+  background-image:linear-gradient(rgba(175,170,235,.08) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(175,170,235,.08) 1px,transparent 1px);
+  background-size:66px 66px;
+  -webkit-mask-image:radial-gradient(ellipse 70% 54% at 50% 42%,#000 22%,transparent 74%);
+  mask-image:radial-gradient(ellipse 70% 54% at 50% 42%,#000 22%,transparent 74%)}
+
+/* ══════════ chrome ══════════ */
+.prog{position:fixed;top:0;left:0;height:2px;width:0;z-index:320;
+  background:linear-gradient(90deg,var(--violet),var(--sky) 55%,var(--emerald));
+  box-shadow:0 0 14px rgba(56,189,248,.6)}
+.nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:center;
+  justify-content:space-between;gap:18px;padding:15px clamp(16px,3vw,38px);
+  background:linear-gradient(180deg,rgba(42,40,71,.94),transparent);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.brand{font-size:15px;font-weight:800;letter-spacing:-.03em;text-decoration:none;color:var(--ink);
+  display:inline-flex;gap:.4em;align-items:baseline}
+.brand i{font-style:normal;color:var(--violet)}
+.nlinks{display:flex;align-items:center;gap:clamp(11px,1.9vw,28px)}
+.nlinks a{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--faint);text-decoration:none;transition:color .3s;
+  position:relative;padding:5px 0}
+.nlinks a:hover,.nlinks a.on{color:var(--ink)}
+.nlinks a.on::after{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;
+  background:var(--emerald)}
+
+.rail{position:fixed;right:clamp(14px,2vw,30px);top:50%;transform:translateY(-50%);
+  z-index:290;display:flex;flex-direction:column;gap:13px;align-items:center}
+.rail i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);cursor:pointer;
+  transition:.4s var(--ease);display:block}
+.rail i:hover{background:rgba(255,255,255,.6);transform:scale(1.5)}
+.rail i.on{background:var(--emerald);box-shadow:0 0 14px var(--emerald);transform:scale(1.7)}
+
+/* ══════════ scene ══════════ */
+.scene{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  padding:clamp(90px,11vh,128px) clamp(18px,5vw,60px);overflow:hidden}
+.scene+.scene{border-top:1px solid var(--line)}
+.scene::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 46% at 50% 24%,
+    color-mix(in srgb,var(--ac) 6%,transparent),transparent 70%)}
+.wrap{width:100%;max-width:1220px;position:relative;z-index:2}
+
+/* giant ghost chapter numeral behind belief headlines — the magazine device */
+.ghost{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%) scale(1.14);
+  z-index:1;pointer-events:none;user-select:none;font-family:var(--disp);font-weight:800;
+  font-size:clamp(190px,38vw,520px);line-height:1;letter-spacing:-.05em;
+  color:transparent;-webkit-text-stroke:1.5px color-mix(in srgb,var(--ac) 26%,rgba(150,175,235,.16));
+  opacity:0;transition:opacity 1.4s var(--ease),transform 1.6s var(--ease)}
+.scene.in .ghost{opacity:.5;transform:translate(-50%,-50%) scale(1)}
+
+/* accent pill eyebrow with a pulsing dot */
+.eb{display:inline-flex;align-items:center;gap:.7em;font-family:var(--mono);font-size:10px;
+  font-weight:800;letter-spacing:.26em;text-transform:uppercase;color:var(--ac);
+  padding:7px 15px;border-radius:999px;
+  background:color-mix(in srgb,var(--ac) 12%,transparent);
+  border:1px solid color-mix(in srgb,var(--ac) 34%,transparent)}
+.eb::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ac);
+  box-shadow:0 0 0 0 color-mix(in srgb,var(--ac) 70%,transparent);animation:beat 2.2s infinite}
+@keyframes beat{70%{box-shadow:0 0 0 9px transparent}100%{box-shadow:0 0 0 0 transparent}}
+
+h1,h2{font-family:var(--disp);font-weight:800;letter-spacing:-.045em;color:var(--ink);
+  line-height:1.06;margin:clamp(20px,2.8vh,32px) auto 0;max-width:22ch}
+h1{font-size:clamp(36px,6vw,80px)}
+h2{font-size:clamp(30px,4.8vw,60px)}
+h1 em,h2 em{font-style:normal;color:var(--ac);
+  text-shadow:0 0 42px color-mix(in srgb,var(--ac) 42%,transparent)}
+h1 .thin,h2 .thin{font-weight:200;color:var(--soft)}
+
+/* cinematic line-mask reveal — each headline line rises out of a clip */
+.lm{display:block;overflow:hidden;padding-bottom:.16em;margin-bottom:-.16em}
+.lm>span{display:block;transform:translateY(114%);
+  transition:transform 1.05s var(--ease);transition-delay:calc(var(--d,0)*150ms)}
+.scene.in .lm>span{transform:none}
+
+.sub{font-size:clamp(13.5px,1.45vw,17px);line-height:1.8;color:var(--soft);font-weight:400;
+  max-width:64ch;margin:clamp(16px,2.2vh,24px) auto 0}
+.sub b{color:var(--ink);font-weight:600}
+.note{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--faint);margin-top:18px;line-height:1.9}
+.note b{color:var(--soft);font-weight:700}
+
+.rv{opacity:0;transform:translateY(26px);filter:blur(7px);
+  transition:opacity 1s var(--ease),transform 1s var(--ease),filter 1s var(--ease);
+  transition-delay:calc(var(--d,0)*120ms)}
+.scene.in .rv{opacity:1;transform:none;filter:none}
+.viz{width:100%;margin-top:clamp(24px,3.4vh,42px)}
+
+.btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:40px;justify-content:center}
+.btn{font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:.22em;
+  text-transform:uppercase;padding:16px 28px;border-radius:999px;text-decoration:none;
+  display:inline-flex;align-items:center;gap:.8em;transition:.4s var(--ease)}
+.btn.pri{color:#0a0f22;background:linear-gradient(110deg,var(--sky),var(--emerald));
+  box-shadow:0 14px 40px -16px var(--sky)}
+.btn.pri:hover{transform:translateY(-3px);box-shadow:0 22px 50px -16px var(--emerald)}
+.btn.sec{color:var(--body);border:1px solid var(--line2)}
+.btn.sec:hover{border-color:var(--sky);color:var(--ink);transform:translateY(-3px)}
+
+.cue{position:absolute;bottom:clamp(16px,2.6vh,28px);left:50%;transform:translateX(-50%);
+  font-family:var(--mono);font-size:8.5px;letter-spacing:.36em;color:var(--faint);
+  display:flex;flex-direction:column;align-items:center;gap:9px;text-transform:uppercase;z-index:3}
+.cue u{width:1px;height:28px;text-decoration:none;display:block;
+  background:linear-gradient(180deg,var(--faint),transparent);animation:drop 2.4s ease-in-out infinite}
+@keyframes drop{0%,100%{opacity:.25;transform:scaleY(.5);transform-origin:top}
+  50%{opacity:1;transform:scaleY(1)}}
+
+/* ══════════ 00 · OUR VISION — the sky IS the hero ══════════ */
+.scene.hero{justify-content:flex-start;min-height:100vh;
+  padding-top:clamp(96px,13vh,160px);padding-bottom:0}
+.scene.hero::before{display:none}
+#skycv{position:absolute;inset:0;width:100%;height:100%;z-index:0;display:block}
+.skyshade{position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(58% 40% at 50% 22%,rgba(42,40,71,.78),transparent 76%)}
+.scene.hero .wrap{margin-bottom:clamp(230px,36vh,430px)}
+
+.cap{position:absolute;font-family:var(--mono);font-size:9px;font-weight:700;
+  letter-spacing:.24em;text-transform:uppercase;color:var(--faint);z-index:2;pointer-events:none}
+.cap.tl{top:18px;left:clamp(16px,2.6vw,34px)}
+.cap.tr{top:18px;right:clamp(16px,2.6vw,34px);
+  color:color-mix(in srgb,var(--pc,var(--sky)) 75%,#fff);transition:color .5s}
+.cap.br{bottom:16px;right:clamp(16px,2.6vw,34px);letter-spacing:.18em}
+
+/* the atlas plate label — bottom-left, like a star-chart legend */
+.plate{position:absolute;left:clamp(16px,2.6vw,34px);bottom:clamp(16px,3.4vh,32px);
+  z-index:2;text-align:left;max-width:min(46%,430px);
+  padding:14px 17px 15px;border-radius:12px;
+  border:1px solid color-mix(in srgb,var(--pc,var(--sky)) 38%,transparent);
+  background:rgba(36,34,62,.78);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  transition:border-color .5s}
+.plate .k{display:block;font-family:var(--mono);font-size:8.5px;font-weight:800;
+  letter-spacing:.26em;text-transform:uppercase;
+  color:color-mix(in srgb,var(--pc,var(--sky)) 80%,#fff);transition:color .5s}
+.plate .n{display:block;font-size:clamp(16px,1.9vw,24px);font-weight:800;
+  letter-spacing:-.03em;color:var(--ink);margin-top:5px;line-height:1.15}
+.plate .parts{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+.plate .parts i{font-style:normal;font-family:var(--mono);font-size:8.5px;font-weight:500;
+  padding:3px 7px;border-radius:5px;
+  color:color-mix(in srgb,var(--pc,var(--sky)) 70%,#fff);
+  background:color-mix(in srgb,var(--pc,var(--sky)) 13%,transparent);
+  border:1px solid color-mix(in srgb,var(--pc,var(--sky)) 28%,transparent);
+  opacity:0;transform:translateY(6px);transition:.4s var(--ease)}
+.plate .parts i.in{opacity:1;transform:none}
+
+.picker{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:22px}
+.pk{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.04em;
+  padding:11px 17px;border-radius:999px;cursor:pointer;color:var(--body);
+  border:1px solid var(--line2);background:rgba(42,40,71,.6);
+  box-shadow:0 2px 0 rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.08);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  transition:transform .22s var(--ease),box-shadow .22s,border-color .3s,background .3s,color .3s}
+.pk:hover{transform:translateY(-2px);color:var(--ink);border-color:var(--pc)}
+.pk:active{transform:translateY(1px) scale(.99);box-shadow:inset 0 2px 5px rgba(0,0,0,.4)}
+.pk:focus-visible{outline:2px solid var(--sky);outline-offset:3px}
+.pk.on{color:#0a0f22;background:var(--pc);border-color:var(--pc);
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.25),0 0 26px -6px var(--pc)}
+
+/* ══════════ manifesto tape — our beliefs scroll past ══════════ */
+.tape{position:relative;z-index:10;border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);background:rgba(52,48,86,.6);overflow:hidden;
+  padding:15px 0;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.tape .in2{display:flex;width:max-content;animation:tape 46s linear infinite}
+.tape span{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.34em;
+  text-transform:uppercase;color:var(--faint);white-space:nowrap;padding:0 .6em}
+.tape b{color:var(--soft);font-weight:800}
+.tape em{font-style:normal;color:var(--ac2);padding:0 .8em}
+@keyframes tape{to{transform:translateX(-50%)}}
+
+/* ══════════ 01 · the problems ══════════ */
+.probs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:left}
+.pb{display:block;text-decoration:none;border-radius:13px;padding:22px 22px 20px;
+  border:1px solid rgba(255,77,109,.24);position:relative;overflow:hidden;
+  background:linear-gradient(165deg,rgba(255,77,109,.08),rgba(58,54,99,.5));
+  transition:transform .4s var(--ease),border-color .4s,box-shadow .4s}
+.pb::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;
+  background:linear-gradient(180deg,var(--red),transparent);opacity:.5}
+.pb:hover{transform:translateY(-5px);border-color:rgba(255,77,109,.55);
+  box-shadow:0 24px 50px -30px rgba(255,77,109,.5)}
+.pb .n{font-family:var(--mono);font-size:9.5px;font-weight:800;letter-spacing:.22em;
+  color:var(--red)}
+.pb .t{display:block;font-size:clamp(14.5px,1.55vw,18px);font-weight:800;color:var(--ink);
+  margin-top:11px;line-height:1.3;letter-spacing:-.025em}
+.pb .d{display:block;font-size:12px;line-height:1.65;color:var(--soft);margin-top:9px}
+.pb .a{display:flex;align-items:center;gap:8px;margin-top:15px;padding-top:13px;
+  border-top:1px solid var(--line);font-family:var(--mono);font-size:9px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--faint)}
+.pb .a b{color:var(--emerald);font-weight:800}
+.pb .a::after{content:'↓';margin-left:auto;color:var(--emerald);transition:transform .3s}
+.pb:hover .a::after{transform:translateY(3px)}
+
+/* ══════════ belief diagrams ══════════ */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,2vw,20px);text-align:left}
+.card{border-radius:14px;padding:clamp(20px,2.3vw,28px);position:relative;overflow:hidden;
+  border:1px solid color-mix(in srgb,var(--c) 28%,var(--line));
+  background:linear-gradient(165deg,color-mix(in srgb,var(--c) 10%,var(--panel)),rgba(46,43,78,.9));
+  transition:transform .45s var(--ease),box-shadow .45s}
+.card::before{content:'';position:absolute;left:0;right:0;top:0;height:2px;
+  background:linear-gradient(90deg,var(--c),transparent 70%);opacity:.65}
+.card:hover{transform:translateY(-4px);
+  box-shadow:0 30px 60px -38px color-mix(in srgb,var(--c) 60%,transparent)}
+.card>b{font-family:var(--mono);font-size:9.5px;font-weight:800;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--c);display:block}
+.card .h{font-size:clamp(15px,1.7vw,20px);font-weight:800;color:var(--ink);margin-top:12px;
+  line-height:1.3;letter-spacing:-.025em}
+.card ul{list-style:none;margin-top:16px}
+.card li{font-size:12.5px;line-height:1.6;color:var(--soft);padding:10px 0;
+  border-top:1px solid var(--line);display:grid;grid-template-columns:auto 1fr;gap:11px}
+.card li s{text-decoration:none;color:var(--c);font-weight:800}
+.card li b{color:var(--ink);font-weight:600}
+
+.four{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;text-align:left}
+.q{border-radius:13px;padding:20px 20px 22px;position:relative;overflow:hidden;
+  border:1px solid color-mix(in srgb,var(--c) 28%,var(--line));
+  background:linear-gradient(165deg,color-mix(in srgb,var(--c) 10%,var(--panel)),rgba(46,43,78,.9));
+  transition:transform .4s var(--ease),box-shadow .4s}
+.q:hover{transform:translateY(-6px);
+  box-shadow:0 30px 55px -35px color-mix(in srgb,var(--c) 65%,transparent)}
+.q .dot{width:7px;height:7px;border-radius:50%;background:var(--c);display:block;
+  box-shadow:0 0 12px var(--c)}
+.q b{display:block;margin-top:15px;font-size:clamp(14px,1.5vw,17px);font-weight:800;
+  color:var(--ink);letter-spacing:-.02em;line-height:1.25}
+.q span{display:block;margin-top:10px;font-size:12px;line-height:1.65;color:var(--soft)}
+
+/* the swap slot (belief: built to change) */
+.slot{position:relative;width:100%;max-width:1000px;margin:0 auto;aspect-ratio:1000/300;
+  container-type:inline-size;--u:1cqw;border:1px solid var(--line);border-radius:14px;
+  background:linear-gradient(165deg,rgba(58,54,99,.5),rgba(42,40,71,.2));overflow:hidden}
+.slot svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-index:1}
+.fx{position:absolute;transform:translateY(-50%);width:20%;z-index:2;text-align:left;
+  border-radius:calc(var(--u)*.7);padding:calc(var(--u)*.8) calc(var(--u)*.9);
+  border:1px solid rgba(52,211,153,.3);background:rgba(52,211,153,.08)}
+.fx b{display:block;font-family:var(--mono);font-size:max(8.5px,calc(var(--u)*.78));
+  font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--emerald)}
+.fx span{display:block;margin-top:calc(var(--u)*.3);font-size:max(11px,calc(var(--u)*1.1));
+  font-weight:600;color:var(--ink)}
+.hole{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:26%;z-index:3;
+  border:2px dashed rgba(251,191,36,.55);border-radius:calc(var(--u)*.9);
+  background:rgba(251,191,36,.08);padding:calc(var(--u)*1) calc(var(--u)*1.1);
+  min-height:calc(var(--u)*8);display:flex;flex-direction:column;justify-content:center;
+  animation:holepulse 3.4s ease-in-out infinite}
+@keyframes holepulse{0%,100%{box-shadow:0 0 0 0 rgba(251,191,36,.0)}
+  50%{box-shadow:0 0 40px -8px rgba(251,191,36,.35)}}
+.hole .k{font-family:var(--mono);font-size:max(8px,calc(var(--u)*.74));font-weight:800;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+.hole .sw{position:relative;min-height:calc(var(--u)*3.6);margin-top:calc(var(--u)*.5)}
+.opt{position:absolute;inset:0;opacity:0;transform:translateY(calc(var(--u)*.8));
+  transition:.5s var(--ease)}
+.opt.on{opacity:1;transform:none}
+.opt b{display:block;font-size:max(12px,calc(var(--u)*1.5));font-weight:800;color:var(--ink);
+  letter-spacing:-.02em}
+.opt span{display:block;margin-top:calc(var(--u)*.25);font-family:var(--mono);
+  font-size:max(9px,calc(var(--u)*.82));color:var(--soft)}
+
+/* topology → derived (belief: topology is control) */
+.derive{display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(14px,2.4vw,28px);
+  align-items:center;text-align:left}
+.hub{border-radius:14px;padding:clamp(22px,2.6vw,32px);text-align:center;
+  border:2px solid rgba(56,189,248,.45);
+  background:linear-gradient(165deg,rgba(56,189,248,.14),rgba(46,43,78,.95));
+  box-shadow:0 0 70px -30px rgba(56,189,248,.55)}
+.hub b{font-family:var(--mono);font-size:9.5px;font-weight:800;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--sky)}
+.hub .h{font-size:clamp(18px,2.2vw,28px);font-weight:800;color:var(--ink);margin-top:12px;
+  letter-spacing:-.03em;line-height:1.2}
+.hub u{display:block;text-decoration:none;margin-top:10px;font-size:12px;color:var(--soft)}
+.dlist{display:flex;flex-direction:column;gap:9px}
+.dv{display:grid;grid-template-columns:auto 1fr;gap:13px;align-items:baseline;
+  padding:14px 16px;border-radius:10px;
+  border:1px solid color-mix(in srgb,var(--c) 30%,var(--line));
+  background:color-mix(in srgb,var(--c) 8%,transparent);
+  transition:transform .35s var(--ease)}
+.dv:hover{transform:translateX(6px)}
+.dv s{text-decoration:none;color:var(--c);font-weight:800;font-family:var(--mono);font-size:11px}
+.dv b{display:block;font-size:14px;font-weight:700;color:var(--ink);letter-spacing:-.02em}
+.dv span{display:block;margin-top:5px;font-size:11.5px;line-height:1.55;color:var(--soft)}
+
+/* ══════════ 08 · OUR UNIQUE APPROACH — encode → link → generate → operate ══════════ */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;text-align:left}
+.st{position:relative;border-radius:13px;padding:22px 20px 24px;
+  border:1px solid color-mix(in srgb,var(--c) 30%,var(--line));
+  background:linear-gradient(165deg,color-mix(in srgb,var(--c) 10%,var(--panel)),rgba(46,43,78,.9));
+  transition:transform .4s var(--ease),box-shadow .4s}
+.st:hover{transform:translateY(-6px);
+  box-shadow:0 30px 55px -35px color-mix(in srgb,var(--c) 65%,transparent)}
+.st s{text-decoration:none;font-family:var(--mono);font-size:26px;font-weight:800;
+  letter-spacing:-.04em;color:var(--c);display:block;line-height:1;opacity:.9}
+.st b{display:block;margin-top:13px;font-size:clamp(15px,1.6vw,19px);font-weight:800;
+  color:var(--ink);letter-spacing:-.02em}
+.st span{display:block;margin-top:9px;font-size:12px;line-height:1.65;color:var(--soft)}
+.st::after{content:'→';position:absolute;right:-14px;top:22px;z-index:2;color:var(--c);
+  font-weight:800;font-size:16px}
+.st:last-child::after{display:none}
+
+/* ══════════ 09 · creed — set like a manifesto page ══════════ */
+.creed{max-width:1000px;margin:clamp(22px,3vh,36px) auto 0;text-align:left}
+.cr{display:grid;grid-template-columns:auto 1fr;gap:clamp(14px,3vw,40px);align-items:baseline;
+  padding:clamp(17px,2.1vw,25px) 0;border-top:1px solid var(--line)}
+.cr:last-of-type{border-bottom:1px solid var(--line)}
+.cr s{text-decoration:none;font-family:var(--mono);font-size:10px;font-weight:800;
+  letter-spacing:.2em;color:var(--faint)}
+.cr p{font-size:clamp(15px,1.9vw,24px);line-height:1.5;color:var(--body);font-weight:300;
+  letter-spacing:-.02em}
+.cr b{color:var(--ink);font-weight:700}
+.cr em{font-style:normal;font-weight:700}
+.cr:nth-child(1) em{color:var(--violet)} .cr:nth-child(2) em{color:var(--indigo)}
+.cr:nth-child(3) em{color:var(--gold)}   .cr:nth-child(4) em{color:var(--sky)}
+.cr:nth-child(5) em{color:var(--emerald)}.cr:nth-child(6) em{color:var(--rose)}
+.sig{margin-top:clamp(22px,3vh,34px);font-family:var(--mono);font-size:10px;font-weight:700;
+  letter-spacing:.3em;text-transform:uppercase;color:var(--faint)}
+.sig b{color:var(--sky);font-weight:800}
+
+/* ══════════ responsive ══════════ */
+@media (max-width:1080px){ .probs,.four{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:1fr 1fr} .st::after{display:none} }
+@media (max-width:1000px){
+  .rail{display:none}
+  .two,.derive{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  .nav{padding:13px 15px}
+  .nlinks{gap:12px}
+  .nlinks a{font-size:9px;letter-spacing:.08em}
+}
+@media (max-width:860px){
+  h1,h2{max-width:none}
+  .probs,.four,.steps{grid-template-columns:1fr}
+  .cap.tr{display:none}
+  .cap.tl{top:14px}
+  .plate{max-width:calc(100% - 30px)}
+  .scene.hero .wrap{margin-bottom:clamp(200px,30vh,340px)}
+  .ghost{font-size:56vw}
+  .slot{aspect-ratio:auto;display:flex;flex-direction:column;gap:9px;container-type:normal;
+    padding:16px}
+  .slot svg{display:none}
+  .fx,.hole{position:static!important;transform:none!important;width:100%!important;
+    min-height:0;padding:13px 15px}
+  .fx span{font-size:14px} .opt b{font-size:15px}
+  .cr{grid-template-columns:1fr;gap:7px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001s!important;transition-duration:.2s!important}
+  .lm>span{transform:none}
+  .tape .in2{animation:none}
+}
+</style>
+</head>
+<body>
+
+<div class="prog" id="prog"></div>
+<div class="bgfx" aria-hidden="true"><div class="grid"></div></div>
+
+<div class="rail">
+  <i data-t="0" class="on"></i><i data-t="1"></i><i data-t="2"></i><i data-t="3"></i>
+  <i data-t="4"></i><i data-t="5"></i><i data-t="6"></i><i data-t="7"></i>
+  <i data-t="8"></i><i data-t="9"></i>
+</div>
+
+
+<!-- ═════════ 00 · OUR VISION — the sky is the hero ═════════ -->
+<section class="scene hero" id="sc-0" data-i="0" style="--ac:var(--sky)">
+  <canvas id="skycv" aria-hidden="true"></canvas>
+  <div class="skyshade" aria-hidden="true"></div>
+  <span class="cap tl">The open-source sky · 100+ projects</span>
+  <span class="cap tr" id="captr">—</span>
+  <span class="cap br">same stars · different constellations</span>
+
+  <div class="wrap">
+    <span class="eb rv">Our vision</span>
+    <h1><span class="lm" style="--d:1"><span>Hundreds of open-source projects.</span></span>
+        <span class="lm" style="--d:2"><span><em>Unified. Automated. One&nbsp;system.</em></span></span></h1>
+    <p class="sub rv" style="--d:3">You don't build it, and you don't wire it.
+      <b>Stacktic unifies and automates hundreds of open-source projects and frameworks into
+      complex systems</b> — a private AI system, an ML platform, a bank — with the operations
+      automated, not just the install.</p>
+    <div class="picker rv" style="--d:4" id="picker" aria-label="Choose a system to draw"></div>
+  </div>
+
+  <div class="plate" id="plate" aria-live="polite">
+    <span class="k"></span><span class="n"></span><span class="parts"></span>
+  </div>
+  <div class="cue"><u></u>scroll</div>
+</section>
+
+
+<!-- ═════════ 01 · THE PROBLEMS ═════════ -->
+<section class="scene" id="sc-1" data-i="1" style="--ac:var(--red)">
+  <div class="wrap">
+    <span class="eb rv">What we set out to solve</span>
+    <h2><span class="lm" style="--d:1"><span>The problems</span></span>
+        <span class="lm" style="--d:2"><span><em>nobody had solved.</em></span></span></h2>
+    <p class="sub rv" style="--d:2">Not features we thought would sell.
+      <b>The things that actually stop open-source stacks from being run properly.</b></p>
+
+    <div class="viz">
+      <div class="probs" id="probs"></div>
+      <div class="note rv" style="--d:6">each one has an answer below</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═════════ manifesto tape ═════════ -->
+<div class="tape" aria-hidden="true" style="--ac2:var(--sky)">
+  <div class="in2" id="tape"></div>
+</div>
+
+
+<!-- ═════════ 02 · BELIEF 01 ═════════ -->
+<section class="scene" id="sc-2" data-i="2" style="--ac:var(--emerald)">
+  <span class="ghost" aria-hidden="true">01</span>
+  <div class="wrap">
+    <span class="eb rv">Our beliefs 01 · Open source</span>
+    <h2><span class="lm" style="--d:1"><span>Not the cheap option.</span></span>
+        <span class="lm" style="--d:2"><span><em>The better one.</em></span></span></h2>
+    <p class="sub rv" style="--d:2">Sovereignty is a consequence, not the reason.
+      <b>The reason is that open source is the stronger way to solve hard problems.</b></p>
+
+    <div class="viz">
+      <div class="four">
+        <div class="q rv" style="--c:var(--violet);--d:3"><span class="dot"></span>
+          <b>More advanced</b>
+          <span>The best work in databases, streaming, identity and observability happens in the
+            open first. Managed services package it later.</span></div>
+        <div class="q rv" style="--c:var(--sky);--d:4"><span class="dot"></span>
+          <b>More flexible</b>
+          <span>Every component replaceable, every version a choice. Nothing fixed because a
+            vendor's roadmap says so.</span></div>
+        <div class="q rv" style="--c:var(--gold);--d:5"><span class="dot"></span>
+          <b>More modular</b>
+          <span>Hard problems get solved by composing parts, not by waiting for one product to
+            grow a feature.</span></div>
+        <div class="q rv" style="--c:var(--emerald);--d:6"><span class="dot"></span>
+          <b>More automatable</b>
+          <span>You cannot automate what you cannot see. Open components expose their behaviour,
+            so the automation can be real.</span></div>
+      </div>
+      <div class="note rv" style="--d:7">and the same property makes it <b>portable and
+        cloud-agnostic</b> — not tied to whoever hosts it this year</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═════════ 03 · BELIEF 02 ═════════ -->
+<section class="scene" id="sc-3" data-i="3" style="--ac:var(--indigo)">
+  <span class="ghost" aria-hidden="true">02</span>
+  <div class="wrap">
+    <span class="eb rv">Our beliefs 02 · Unification</span>
+    <h2><span class="lm" style="--d:1"><span>They connect <em>in pairs</em>.</span></span>
+        <span class="lm" style="--d:2"><span class="thin">Never as a whole.</span></span></h2>
+    <p class="sub rv" style="--d:2">Strimzi runs Kafka. Debezium publishes through Kafka Connect.
+      Grafana reads Prometheus. <b>Those integrations are real — and each one stops at two.</b></p>
+
+    <div class="viz">
+      <div class="two">
+        <div class="card rv" style="--c:var(--red);--d:3">
+          <b>What exists today</b>
+          <div class="h">Working pairs, and nobody in charge of the set.</div>
+          <ul>
+            <li><s>—</s><span>Each pair wired <b>by hand</b>, by whoever knew both sides
+              that week</span></li>
+            <li><s>—</s><span>No <b>central control</b> — no one place that holds the whole</span></li>
+            <li><s>—</s><span>No <b>compatibility management</b> — does this connector work with
+              that version of that database? Nobody says</span></li>
+            <li><s>—</s><span>No <b>awareness</b> — change one thing, find out about the third
+              hop in production</span></li>
+          </ul>
+        </div>
+        <div class="card rv" style="--c:var(--emerald);--d:4">
+          <b>The missing part of the ecosystem</b>
+          <div class="h">Not more integrations. Metadata a machine can act on.</div>
+          <ul>
+            <li><s>→</s><span>What each component <b>is</b>, needs, and emits</span></li>
+            <li><s>→</s><span>Which <b>versions</b> may face each other across a link</span></li>
+            <li><s>→</s><span>Who may <b>reach</b> whom, and over what</span></li>
+            <li><s>→</s><span>What each one <b>proves</b> — the control, and the evidence</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═════════ 04 · BELIEF 03 ═════════ -->
+<section class="scene" id="sc-4" data-i="4" style="--ac:var(--gold)">
+  <span class="ghost" aria-hidden="true">03</span>
+  <div class="wrap">
+    <span class="eb rv">Our beliefs 03 · Built to change</span>
+    <h2><span class="lm" style="--d:1"><span>Adopt. Upgrade. Replace.</span></span>
+        <span class="lm" style="--d:2"><span><em>Eliminate legacy.</em></span></span></h2>
+    <p class="sub rv" style="--d:2">New technology arrives, versions move, patterns die.
+      <b>Any piece swaps out without redrawing everything around it — legacy has nowhere
+      to hide.</b></p>
+
+    <div class="viz rv" style="--d:3">
+      <div class="slot" id="slot" role="img"
+           aria-label="A stack with a slot in the middle. The components around it stay fixed and connected while the contents of the slot are swapped: the legacy engine is replaced by a newer version, a different engine, and then something that did not exist before."></div>
+      <div class="note">the links hold — <b>that is what modular actually means</b></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═════════ 05 · BELIEF 04 ═════════ -->
+<section class="scene" id="sc-5" data-i="5" style="--ac:var(--sky)">
+  <span class="ghost" aria-hidden="true">04</span>
+  <div class="wrap">
+    <span class="eb rv">Our beliefs 04 · Topology is control</span>
+    <h2><span class="lm" style="--d:1"><span>The whole map</span></span>
+        <span class="lm" style="--d:2"><span><em>is the whole control.</em></span></span></h2>
+    <p class="sub rv" style="--d:2">Once the relationships between layers are solved, the hardest
+      work stops being manual — <b>it becomes something you calculate.</b></p>
+
+    <div class="viz">
+      <div class="derive">
+        <div class="hub rv" style="--d:3">
+          <b>the topology</b>
+          <div class="h">Every component,<br>every relationship</div>
+          <u>one model of the whole system</u>
+        </div>
+        <div class="dlist">
+          <div class="dv rv" style="--c:var(--gold);--d:4"><s>→</s><div>
+            <b>Migrations</b><span>what moves, in what order, and what breaks if it does not</span>
+          </div></div>
+          <div class="dv rv" style="--c:var(--violet);--d:5"><s>→</s><div>
+            <b>Version compatibility</b><span>which versions may face each other across a link</span>
+          </div></div>
+          <div class="dv rv" style="--c:var(--rose);--d:6"><s>→</s><div>
+            <b>Security posture</b><span>who may reach whom — read off the graph, not guessed</span>
+          </div></div>
+          <div class="dv rv" style="--c:var(--emerald);--d:7"><s>→</s><div>
+            <b>Compliance evidence</b><span>the control, the component, and the proof it is applied</span>
+          </div></div>
+        </div>
+      </div>
+      <div class="note rv" style="--d:8">all of it <b>derived from the map</b> — not written down
+        and hopefully kept current</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═════════ 06 · BELIEF 05 ═════════ -->
+<section class="scene" id="sc-6" data-i="6" style="--ac:var(--emerald)">
+  <span class="ghost" aria-hidden="true">05</span>
+  <div class="wrap">
+    <span class="eb rv">Our beliefs 05 · The graph is the truth</span>
+    <h2><span class="lm" style="--d:1"><span>One graph holds the system.</span></span>
+        <span class="lm" style="--d:2"><span><em>Everything else is generated.</em></span></span></h2>
+    <p class="sub rv" style="--d:2">Not documentation someone remembers to update.
+      <b>A graph of every component, every link and every version — and the manifests,
+      diagrams and evidence generated from it.</b></p>
+
+    <div class="viz">
+      <div class="two">
+        <div class="card rv" style="--c:var(--red);--d:3">
+          <b>Where the truth lives today</b>
+          <div class="h">Four descriptions of one system, kept apart by hand.</div>
+          <ul>
+            <li><s>·</s><span>the running cluster — <b>the only one that is actually
+              true</b></span></li>
+            <li><s>·</s><span>the architecture diagram — <b>drawn once, never revisited</b></span></li>
+            <li><s>·</s><span>the written documentation — <b>correct on the day it was
+              written</b></span></li>
+            <li><s>·</s><span>the audit evidence — <b>reassembled from scratch every
+              time</b></span></li>
+          </ul>
+        </div>
+        <div class="card rv" style="--c:var(--emerald);--d:4">
+          <b>One graph, everything generated</b>
+          <div class="h">It cannot drift — there is only one of it.</div>
+          <ul>
+            <li><s>→</s><span>the <b>manifests</b></span></li>
+            <li><s>→</s><span>the <b>documentation</b></span></li>
+            <li><s>→</s><span>the <b>diagram</b></span></li>
+            <li><s>→</s><span>the <b>evidence</b>, versioned with the stack</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═════════ 07 · BELIEF 06 ═════════ -->
+<section class="scene" id="sc-7" data-i="7" style="--ac:var(--violet)">
+  <span class="ghost" aria-hidden="true">06</span>
+  <div class="wrap">
+    <span class="eb rv">Our beliefs 06 · Governed AI</span>
+    <h2><span class="lm" style="--d:1"><span>AI should be powerful.</span></span>
+        <span class="lm" style="--d:2"><span><em>And governed.</em></span></span></h2>
+    <p class="sub rv" style="--d:2">Not trusted because it sounds confident —
+      <b>constrained, validated, and leaving a trail behind it.</b></p>
+
+    <div class="viz">
+      <div class="four">
+        <div class="q rv" style="--c:var(--sky);--d:3"><span class="dot"></span>
+          <b>What it reads</b>
+          <span>The whole graph — every component, relationship and version. Not one folder
+            of YAML.</span></div>
+        <div class="q rv" style="--c:var(--indigo);--d:4"><span class="dot"></span>
+          <b>What it may do</b>
+          <span>Only what you allow, per environment. Read-only in production until you say
+            otherwise.</span></div>
+        <div class="q rv" style="--c:var(--gold);--d:5"><span class="dot"></span>
+          <b>What it must pass</b>
+          <span>Validation. The rules the relationships carry have to hold, or the change does
+            not exist.</span></div>
+        <div class="q rv" style="--c:var(--emerald);--d:6"><span class="dot"></span>
+          <b>What it leaves</b>
+          <span>A reviewable diff in Git, with the evidence — so you can see exactly what
+            it did.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═════════ 08 · OUR UNIQUE APPROACH ═════════ -->
+<section class="scene" id="sc-8" data-i="8" style="--ac:var(--gold)">
+  <div class="wrap">
+    <span class="eb rv">Our unique approach</span>
+    <h2><span class="lm" style="--d:1"><span>We don't integrate tools.</span></span>
+        <span class="lm" style="--d:2"><span><em>We encode how they relate.</em></span></span></h2>
+    <p class="sub rv" style="--d:2">Every component carries machine-readable metadata, every
+      relationship is a first-class link — <b>and the whole system, operations included,
+      is generated from that graph.</b></p>
+
+    <div class="viz">
+      <div class="steps">
+        <div class="st rv" style="--c:var(--violet);--d:3"><s>01</s>
+          <b>Encode</b>
+          <span>Every component carries machine-readable metadata — what it is, what it needs,
+            what it emits, what it proves.</span></div>
+        <div class="st rv" style="--c:var(--sky);--d:4"><s>02</s>
+          <b>Link</b>
+          <span>Relationships are first-class. A link generates real configuration — routes,
+            credentials, policies, monitoring.</span></div>
+        <div class="st rv" style="--c:var(--gold);--d:5"><s>03</s>
+          <b>Generate</b>
+          <span>The entire system is generated from the graph — manifests, documentation,
+            diagrams, evidence. Nothing written twice.</span></div>
+        <div class="st rv" style="--c:var(--emerald);--d:6"><s>04</s>
+          <b>Operate</b>
+          <span>Day-two work is calculated from the same graph — upgrades, migrations,
+            compliance, scale. Operations, automated.</span></div>
+      </div>
+      <div class="note rv" style="--d:7">one graph in — <b>a running, governed system out</b></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═════════ 09 · OUR GOAL ═════════ -->
+<section class="scene" id="sc-9" data-i="9" style="--ac:var(--sky)">
+  <div class="wrap">
+    <span class="eb rv">Our goal</span>
+    <h2><span class="lm" style="--d:1"><span>100% open-source stacks,</span></span>
+        <span class="lm" style="--d:2"><span><em>better than the managed alternative.</em></span></span></h2>
+    <p class="sub rv" style="--d:2">A managed service is this same open source — usually a version
+      behind, behind an API you did not design, priced per unit of your own traffic.
+      <b>The lock-in is not a side effect of the convenience. It is the product.</b></p>
+
+    <div class="creed">
+      <div class="cr rv" style="--d:3"><s>01</s><p>Open source is <em>more advanced, flexible and
+        modular</em> — and sovereignty comes with it, rather than being the reason for it.</p></div>
+      <div class="cr rv" style="--d:4"><s>02</s><p>The pieces already integrate, pairwise.
+        <em>Single control and awareness of the whole set</em> is the missing part of the
+        ecosystem.</p></div>
+      <div class="cr rv" style="--d:5"><s>03</s><p>It has to stay able to <em>change</em> —
+        adopt, upgrade, replace, eliminate legacy — without a rebuild.</p></div>
+      <div class="cr rv" style="--d:6"><s>04</s><p>The map is the control: <em>migrations,
+        compatibility, security and evidence are calculated</em>, not remembered.</p></div>
+      <div class="cr rv" style="--d:7"><s>05</s><p>One graph, one truth. <em>Manifests, diagrams
+        and evidence are generated — never written by hand.</em></p></div>
+      <div class="cr rv" style="--d:8"><s>06</s><p>AI works from that graph — <em>bounded,
+        validated, and leaving a diff behind it.</em></p></div>
+    </div>
+    <div class="sig rv" style="--d:9">the same stars · <b>any constellation</b></div>
+  </div>
+</section>
+
+
+<script>
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ═══════════════════════════════════════════════════════════
+   00 · THE SKY — a full-bleed living star atlas.
+   Three parallax depth-layers of dust react to the pointer,
+   nebulae drift, meteors pass. Named open-source projects are
+   fixed stars with diffraction spikes. Picking a system makes
+   its stars flare in the system's colour, draws gradient
+   constellation lines between them with energy pulses, and
+   lights an ambient glow under the figure.
+   Same sky every time — only the constellation changes.
+   ═══════════════════════════════════════════════════════════ */
+const STARS=[
+  {id:'k8s',    n:'Kubernetes', x:.13,y:.20},
+  {id:'kafka',  n:'Kafka',      x:.31,y:.11},
+  {id:'pg',     n:'PostgreSQL', x:.51,y:.16},
+  {id:'strim',  n:'Strimzi',    x:.40,y:.30},
+  {id:'dbz',    n:'Debezium',   x:.25,y:.42},
+  {id:'vllm',   n:'vLLM',       x:.63,y:.33},
+  {id:'qdrant', n:'Qdrant',     x:.78,y:.19},
+  {id:'apisix', n:'APISIX',     x:.57,y:.55},
+  {id:'kc',     n:'Keycloak',   x:.43,y:.68},
+  {id:'airflow',n:'Airflow',    x:.18,y:.60},
+  {id:'prom',   n:'Prometheus', x:.71,y:.74},
+  {id:'seaweed',n:'SeaweedFS',  x:.87,y:.48},
+  {id:'velero', n:'Velero',     x:.08,y:.82},
+  {id:'grafana',n:'Grafana',    x:.88,y:.84},
+  {id:'nextcloud',n:'Nextcloud',x:.30,y:.85},
+  {id:'mailu',  n:'Mailu',      x:.10,y:.44}
+];
+const SYSTEMS=[
+  {key:'ai', label:'A private AI system', c:'#a78bfa', cv:'var(--violet)',
+   use:['vllm','qdrant','apisix','kc','k8s','prom'],
+   edges:[['k8s','vllm'],['vllm','qdrant'],['vllm','apisix'],['apisix','kc'],['apisix','prom']],
+   parts:['model serving','vector store','AI gateway','single sign-on','autoscaling','metrics']},
+  {key:'ml', label:'An ML platform', c:'#38bdf8', cv:'var(--sky)',
+   use:['airflow','pg','seaweed','k8s','prom','grafana'],
+   edges:[['k8s','airflow'],['airflow','pg'],['pg','seaweed'],['seaweed','grafana'],['grafana','prom'],['airflow','prom']],
+   parts:['scheduled training','feature store','artifact storage','GPU scheduling','lineage','dashboards']},
+  {key:'fin', label:'A real-time ledger', c:'#fbbf24', cv:'var(--gold)',
+   use:['kafka','strim','dbz','pg','k8s','prom'],
+   edges:[['k8s','strim'],['strim','kafka'],['strim','dbz'],['dbz','pg'],['pg','prom']],
+   parts:['event streaming','change capture','schema contracts','the ledger','autoscale on lag','metrics']},
+  {key:'gov', label:'A sovereign workspace', c:'#34d399', cv:'var(--emerald)',
+   use:['nextcloud','mailu','kc','apisix','pg','velero'],
+   edges:[['velero','nextcloud'],['nextcloud','kc'],['kc','apisix'],['apisix','pg'],['mailu','kc']],
+   parts:['files','mail','single sign-on','the gateway','database','backup & restore']}
+];
+
+(function sky(){
+  const scene=$('#sc-0'), cv=$('#skycv'), bar=$('#picker'),
+        plate=$('#plate'), captr=$('#captr');
+  if(!cv) return;
+  const ctx=cv.getContext('2d');
+  const byId=Object.fromEntries(STARS.map(s=>[s.id,s]));
+  // map into the sky band: full width with margins, below the headline zone
+  STARS.forEach(s=>{ s.X=.06+s.x*.88; s.Y=.30+s.y*.66; s.a=.85; s.ta=.85; s.fl=0; });
+
+  let W=0,H=0;
+  function fit(){
+    const r=scene.getBoundingClientRect(), d=Math.min(2,devicePixelRatio||1);
+    W=r.width; H=r.height; cv.width=W*d; cv.height=H*d; ctx.setTransform(d,0,0,d,0,0);
+  }
+  fit(); new ResizeObserver(()=>{fit(); if(RM) draw(0,true);}).observe(scene);
+
+  // dust: three parallax depth layers
+  const dust=[];
+  [{n:70,f:.15,r:[.4,1],a:.5},{n:45,f:.4,r:[.7,1.5],a:.7},{n:22,f:.8,r:[1,2.1],a:.9}]
+  .forEach(L=>{ for(let i=0;i<L.n;i++) dust.push({
+    x:Math.random(), y:Math.random(), r:L.r[0]+Math.random()*(L.r[1]-L.r[0]),
+    f:L.f, base:L.a, ph:Math.random()*6.28, sp:.3+Math.random() }); });
+
+  // nebulae — slow colour clouds
+  const NEB=[{x:.20,y:.60,r:.34,c:'167,139,250'},
+             {x:.74,y:.40,r:.40,c:'56,189,248'},
+             {x:.52,y:.88,r:.30,c:'52,211,153'}];
+
+  // pointer parallax (lerped)
+  let mx=0,my=0,tx=0,ty=0;
+  scene.addEventListener('pointermove',e=>{
+    const r=scene.getBoundingClientRect();
+    tx=(e.clientX-r.left)/r.width*2-1; ty=(e.clientY-r.top)/r.height*2-1;
+  },{passive:true});
+
+  let meteors=[], nextMet=0;
+  let cur=-1, prev=-1, prevT=0, selT=0, held=false, timer=null, raf=null, visible=false;
+  const STAG=240, DUR=680;
+  const ease=p=>1-Math.pow(1-p,3);
+  const P=s=>[(s.X+mx*.012)*W,(s.Y+my*.012)*H];
+
+  function show(j){
+    prev=cur; prevT=performance.now(); cur=j; selT=prevT;
+    const S=SYSTEMS[j];
+    SYSTEMS.forEach((x,k)=>x.el.classList.toggle('on',k===j));
+    scene.style.setProperty('--pc',S.cv);
+    captr.textContent='drawing · '+S.label;
+    $('.k',plate).textContent='constellation '+String(j+1).padStart(2,'0')+' / '+String(SYSTEMS.length).padStart(2,'0');
+    $('.n',plate).textContent=S.label;
+    const parts=$('.parts',plate); parts.innerHTML='';
+    S.parts.forEach((t,k)=>{
+      const el=document.createElement('i'); el.textContent=t; parts.appendChild(el);
+      setTimeout(()=>el.classList.add('in'), RM?0:380+k*110);
+    });
+    STARS.forEach(s=>{
+      const m=S.use.includes(s.id);
+      if(m && s.ta<1) s.fl=performance.now();
+      s.ta=m?1:.3;
+    });
+  }
+
+  function drawEdges(S,t0,alpha,now,withPulse){
+    ctx.lineCap='round';
+    S.edges.forEach((e,i)=>{
+      const A=byId[e[0]], B=byId[e[1]]; if(!A||!B) return;
+      const st=t0+i*STAG, p=Math.min(1,Math.max(0,(now-st)/DUR));
+      if(p<=0) return;
+      const [ax,ay]=P(A),[bx,by]=P(B), q=ease(p);
+      const g=ctx.createLinearGradient(ax,ay,bx,by);
+      g.addColorStop(0,S.c); g.addColorStop(.5,'#e9f2ff'); g.addColorStop(1,S.c);
+      ctx.strokeStyle=g; ctx.globalAlpha=alpha; ctx.lineWidth=1.7;
+      ctx.shadowColor=S.c; ctx.shadowBlur=12;
+      ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(ax+(bx-ax)*q,ay+(by-ay)*q); ctx.stroke();
+      ctx.shadowBlur=0;
+      if(withPulse && p>=1 && !RM){
+        const t=((now-st)/1600+i*.31)%1;
+        ctx.fillStyle='#fff'; ctx.globalAlpha=alpha;
+        ctx.beginPath(); ctx.arc(ax+(bx-ax)*t,ay+(by-ay)*t,1.8,0,6.2832); ctx.fill();
+      }
+      ctx.globalAlpha=1;
+    });
+  }
+
+  function draw(now,final){
+    mx+=(tx-mx)*.04; my+=(ty-my)*.04;
+    ctx.clearRect(0,0,W,H);
+    const S=cur>=0?SYSTEMS[cur]:null;
+
+    // nebulae drift with deep parallax
+    for(const n of NEB){
+      const ox=RM?0:Math.sin(now*.00005+n.r*40)*.02,
+            oy=RM?0:Math.cos(now*.00004+n.r*30)*.02;
+      const x=(n.x+ox+mx*.03)*W, y=(n.y+oy+my*.03)*H, r=n.r*Math.max(W,H);
+      const g=ctx.createRadialGradient(x,y,0,x,y,r);
+      g.addColorStop(0,'rgba('+n.c+',.07)'); g.addColorStop(1,'rgba('+n.c+',0)');
+      ctx.fillStyle=g; ctx.fillRect(x-r,y-r,r*2,r*2);
+    }
+
+    // dust with per-layer parallax + twinkle
+    ctx.fillStyle='#cfe0ff';
+    for(const d of dust){
+      const tw=RM?.55:.3+.45*(.5+.5*Math.sin(now*.001*d.sp+d.ph));
+      ctx.globalAlpha=tw*d.base;
+      ctx.beginPath();
+      ctx.arc((d.x+mx*.02*d.f)*W,(d.y+my*.02*d.f)*H,d.r,0,6.2832); ctx.fill();
+    }
+    ctx.globalAlpha=1;
+
+    // meteors
+    if(!RM){
+      if(now>nextMet){
+        nextMet=now+4500+Math.random()*6500;
+        meteors.push({x:(.1+Math.random()*.7)*W, y:Math.random()*.3*H,
+          vx:.22+Math.random()*.1, vy:.12+Math.random()*.06, t0:now});
+      }
+      meteors=meteors.filter(m=>now-m.t0<850);
+      for(const m of meteors){
+        const t=now-m.t0, x=m.x+m.vx*t, y=m.y+m.vy*t, f=1-t/850;
+        const g=ctx.createLinearGradient(x,y,x-m.vx*160,y-m.vy*160);
+        g.addColorStop(0,'rgba(226,238,255,'+(.75*f)+')');
+        g.addColorStop(1,'rgba(226,238,255,0)');
+        ctx.strokeStyle=g; ctx.lineWidth=1.3; ctx.beginPath();
+        ctx.moveTo(x,y); ctx.lineTo(x-m.vx*160,y-m.vy*160); ctx.stroke();
+      }
+    }
+
+    // ambient glow under the current constellation figure
+    if(S){
+      let cx=0,cy=0;
+      S.use.forEach(id=>{ const [x,y]=P(byId[id]); cx+=x; cy+=y; });
+      cx/=S.use.length; cy/=S.use.length;
+      const r=Math.max(W,H)*.26;
+      const g=ctx.createRadialGradient(cx,cy,0,cx,cy,r);
+      g.addColorStop(0,S.c+'16'); g.addColorStop(1,S.c+'00');
+      ctx.fillStyle=g; ctx.fillRect(cx-r,cy-r,r*2,r*2);
+    }
+
+    // keep the page borders flat #2A2847 for the Wix embed: fade out all the
+    // soft fields (nebulae, dust, glow) within 90px of every edge
+    ctx.globalCompositeOperation='destination-out';
+    const E=90;
+    let eg=ctx.createLinearGradient(0,0,E,0);
+    eg.addColorStop(0,'#000'); eg.addColorStop(1,'transparent');
+    ctx.fillStyle=eg; ctx.fillRect(0,0,E,H);
+    eg=ctx.createLinearGradient(W,0,W-E,0);
+    eg.addColorStop(0,'#000'); eg.addColorStop(1,'transparent');
+    ctx.fillStyle=eg; ctx.fillRect(W-E,0,E,H);
+    eg=ctx.createLinearGradient(0,0,0,E);
+    eg.addColorStop(0,'#000'); eg.addColorStop(1,'transparent');
+    ctx.fillStyle=eg; ctx.fillRect(0,0,W,E);
+    eg=ctx.createLinearGradient(0,H,0,H-E);
+    eg.addColorStop(0,'#000'); eg.addColorStop(1,'transparent');
+    ctx.fillStyle=eg; ctx.fillRect(0,H-E,W,E);
+    ctx.globalCompositeOperation='source-over';
+
+    // previous constellation fades out while the new one draws in
+    if(prev>=0 && prev!==cur){
+      const f=1-Math.min(1,(now-prevT)/450);
+      if(f>0) drawEdges(SYSTEMS[prev], now-9e5, .6*f, now, false);
+      else prev=-1;
+    }
+    if(S) drawEdges(S, final?now-9e5:selT, .85, now, true);
+
+    // named stars — halo, diffraction spikes, label; members flare
+    const fs=Math.max(9.5,Math.min(12,W*.009));
+    ctx.textBaseline='middle';
+    for(const s of STARS){
+      s.a+=(s.ta-s.a)*(final?1:.08);
+      const member=S&&S.use.includes(s.id);
+      const [x,y]=P(s);
+      const flare=(s.fl&&!RM)?Math.exp(-(now-s.fl)/380):0;
+      const R=(member?3:1.9)+flare*4, L=(member?11:5)+flare*12;
+      const col=member?S.c:'#9d99c8';
+      if(member){
+        const hr=18+flare*24;
+        const g=ctx.createRadialGradient(x,y,0,x,y,hr);
+        g.addColorStop(0,S.c+'55'); g.addColorStop(1,S.c+'00');
+        ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,hr,0,6.2832); ctx.fill();
+      }
+      ctx.globalAlpha=s.a;
+      ctx.strokeStyle=col; ctx.lineWidth=1;
+      ctx.beginPath();
+      ctx.moveTo(x-L,y); ctx.lineTo(x+L,y);
+      ctx.moveTo(x,y-L); ctx.lineTo(x,y+L); ctx.stroke();
+      ctx.fillStyle=member?'#fff':col;
+      ctx.beginPath(); ctx.arc(x,y,R,0,6.2832); ctx.fill();
+      ctx.font=(member?'700 ':'500 ')+fs+"px 'JetBrains Mono',monospace";
+      ctx.fillStyle=member?S.c:'#9b97c4';
+      const right=x>W-110;
+      ctx.textAlign=right?'right':'left';
+      ctx.fillText(s.n, right?x-13:x+13, y+1);
+      ctx.globalAlpha=1;
+    }
+  }
+
+  function loop(now){ if(!visible){raf=null;return;} draw(now,false); raf=requestAnimationFrame(loop); }
+
+  SYSTEMS.forEach((S,j)=>{
+    const b=document.createElement('button');
+    b.className='pk'; b.type='button'; b.style.setProperty('--pc',S.cv);
+    b.textContent=S.label;
+    b.addEventListener('click',()=>{ held=true; clearTimeout(timer); show(j);
+      if(RM) draw(0,true); });
+    bar.appendChild(b); S.el=b;
+  });
+
+  function cycle(){ if(held) return;
+    show(cur<0?0:(cur+1)%SYSTEMS.length);
+    timer=setTimeout(cycle,6200); }
+
+  new IntersectionObserver(es=>es.forEach(e=>{
+    visible=e.isIntersecting;
+    if(visible){
+      if(cur<0){ if(RM){ show(0); draw(0,true); return; } cycle(); }
+      if(!RM && !raf) raf=requestAnimationFrame(loop);
+    }
+  }),{threshold:.15}).observe(scene);
+})();
+
+
+/* ═══════════ manifesto tape ═══════════ */
+(function tape(){
+  const t=$('#tape'); if(!t) return;
+  const seq='<b>Our beliefs</b><em>✦</em>Open source<em>✦</em>Unification<em>✦</em>'+
+    'Built to change<em>✦</em>Topology is control<em>✦</em>The graph is the truth<em>✦</em>'+
+    'Governed AI<em>✦</em>';
+  t.innerHTML='<span>'+(seq+seq)+'</span>';
+})();
+
+
+/* ═══════════ 01 · the problems, each pointing at its belief ═══════════ */
+const PROBS=[
+  {t:'AI with nothing validating it',
+   d:'It produces confidently and at speed. Nothing checks the result against the real system before it lands.',
+   a:'Governed AI', to:'sc-7'},
+  {t:'Open source that does not agree with itself',
+   d:'Every piece is excellent alone. Which versions work together, and how they wire up, is nobody’s job.',
+   a:'Unification', to:'sc-3'},
+  {t:'Relationships with no graph',
+   d:'The links are real — inside one stack and across several — but no machine holds them. They live in people’s heads.',
+   a:'Topology is control', to:'sc-5'},
+  {t:'Compliance assembled by hand',
+   d:'Controls gathered and evidence collected in the weeks before an audit, then left to rot until the next.',
+   a:'Topology is control', to:'sc-5'},
+  {t:'Day two, manual for ever',
+   d:'Upgrades, migrations, certificates and backups — work that never ends and never gets automated.',
+   a:'Built to change', to:'sc-4'},
+  {t:'Systems with no map',
+   d:'No graph, no metadata — the architecture is a slide from two years ago. Only the running cluster knows the truth.',
+   a:'The graph is the truth', to:'sc-6'}
+];
+(function probs(){
+  const g=$('#probs'); if(!g) return;
+  PROBS.forEach((P,k)=>{
+    const a=document.createElement('a');
+    a.className='pb rv'; a.href='#'+P.to; a.style.setProperty('--d',k+3);
+    a.innerHTML=`<span class="n">${String(k+1).padStart(2,'0')}</span>
+      <span class="t">${P.t}</span><span class="d">${P.d}</span>
+      <span class="a">our answer &nbsp;<b>${P.a}</b></span>`;
+    g.appendChild(a);
+  });
+})();
+
+
+/* ═══════════ 04 · the swappable slot ═══════════ */
+(function slot(){
+  const host=$('#slot'); if(!host) return;
+  const NS='http://www.w3.org/2000/svg';
+  const W=1000,H=300;
+  const svg=document.createElementNS(NS,'svg');
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  svg.setAttribute('preserveAspectRatio','none');
+  host.appendChild(svg);
+
+  const FIX=[{b:'stays',n:'the services around it',x:'3%',y:'28%'},
+             {b:'stays',n:'its identity and access',x:'3%',y:'72%'},
+             {b:'stays',n:'its monitoring',x:'77%',y:'28%'},
+             {b:'stays',n:'its backups',x:'77%',y:'72%'}];
+  FIX.forEach(f=>{
+    const d=document.createElement('div');
+    d.className='fx'; d.style.cssText=`left:${f.x};top:${f.y}`;
+    d.innerHTML=`<b>${f.b}</b><span>${f.n}</span>`;
+    host.appendChild(d);
+  });
+  [[23,28,37,44],[23,72,37,56],[77,28,63,44],[77,72,63,56]].forEach(([x1,y1,x2,y2])=>{
+    const p=document.createElementNS(NS,'path');
+    const mx=(x1+x2)/2/100*W;
+    p.setAttribute('d',`M${x1/100*W},${y1/100*H} C${mx},${y1/100*H} ${mx},${y2/100*H} ${x2/100*W},${y2/100*H}`);
+    p.setAttribute('fill','none'); p.setAttribute('stroke','#34d399');
+    p.setAttribute('stroke-opacity','.45'); p.setAttribute('stroke-width','1.6');
+    svg.appendChild(p);
+  });
+
+  const OPTS=[
+    {b:'the legacy engine', s:'where every stack starts'},
+    {b:'a newer version',   s:'upgraded — same links'},
+    {b:'a different engine',s:'replaced, and it still fits'},
+    {b:'something new',     s:'a technology that did not exist last year'}
+  ];
+  host.insertAdjacentHTML('beforeend',
+    `<div class="hole"><span class="k">this slot</span><div class="sw">${
+      OPTS.map((o,k)=>`<div class="opt${k===0?' on':''}"><b>${o.b}</b><span>${o.s}</span></div>`).join('')
+    }</div></div>`);
+
+  const els=$$('.opt',host); let i=0;
+  function tick(){ els.forEach((e,k)=>e.classList.toggle('on',k===i)); i=(i+1)%els.length;
+    setTimeout(tick,2600); }
+  new IntersectionObserver((es,ob)=>es.forEach(e=>{
+    if(e.isIntersecting){ setTimeout(tick,900); ob.disconnect(); }
+  }),{threshold:.3}).observe(host);
+})();
+
+
+/* ═══════════ chrome ═══════════ */
+const scenes=$$('.scene'), rail=$$('.rail i'), prog=$('#prog');
+const seen=new IntersectionObserver(es=>{
+  es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); });
+},{threshold:.12});
+scenes.forEach(s=>seen.observe(s));
+
+const active=new IntersectionObserver(es=>{
+  es.forEach(e=>{
+    if(!e.isIntersecting) return;
+    const i=+e.target.dataset.i;
+    rail.forEach(r=>r.classList.toggle('on',+r.dataset.t===i));
+  });
+},{threshold:.45});
+scenes.forEach(s=>active.observe(s));
+
+rail.forEach(r=>r.addEventListener('click',()=>{
+  const s=$('#sc-'+r.dataset.t); if(s) s.scrollIntoView({behavior:'smooth'});
+}));
+
+addEventListener('scroll',()=>{
+  const h=document.documentElement;
+  prog.style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';
+},{passive:true});
+</script>
+</body>
+</html>

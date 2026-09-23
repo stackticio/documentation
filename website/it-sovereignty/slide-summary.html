@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>IT Sovereignty Summary — Stacktic</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&family=DM+Serif+Display&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{width:1440px;height:810px;overflow:hidden;font-family:'DM Sans',sans-serif;background:#080b16}
+  canvas{display:block}
+</style>
+</head>
+<body>
+<canvas id="c" width="2880" height="1620"></canvas>
+<script>
+const C=document.getElementById('c');
+C.style.width='1440px';C.style.height='810px';
+const X=C.getContext('2d');
+const W=2880,H=1620;
+
+// ─── Easing ───
+function easeOutExpo(t){return t===1?1:1-Math.pow(2,-10*t)}
+function easeOutBack(t){const c=1.7;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2)}
+function easeInOutCubic(t){return t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}
+function easeOutElastic(t){if(t===0||t===1)return t;return Math.pow(2,-10*t)*Math.sin((t-0.075)*2*Math.PI/0.3)+1}
+function easeOutCubic(t){return 1-Math.pow(1-t,3)}
+function clamp01(t){return Math.max(0,Math.min(1,t))}
+function lerp(a,b,t){return a+(b-a)*t}
+function P(n,f,t){return clamp01((n-f)/(t-f))}
+
+// ─── Section timing (base offsets) ───
+const S0=0;    // HERO
+const S1=11;   // PILLAR 1: Licensing
+const S2=28;   // PILLAR 1b: Infra Cost Reduction (NEW)
+const S3=45;   // PILLAR 2: M&A Carve-Out
+const S4=62;   // PILLAR 3: AI Adoption
+const S5=79;   // PILLAR 4: Sovereignty
+const S6=96;   // GRAND FINALE
+
+// ─── OSS Tool icons ───
+const ossTools=[
+  {name:'SuiteCRM',short:'CRM',color:'#ef4444',cat:'app'},
+  {name:'ERPNext',short:'ERP',color:'#f97316',cat:'app'},
+  {name:'Stalwart',short:'MAIL',color:'#06b6d4',cat:'app'},
+  {name:'ONLYOFFICE',short:'DOCS',color:'#8b5cf6',cat:'app'},
+  {name:'Rocket.Chat',short:'CHAT',color:'#3b82f6',cat:'app'},
+  {name:'Jitsi',short:'VIDEO',color:'#22d3ee',cat:'app'},
+  {name:'n8n',short:'n8n',color:'#f472b6',cat:'app'},
+  {name:'Metabase',short:'BI',color:'#0ea5e9',cat:'app'},
+  {name:'PostgreSQL',short:'PG',color:'#336791',cat:'data'},
+  {name:'MongoDB',short:'MDB',color:'#47A248',cat:'data'},
+  {name:'SeaweedFS',short:'S3',color:'#10b981',cat:'data'},
+  {name:'Redis',short:'RDS',color:'#DC382D',cat:'data'},
+  {name:'RabbitMQ',short:'RMQ',color:'#FF6600',cat:'data'},
+  {name:'APISIX',short:'GW',color:'#f43f5e',cat:'platform'},
+  {name:'Keycloak',short:'SSO',color:'#6366f1',cat:'platform'},
+  {name:'Cert-Manager',short:'TLS',color:'#14b8a6',cat:'platform'},
+  {name:'CoreDNS',short:'DNS',color:'#0ea5e9',cat:'platform'},
+  {name:'Prometheus',short:'MON',color:'#f59e0b',cat:'ops'},
+  {name:'Grafana',short:'LOG',color:'#84cc16',cat:'ops'},
+  {name:'Velero',short:'BAK',color:'#64748b',cat:'ops'},
+  {name:'Ollama',short:'LLM',color:'#d946ef',cat:'ai'},
+  {name:'Milvus',short:'VDB',color:'#f472b6',cat:'ai'},
+  {name:'LangFlow',short:'RAG',color:'#fb923c',cat:'ai'},
+  {name:'Open WebUI',short:'UI',color:'#818cf8',cat:'ai'},
+];
+ossTools.forEach((t,i)=>{
+  t.phase=Math.random()*Math.PI*2;
+  t.orbitSpeed=0.15+Math.random()*0.2;
+  t.orbitR=250+Math.random()*350;
+  t.baseAngle=i*(Math.PI*2/ossTools.length);
+});
+
+// ─── Particle class ───
+class Spark{
+  constructor(x,y,color,vx,vy,life){
+    this.x=x;this.y=y;this.color=color;this.vx=vx;this.vy=vy;
+    this.life=life;this.max=life;this.size=1+Math.random()*3;
+  }
+  update(dt){this.x+=this.vx*dt;this.y+=this.vy*dt;this.life-=dt;}
+  draw(a){
+    if(this.life<=0)return;
+    X.save();X.globalAlpha=a*(this.life/this.max);
+    X.beginPath();X.arc(this.x,this.y,this.size,0,Math.PI*2);
+    X.fillStyle=this.color;X.shadowColor=this.color;X.shadowBlur=8;
+    X.fill();X.restore();
+  }
+}
+let sparks=[];
+function burst(x,y,c,n,s){
+  for(let i=0;i<n;i++){
+    const a=Math.random()*Math.PI*2,sp=s*(0.3+Math.random());
+    sparks.push(new Spark(x,y,c,Math.cos(a)*sp,Math.sin(a)*sp,1+Math.random()*1.5));
+  }
+}
+
+// ─── Background ───
+const ambDots=[];
+for(let i=0;i<60;i++) ambDots.push({
+  x:Math.random()*W,y:Math.random()*H,
+  vx:(Math.random()-0.5)*10,vy:(Math.random()-0.5)*10,
+  ph:Math.random()*Math.PI*2,
+  c:['#4f46e5','#7c3aed','#0891b2','#059669'][Math.floor(Math.random()*4)]
+});
+
+function drawBG(now){
+  const bg=X.createRadialGradient(W/2,H/2,100,W/2,H/2,W*0.7);
+  bg.addColorStop(0,'#0d1025');bg.addColorStop(1,'#080b16');
+  X.fillStyle=bg;X.fillRect(0,0,W,H);
+  X.save();X.globalAlpha=0.02;X.fillStyle='#4f46e5';
+  for(let gx=0;gx<W;gx+=60)for(let gy=0;gy<H;gy+=60){X.beginPath();X.arc(gx,gy,1,0,Math.PI*2);X.fill();}
+  X.restore();
+  ambDots.forEach(d=>{
+    d.x+=d.vx*0.016;d.y+=d.vy*0.016;
+    if(d.x<0||d.x>W)d.vx*=-1;if(d.y<0||d.y>H)d.vy*=-1;
+    X.save();X.globalAlpha=0.06*(0.5+0.5*Math.sin(now*0.5+d.ph));
+    X.beginPath();X.arc(d.x,d.y,1.5,0,Math.PI*2);X.fillStyle=d.c;X.fill();X.restore();
+  });
+}
+
+function drawToolNode(x,y,tool,alpha,scale,showName){
+  if(alpha<0.01)return;
+  const s=scale||1, R=28*s;
+  X.save();X.globalAlpha=alpha;
+  const g=X.createRadialGradient(x,y,R*0.3,x,y,R*2);
+  g.addColorStop(0,tool.color+'20');g.addColorStop(1,tool.color+'00');
+  X.beginPath();X.arc(x,y,R*2,0,Math.PI*2);X.fillStyle=g;X.fill();
+  X.beginPath();X.arc(x,y,R,0,Math.PI*2);
+  X.fillStyle=tool.color+'15';X.strokeStyle=tool.color+'80';X.lineWidth=2*s;
+  X.fill();X.stroke();
+  X.font=`700 ${Math.round(16*s)}px "DM Sans"`;X.fillStyle=tool.color;
+  X.textAlign='center';X.textBaseline='middle';
+  X.fillText(tool.short,x,y);
+  if(showName){
+    X.font=`400 ${Math.round(13*s)}px "DM Sans"`;X.fillStyle=tool.color+'90';
+    X.fillText(tool.name,x,y+R+14*s);
+  }
+  X.restore();
+}
+
+function drawEnergyLine(x1,y1,x2,y2,color,alpha,now,idx){
+  if(alpha<0.01)return;
+  X.save();X.globalAlpha=alpha*0.4;
+  X.beginPath();X.moveTo(x1,y1);X.lineTo(x2,y2);
+  X.strokeStyle=color+'60';X.lineWidth=1.5;
+  X.shadowColor=color;X.shadowBlur=8;X.stroke();X.shadowBlur=0;
+  const t=((now*0.5+idx*0.2)%1);
+  const dx=lerp(x1,x2,t),dy=lerp(y1,y2,t);
+  X.globalAlpha=alpha*0.7*Math.sin(t*Math.PI);
+  X.beginPath();X.arc(dx,dy,3,0,Math.PI*2);
+  X.fillStyle=color;X.shadowColor=color;X.shadowBlur=10;X.fill();
+  X.restore();
+}
+
+function drawTopBar(a){
+  if(a<0.01)return;
+  X.save();X.globalAlpha=a;
+  X.fillStyle='#4f46e5';X.fillRect(0,0,W,6);
+  X.font='700 24px "DM Sans"';X.fillStyle='#4f46e5';
+  X.textAlign='left';X.textBaseline='top';
+  X.fillText('STACKTIC',60,20);
+  X.font='400 20px "DM Sans"';X.fillStyle='#475569';
+  X.fillText('IT Sovereignty',220,22);
+  X.restore();
+}
+
+// ═══════════════════════════════════════════
+// TIMELINE — 5 SECTIONS + finale (+5s each)
+//  0-11    HERO
+// 11-28    PILLAR 1: Elimination of Licensing Cost
+// 28-45    PILLAR 1b: Infrastructure Cost Reduction (NEW)
+// 45-62    PILLAR 2: M&A Carve-Out
+// 62-79    PILLAR 3: AI Adoption & Private AI
+// 79-96    PILLAR 4: Sovereignty Strategy
+// 96-110   GRAND FINALE
+// ═══════════════════════════════════════════
+
+let startTime=0,lastTime=0;
+
+function frame(ts){
+  if(!startTime)startTime=ts;
+  const now=(ts-startTime)/1000;
+  const dt=lastTime?Math.min((ts-lastTime)/1000,0.05):0.016;
+  lastTime=ts;
+
+  X.clearRect(0,0,W,H);
+  drawBG(now);
+
+  sparks.forEach(s=>s.update(dt));
+  sparks=sparks.filter(s=>s.life>0);
+
+  // ══════════════════════════════════════
+  // HERO: Tool constellation (0-11)
+  // ══════════════════════════════════════
+  const heroIn=easeOutExpo(P(now,S0,S0+2));
+  const heroOut=1-easeOutExpo(P(now,S0+9,S0+11));
+  const heroA=heroIn*Math.max(heroOut,0);
+
+  if(heroA>0.01){
+    const cx=W/2,cy=H/2;
+
+    X.save();X.globalAlpha=heroA*0.5;
+    const cg=X.createRadialGradient(cx,cy,30,cx,cy,500);
+    cg.addColorStop(0,'rgba(79,70,229,0.2)');cg.addColorStop(1,'rgba(79,70,229,0)');
+    X.beginPath();X.arc(cx,cy,500,0,Math.PI*2);X.fillStyle=cg;X.fill();
+    X.restore();
+
+    X.save();X.globalAlpha=heroA*0.15;
+    X.beginPath();X.arc(cx,cy,400,0,Math.PI*2);
+    X.strokeStyle='#4f46e5';X.lineWidth=1.5;X.stroke();
+    const arcS=now*0.3;
+    X.beginPath();X.arc(cx,cy,400,arcS,arcS+Math.PI*0.6);
+    X.strokeStyle='#4f46e5';X.lineWidth=4;X.globalAlpha=heroA*0.4;
+    X.shadowColor='#4f46e5';X.shadowBlur=15;X.stroke();X.shadowBlur=0;
+    X.restore();
+
+    ossTools.forEach((t,i)=>{
+      const delay=i*0.08;
+      const tIn=easeOutElastic(P(now,S0+0.3+delay,S0+1.5+delay));
+      const angle=t.baseAngle+now*t.orbitSpeed*0.3;
+      const r=t.orbitR*0.8;
+      const tx=cx+Math.cos(angle)*r;
+      const ty=cy+Math.sin(angle)*r*0.55;
+      drawToolNode(tx,ty,t,heroA*tIn,0.9,false);
+      if(i>0&&i%3===0){
+        const prev=ossTools[i-1];
+        const pa=prev.baseAngle+now*prev.orbitSpeed*0.3;
+        const pr2=prev.orbitR*0.8;
+        drawEnergyLine(tx,ty,cx+Math.cos(pa)*pr2,cy+Math.sin(pa)*pr2*0.55,t.color,heroA*tIn*0.3,now,i);
+      }
+    });
+
+    const titleIn=easeOutBack(P(now,S0+1,S0+3));
+    X.save();X.globalAlpha=heroA*titleIn;
+    const tbg=X.createRadialGradient(cx,cy,100,cx,cy,350);
+    tbg.addColorStop(0,'rgba(8,11,22,0.85)');tbg.addColorStop(1,'rgba(8,11,22,0)');
+    X.beginPath();X.arc(cx,cy,350,0,Math.PI*2);X.fillStyle=tbg;X.fill();
+    X.font='800 130px "DM Sans"';X.fillStyle='#4f46e5';
+    X.textAlign='center';X.textBaseline='middle';
+    X.shadowColor='#4f46e5';X.shadowBlur=60;
+    X.fillText('STACKTIC',cx,cy-30);X.shadowBlur=0;
+    X.font='400 44px "DM Serif Display"';X.fillStyle='#94a3b8';
+    X.fillText('IT Sovereignty',cx,cy+60);
+    X.restore();
+  }
+
+  // ══════════════════════════════════════
+  // PILLAR 1: ELIMINATION OF LICENSING COST (11-28)
+  // ══════════════════════════════════════
+  const p1In=easeOutExpo(P(now,S1,S1+2));
+  const p1Out=1-easeOutExpo(P(now,S1+15,S1+17));
+  const p1A=p1In*Math.max(p1Out,0);
+
+  if(p1A>0.01){
+    X.save();X.globalAlpha=p1A;
+    drawTopBar(p1A);
+
+    X.save();X.globalAlpha=p1A*0.06;
+    X.font='800 600px "DM Sans"';X.fillStyle='#4f46e5';
+    X.textAlign='right';X.textBaseline='top';
+    X.fillText('01',W-40,50);
+    X.restore();
+
+    const t1=easeOutBack(P(now,S1+0.5,S1+2));
+    X.save();X.globalAlpha=p1A*t1;
+    X.font='800 72px "DM Sans"';X.fillStyle='#e2e8f0';
+    X.textAlign='left';X.textBaseline='middle';
+    X.fillText('Elimination of',120,160);
+    X.fillStyle='#4f46e5';X.shadowColor='#4f46e5';X.shadowBlur=30;
+    X.fillText('Licensing Cost',120,240);
+    X.shadowBlur=0;
+    X.restore();
+
+    const saasTools=['Salesforce','Microsoft 365','Slack','Google Workspace','Jira','Confluence','Zoom','Datadog'];
+    const saasColors=['#00A1E0','#D83B01','#4A154B','#4285F4','#0052CC','#172B4D','#2D8CFF','#632CA6'];
+
+    const saasX=350,saasStartY=380;
+    saasTools.forEach((s,i)=>{
+      const sIn=easeOutExpo(P(now,S1+1.5+i*0.3,S1+2.5+i*0.3));
+      const sCross=easeOutCubic(P(now,S1+5+i*0.2,S1+6.5+i*0.2));
+      X.save();X.globalAlpha=p1A*sIn*(1-sCross*0.6);
+      const sy=saasStartY+i*65;
+      X.beginPath();X.roundRect(saasX,sy,500,50,8);
+      X.fillStyle='rgba(30,30,50,0.5)';X.fill();
+      X.strokeStyle=saasColors[i]+'40';X.lineWidth=1.5;X.stroke();
+      X.beginPath();X.arc(saasX+25,sy+25,8,0,Math.PI*2);
+      X.fillStyle=saasColors[i];X.fill();
+      X.font='500 24px "DM Sans"';X.fillStyle='#94a3b8';
+      X.textAlign='left';X.textBaseline='middle';
+      X.fillText(s,saasX+45,sy+25);
+      X.font='600 20px "DM Sans"';X.fillStyle='#ef4444';
+      X.textAlign='right';
+      X.fillText('$'+Math.floor(15+Math.random()*45)+'/user/mo',saasX+490,sy+25);
+      if(sCross>0.01){
+        X.globalAlpha=p1A*sCross;
+        X.beginPath();X.moveTo(saasX+10,sy+25);X.lineTo(saasX+490,sy+25);
+        X.strokeStyle='#ef4444';X.lineWidth=3;X.stroke();
+      }
+      X.restore();
+    });
+
+    const arrowA=easeOutExpo(P(now,S1+6,S1+8))*p1A;
+    if(arrowA>0.01){
+      X.save();X.globalAlpha=arrowA;
+      const ax=950,ay=H/2+20;
+      X.beginPath();X.moveTo(ax,ay-40);X.lineTo(ax+120,ay);X.lineTo(ax,ay+40);
+      X.strokeStyle='#059669';X.lineWidth=5;
+      X.shadowColor='#059669';X.shadowBlur=20;X.stroke();X.shadowBlur=0;
+      X.font='700 28px "DM Sans"';X.fillStyle='#059669';
+      X.textAlign='center';X.fillText('REPLACE',ax+60,ay-60);
+      X.restore();
+    }
+
+    const ossReplacements=[ossTools[0],ossTools[1],ossTools[4],ossTools[7],ossTools[3],ossTools[5],ossTools[6],ossTools[17]];
+    const ossX=1180,ossStartY=380;
+    ossReplacements.forEach((t,i)=>{
+      const oIn=easeOutElastic(P(now,S1+6.5+i*0.35,S1+8+i*0.35));
+      X.save();X.globalAlpha=p1A*oIn;
+      const oy=ossStartY+i*65;
+      X.beginPath();X.roundRect(ossX,oy,560,50,8);
+      X.fillStyle='rgba(15,20,35,0.6)';X.fill();
+      X.strokeStyle=t.color+'40';X.lineWidth=1.5;X.stroke();
+      X.beginPath();X.arc(ossX+25,oy+25,10,0,Math.PI*2);
+      X.fillStyle=t.color+'20';X.strokeStyle=t.color;X.lineWidth=1.5;X.fill();X.stroke();
+      X.font='700 11px "DM Sans"';X.fillStyle=t.color;
+      X.textAlign='center';X.textBaseline='middle';
+      X.fillText(t.short,ossX+25,oy+25);
+      X.font='500 24px "DM Sans"';X.fillStyle='#e2e8f0';
+      X.textAlign='left';
+      X.fillText(t.name,ossX+48,oy+25);
+      X.font='700 18px "DM Sans"';X.fillStyle='#059669';
+      X.textAlign='right';
+      X.fillText('OPEN SOURCE',ossX+550,oy+25);
+      X.restore();
+      if(Math.abs(oIn-0.5)<0.08&&sparks.length<150) burst(ossX+25,oy+25,t.color,4,60);
+    });
+
+    const savIn=easeOutElastic(P(now,S1+10,S1+12))*p1A;
+    if(savIn>0.01){
+      X.save();X.globalAlpha=savIn;
+      const sx=W/2+450,sy=250;
+      const sg=X.createRadialGradient(sx,sy,20,sx,sy,200);
+      sg.addColorStop(0,'rgba(5,150,105,0.15)');sg.addColorStop(1,'rgba(5,150,105,0)');
+      X.beginPath();X.arc(sx,sy,200,0,Math.PI*2);X.fillStyle=sg;X.fill();
+      X.font='800 100px "DM Sans"';X.fillStyle='#059669';
+      X.textAlign='center';X.textBaseline='middle';
+      X.shadowColor='#059669';X.shadowBlur=40;
+      X.fillText('$M+',sx,sy-10);X.shadowBlur=0;
+      X.font='600 30px "DM Sans"';X.fillStyle='#94a3b8';
+      X.fillText('Licensing Eliminated',sx,sy+60);
+      X.font='400 24px "DM Sans"';X.fillStyle='#64748b';
+      X.fillText('Zero per-user fees. Fixed infra cost.',sx,sy+100);
+      X.restore();
+    }
+
+    if(now>S1+8){
+      const connA=easeOutExpo(P(now,S1+8,S1+10))*p1A*0.2;
+      for(let i=0;i<ossReplacements.length-1;i++){
+        const y1=ossStartY+i*65+25,y2=ossStartY+(i+1)*65+25;
+        X.save();X.globalAlpha=connA;
+        X.beginPath();X.moveTo(ossX+560,y1);
+        X.quadraticCurveTo(ossX+620,((y1+y2)/2),ossX+560,y2);
+        X.strokeStyle=ossReplacements[i].color+'40';X.lineWidth=1.5;X.stroke();
+        X.restore();
+      }
+    }
+
+    X.restore();
+  }
+
+  // ══════════════════════════════════════
+  // PILLAR 1b: INFRA COST REDUCTION (28-45) — NEW
+  // ══════════════════════════════════════
+  const irIn=easeOutExpo(P(now,S2,S2+2));
+  const irOut=1-easeOutExpo(P(now,S2+15,S2+17));
+  const irA=irIn*Math.max(irOut,0);
+
+  if(irA>0.01){
+    X.save();X.globalAlpha=irA;
+    drawTopBar(irA);
+
+    // Section number watermark
+    X.save();X.globalAlpha=irA*0.06;
+    X.font='800 600px "DM Sans"';X.fillStyle='#7c3aed';
+    X.textAlign='right';X.textBaseline='top';
+    X.fillText('02',W-40,50);
+    X.restore();
+
+    // Title
+    const irT=easeOutBack(P(now,S2+0.5,S2+2));
+    X.save();X.globalAlpha=irA*irT;
+    X.font='800 72px "DM Sans"';X.fillStyle='#e2e8f0';
+    X.textAlign='center';X.textBaseline='middle';
+    X.fillText('Infrastructure',W/2,130);
+    X.fillStyle='#7c3aed';X.shadowColor='#7c3aed';X.shadowBlur=30;
+    X.fillText('Cost Reduction',W/2,210);
+    X.shadowBlur=0;
+    X.restore();
+
+    // ── LEFT: SaaS model (per-user scaling bars going UP) ──
+    const leftX=200,leftCx=580;
+    const modelIn=easeOutCubic(P(now,S2+2,S2+4));
+
+    if(modelIn>0.01){
+      X.save();X.globalAlpha=irA*modelIn;
+
+      // "SaaS Model" label
+      X.font='700 32px "DM Sans"';X.fillStyle='#ef4444';
+      X.textAlign='center';X.textBaseline='middle';
+      X.fillText('SaaS Model',leftCx,340);
+      X.font='400 24px "DM Sans"';X.fillStyle='#64748b';
+      X.fillText('Cost scales with every user',leftCx,380);
+
+      // Animated rising bars (cost grows with headcount)
+      const barLabels=['100','500','1K','5K','10K'];
+      const barHeights=[80,200,320,500,700];
+      const barW=100,barGap=30;
+      const bStartX=leftX+60;
+      const bBaseY=1100;
+
+      barLabels.forEach((lbl,bi)=>{
+        const bIn=easeOutCubic(P(now,S2+3+bi*0.6,S2+5+bi*0.6));
+        X.save();X.globalAlpha=irA*modelIn*bIn;
+        const bx=bStartX+bi*(barW+barGap);
+        const bh=barHeights[bi]*bIn;
+
+        // bar
+        const barGrad=X.createLinearGradient(bx,bBaseY,bx,bBaseY-bh);
+        barGrad.addColorStop(0,'#ef444430');barGrad.addColorStop(1,'#ef4444');
+        X.beginPath();X.roundRect(bx,bBaseY-bh,barW,bh,6);
+        X.fillStyle=barGrad;X.fill();
+
+        // cost label on top
+        const cost=['$2K','$10K','$20K','$100K','$200K'][bi];
+        X.font='700 20px "DM Sans"';X.fillStyle='#ef4444';
+        X.textAlign='center';
+        X.fillText(cost,bx+barW/2,bBaseY-bh-15);
+
+        // headcount label at bottom
+        X.font='500 18px "DM Sans"';X.fillStyle='#64748b';
+        X.fillText(lbl+' users',bx+barW/2,bBaseY+25);
+
+        X.restore();
+      });
+
+      // rising arrow
+      const arrowIn=easeOutExpo(P(now,S2+6,S2+8));
+      if(arrowIn>0.01){
+        X.save();X.globalAlpha=irA*arrowIn*0.6;
+        X.beginPath();X.moveTo(bStartX-20,bBaseY);X.lineTo(bStartX-20,bBaseY-750);
+        X.strokeStyle='#ef4444';X.lineWidth=2;X.setLineDash([6,4]);X.stroke();X.setLineDash([]);
+        X.beginPath();X.moveTo(bStartX-28,bBaseY-740);X.lineTo(bStartX-20,bBaseY-760);X.lineTo(bStartX-12,bBaseY-740);
+        X.strokeStyle='#ef4444';X.lineWidth=2;X.stroke();
+        X.font='600 20px "DM Sans"';X.fillStyle='#ef4444';
+        X.textAlign='center';
+        X.save();X.translate(bStartX-45,bBaseY-400);X.rotate(-Math.PI/2);
+        X.fillText('COST KEEPS GROWING',0,0);X.restore();
+        X.restore();
+      }
+
+      X.restore();
+    }
+
+    // ── ARROW between models ──
+    const swapA=easeOutExpo(P(now,S2+6,S2+8))*irA;
+    if(swapA>0.01){
+      X.save();X.globalAlpha=swapA;
+      const mx=W/2,my=700;
+      X.beginPath();X.moveTo(mx-60,my);X.lineTo(mx+60,my);
+      X.strokeStyle='#059669';X.lineWidth=5;
+      X.shadowColor='#059669';X.shadowBlur=20;X.stroke();X.shadowBlur=0;
+      X.beginPath();X.moveTo(mx+45,my-12);X.lineTo(mx+65,my);X.lineTo(mx+45,my+12);
+      X.strokeStyle='#059669';X.lineWidth=4;X.stroke();
+
+      X.font='700 26px "DM Sans"';X.fillStyle='#059669';
+      X.textAlign='center';
+      X.fillText('vs',mx,my-30);
+      X.restore();
+    }
+
+    // ── RIGHT: Stacktic model (flat cost line, K8s shared cluster) ──
+    const rightX=W/2+120,rightCx=W/2+500;
+    const flatIn=easeOutCubic(P(now,S2+5,S2+7));
+
+    if(flatIn>0.01){
+      X.save();X.globalAlpha=irA*flatIn;
+
+      // "Stacktic Model" label
+      X.font='700 32px "DM Sans"';X.fillStyle='#059669';
+      X.textAlign='center';X.textBaseline='middle';
+      X.fillText('Stacktic Model',rightCx+100,340);
+      X.font='400 24px "DM Sans"';X.fillStyle='#64748b';
+      X.fillText('Shared K8s cluster · Fixed cost',rightCx+100,380);
+
+      // Flat cost bar — same height regardless of users
+      const flatBarW=700,flatBarH=60;
+      const flatY=700;
+
+      // the flat bar
+      const flatBarIn=easeOutExpo(P(now,S2+6,S2+9));
+      X.save();X.globalAlpha=irA*flatIn*flatBarIn;
+      const fbGrad=X.createLinearGradient(rightX,flatY,rightX+flatBarW,flatY);
+      fbGrad.addColorStop(0,'#05966930');fbGrad.addColorStop(1,'#059669');
+      X.beginPath();X.roundRect(rightX,flatY-flatBarH/2,flatBarW*flatBarIn,flatBarH,8);
+      X.fillStyle=fbGrad;X.fill();
+      X.strokeStyle='#059669'+'60';X.lineWidth=2;X.stroke();
+
+      X.font='800 28px "DM Sans"';X.fillStyle='#fff';
+      X.textAlign='center';
+      X.fillText('FIXED COST',rightX+flatBarW/2,flatY+2);
+      X.restore();
+
+      // user count labels below the flat bar
+      const userCounts=['100','500','1K','5K','10K','20K'];
+      userCounts.forEach((u,ui)=>{
+        const uIn=easeOutExpo(P(now,S2+8+ui*0.3,S2+9.5+ui*0.3));
+        X.save();X.globalAlpha=irA*flatIn*uIn;
+        const ux=rightX+40+ui*(flatBarW-80)/(userCounts.length-1);
+        X.font='500 18px "DM Sans"';X.fillStyle='#94a3b8';
+        X.textAlign='center';
+        X.fillText(u,ux,flatY+55);
+
+        // tick mark
+        X.fillStyle='#059669'+'60';
+        X.fillRect(ux-1,flatY+flatBarH/2+2,2,12);
+        X.restore();
+      });
+
+      // K8s cluster visual below — tools sharing one cluster
+      const clusterY=900;
+      const clusterIn=easeOutCubic(P(now,S2+8,S2+11));
+      if(clusterIn>0.01){
+        X.save();X.globalAlpha=irA*flatIn*clusterIn;
+
+        // cluster box
+        X.beginPath();X.roundRect(rightX+30,clusterY-20,flatBarW-60,280,16);
+        X.fillStyle='rgba(5,150,105,0.04)';X.fill();
+        X.strokeStyle='#059669'+'25';X.lineWidth=2;X.setLineDash([6,6]);X.stroke();X.setLineDash([]);
+
+        X.font='600 20px "DM Sans"';X.fillStyle='#059669';
+        X.textAlign='left';
+        X.fillText('SHARED KUBERNETES CLUSTER',rightX+50,clusterY+10);
+
+        // tools inside the cluster
+        const clusterTools=[ossTools[0],ossTools[1],ossTools[2],ossTools[3],ossTools[4],ossTools[5],ossTools[8],ossTools[9],ossTools[13],ossTools[14],ossTools[17],ossTools[20]];
+        const cols=6,rows=2;
+        clusterTools.forEach((ct,ci)=>{
+          const row=Math.floor(ci/cols),col=ci%cols;
+          const ctIn=easeOutElastic(P(now,S2+9+ci*0.15,S2+11+ci*0.15));
+          const ctx2=rightX+80+col*100;
+          const cty=clusterY+70+row*100;
+          drawToolNode(ctx2,cty,ct,irA*flatIn*clusterIn*ctIn,0.6,false);
+        });
+
+        X.restore();
+      }
+
+      X.restore();
+    }
+
+    // ── Big 30-40% stat ──
+    const statIn=easeOutElastic(P(now,S2+10,S2+13))*irA;
+    if(statIn>0.01){
+      X.save();X.globalAlpha=statIn;
+      const stx=W/2,sty=1350;
+
+      const sg=X.createRadialGradient(stx,sty,20,stx,sty,250);
+      sg.addColorStop(0,'rgba(124,58,237,0.15)');sg.addColorStop(1,'rgba(124,58,237,0)');
+      X.beginPath();X.arc(stx,sty,250,0,Math.PI*2);X.fillStyle=sg;X.fill();
+
+      X.font='800 90px "DM Sans"';X.fillStyle='#7c3aed';
+      X.textAlign='center';X.textBaseline='middle';
+      X.shadowColor='#7c3aed';X.shadowBlur=40;
+      X.fillText('30-40% Infrastructure Cost Cut',stx,sty);X.shadowBlur=0;
+
+      X.font='400 28px "DM Sans"';X.fillStyle='#94a3b8';
+      X.fillText('Shared cluster. Fixed cost. Doesn\'t scale with headcount.',stx,sty+60);
+
+      X.restore();
+    }
+
+    X.restore();
+  }
+
+  // ══════════════════════════════════════
+  // PILLAR 2: M&A CARVE-OUT (45-62)
+  // ══════════════════════════════════════
+  const p2In=easeOutExpo(P(now,S3,S3+2));
+  const p2Out=1-easeOutExpo(P(now,S3+15,S3+17));
+  const p2A=p2In*Math.max(p2Out,0);
+
+  if(p2A>0.01){
+    X.save();X.globalAlpha=p2A;
+    drawTopBar(p2A);
+
+    X.save();X.globalAlpha=p2A*0.06;
+    X.font='800 600px "DM Sans"';X.fillStyle='#f97316';
+    X.textAlign='right';X.textBaseline='top';
+    X.fillText('03',W-40,50);
+    X.restore();
+
+    const t2=easeOutBack(P(now,S3+0.5,S3+2));
+    X.save();X.globalAlpha=p2A*t2;
+    X.font='800 72px "DM Sans"';X.fillStyle='#e2e8f0';
+    X.textAlign='center';X.textBaseline='middle';
+    X.fillText('M&A',W/2,110);
+    X.fillStyle='#f97316';X.shadowColor='#f97316';X.shadowBlur=30;
+    X.fillText('Carve-Out',W/2,185);
+    X.shadowBlur=0;
+
+    const subIn2=easeOutExpo(P(now,S3+1.5,S3+3.5));
+    X.globalAlpha=p2A*t2*subIn2;
+    X.font='400 32px "DM Sans"';X.fillStyle='#94a3b8';
+    X.fillText('Split organizations into independent, right-sized IT environments',W/2,250);
+    X.font='400 26px "DM Sans"';X.fillStyle='#64748b';
+    X.fillText('Each division gets its own sovereign stack — decoupled from the parent, ready to operate independently',W/2,295);
+    X.restore();
+
+    const parentX=420,parentY=620,parentR=260;
+
+    const ph1=easeOutCubic(P(now,S3+2,S3+4.5));
+    if(ph1>0.01){
+      X.save();X.globalAlpha=p2A*ph1;
+      X.beginPath();X.arc(parentX,parentY,parentR,0,Math.PI*2);
+      X.fillStyle='rgba(30,30,50,0.3)';X.strokeStyle='#64748b40';X.lineWidth=2;
+      X.fill();X.stroke();
+      X.font='700 24px "DM Sans"';X.fillStyle='#94a3b8';
+      X.textAlign='center';X.textBaseline='middle';
+      X.fillText('PARENT COMPANY',parentX,parentY-parentR-20);
+      X.font='400 20px "DM Sans"';X.fillStyle='#64748b';
+      X.fillText('10,000 employees · oversized IT',parentX,parentY-parentR+10);
+      const parentTools2=ossTools.slice(0,16);
+      parentTools2.forEach((t,i)=>{
+        const angle=i*Math.PI*2/parentTools2.length;
+        const r=80+Math.random()*120;
+        const tx=parentX+Math.cos(angle+now*0.05)*r;
+        const ty=parentY+Math.sin(angle+now*0.05)*r;
+        drawToolNode(tx,ty,t,p2A*ph1*0.6,0.55,false);
+      });
+      X.restore();
+    }
+
+    const sepProgress=easeInOutCubic(P(now,S3+5,S3+8));
+    const carveX=lerp(parentX,W/2+500,sepProgress);
+    const carveY=620;
+
+    if(sepProgress>0.01&&sepProgress<0.99){
+      X.save();X.globalAlpha=p2A*(1-Math.abs(sepProgress-0.5)*2)*0.5;
+      X.beginPath();X.moveTo(parentX+parentR+20,parentY);X.lineTo(carveX-200,carveY);
+      X.strokeStyle='#f97316';X.lineWidth=3;X.setLineDash([10,10]);X.stroke();X.setLineDash([]);
+      const midX=(parentX+parentR+carveX-200)/2;
+      X.font='800 40px "DM Sans"';X.fillStyle='#f97316';
+      X.textAlign='center';X.fillText('✂',midX,parentY-10);
+      X.restore();
+    }
+
+    const carveIn=easeOutElastic(P(now,S3+6,S3+9));
+    if(carveIn>0.01){
+      X.save();X.globalAlpha=p2A*carveIn;
+      const cr=200;
+      X.beginPath();X.arc(carveX,carveY,cr,0,Math.PI*2);
+      X.fillStyle='rgba(249,115,22,0.05)';X.strokeStyle='#f97316'+'50';X.lineWidth=2.5;
+      X.fill();X.stroke();
+      X.font='700 24px "DM Sans"';X.fillStyle='#f97316';
+      X.textAlign='center';
+      X.fillText('CARVED-OUT ENTITY',carveX,carveY-cr-20);
+      X.font='400 20px "DM Sans"';X.fillStyle='#94a3b8';
+      X.fillText('300 employees · right-sized',carveX,carveY-cr+10);
+      const carveTools=ossTools.slice(0,8);
+      carveTools.forEach((t,i)=>{
+        const angle=i*Math.PI*2/carveTools.length;
+        const r=60+Math.random()*90;
+        const tIn=easeOutElastic(P(now,S3+7+i*0.2,S3+9+i*0.2));
+        const tx=carveX+Math.cos(angle+now*0.08)*r;
+        const ty=carveY+Math.sin(angle+now*0.08)*r;
+        drawToolNode(tx,ty,t,p2A*carveIn*tIn,0.65,false);
+      });
+      if(now>S3+8){
+        const cA2=easeOutExpo(P(now,S3+8,S3+10))*p2A*carveIn;
+        for(let i=0;i<carveTools.length;i++){
+          for(let j=i+1;j<Math.min(i+3,carveTools.length);j++){
+            const a1=i*Math.PI*2/carveTools.length,a2=j*Math.PI*2/carveTools.length;
+            drawEnergyLine(
+              carveX+Math.cos(a1+now*0.08)*80,carveY+Math.sin(a1+now*0.08)*80,
+              carveX+Math.cos(a2+now*0.08)*80,carveY+Math.sin(a2+now*0.08)*80,
+              '#f97316',cA2*0.15,now,i+j
+            );
+          }
+        }
+      }
+      X.restore();
+    }
+
+    const stepsY=1020;
+    const steps=[
+      {num:'1',title:'Identify & Isolate',desc:'Map systems & users',color:'#64748b'},
+      {num:'2',title:'Deploy Stack',desc:'Independent infra',color:'#f97316'},
+      {num:'3',title:'Migrate & Right-size',desc:'Move relevant data',color:'#0891b2'},
+      {num:'4',title:'Exit TSA',desc:'Cost drops. Value up.',color:'#059669'},
+    ];
+    const stW=520,stGap=50;
+    const stTotal=steps.length*stW+(steps.length-1)*stGap;
+    const stStart=W/2-stTotal/2;
+
+    steps.forEach((st,si)=>{
+      const sIn2=easeOutCubic(P(now,S3+9+si*0.8,S3+11+si*0.8));
+      X.save();X.globalAlpha=p2A*sIn2;
+      const sx=stStart+si*(stW+stGap);
+      X.beginPath();X.roundRect(sx,stepsY,stW,160,12);
+      X.fillStyle='rgba(15,18,35,0.6)';X.fill();
+      X.strokeStyle=st.color+'30';X.lineWidth=1.5;X.stroke();
+      X.fillStyle=st.color;X.fillRect(sx+15,stepsY,stW-30,3);
+      X.font='800 22px "DM Sans"';X.fillStyle=st.color;
+      X.textAlign='left';X.fillText('STEP '+st.num,sx+25,stepsY+40);
+      X.font='700 28px "DM Sans"';X.fillStyle='#e2e8f0';
+      X.fillText(st.title,sx+25,stepsY+80);
+      X.font='400 22px "DM Sans"';X.fillStyle='#64748b';
+      X.fillText(st.desc,sx+25,stepsY+120);
+      if(si<steps.length-1){
+        const ax2=sx+stW+5,bx=sx+stW+stGap-5,my=stepsY+80;
+        X.beginPath();X.moveTo(ax2,my);X.lineTo(bx,my);
+        X.strokeStyle=st.color+'60';X.lineWidth=2;X.stroke();
+        X.beginPath();X.moveTo(bx-8,my-6);X.lineTo(bx,my);X.lineTo(bx-8,my+6);
+        X.strokeStyle=steps[si+1].color;X.lineWidth=2;X.stroke();
+      }
+      X.restore();
+    });
+
+    const impA2=easeOutExpo(P(now,S3+12,S3+14))*p2A;
+    if(impA2>0.01){
+      X.save();X.globalAlpha=impA2;
+      X.font='500 26px "DM Sans"';X.fillStyle='#94a3b8';
+      X.textAlign='center';
+      X.fillText('100-5,000 employees  ·  3-6 months  ·  TSA exit + EBITDA uplift',W/2,stepsY+220);
+      X.restore();
+    }
+
+    X.restore();
+  }
+
+  // ══════════════════════════════════════
+  // PILLAR 3: AI ADOPTION & PRIVATE AI (62-79)
+  // ══════════════════════════════════════
+  const p3In=easeOutExpo(P(now,S4,S4+2));
+  const p3Out=1-easeOutExpo(P(now,S4+15,S4+17));
+  const p3A=p3In*Math.max(p3Out,0);
+
+  if(p3A>0.01){
+    X.save();X.globalAlpha=p3A;
+    drawTopBar(p3A);
+
+    X.save();X.globalAlpha=p3A*0.06;
+    X.font='800 600px "DM Sans"';X.fillStyle='#d946ef';
+    X.textAlign='right';X.textBaseline='top';
+    X.fillText('04',W-40,50);
+    X.restore();
+
+    const t3=easeOutBack(P(now,S4+0.5,S4+2));
+    X.save();X.globalAlpha=p3A*t3;
+    X.font='800 72px "DM Sans"';X.fillStyle='#e2e8f0';
+    X.textAlign='center';X.textBaseline='middle';
+    X.fillText('AI Adoption &',W/2,130);
+    X.fillStyle='#d946ef';X.shadowColor='#d946ef';X.shadowBlur=30;
+    X.fillText('Private AI',W/2,210);
+    X.shadowBlur=0;
+    X.restore();
+
+    const aiCx=W/2,aiCy=680,aiR=200;
+
+    const hubIn=easeOutElastic(P(now,S4+2.5,S4+5));
+    if(hubIn>0.01){
+      X.save();X.globalAlpha=p3A*hubIn;
+      const pulse=1+Math.sin(now*1.5)*0.04;
+      X.beginPath();X.arc(aiCx,aiCy,aiR*1.5*pulse,0,Math.PI*2);
+      X.strokeStyle='#d946ef15';X.lineWidth=1.5;X.stroke();
+      const arc=now*0.4;
+      X.beginPath();X.arc(aiCx,aiCy,aiR*1.5*pulse,arc,arc+Math.PI*0.5);
+      X.strokeStyle='#d946ef40';X.lineWidth=3;
+      X.shadowColor='#d946ef';X.shadowBlur=12;X.stroke();X.shadowBlur=0;
+      X.beginPath();X.arc(aiCx,aiCy,aiR*pulse,0,Math.PI*2);
+      X.strokeStyle='#d946ef25';X.lineWidth=2;X.stroke();
+      const hg=X.createRadialGradient(aiCx,aiCy,30,aiCx,aiCy,aiR);
+      hg.addColorStop(0,'rgba(217,70,239,0.12)');hg.addColorStop(1,'rgba(217,70,239,0)');
+      X.beginPath();X.arc(aiCx,aiCy,aiR,0,Math.PI*2);X.fillStyle=hg;X.fill();
+      X.beginPath();X.arc(aiCx,aiCy,70,0,Math.PI*2);
+      X.fillStyle='rgba(217,70,239,0.08)';X.strokeStyle='#d946ef';X.lineWidth=3;
+      X.shadowColor='#d946ef';X.shadowBlur=20;X.fill();X.stroke();X.shadowBlur=0;
+      X.font='800 32px "DM Sans"';X.fillStyle='#d946ef';
+      X.textAlign='center';X.textBaseline='middle';
+      X.fillText('PRIVATE',aiCx,aiCy-12);X.fillText('AI',aiCx,aiCy+22);
+      X.restore();
+    }
+
+    const aiTools=[ossTools[20],ossTools[21],ossTools[22],ossTools[23]];
+    aiTools.forEach((t,i)=>{
+      const tIn=easeOutElastic(P(now,S4+4+i*0.6,S4+6+i*0.6));
+      const angle=i*Math.PI*2/aiTools.length-Math.PI/2+now*0.1;
+      const tr=aiR+80;
+      const tx=aiCx+Math.cos(angle)*tr;
+      const ty=aiCy+Math.sin(angle)*tr;
+      drawToolNode(tx,ty,t,p3A*tIn,1.1,true);
+      drawEnergyLine(aiCx,aiCy,tx,ty,t.color,p3A*tIn*0.4,now,i);
+    });
+
+    const dataTools=[ossTools[8],ossTools[9],ossTools[10],ossTools[11]];
+    const dataY=aiCy-50;
+    dataTools.forEach((t,i)=>{
+      const tIn=easeOutCubic(P(now,S4+6+i*0.5,S4+8+i*0.5));
+      const dx=300+i*200;
+      drawToolNode(dx,dataY-200,t,p3A*tIn,0.8,true);
+      if(tIn>0.1){
+        X.save();X.globalAlpha=p3A*tIn*0.25;
+        X.beginPath();X.moveTo(dx,dataY-170);
+        X.quadraticCurveTo(dx+(aiCx-dx)*0.3,dataY-50,aiCx-aiR*0.8,aiCy-aiR*0.3);
+        X.strokeStyle=t.color+'60';X.lineWidth=1.5;
+        X.shadowColor=t.color;X.shadowBlur=6;X.stroke();X.shadowBlur=0;
+        const dotT=((now*0.3+i*0.25)%1);
+        const dotX=lerp(dx,aiCx-aiR*0.3,dotT);
+        const dotY2=lerp(dataY-170,aiCy-aiR*0.3,dotT*dotT);
+        X.globalAlpha=p3A*tIn*0.5*Math.sin(dotT*Math.PI);
+        X.beginPath();X.arc(dotX,dotY2,3,0,Math.PI*2);
+        X.fillStyle=t.color;X.fill();
+        X.restore();
+      }
+    });
+
+    const appTools=[ossTools[0],ossTools[1],ossTools[3],ossTools[4]];
+    appTools.forEach((t,i)=>{
+      const tIn=easeOutCubic(P(now,S4+7+i*0.5,S4+9+i*0.5));
+      const ax=W-300-i*200;
+      drawToolNode(ax,dataY-200,t,p3A*tIn,0.8,true);
+      if(tIn>0.1){
+        X.save();X.globalAlpha=p3A*tIn*0.25;
+        X.beginPath();X.moveTo(aiCx+aiR*0.8,aiCy-aiR*0.3);
+        X.quadraticCurveTo(ax-(ax-aiCx)*0.3,dataY-50,ax,dataY-170);
+        X.strokeStyle=t.color+'60';X.lineWidth=1.5;X.stroke();
+        const dotT=((now*0.3+i*0.25+0.5)%1);
+        const dotX=lerp(aiCx+aiR*0.3,ax,dotT);
+        const dotY2=lerp(aiCy-aiR*0.3,dataY-170,dotT*dotT);
+        X.globalAlpha=p3A*tIn*0.5*Math.sin(dotT*Math.PI);
+        X.beginPath();X.arc(dotX,dotY2,3,0,Math.PI*2);
+        X.fillStyle=t.color;X.fill();
+        X.restore();
+      }
+    });
+
+    const keyPoints=[
+      {text:'Your data never leaves your infrastructure',color:'#059669'},
+      {text:'Run LLMs on your own GPU clusters',color:'#d946ef'},
+      {text:'Every AI tool integrated with your stack',color:'#0891b2'},
+    ];
+    keyPoints.forEach((kp,ki)=>{
+      const kIn=easeOutExpo(P(now,S4+10+ki*0.8,S4+12+ki*0.8));
+      X.save();X.globalAlpha=p3A*kIn;
+      const kx=W/2,ky=1120+ki*60;
+      X.beginPath();X.arc(kx-380,ky,8,0,Math.PI*2);
+      X.fillStyle=kp.color;X.fill();
+      X.font='500 28px "DM Sans"';X.fillStyle='#cbd5e1';
+      X.textAlign='left';X.textBaseline='middle';
+      X.fillText(kp.text,kx-360,ky);
+      X.restore();
+    });
+
+    X.restore();
+  }
+
+  // ══════════════════════════════════════
+  // PILLAR 4: SOVEREIGNTY STRATEGY (79-96)
+  // ══════════════════════════════════════
+  const p4In=easeOutExpo(P(now,S5,S5+2));
+  const p4Out=1-easeOutExpo(P(now,S5+15,S5+17));
+  const p4A=p4In*Math.max(p4Out,0);
+
+  if(p4A>0.01){
+    X.save();X.globalAlpha=p4A;
+    drawTopBar(p4A);
+
+    X.save();X.globalAlpha=p4A*0.06;
+    X.font='800 600px "DM Sans"';X.fillStyle='#059669';
+    X.textAlign='right';X.textBaseline='top';
+    X.fillText('05',W-40,50);
+    X.restore();
+
+    const t4=easeOutBack(P(now,S5+0.5,S5+2));
+    X.save();X.globalAlpha=p4A*t4;
+    X.font='800 72px "DM Sans"';X.fillStyle='#e2e8f0';
+    X.textAlign='center';X.textBaseline='middle';
+    X.fillText('Sovereignty',W/2,130);
+    X.fillStyle='#059669';X.shadowColor='#059669';X.shadowBlur=30;
+    X.fillText('Strategy',W/2,210);
+    X.shadowBlur=0;
+    X.restore();
+
+    const shieldCx=W/2,shieldCy=650;
+
+    const ringIn=easeOutCubic(P(now,S5+2.5,S5+5));
+    if(ringIn>0.01){
+      X.save();X.globalAlpha=p4A*ringIn;
+      [400,340,280].forEach((r,ri)=>{
+        X.beginPath();X.arc(shieldCx,shieldCy,r,0,Math.PI*2);
+        X.strokeStyle=`rgba(5,150,105,${0.05+ri*0.03})`;X.lineWidth=1.5;X.stroke();
+      });
+      const rot=now*0.2;
+      for(let i=0;i<3;i++){
+        const aOff=rot+i*Math.PI*2/3;
+        X.beginPath();X.arc(shieldCx,shieldCy,400,aOff,aOff+0.4);
+        X.strokeStyle='rgba(5,150,105,0.2)';X.lineWidth=4;
+        X.shadowColor='#059669';X.shadowBlur=10;X.stroke();X.shadowBlur=0;
+      }
+      for(let i=0;i<4;i++){
+        const aOff=-rot*1.3+i*Math.PI/2;
+        X.beginPath();X.arc(shieldCx,shieldCy,340,aOff,aOff+0.3);
+        X.strokeStyle='rgba(5,150,105,0.15)';X.lineWidth=3;X.stroke();
+      }
+      X.beginPath();X.arc(shieldCx,shieldCy,100,0,Math.PI*2);
+      X.fillStyle='rgba(5,150,105,0.08)';X.strokeStyle='#059669';X.lineWidth=4;
+      X.shadowColor='#059669';X.shadowBlur=25;X.fill();X.stroke();X.shadowBlur=0;
+      X.font='800 48px "DM Sans"';X.fillStyle='#059669';
+      X.textAlign='center';X.textBaseline='middle';
+      X.fillText('100%',shieldCx,shieldCy-8);
+      X.font='600 22px "DM Sans"';
+      X.fillText('SOVEREIGN',shieldCx,shieldCy+30);
+      X.restore();
+    }
+
+    const sovTools=[
+      ossTools[0],ossTools[1],ossTools[2],ossTools[3],ossTools[4],ossTools[5],
+      ossTools[8],ossTools[9],ossTools[10],ossTools[11],ossTools[12],
+      ossTools[13],ossTools[14],ossTools[15],ossTools[16],
+      ossTools[17],ossTools[18],ossTools[19],
+      ossTools[20],ossTools[21],ossTools[22],ossTools[23],
+    ];
+
+    sovTools.forEach((t,i)=>{
+      const tIn=easeOutElastic(P(now,S5+4+i*0.15,S5+6+i*0.15));
+      const ring=i<6?400:i<11?340:i<15?280:i<18?220:280;
+      const groupSize=i<6?6:i<11?5:i<15?4:i<18?3:4;
+      const groupStart=i<6?0:i<11?6:i<15?11:i<18?15:18;
+      const localI=i-groupStart;
+      const angle=localI*Math.PI*2/groupSize-Math.PI/2+now*0.05*(i<11?1:-1);
+      const tx=shieldCx+Math.cos(angle)*ring;
+      const ty=shieldCy+Math.sin(angle)*ring;
+      drawToolNode(tx,ty,t,p4A*tIn,0.7,false);
+      if(tIn>0.5) drawEnergyLine(shieldCx,shieldCy,tx,ty,t.color,p4A*tIn*0.08,now,i);
+    });
+
+    const sovPillars=[
+      {title:'GDPR & Compliance',desc:'Data residency. Full audit trail.',color:'#059669',angle:-Math.PI*0.75},
+      {title:'Any Cloud',desc:'Deploy anywhere. Or on-prem.',color:'#0891b2',angle:-Math.PI*0.25},
+      {title:'Zero Lock-in',desc:'100% open-source. No vendor trap.',color:'#7c3aed',angle:Math.PI*0.25},
+      {title:'Full Control',desc:'Your data. Your rules. Your jurisdiction.',color:'#4f46e5',angle:Math.PI*0.75},
+    ];
+
+    sovPillars.forEach((sp,si)=>{
+      const spIn=easeOutCubic(P(now,S5+8+si*0.8,S5+10+si*0.8));
+      X.save();X.globalAlpha=p4A*spIn;
+      const spR=530;
+      const spx=shieldCx+Math.cos(sp.angle)*spR;
+      const spy=shieldCy+Math.sin(sp.angle)*spR;
+      X.beginPath();X.roundRect(spx-180,spy-45,360,90,12);
+      X.fillStyle='rgba(15,18,35,0.8)';X.fill();
+      X.strokeStyle=sp.color+'40';X.lineWidth=1.5;X.stroke();
+      X.fillStyle=sp.color;X.fillRect(spx-180,spy-45,4,90);
+      X.font='700 24px "DM Sans"';X.fillStyle=sp.color;
+      X.textAlign='center';X.textBaseline='middle';
+      X.fillText(sp.title,spx,spy-12);
+      X.font='400 20px "DM Sans"';X.fillStyle='#94a3b8';
+      X.fillText(sp.desc,spx,spy+18);
+      X.beginPath();
+      const connEnd=shieldCx+Math.cos(sp.angle)*410;
+      const connEndY=shieldCy+Math.sin(sp.angle)*410;
+      X.moveTo(spx+Math.cos(sp.angle+Math.PI)*180,spy);
+      X.lineTo(connEnd,connEndY);
+      X.strokeStyle=sp.color+'30';X.lineWidth=1.5;X.setLineDash([4,4]);X.stroke();X.setLineDash([]);
+      X.restore();
+    });
+
+    const btmA=easeOutExpo(P(now,S5+12,S5+14))*p4A;
+    if(btmA>0.01){
+      X.save();X.globalAlpha=btmA;
+      X.font='500 30px "DM Sans"';X.fillStyle='#94a3b8';
+      X.textAlign='center';
+      X.fillText('200-10K employees  ·  4-8 months  ·  Complete IT independence',W/2,1200);
+      X.restore();
+    }
+
+    X.restore();
+  }
+
+  // ══════════════════════════════════════
+  // GRAND FINALE (96-110+)
+  // ══════════════════════════════════════
+  const finIn=easeOutExpo(P(now,S6,S6+3));
+  if(finIn>0.01){
+    X.save();X.globalAlpha=finIn;
+
+    X.fillStyle='rgba(8,11,22,0.97)';X.fillRect(0,0,W,H);
+    X.fillStyle='#4f46e5';X.fillRect(0,0,W,6);
+
+    const fcx=W/2,fcy=H/2-50;
+
+    const orbitIn=easeOutCubic(P(now,S6+1,S6+5));
+    ossTools.forEach((t,i)=>{
+      const tIn=easeOutElastic(P(now,S6+1+i*0.05,S6+3+i*0.05));
+      const angle=t.baseAngle+now*0.15;
+      const r=200+((i*37)%200);
+      const tx=fcx+Math.cos(angle)*r*orbitIn;
+      const ty=fcy+Math.sin(angle)*r*0.6*orbitIn;
+      drawToolNode(tx,ty,t,finIn*tIn*0.5,0.5,false);
+      if(i%2===0&&i<ossTools.length-1){
+        const next=ossTools[(i+3)%ossTools.length];
+        const na=next.baseAngle+now*0.15;
+        const nr=200+((((i+3)%ossTools.length)*37)%200);
+        drawEnergyLine(tx,ty,
+          fcx+Math.cos(na)*nr*orbitIn,fcy+Math.sin(na)*nr*0.6*orbitIn,
+          t.color,finIn*tIn*0.08,now,i);
+      }
+    });
+
+    const tBg=X.createRadialGradient(fcx,fcy,80,fcx,fcy,350);
+    tBg.addColorStop(0,'rgba(8,11,22,0.9)');tBg.addColorStop(1,'rgba(8,11,22,0)');
+    X.beginPath();X.arc(fcx,fcy,350,0,Math.PI*2);X.fillStyle=tBg;X.fill();
+
+    X.font='800 120px "DM Sans"';X.fillStyle='#4f46e5';
+    X.textAlign='center';X.textBaseline='middle';
+    X.shadowColor='#4f46e5';X.shadowBlur=60;
+    X.fillText('STACKTIC',fcx,fcy-60);X.shadowBlur=0;
+
+    const tag1=easeOutExpo(P(now,S6+2,S6+4));
+    X.save();X.globalAlpha=finIn*tag1;
+    X.font='400 56px "DM Serif Display"';X.fillStyle='#e2e8f0';
+    X.fillText('Automate your entire IT. Own everything.',fcx,fcy+40);
+    X.restore();
+
+    const stripIn=easeOutExpo(P(now,S6+4,S6+6));
+    if(stripIn>0.01){
+      const pillars=[
+        {text:'Eliminate Licensing',color:'#4f46e5'},
+        {text:'Cut Infra Cost',color:'#7c3aed'},
+        {text:'M&A Carve-Out',color:'#f97316'},
+        {text:'Private AI',color:'#d946ef'},
+        {text:'Full Sovereignty',color:'#059669'},
+      ];
+      const stripY=fcy+130;
+      const pilW=350,pilGap=20;
+      const pilTotal=pillars.length*pilW+(pillars.length-1)*pilGap;
+      const pilStart=W/2-pilTotal/2;
+
+      pillars.forEach((pl,pi)=>{
+        const plIn=easeOutExpo(P(now,S6+4.5+pi*0.3,S6+6+pi*0.3));
+        X.save();X.globalAlpha=finIn*stripIn*plIn;
+        const px=pilStart+pi*(pilW+pilGap);
+        X.beginPath();X.roundRect(px,stripY,pilW,56,28);
+        X.fillStyle=pl.color+'15';X.strokeStyle=pl.color+'60';X.lineWidth=2;
+        X.fill();X.stroke();
+        X.font='700 22px "DM Sans"';X.fillStyle=pl.color;
+        X.textAlign='center';X.fillText(pl.text,px+pilW/2,stripY+28);
+        if(pi<pillars.length-1){
+          X.beginPath();X.arc(px+pilW+pilGap/2,stripY+28,3,0,Math.PI*2);
+          X.fillStyle='#4f46e5'+'40';X.fill();
+        }
+        X.restore();
+      });
+    }
+
+    const sov=easeOutExpo(P(now,S6+6,S6+8));
+    X.save();X.globalAlpha=finIn*sov;
+    const divW=600*sov;
+    X.beginPath();X.moveTo(fcx-divW/2,fcy+230);X.lineTo(fcx+divW/2,fcy+230);
+    X.strokeStyle='#4f46e5';X.lineWidth=3;X.stroke();
+    X.font='600 32px "DM Sans"';X.fillStyle='#4f46e5';
+    X.textAlign='center';
+    X.fillText('Your data. Your infrastructure. Your jurisdiction.',fcx,fcy+280);
+    X.restore();
+
+    const btnIn2=easeOutElastic(P(now,S6+7,S6+9));
+    X.save();X.globalAlpha=finIn*btnIn2;
+    const btnW=480,btnH2=76,btnX2=fcx-btnW/2,btnY2=fcy+340;
+    X.beginPath();X.roundRect(btnX2,btnY2,btnW,btnH2,38);
+    X.fillStyle='#4f46e5';X.shadowColor='#4f46e5';X.shadowBlur=25;X.fill();X.shadowBlur=0;
+    X.font='700 28px "DM Sans"';X.fillStyle='#fff';
+    X.fillText('Open ROI Calculator',fcx,btnY2+btnH2/2);
+    X.restore();
+
+    X.save();X.globalAlpha=finIn*sov*0.5;
+    X.font='400 22px "DM Sans"';X.fillStyle='#64748b';
+    X.fillText('stacktic.io  —  info@stacktic.io',fcx,fcy+460);
+    X.restore();
+
+    X.restore();
+  }
+
+  sparks.forEach(s=>s.draw(0.8));
+
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

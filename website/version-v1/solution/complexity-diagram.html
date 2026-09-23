@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture Flow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #7C7E99;
+            color: #1e293b;
+            overflow-x: auto;
+            overflow-y: hidden;
+            height: 100vh;
+        }
+
+        .canvas {
+            position: relative;
+            width: 2400px;
+            height: 100vh;
+            min-height: 500px;
+        }
+
+        .node {
+            position: absolute;
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .node:hover {
+            border-color: #6366f1;
+        }
+
+        .node.inactive {
+            opacity: 0.4;
+            border-color: #cbd5e1;
+            background: #f8fafc;
+        }
+
+        .node.inactive:hover {
+            opacity: 0.6;
+        }
+
+        .node-icon {
+            width: 38px;
+            height: 38px;
+            display: block;
+            margin: 0 auto 6px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: #fff;
+            box-shadow: 0 3px 8px rgba(99, 102, 241, 0.4);
+        }
+
+        .node.inactive .node-icon {
+            background: linear-gradient(135deg, #cbd5e1, #94a3b8);
+            box-shadow: none;
+        }
+
+        .node-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-align: center;
+            color: #1e293b;
+            margin-bottom: 3px;
+        }
+
+        .node.inactive .node-title {
+            color: #94a3b8;
+        }
+
+        .node-type {
+            font-size: 0.65rem;
+            text-align: center;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .node.inactive .node-type {
+            color: #cbd5e1;
+        }
+
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Connection complexity styles */
+        .connection {
+            fill: none;
+            opacity: 0.3;
+        }
+
+        .connection.simple {
+            stroke: #10b981;
+            stroke-width: 2;
+            stroke-dasharray: 0;
+        }
+
+        .connection.moderate {
+            stroke: #f59e0b;
+            stroke-width: 3;
+            stroke-dasharray: 8, 4;
+        }
+
+        .connection.complex {
+            stroke: #ef4444;
+            stroke-width: 4;
+            stroke-dasharray: 12, 6;
+        }
+
+        .connection.inactive {
+            stroke: #cbd5e1;
+            opacity: 0.15;
+            stroke-dasharray: 4, 8;
+            stroke-width: 2;
+        }
+
+        /* Particle colors based on complexity */
+        .particle {
+            opacity: 0.7;
+        }
+
+        .particle.simple {
+            fill: #10b981;
+        }
+
+        .particle.moderate {
+            fill: #f59e0b;
+        }
+
+        .particle.complex {
+            fill: #ef4444;
+        }
+
+        .particle.inactive {
+            fill: #cbd5e1;
+            opacity: 0.3;
+        }
+
+        /* Complexity badge on nodes */
+        .complexity-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 0.65rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .complexity-badge.low {
+            background: #10b981;
+        }
+
+        .complexity-badge.medium {
+            background: #f59e0b;
+        }
+
+        .complexity-badge.high {
+            background: #ef4444;
+        }
+
+        .layer-1 { z-index: 10; }
+        .layer-2 { z-index: 8; }
+
+        .glow {
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .node-sm { padding: 8px 14px; }
+        .node-md { padding: 10px 16px; }
+        .node-lg { padding: 12px 18px; }
+
+        .legend {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            min-width: 200px;
+        }
+
+        .legend-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 12px;
+        }
+
+        .legend-section {
+            margin-bottom: 14px;
+        }
+
+        .legend-section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+            font-size: 0.75rem;
+        }
+
+        .legend-line {
+            width: 30px;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        .legend-line.simple {
+            background: #10b981;
+        }
+
+        .legend-line.moderate {
+            background: #f59e0b;
+        }
+
+        .legend-line.complex {
+            background: #ef4444;
+        }
+
+        .legend-line.inactive {
+            background: #cbd5e1;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.active {
+            background: #6366f1;
+            box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
+        }
+
+        .legend-dot.inactive {
+            background: #cbd5e1;
+        }
+
+
+        /* Logo styling */
+        .logo-nginx { background: linear-gradient(135deg, #009639, #00c853); }
+        .logo-fastapi { background: linear-gradient(135deg, #009688, #00bcd4); }
+        .logo-node { background: linear-gradient(135deg, #339933, #66bb6a); }
+        .logo-spring { background: linear-gradient(135deg, #6db33f, #8bc34a); }
+        .logo-llama { background: linear-gradient(135deg, #ff6b6b, #ee5a6f); }
+        .logo-flowise { background: linear-gradient(135deg, #4a90e2, #5c6bc0); }
+        .logo-qdrant { background: linear-gradient(135deg, #dc477d, #e91e63); }
+        .logo-redis { background: linear-gradient(135deg, #dc382d, #ff5252); }
+        .logo-postgres { background: linear-gradient(135deg, #336791, #5c6bc0); }
+        .logo-mongo { background: linear-gradient(135deg, #47a248, #66bb6a); }
+        .logo-elastic { background: linear-gradient(135deg, #005571, #00bcd4); }
+        .logo-rabbit { background: linear-gradient(135deg, #ff6600, #ff9800); }
+        .logo-kafka { background: linear-gradient(135deg, #231f20, #424242); }
+        .logo-apisix { background: linear-gradient(135deg, #e8433e, #f44336); }
+        .logo-memcached { background: linear-gradient(135deg, #00aaff, #03a9f4); }
+        .logo-grafana { background: linear-gradient(135deg, #f46800, #ff9800); }
+    </style>
+</head>
+<body>
+    <div class="canvas" id="canvas">
+        <svg id="connections" xmlns="http://www.w3.org/2000/svg"></svg>
+
+        <!-- Entry Layer -->
+        <div class="node layer-1 node-md glow" style="left: 60px; top: 45%;" data-id="0" data-active="true">
+            <div class="complexity-badge low">1</div>
+            <div class="node-icon">→</div>
+            <div class="node-title">Client</div>
+            <div class="node-type">Entry</div>
+        </div>
+
+        <!-- Load Balancing Layer -->
+        <div class="node layer-1 node-lg" style="left: 240px; top: 32%;" data-id="1" data-active="true">
+            <div class="complexity-badge medium">2</div>
+            <div class="node-icon logo-nginx">N</div>
+            <div class="node-title">Nginx</div>
+            <div class="node-type">Load Balancer</div>
+        </div>
+
+        <div class="node layer-2 node-sm inactive" style="left: 255px; top: 60%;" data-id="2" data-active="false">
+            <div class="node-icon">🔐</div>
+            <div class="node-title">SSL/TLS</div>
+            <div class="node-type">Security</div>
+        </div>
+
+        <!-- API Gateway -->
+        <div class="node layer-1 node-lg glow" style="left: 420px; top: 42%;" data-id="3" data-active="true">
+            <div class="complexity-badge high">3</div>
+            <div class="node-icon logo-apisix">A</div>
+            <div class="node-title">APISIX</div>
+            <div class="node-type">API Gateway</div>
+        </div>
+
+        <!-- Backend Services Layer -->
+        <div class="node layer-1 node-md" style="left: 650px; top: 18%;" data-id="4" data-active="true">
+            <div class="complexity-badge medium">2</div>
+            <div class="node-icon logo-fastapi">F</div>
+            <div class="node-title">FastAPI</div>
+            <div class="node-type">Python</div>
+        </div>
+
+        <div class="node layer-1 node-md inactive" style="left: 650px; top: 47%;" data-id="5" data-active="false">
+            <div class="node-icon logo-node">N</div>
+            <div class="node-title">Node.js</div>
+            <div class="node-type">Express</div>
+        </div>
+
+        <div class="node layer-1 node-md" style="left: 650px; top: 74%;" data-id="6" data-active="true">
+            <div class="complexity-badge medium">2</div>
+            <div class="node-icon logo-spring">S</div>
+            <div class="node-title">Spring Boot</div>
+            <div class="node-type">Java</div>
+        </div>
+
+        <!-- AI/ML Layer -->
+        <div class="node layer-2 node-lg glow" style="left: 880px; top: 12%;" data-id="7" data-active="true">
+            <div class="complexity-badge high">3</div>
+            <div class="node-icon logo-llama">L</div>
+            <div class="node-title">Llama</div>
+            <div class="node-type">LLM</div>
+        </div>
+
+        <div class="node layer-2 node-md inactive" style="left: 895px; top: 40%;" data-id="8" data-active="false">
+            <div class="node-icon logo-flowise">F</div>
+            <div class="node-title">Flowise</div>
+            <div class="node-type">Workflow</div>
+        </div>
+
+        <div class="node layer-2 node-md" style="left: 880px; top: 66%;" data-id="9" data-active="true">
+            <div class="complexity-badge high">3</div>
+            <div class="node-icon logo-qdrant">Q</div>
+            <div class="node-title">Qdrant</div>
+            <div class="node-type">Vector DB</div>
+        </div>
+
+        <!-- Cache Layer -->
+        <div class="node layer-2 node-sm" style="left: 1110px; top: 28%;" data-id="10" data-active="true">
+            <div class="complexity-badge low">1</div>
+            <div class="node-icon logo-redis">R</div>
+            <div class="node-title">Redis</div>
+            <div class="node-type">Cache</div>
+        </div>
+
+        <div class="node layer-2 node-sm inactive" style="left: 1125px; top: 56%;" data-id="11" data-active="false">
+            <div class="node-icon logo-memcached">M</div>
+            <div class="node-title">Memcached</div>
+            <div class="node-type">Memory</div>
+        </div>
+
+        <!-- Database Layer -->
+        <div class="node layer-1 node-lg" style="left: 1310px; top: 22%;" data-id="12" data-active="true">
+            <div class="complexity-badge medium">2</div>
+            <div class="node-icon logo-postgres">P</div>
+            <div class="node-title">PostgreSQL</div>
+            <div class="node-type">SQL DB</div>
+        </div>
+
+        <div class="node layer-1 node-lg inactive" style="left: 1310px; top: 60%;" data-id="13" data-active="false">
+            <div class="node-icon logo-mongo">M</div>
+            <div class="node-title">MongoDB</div>
+            <div class="node-type">NoSQL</div>
+        </div>
+
+        <!-- Search Layer -->
+        <div class="node layer-2 node-md" style="left: 1540px; top: 38%;" data-id="14" data-active="true">
+            <div class="complexity-badge medium">2</div>
+            <div class="node-icon logo-elastic">E</div>
+            <div class="node-title">Elasticsearch</div>
+            <div class="node-type">Search</div>
+        </div>
+
+        <!-- Message Queue Layer -->
+        <div class="node layer-1 node-lg glow" style="left: 1740px; top: 18%;" data-id="15" data-active="true">
+            <div class="complexity-badge high">3</div>
+            <div class="node-icon logo-rabbit">R</div>
+            <div class="node-title">RabbitMQ</div>
+            <div class="node-type">Queue</div>
+        </div>
+
+        <div class="node layer-2 node-md inactive" style="left: 1755px; top: 52%;" data-id="16" data-active="false">
+            <div class="node-icon logo-kafka">K</div>
+            <div class="node-title">Kafka</div>
+            <div class="node-type">Stream</div>
+        </div>
+
+        <!-- Analytics Layer -->
+        <div class="node layer-1 node-lg" style="left: 1960px; top: 28%;" data-id="17" data-active="true">
+            <div class="complexity-badge medium">2</div>
+            <div class="node-icon">▦</div>
+            <div class="node-title">Warehouse</div>
+            <div class="node-type">Analytics</div>
+        </div>
+
+        <div class="node layer-2 node-md inactive" style="left: 1975px; top: 60%;" data-id="18" data-active="false">
+            <div class="node-icon logo-grafana">G</div>
+            <div class="node-title">Grafana</div>
+            <div class="node-type">Monitor</div>
+        </div>
+
+        <!-- Final Sink -->
+        <div class="node layer-1 node-lg glow" style="left: 2180px; top: 42%;" data-id="19" data-active="true">
+            <div class="complexity-badge low">1</div>
+            <div class="node-icon">◉</div>
+            <div class="node-title">Data Sink</div>
+            <div class="node-type">Storage</div>
+        </div>
+    </div>
+
+    <div class="legend">
+        <div class="legend-title">Complexity Legend</div>
+        
+        <div class="legend-section">
+            <div class="legend-section-title">Integration Complexity</div>
+            <div class="legend-item">
+                <div class="legend-line simple"></div>
+                <span>Simple - Basic Config</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-line moderate"></div>
+                <span>Moderate - APIs, Auth</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-line complex"></div>
+                <span>Complex - Secrets, Encryption, Dependencies</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-line inactive"></div>
+                <span>Inactive</span>
+            </div>
+        </div>
+
+        <div class="legend-section">
+            <div class="legend-section-title">Service Status</div>
+            <div class="legend-item">
+                <div class="legend-dot active"></div>
+                <span>Active</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot inactive"></div>
+                <span>Not in Stack</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const nodes = document.querySelectorAll('.node');
+        const svg = document.getElementById('connections');
+
+        // Connection complexity: simple, moderate, complex
+        const connections = [
+            {from: 0, to: 1, active: true, complexity: 'simple'},
+            {from: 0, to: 2, active: false, complexity: 'simple'},
+            {from: 1, to: 3, active: true, complexity: 'moderate'},
+            {from: 2, to: 3, active: false, complexity: 'complex'},
+            {from: 3, to: 4, active: true, complexity: 'complex'}, // API Gateway routing
+            {from: 3, to: 5, active: false, complexity: 'complex'},
+            {from: 3, to: 6, active: true, complexity: 'complex'},
+            {from: 4, to: 7, active: true, complexity: 'complex'}, // AI/RAG setup
+            {from: 4, to: 8, active: false, complexity: 'complex'},
+            {from: 5, to: 8, active: false, complexity: 'complex'},
+            {from: 5, to: 9, active: false, complexity: 'complex'},
+            {from: 6, to: 9, active: true, complexity: 'complex'}, // Vector DB integration
+            {from: 4, to: 10, active: true, complexity: 'simple'},
+            {from: 5, to: 10, active: false, complexity: 'simple'},
+            {from: 6, to: 11, active: false, complexity: 'simple'},
+            {from: 7, to: 12, active: true, complexity: 'moderate'},
+            {from: 8, to: 12, active: false, complexity: 'moderate'},
+            {from: 8, to: 13, active: false, complexity: 'moderate'},
+            {from: 9, to: 13, active: false, complexity: 'moderate'},
+            {from: 10, to: 12, active: true, complexity: 'simple'},
+            {from: 11, to: 13, active: false, complexity: 'simple'},
+            {from: 12, to: 14, active: true, complexity: 'moderate'},
+            {from: 13, to: 14, active: false, complexity: 'moderate'},
+            {from: 12, to: 15, active: true, complexity: 'complex'}, // Messaging setup
+            {from: 13, to: 16, active: false, complexity: 'complex'},
+            {from: 14, to: 16, active: false, complexity: 'complex'},
+            {from: 15, to: 17, active: true, complexity: 'complex'}, // Queue to warehouse
+            {from: 16, to: 17, active: false, complexity: 'complex'},
+            {from: 16, to: 18, active: false, complexity: 'moderate'},
+            {from: 17, to: 19, active: true, complexity: 'moderate'},
+            {from: 18, to: 19, active: false, complexity: 'moderate'}
+        ];
+
+        function getNodeCenter(node) {
+            const rect = node.getBoundingClientRect();
+            const canvasRect = document.getElementById('canvas').getBoundingClientRect();
+            return {
+                x: rect.left - canvasRect.left + rect.width / 2,
+                y: rect.top - canvasRect.top + rect.height / 2
+            };
+        }
+
+        function drawConnections() {
+            svg.querySelectorAll('path, circle').forEach(el => el.remove());
+
+            connections.forEach(({from, to, active, complexity}) => {
+                const fromNode = nodes[from];
+                const toNode = nodes[to];
+                
+                const start = getNodeCenter(fromNode);
+                const end = getNodeCenter(toNode);
+
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                
+                const dx = end.x - start.x;
+                const dy = end.y - start.y;
+                const cx1 = start.x + dx * 0.3;
+                const cy1 = start.y;
+                const cx2 = start.x + dx * 0.7;
+                const cy2 = end.y;
+
+                const d = `M ${start.x} ${start.y} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${end.x} ${end.y}`;
+                
+                path.setAttribute('d', d);
+                path.setAttribute('class', active ? `connection ${complexity}` : 'connection inactive');
+                path.setAttribute('id', `path-${from}-${to}`);
+                svg.appendChild(path);
+
+                if (active) {
+                    // Only 1 particle per connection - much better performance
+                    const particle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    particle.setAttribute('r', '3');
+                    particle.setAttribute('class', `particle ${complexity}`);
+
+                    const animateMotion = document.createElementNS('http://www.w3.org/2000/svg', 'animateMotion');
+                    animateMotion.setAttribute('dur', '4s');
+                    animateMotion.setAttribute('repeatCount', 'indefinite');
+                    animateMotion.setAttribute('begin', `${Math.random() * 2}s`);
+
+                    const mpath = document.createElementNS('http://www.w3.org/2000/svg', 'mpath');
+                    mpath.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', `#path-${from}-${to}`);
+
+                    animateMotion.appendChild(mpath);
+                    particle.appendChild(animateMotion);
+                    svg.appendChild(particle);
+                }
+            });
+        }
+
+        drawConnections();
+
+        // Debounced resize handler for better performance
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(drawConnections, 150);
+        });
+    </script>
+</body>
+</html>

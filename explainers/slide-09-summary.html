@@ -1,0 +1,613 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stacktic — Slide 09 · In summary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b1330; --ink:#f2f5ff; --body:#b6c1e2; --soft:#8b97bf; --faint:#6b78a3;
+  --line:rgba(150,175,235,.20); --line2:rgba(150,175,235,.34);
+  --gold:#fbbf24; --sky:#38bdf8; --indigo:#818cf8; --violet:#a78bfa;
+  --amber:#f59e0b; --emerald:#34d399; --rose:#fb7185; --red:#ff4d6d;
+  --disp:"Sora",system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;min-width:0}
+html,body{height:100%}
+body{background:
+   radial-gradient(120% 90% at 50% -20%,#1c2a63 0%,transparent 62%),
+   radial-gradient(80% 70% at 110% 110%,#221a52 0%,transparent 60%),
+   var(--bg);
+  color:var(--ink);font-family:var(--disp);-webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:18px}
+
+.slide{position:relative;width:min(1500px,96vw);aspect-ratio:16/9;max-height:84vh;border-radius:20px;overflow:hidden;
+  background:linear-gradient(165deg,#182356 0%,#111a42 52%,#16204d 100%);
+  border:1px solid var(--line);box-shadow:0 50px 120px -50px rgba(4,8,26,.9),0 0 0 1px rgba(255,255,255,.03) inset;
+  container-type:inline-size;--u:1cqw;display:flex;flex-direction:column}
+.slide::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.7;
+  background-image:linear-gradient(rgba(150,180,255,.06) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(150,180,255,.06) 1px,transparent 1px);
+  background-size:calc(var(--u)*3.2) calc(var(--u)*3.2);
+  mask-image:radial-gradient(120% 100% at 50% 45%,#000 20%,transparent 82%)}
+.slide::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:60;
+  background:radial-gradient(125% 105% at 50% 48%,transparent 62%,rgba(8,14,42,.42) 100%)}
+.pad{position:relative;z-index:5;flex:1;display:flex;flex-direction:column;
+  padding:calc(var(--u)*1.7) calc(var(--u)*2.2) calc(var(--u)*1.2)}
+
+.top{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);
+  font-size:calc(var(--u)*.78);color:var(--soft);letter-spacing:.13em;flex:none}
+.top b{color:var(--ink);font-weight:800}
+.top .acts{display:flex;gap:calc(var(--u)*.4);align-items:center}
+.top .acts i{font-style:normal;font-size:calc(var(--u)*.56);letter-spacing:.14em;font-weight:700;
+  padding:calc(var(--u)*.2) calc(var(--u)*.44);border-radius:999px;color:#5b6791;
+  border:1px solid transparent;transition:.45s}
+.top .acts i.on{color:#0a0f22;background:var(--ac);border-color:var(--ac)}
+.top .acts i.past{color:var(--soft);border-color:var(--line)}
+
+.head{flex:none;margin-top:calc(var(--u)*.8);min-height:calc(var(--u)*8.6);position:relative}
+.eb{display:inline-flex;align-items:center;gap:.6em;font-family:var(--mono);font-size:calc(var(--u)*.68);
+  font-weight:800;letter-spacing:.22em;padding:calc(var(--u)*.3) calc(var(--u)*.8);border-radius:999px;
+  color:var(--ac);background:color-mix(in srgb,var(--ac) 12%,transparent);
+  border:1px solid color-mix(in srgb,var(--ac) 34%,transparent)}
+.eb::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--ac);
+  box-shadow:0 0 0 0 color-mix(in srgb,var(--ac) 70%,transparent);animation:beat 2s infinite}
+@keyframes beat{70%{box-shadow:0 0 0 calc(var(--u)*.7) transparent}100%{box-shadow:0 0 0 0 transparent}}
+h1{font-weight:800;letter-spacing:-.045em;line-height:1.03;font-size:calc(var(--u)*2.7);
+  margin-top:calc(var(--u)*.55)}
+h1 em{font-style:normal;color:var(--ac)}
+.hl{position:absolute;inset:0;opacity:0;transform:translateY(calc(var(--u)*.8));
+  transition:opacity .5s ease,transform .5s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+.hl.on{opacity:1;transform:none}
+
+.stage{position:relative;flex:1;min-height:0}
+.layer{position:absolute;inset:0;opacity:0;pointer-events:none;transition:.55s}
+.layer.in{opacity:1}
+
+/* ── act 0 · the one sentence ── */
+#thesis{display:flex;flex-direction:column;justify-content:center;gap:calc(var(--u)*1)}
+.line{font-size:calc(var(--u)*2.3);font-weight:800;letter-spacing:-.03em;line-height:1.25;max-width:82ch}
+/* pre-wrap keeps the spaces between phrases — an inline-block trims them */
+.line span{opacity:0;transform:translateY(calc(var(--u)*.7));display:inline-block;
+  white-space:pre-wrap;transition:.5s cubic-bezier(.2,.9,.2,1)}
+.line span.in{opacity:1;transform:none}
+.line .k{color:var(--gold)}
+.line .g{color:var(--emerald)}
+#pill3{display:flex;gap:calc(var(--u)*.7)}
+#pill3 div{border-radius:calc(var(--u)*.7);padding:calc(var(--u)*.5) calc(var(--u)*.8);
+  background:rgba(13,20,52,.9);border:1px solid color-mix(in srgb,var(--c) 40%,var(--line));
+  opacity:0;transform:translateY(calc(var(--u)*.6));transition:.45s cubic-bezier(.2,.9,.2,1)}
+#pill3 div.in{opacity:1;transform:none}
+#pill3 b{font-family:var(--mono);font-size:calc(var(--u)*.58);font-weight:800;letter-spacing:.14em;color:var(--c)}
+#pill3 span{display:block;margin-top:.3em;font-size:calc(var(--u)*.8);color:var(--body)}
+
+/* ── act 1 · what people build on it ── */
+#apps{display:grid;grid-template-columns:repeat(5,1fr);gap:calc(var(--u)*.8);align-items:center}
+.app{border-radius:calc(var(--u)*.9);padding:calc(var(--u)*.8) calc(var(--u)*.75);
+  background:linear-gradient(165deg,color-mix(in srgb,var(--c) 16%,rgba(16,24,60,.96)),rgba(13,20,52,.96));
+  border:1px solid color-mix(in srgb,var(--c) 38%,var(--line));min-height:calc(var(--u)*14);
+  display:flex;flex-direction:column;gap:calc(var(--u)*.5);
+  opacity:0;transform:translateY(calc(var(--u)*1.4)) scale(.96);
+  transition:.55s cubic-bezier(.2,.9,.2,1)}
+.app.in{opacity:1;transform:none}
+.app b{font-size:calc(var(--u)*1.05);font-weight:800;letter-spacing:-.02em;line-height:1.2}
+.app em{font-style:normal;font-family:var(--mono);font-size:calc(var(--u)*.5);letter-spacing:.14em;
+  color:var(--c)}
+.app .cs{display:flex;flex-direction:column;gap:calc(var(--u)*.26);margin-top:auto}
+.app .cs i{font-style:normal;font-family:var(--mono);font-size:calc(var(--u)*.52);font-weight:700;
+  color:var(--body);background:rgba(26,36,82,.75);border:1px solid var(--line);
+  border-radius:calc(var(--u)*.32);padding:calc(var(--u)*.16) calc(var(--u)*.4);
+  opacity:0;transform:translateX(calc(var(--u)*-.4));transition:.3s}
+.app .cs i.in{opacity:1;transform:none}
+
+/* ── acts 2-3 · not only / also ── */
+#value{display:flex;flex-direction:column;justify-content:center;gap:calc(var(--u)*1.4)}
+.vrow{display:flex;align-items:center;gap:calc(var(--u)*.8)}
+.vrow .lbl{flex:none;width:calc(var(--u)*13);font-family:var(--mono);font-size:calc(var(--u)*.62);
+  font-weight:800;letter-spacing:.16em;color:var(--faint);text-align:right}
+.vrow .items{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--u)*.7)}
+.vi{border-radius:calc(var(--u)*.8);padding:calc(var(--u)*.7) calc(var(--u)*.9);
+  background:rgba(13,20,52,.9);border:1px solid var(--line);
+  opacity:0;transform:translateY(calc(var(--u)*.7));transition:.5s cubic-bezier(.2,.9,.2,1)}
+.vi.in{opacity:1;transform:none}
+.vi b{display:block;font-size:calc(var(--u)*1.15);font-weight:800;letter-spacing:-.02em}
+.vi span{display:block;margin-top:.3em;font-family:var(--mono);font-size:calc(var(--u)*.54);color:var(--soft)}
+.vrow.faded .vi{opacity:.34;transform:scale(.97)}
+.vrow.faded .lbl{color:#4d5883}
+.vrow.hero .vi{background:linear-gradient(160deg,color-mix(in srgb,var(--c) 18%,rgba(13,20,52,.9)),rgba(13,20,52,.9));
+  border-color:color-mix(in srgb,var(--c) 46%,transparent)}
+.vrow.hero .vi b{color:var(--c)}
+.vrow.hero .lbl{color:var(--c)}
+
+/* ── acts 4-5 · the gap ── */
+#gap{display:grid;grid-template-columns:34fr 66fr;gap:calc(var(--u)*1.4);align-items:center}
+.odo{border-radius:calc(var(--u)*1);padding:calc(var(--u)*1.1);text-align:center;
+  background:linear-gradient(165deg,rgba(56,189,248,.14),rgba(13,20,52,.96));
+  border:1px solid color-mix(in srgb,var(--sky) 40%,transparent)}
+.odo b{display:block;font-size:calc(var(--u)*3.4);font-weight:800;letter-spacing:-.04em;line-height:1;
+  color:var(--sky);font-variant-numeric:tabular-nums}
+.odo span{display:block;margin-top:.5em;font-family:var(--mono);font-size:calc(var(--u)*.58);
+  letter-spacing:.14em;color:var(--soft)}
+.odo em{display:block;margin-top:calc(var(--u)*.7);padding-top:calc(var(--u)*.6);
+  border-top:1px solid var(--line);font-style:normal;font-size:calc(var(--u)*.9);color:var(--ink)}
+.qs{display:flex;flex-direction:column;gap:calc(var(--u)*.5)}
+.q{display:flex;align-items:center;gap:calc(var(--u)*.7);border-radius:calc(var(--u)*.7);
+  padding:calc(var(--u)*.6) calc(var(--u)*.85);background:rgba(13,20,52,.9);border:1px solid var(--line);
+  opacity:0;transform:translateX(calc(var(--u)*.8));transition:.45s}
+.q.in{opacity:1;transform:none}
+.q u{width:calc(var(--u)*1.9);height:calc(var(--u)*1.9);border-radius:50%;flex:none;text-decoration:none;
+  display:grid;place-items:center;font-weight:800;font-size:calc(var(--u)*1.1);
+  border:1.5px dashed var(--line2);color:var(--faint);transition:.4s}
+.q b{font-size:calc(var(--u)*1.05);font-weight:700}
+.q s{text-decoration:none;margin-left:auto;font-family:var(--mono);font-size:calc(var(--u)*.56);
+  color:var(--faint);white-space:nowrap}
+.q.miss u{border-style:solid;border-color:var(--red);background:rgba(255,77,109,.18);color:var(--red)}
+.q.miss{border-color:color-mix(in srgb,var(--red) 34%,transparent)}
+.q.miss s{color:var(--red)}
+.stamp{position:absolute;left:17%;top:74%;transform:translate(-50%,-50%) rotate(-7deg) scale(1.25);
+  z-index:9;border-radius:calc(var(--u)*.9);padding:calc(var(--u)*.9) calc(var(--u)*1.6);
+  background:rgba(70,16,42,.96);border:2px solid var(--red);backdrop-filter:blur(6px);
+  text-align:center;opacity:0;transition:.45s cubic-bezier(.2,1.5,.4,1)}
+.stamp.in{opacity:1;transform:translate(-50%,-50%) rotate(-7deg) scale(1)}
+.stamp b{display:block;font-size:calc(var(--u)*2);font-weight:800;letter-spacing:-.03em;color:#fff}
+.stamp span{display:block;margin-top:.3em;font-family:var(--mono);font-size:calc(var(--u)*.6);
+  letter-spacing:.16em;color:#ff9bb3}
+.fix{position:absolute;left:50%;bottom:calc(var(--u)*.4);transform:translateX(-50%);z-index:10;
+  display:flex;gap:calc(var(--u)*.7);opacity:0;transition:.5s}
+.fix.in{opacity:1}
+.fix div{border-radius:999px;padding:calc(var(--u)*.42) calc(var(--u)*1);
+  background:rgba(13,20,52,.96);border:1px solid color-mix(in srgb,var(--emerald) 45%,transparent);
+  font-family:var(--mono);font-size:calc(var(--u)*.62);font-weight:700;color:var(--emerald);
+  opacity:0;transform:translateY(calc(var(--u)*.5));transition:.45s cubic-bezier(.2,.9,.2,1)}
+.fix div.in{opacity:1;transform:none}
+
+/* ── act 6 · the vision ── */
+#vision{display:flex;flex-direction:column;justify-content:center;gap:calc(var(--u)*1.2)}
+.big{font-size:calc(var(--u)*3.2);font-weight:800;letter-spacing:-.04em;line-height:1.1;
+  opacity:0;transform:translateY(calc(var(--u)*.8));transition:.6s cubic-bezier(.2,.9,.2,1)}
+.big.in{opacity:1;transform:none}
+.big u{text-decoration:none;color:var(--emerald)}
+.mores{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(var(--u)*.8)}
+.mo{border-radius:calc(var(--u)*.85);padding:calc(var(--u)*.7) calc(var(--u)*.9);
+  background:linear-gradient(160deg,color-mix(in srgb,var(--c) 16%,rgba(13,20,52,.94)),rgba(13,20,52,.94));
+  border:1px solid color-mix(in srgb,var(--c) 42%,transparent);
+  opacity:0;transform:translateY(calc(var(--u)*.9));transition:.5s cubic-bezier(.2,.9,.2,1)}
+.mo.in{opacity:1;transform:none}
+.mo b{display:block;font-size:calc(var(--u)*1.3);font-weight:800;letter-spacing:-.03em;color:var(--c)}
+.mo span{display:block;margin-top:.3em;font-family:var(--mono);font-size:calc(var(--u)*.54);color:var(--soft)}
+.than{font-family:var(--mono);font-size:calc(var(--u)*.72);color:var(--faint);letter-spacing:.06em;
+  opacity:0;transition:.5s}
+.than.in{opacity:1}
+.than b{color:var(--body);font-weight:700}
+#sig{display:flex;align-items:baseline;gap:calc(var(--u)*.8);opacity:0;transition:.6s}
+#sig.in{opacity:1}
+#sig .wm{font-size:calc(var(--u)*2.2);font-weight:800;letter-spacing:-.05em}
+#sig .wm i{font-style:normal;color:var(--gold)}
+#sig em{font-style:normal;font-family:var(--mono);font-size:calc(var(--u)*.62);letter-spacing:.16em;
+  color:var(--soft)}
+
+/* caption + chrome */
+.cap{position:relative;z-index:50;flex:none;margin-top:calc(var(--u)*.7);padding-top:calc(var(--u)*.7);
+  border-top:1px solid var(--line);display:flex;align-items:center;gap:calc(var(--u)*1)}
+.cap .txt{position:relative;flex:1;height:calc(var(--u)*2.8);font-family:var(--mono);
+  font-size:calc(var(--u)*.84);color:var(--body);line-height:1.35}
+.cap .txt span{position:absolute;left:0;right:0;top:0;opacity:0;transition:.45s}
+.cap .txt span.on{opacity:1}
+.cap .br{font-family:var(--mono);font-size:calc(var(--u)*.58);letter-spacing:.24em;color:#4f5c8a;flex:none}
+.prog{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.06);z-index:70}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--sky),var(--emerald))}
+.gate{position:absolute;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;
+  gap:calc(var(--u)*.8);border:0;cursor:pointer;font-family:var(--mono);font-weight:800;
+  font-size:calc(var(--u)*1.1);letter-spacing:.2em;color:var(--ink);
+  background:rgba(11,19,48,.72);backdrop-filter:blur(3px)}
+.gate[hidden]{display:none}
+.gate span{display:grid;place-items:center;width:calc(var(--u)*4);height:calc(var(--u)*4);border-radius:50%;
+  background:var(--gold);color:#1a1204;font-size:calc(var(--u)*1.4);
+  box-shadow:0 0 0 calc(var(--u)*.6) rgba(251,191,36,.22)}
+.ctl{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;color:#8b95bb;
+  width:min(1500px,96vw)}
+.ctl button{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.1em;color:#cfd8f5;
+  background:#1a2452;border:1px solid rgba(150,175,235,.28);border-radius:8px;padding:7px 13px;cursor:pointer}
+.ctl button:hover{background:#243066;color:#fff}
+.ctl input[type=range]{flex:1;accent-color:#fbbf24;cursor:pointer}
+.ctl .t{font-variant-numeric:tabular-nums;color:#fbbf24;min-width:78px;text-align:right}
+.noanim *,.noanim *::before,.noanim *::after{transition:none!important;animation:none!important}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001s!important}}
+</style>
+</head>
+<body>
+
+<section class="slide" id="slide" style="--ac:var(--gold)">
+ <div class="pad">
+  <div class="top">
+    <span>{ <b>STACKTIC</b> }</span>
+    <span class="acts" id="acts"></span>
+    <span>09 / 09</span>
+  </div>
+
+  <div class="head" id="head">
+    <div class="hl" data-act="0"><span class="eb">IN SUMMARY</span>
+      <h1>One platform,<br><em>so AI can be trusted with production.</em></h1></div>
+    <div class="hl" data-act="1"><span class="eb">WHAT YOU BUILD ON IT</span>
+      <h1>The stack is the product.<br><em>The application can be anything.</em></h1></div>
+    <div class="hl" data-act="2"><span class="eb">NOT ONLY</span>
+      <h1>Speed and cost are<br><em>the easy half of the story.</em></h1></div>
+    <div class="hl" data-act="3"><span class="eb">IT IS ALSO</span>
+      <h1>Governance, risk,<br><em>and knowing it is actually ready.</em></h1></div>
+    <div class="hl" data-act="4"><span class="eb">THE GAP</span>
+      <h1>Thousands of lines in days.<br><em>None of them know the system.</em></h1></div>
+    <div class="hl" data-act="5"><span class="eb">THE POINT</span>
+      <h1>Without context and validation,<br><em>you are trusting a guessing machine.</em></h1></div>
+    <div class="hl" data-act="6"><span class="eb">OUR VISION</span>
+      <h1>100% open source<br><em>operational stacks.</em></h1></div>
+  </div>
+
+  <div class="stage" id="stage">
+
+    <!-- act 0 -->
+    <div class="layer" id="thesis">
+      <div class="line" id="l1"></div>
+      <div id="pill3">
+        <div style="--c:var(--gold)"><b>CONTEXT</b><span>every layer of the stack, as one model</span></div>
+        <div style="--c:var(--sky)"><b>CONTROL</b><span>what the AI may do, and where</span></div>
+        <div style="--c:var(--emerald)"><b>CONFIDENCE</b><span>checked, evidenced, human-approved</span></div>
+      </div>
+    </div>
+
+    <!-- act 1 -->
+    <div class="layer" id="apps">
+      <div class="app" style="--c:var(--violet)"><em>PRIVATE AI</em><b>Models that never leave your cluster</b>
+        <div class="cs"><i>vllm</i><i>open-webui</i><i>qdrant</i><i>langfuse</i></div></div>
+      <div class="app" style="--c:var(--sky)"><em>MICROSERVICES</em><b>Services that have to agree with each other</b>
+        <div class="cs"><i>fastapi</i><i>kafka</i><i>cnpg</i><i>apisix</i></div></div>
+      <div class="app" style="--c:var(--emerald)"><em>ML PLATFORMS</em><b>Pipelines, notebooks and the data behind them</b>
+        <div class="cs"><i>airflow</i><i>spark</i><i>jupyterhub</i><i>clickhouse</i></div></div>
+      <div class="app" style="--c:var(--gold)"><em>SOVEREIGN IT</em><b>Your own everything, on your own ground</b>
+        <div class="cs"><i>keycloak</i><i>nextcloud</i><i>openbao</i><i>velero</i></div></div>
+      <div class="app" style="--c:var(--rose)"><em>REAL-TIME FINTECH</em><b>Events that cannot be lost or replayed wrong</b>
+        <div class="cs"><i>kafka</i><i>apicurio</i><i>cnpg</i><i>keda</i></div></div>
+    </div>
+
+    <!-- acts 2-3 -->
+    <div class="layer" id="value">
+      <div class="vrow" id="v1">
+        <span class="lbl">NOT ONLY</span>
+        <div class="items">
+          <div class="vi"><b>Automation</b><span>less of it done by hand</span></div>
+          <div class="vi"><b>Time to market</b><span>days instead of quarters</span></div>
+          <div class="vi"><b>Lower cost</b><span>fewer people wiring things</span></div>
+        </div>
+      </div>
+      <div class="vrow hero" id="v2">
+        <span class="lbl">IT IS ALSO</span>
+        <div class="items">
+          <div class="vi" style="--c:var(--violet)"><b>Governance</b><span>who may change what, and where</span></div>
+          <div class="vi" style="--c:var(--amber)"><b>Risk reduction</b><span>the impact is known before the change</span></div>
+          <div class="vi" style="--c:var(--emerald)"><b>Production-ready</b><span>evidenced, not asserted</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- acts 4-5 -->
+    <div class="layer" id="gap">
+      <div class="odo">
+        <b id="loc">0</b>
+        <span>LINES OF CODE · IN DAYS</span>
+        <em>the easy part, and it keeps getting easier</em>
+      </div>
+      <div class="qs">
+        <div class="q" data-q="0"><u>?</u><b>the full stack</b><s>13 components, 20 relations</s></div>
+        <div class="q" data-q="1"><u>?</u><b>its dependencies</b><s>who breaks when this moves</s></div>
+        <div class="q" data-q="2"><u>?</u><b>its security and compliance requirements</b><s>93 controls, evidenced</s></div>
+        <div class="q" data-q="3"><u>?</u><b>how it needs to scale in production</b><s>every part, together</s></div>
+      </div>
+      <div class="stamp" id="stamp"><b>a guessing machine</b><span>CONFIDENT, AND UNVERIFIED</span></div>
+      <div class="fix" id="fix">
+        <div>+ context from every layer</div>
+        <div>+ human validation</div>
+      </div>
+    </div>
+
+    <!-- act 6 -->
+    <div class="layer" id="vision">
+      <div class="big" id="big">&hellip;and they should <u>outrun</u><br>the managed ones.</div>
+      <div class="mores">
+        <div class="mo" style="--c:var(--sky)"><b>More advanced</b><span>a whole stack, not one service</span></div>
+        <div class="mo" style="--c:var(--violet)"><b>More innovative</b><span>we adopt what is better, when it is better</span></div>
+        <div class="mo" style="--c:var(--amber)"><b>More secure</b><span>policy and evidence built in, not bolted on</span></div>
+        <div class="mo" style="--c:var(--emerald)"><b>Far more automated</b><span>day 0 to day 2, from one model</span></div>
+      </div>
+      <div class="than" id="than">&hellip;than <b>traditional managed services</b>.</div>
+      <div id="sig"><span class="wm"><i>STACK</i>TIC</span><em>STACK + TACTIC</em></div>
+    </div>
+  </div>
+
+  <div class="cap">
+    <div class="txt" id="cap"></div>
+    <span class="br">STACKTIC 2026</span>
+  </div>
+ </div>
+ <div class="prog"><i id="prog"></i></div>
+ <button class="gate" id="gate" hidden><span>&#9654;</span>PLAY WITH NARRATION</button>
+</section>
+<audio id="vo" src="slide-9.mp3" preload="auto"></audio>
+
+<div class="ctl">
+  <button id="play">&#9199; PLAY</button>
+  <button id="rst">&#8635; RESTART</button>
+  <input type="range" id="scrub" min="0" max="70.2" step="0.05" value="0" aria-label="timeline">
+  <span class="t" id="clock">0.0 / 70s</span>
+  <span>SPACE&nbsp;play&nbsp;&nbsp;&larr;&rarr;&nbsp;act&nbsp;&nbsp;1-7&nbsp;jump</span>
+</div>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+
+/* transcript from the recording itself (whisper), cue times from its pauses
+   (ffmpeg silencedetect). speech ends at 69.34s — the file has 10s of tail silence. */
+const CAPS=[
+ [0.00, 'So, to summarise,'],
+ [1.90, 'Stacktic is an automation platform that gives AI the context and control to build and operate complex, compliant production stacks with confidence.'],
+ [12.62,'The applications behind it can be anything —'],
+ [14.26,'private AI,'],
+ [15.48,'microservices, ML platforms,'],
+ [18.09,'sovereign IT,'],
+ [21.05,'or real-time fintech.'],
+ [23.43,'And this is not only about automation,'],
+ [25.99,'faster time to market, or lower cost.'],
+ [28.80,'It is also about governance,'],
+ [30.58,'risk reduction,'],
+ [31.84,'and knowing that what AI creates'],
+ [34.16,'is actually production ready.'],
+ [37.05,'AI can generate thousands of lines of code in days,'],
+ [40.82,'but that does not help if it does not understand the full stack,'],
+ [44.26,'its dependencies,'],
+ [45.68,'its security and compliance requirements,'],
+ [48.47,'or how it needs to scale in production.'],
+ [51.22,'Without that context and human validation,'],
+ [54.53,'you are still trusting a guessing machine.'],
+ [57.80,'Our vision is to enable 100% open source operational stacks'],
+ [63.78,'that are more advanced,'],
+ [64.97,'more innovative,'],
+ [66.18,'more secure, and far more automated than traditional managed services.']
+];
+const ACTS=[
+ {t:0,     id:'SUMMARY'},
+ {t:12.62, id:'ANYTHING'},
+ {t:23.43, id:'NOT ONLY'},
+ {t:28.80, id:'ALSO'},
+ {t:37.05, id:'THE GAP'},
+ {t:51.22, id:'GUESSING'},
+ {t:57.80, id:'VISION'}
+];
+const AC=['var(--gold)','var(--sky)','var(--faint)','var(--emerald)','var(--sky)','var(--red)','var(--emerald)'];
+const END=70.2;                       /* stop before the tail silence */
+let TOTAL=END;
+
+/* the thesis sentence, built in phrases */
+const PHRASES=[
+ ['Stacktic is an automation platform ',''],
+ ['that gives AI the ',''],
+ ['context','k'],[' and ',''],['control','k'],
+ [' to build and operate ',''],
+ ['complex, compliant production stacks','g'],
+ [' — with confidence.','']
+];
+const l1=$('#l1');
+PHRASES.forEach(([t,c])=>{
+  const s=document.createElement('span'); s.textContent=t; if(c) s.className=c; l1.appendChild(s);
+});
+const WORDS=$$('#l1 span');
+
+/* chrome */
+const capBox=$('#cap');
+CAPS.forEach(([t,s])=>{const el=document.createElement('span');el.textContent=s;capBox.appendChild(el)});
+const capEls=$$('#cap span');
+ACTS.forEach(a=>{const i=document.createElement('i');i.textContent=a.id;$('#acts').appendChild(i)});
+const actEls=$$('#acts i');
+
+let FAST=false;
+const timers=[];
+const later=(ms,fn)=>{ if(FAST){fn();return} timers.push(setTimeout(fn,ms)) };
+const clearLater=()=>{timers.forEach(clearTimeout);timers.length=0};
+const show=(id)=>{ $$('.layer').forEach(l=>l.classList.toggle('in',l.id===id)) };
+const APPS=$$('#apps .app'), QS=$$('#gap .q');
+
+/* the odometer keeps running — it is an illustration, not a claim */
+let odoOn=false, odoV=0, odoRaf=0;
+function odo(on){
+  odoOn=on;
+  if(!on){ cancelAnimationFrame(odoRaf); return }
+  if(FAST){ $('#loc').textContent='128,400'; return }
+  let last=performance.now();
+  const go=now=>{
+    if(!odoOn) return;
+    odoV += (now-last)*38; last=now;
+    $('#loc').textContent=Math.round(odoV).toLocaleString('en-US');
+    odoRaf=requestAnimationFrame(go);
+  };
+  odoRaf=requestAnimationFrame(go);
+}
+function replay(i){ const prev=FAST; FAST=true; A[i].enter(true); FAST=prev }
+const A=[];
+
+/* ── ACT 0 · the one sentence ── */
+A[0]={ enter(instant){
+  const D=instant?0:1;
+  show('thesis');
+  WORDS.forEach((w,i)=>later(D*(1900*0+300+i*520),()=>w.classList.add('in')));
+  later(D*5200,()=>$$('#pill3 div').forEach((p,i)=>later(D*(i*700),()=>p.classList.add('in'))));
+}};
+
+/* ── ACT 1 · the applications can be anything ── */
+A[1]={ enter(instant){
+  const D=instant?0:1;
+  show('apps');
+  /* one card per name, on the beat it is spoken */
+  const AT=[1640,2860,2860,5470,8430];      /* private AI · micro · ML · sovereign · fintech */
+  APPS.forEach((a,i)=>later(D*AT[i],()=>{
+    a.classList.add('in');
+    $$('.cs i',a).forEach((c,j)=>later(D*(200+j*130),()=>c.classList.add('in')));
+  }));
+}};
+
+/* ── ACT 2 · not only speed and cost ── */
+A[2]={ enter(instant){
+  const D=instant?0:1;
+  show('value');
+  $('#v1').classList.remove('faded');
+  $$('#v1 .vi').forEach((v,i)=>later(D*(200+i*820),()=>v.classList.add('in')));
+}};
+
+/* ── ACT 3 · it is also governance, risk, readiness ── */
+A[3]={ enter(instant){
+  const D=instant?0:1;
+  show('value');
+  $$('#v1 .vi').forEach(v=>v.classList.add('in'));
+  later(D*200,()=>$('#v1').classList.add('faded'));
+  /* governance (t+0) · risk reduction (t+1.78) · production-ready (t+5.36) */
+  const AT=[300,1780,5360];
+  $$('#v2 .vi').forEach((v,i)=>later(D*AT[i],()=>v.classList.add('in')));
+}};
+
+/* ── ACT 4 · thousands of lines that know nothing ── */
+A[4]={ enter(instant){
+  const D=instant?0:1;
+  show('gap');
+  odo(true);
+  /* the four things it does not understand, as they are named */
+  const AT=[3770,7210,8630,11420];
+  QS.forEach((q,i)=>later(D*AT[i],()=>{
+    q.classList.add('in'); later(D*600,()=>q.classList.add('miss'));
+  }));
+}};
+
+/* ── ACT 5 · a guessing machine ── */
+A[5]={ enter(instant){
+  const D=instant?0:1;
+  replay(4);
+  QS.forEach(q=>q.classList.add('in','miss'));
+  odo(true);
+  /* "you are still trusting a guessing machine" (t+3.31s) */
+  later(D*3310,()=>$('#stamp').classList.add('in'));
+  later(D*4600,()=>{
+    $('#fix').classList.add('in');
+    $$('#fix div').forEach((f,i)=>later(D*(i*600),()=>f.classList.add('in')));
+  });
+}};
+
+/* ── ACT 6 · the vision ── */
+A[6]={ enter(instant){
+  const D=instant?0:1;
+  odo(false);
+  show('vision');
+  later(D*300,()=>$('#big').classList.add('in'));
+  /* more advanced (t+5.98) · innovative (t+7.17) · secure (t+8.38) · automated (t+9.2) */
+  const AT=[5980,7170,8380,9200];
+  $$('.mo').forEach((m,i)=>later(D*AT[i],()=>m.classList.add('in')));
+  later(D*10200,()=>$('#than').classList.add('in'));
+  later(D*11200,()=>$('#sig').classList.add('in'));
+}};
+
+/* ── reset + seek ── */
+function resetScene(){
+  clearLater(); odo(false); odoV=0; $('#loc').textContent='0';
+  document.documentElement.classList.add('noanim');
+  $$('.layer').forEach(l=>l.classList.remove('in'));
+  WORDS.forEach(w=>w.classList.remove('in'));
+  $$('#pill3 div').forEach(p=>p.classList.remove('in'));
+  APPS.forEach(a=>{a.classList.remove('in');$$('.cs i',a).forEach(c=>c.classList.remove('in'))});
+  $('#v1').classList.remove('faded');
+  $$('#value .vi').forEach(v=>v.classList.remove('in'));
+  QS.forEach(q=>q.classList.remove('in','miss'));
+  $('#stamp').classList.remove('in');
+  $('#fix').classList.remove('in'); $$('#fix div').forEach(f=>f.classList.remove('in'));
+  $('#big').classList.remove('in'); $$('.mo').forEach(m=>m.classList.remove('in'));
+  $('#than').classList.remove('in'); $('#sig').classList.remove('in');
+  document.body.offsetWidth;
+  document.documentElement.classList.remove('noanim');
+}
+
+let clock=0, playing=false, lastTs=0, curAct=-1, seekToken=0;
+function applyUpTo(i){
+  const token=++seekToken;
+  resetScene();
+  document.documentElement.classList.add('noanim');
+  FAST=true;
+  for(let k=0;k<i;k++) A[k].enter(true);
+  curAct=i; paintChrome(i);
+  setTimeout(()=>{
+    if(token!==seekToken) return;
+    FAST=false;
+    document.body.offsetWidth;
+    document.documentElement.classList.remove('noanim');
+    A[i].enter(false);
+  },0);
+}
+function paintChrome(i){
+  $('#slide').style.setProperty('--ac',AC[i]);
+  $$('.hl').forEach((el,k)=>el.classList.toggle('on',k===i));
+  actEls.forEach((el,k)=>{el.classList.toggle('on',k===i);el.classList.toggle('past',k<i)});
+}
+function actAt(t){let i=0;ACTS.forEach((a,k)=>{if(t>=a.t)i=k});return i}
+function paintCaption(t){
+  let idx=-1; CAPS.forEach(([ct],i)=>{if(t>=ct)idx=i});
+  capEls.forEach((el,i)=>el.classList.toggle('on',i===idx));
+}
+
+const vo=$('#vo'); let useAudio=false;
+vo.addEventListener('loadedmetadata',()=>{ useAudio=true });
+vo.addEventListener('error',()=>{useAudio=false});
+
+function frame(ts){
+  if(playing){
+    const dt=Math.min(.05,(ts-lastTs)/1000)||0;
+    clock = useAudio && !vo.paused ? vo.currentTime : Math.min(TOTAL,clock+dt);
+    const a=actAt(clock);
+    if(a!==curAct){ if(a===curAct+1){A[a].enter(false);curAct=a;paintChrome(a)} else applyUpTo(a) }
+    paintCaption(clock); readout();
+    if(clock>=TOTAL) setPlay(false);
+  }
+  lastTs=ts;
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+function readout(){
+  $('#scrub').value=clock;
+  $('#clock').textContent=clock.toFixed(1)+' / '+TOTAL.toFixed(0)+'s';
+  $('#prog').style.width=(clock/TOTAL*100)+'%';
+}
+function setPlay(p){
+  playing=p; $('#play').innerHTML=p?'&#9208; PAUSE':'&#9199; PLAY';
+  if(!useAudio) return;
+  if(p){ vo.play().catch(()=>{ setPlay(false); $('#gate').hidden=false }) } else vo.pause();
+}
+function seek(t){
+  clock=Math.max(0,Math.min(TOTAL,t));
+  if(useAudio) vo.currentTime=clock;
+  applyUpTo(actAt(clock)); paintCaption(clock); readout();
+}
+function restart(){seek(0);setPlay(true)}
+$('#gate').onclick=()=>{ $('#gate').hidden=true; seek(0); setPlay(true) };
+$('#play').onclick=()=>setPlay(!playing);
+$('#rst').onclick=restart;
+$('#scrub').oninput=e=>seek(+e.target.value);
+addEventListener('keydown',e=>{
+  if(e.code==='Space'){e.preventDefault();setPlay(!playing)}
+  else if(e.key==='ArrowRight'){seek(ACTS[Math.min(ACTS.length-1,actAt(clock)+1)].t)}
+  else if(e.key==='ArrowLeft'){seek(ACTS[Math.max(0,actAt(clock)-1)].t)}
+  else if(e.key.toLowerCase()==='r'){restart()}
+  else if(/^[1-7]$/.test(e.key)){seek(ACTS[+e.key-1].t)}
+});
+
+const hash=new URLSearchParams(location.hash.slice(1));
+const start = hash.has('act') ? (ACTS[+hash.get('act')]||ACTS[0]).t
+            : hash.has('t')   ? +hash.get('t') : 0;
+let booted=false;
+function boot(){ if(booted) return; booted=true; seek(start); setPlay(!hash.has('pause')) }
+seek(start);
+vo.addEventListener('canplay',boot,{once:true});
+setTimeout(boot,1500);
+</script>
+</body></html>

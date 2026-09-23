@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stacktic | The Story</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --indigo: #4f46e5;
+            --indigo-light: #818cf8;
+            --purple: #7c3aed;
+            --cyan: #0891b2;
+            --green: #059669;
+            --green-light: #34d399;
+            --amber: #fbbf24;
+            --red: #dc2626;
+            --red-light: #f87171;
+            --dark: #0b0f1e;
+            --dark-2: #1a1a2e;
+            --slate-700: #334155;
+            --slate-600: #475569;
+            --slate-500: #64748b;
+            --slate-400: #94a3b8;
+            --slate-300: #cbd5e1;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+            --slate-50: #f8fafc;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+        html, body { width: 100%; }
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #fff;
+            color: var(--dark-2);
+            line-height: 1.5;
+        }
+        .page {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 28px 22px 36px;
+        }
+        .serif { font-family: 'DM Serif Display', Georgia, serif; }
+
+        /* ===== CHAPTER MARKER ===== */
+        .chapter {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .chapter-num {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 28px;
+            line-height: 1;
+            color: var(--indigo);
+            opacity: 0.4;
+        }
+        .chapter-label {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--slate-500);
+        }
+        .chapter-dark .chapter-num { color: var(--indigo-light); opacity: 0.5; }
+        .chapter-dark .chapter-label { color: var(--slate-400); }
+
+        /* ===== TYPOGRAPHY ===== */
+        h1.hero-title {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 38px;
+            line-height: 1.08;
+            letter-spacing: -1px;
+            color: var(--dark-2);
+            margin-bottom: 18px;
+        }
+        h1.hero-title .accent { color: var(--indigo); }
+        h2.section-title {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 30px;
+            line-height: 1.15;
+            letter-spacing: -0.5px;
+            color: var(--dark-2);
+            margin-bottom: 14px;
+        }
+        h2.section-title.on-dark { color: #fff; }
+        h2.section-title .red { color: var(--red-light); }
+        h2.section-title .indigo { color: var(--indigo); }
+        h2.section-title .green { color: var(--green); }
+        h2.section-title .amber { color: var(--amber); }
+        h2.section-title .purple { color: var(--purple); }
+        .lede {
+            font-size: 16px;
+            line-height: 1.55;
+            color: var(--slate-600);
+            margin-bottom: 18px;
+        }
+        .lede.on-dark { color: var(--slate-300); }
+        .kicker {
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--indigo);
+            margin-bottom: 10px;
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            border-radius: 18px;
+            padding: 24px 22px;
+            margin-bottom: 22px;
+        }
+        .card-dark { background: var(--dark); color: #fff; }
+        .card-light { background: linear-gradient(135deg, var(--slate-50), var(--slate-100)); border: 1px solid var(--slate-200); }
+        .card-green { background: linear-gradient(135deg, #ecfdf5, #d1fae5); border: 1px solid #a7f3d0; }
+        .card-amber { background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 1px solid #fde68a; }
+        .card-feature {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: #fff;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            padding: 12px 0 26px;
+            border-bottom: 1px solid var(--slate-200);
+            margin-bottom: 26px;
+        }
+        .brand {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 28px;
+        }
+        .brand .logo {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 36px;
+            line-height: 1;
+            color: var(--indigo);
+            letter-spacing: -1px;
+        }
+        .brand .tagline { font-size: 11px; color: var(--slate-500); margin-top: 4px; font-weight: 600; letter-spacing: 0.5px; }
+        .brand .contact { text-align: right; font-size: 11px; }
+        .brand .contact .url { color: var(--dark-2); font-weight: 700; }
+        .brand .contact .email { color: var(--slate-400); margin-top: 2px; }
+
+        .hero-subline {
+            font-size: 17px;
+            color: var(--slate-600);
+            line-height: 1.45;
+            margin-bottom: 22px;
+        }
+        .hero-subline strong { color: var(--dark-2); font-weight: 700; }
+
+        .hero-pillars {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        .hero-pill {
+            background: var(--slate-50);
+            border: 1px solid var(--slate-200);
+            border-radius: 10px;
+            padding: 12px 10px;
+            text-align: center;
+        }
+        .hero-pill .val {
+            font-size: 22px;
+            font-weight: 900;
+            line-height: 1;
+            color: var(--indigo);
+        }
+        .hero-pill .lab {
+            font-size: 10px;
+            color: var(--slate-500);
+            margin-top: 6px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .hero-pill.p2 .val { color: var(--purple); }
+        .hero-pill.p3 .val { color: var(--cyan); }
+        .hero-pill.p4 .val { color: var(--green); }
+
+        /* ===== PAIN (CHAPTER 1) ===== */
+        .demands {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin: 18px 0 22px;
+            padding: 18px 0;
+            border-top: 1px solid rgba(255,255,255,0.10);
+            border-bottom: 1px solid rgba(255,255,255,0.10);
+        }
+        .demand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .demand .num {
+            flex-shrink: 0;
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 22px;
+            line-height: 1;
+            color: var(--red-light);
+            font-weight: 900;
+            letter-spacing: -1px;
+            opacity: 0.7;
+        }
+        .demand .h {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.2px;
+            line-height: 1.2;
+        }
+        .pain-list { display: flex; flex-direction: column; }
+        .pain-item {
+            padding: 16px 0;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+        .pain-item:first-child { border-top: none; padding-top: 4px; }
+        .pain-icon {
+            flex-shrink: 0;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: rgba(248,113,113,0.10);
+            border: 1px solid rgba(248,113,113,0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--red-light);
+            font-weight: 800;
+            font-size: 15px;
+            font-family: 'DM Sans', sans-serif;
+            letter-spacing: -0.5px;
+        }
+        .pain-icon.icon-tight {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0;
+        }
+        .pain-content { flex: 1; }
+        .pain-content .h {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+            letter-spacing: -0.2px;
+        }
+        .pain-content .p {
+            font-size: 14px;
+            color: var(--slate-400);
+            line-height: 1.55;
+        }
+        .pain-closing {
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 20px;
+            line-height: 1.3;
+            color: var(--red-light);
+            text-align: center;
+        }
+
+        /* ===== WHY NOW (CHAPTER 2) ===== */
+        .shift-list { display: flex; flex-direction: column; gap: 18px; }
+        .shift-item { display: flex; gap: 14px; align-items: flex-start; }
+        .shift-num {
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--dark-2);
+            color: var(--indigo-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'DM Serif Display', serif;
+            font-size: 18px;
+            font-weight: 900;
+        }
+        .shift-item .h {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--dark-2);
+            margin-bottom: 4px;
+        }
+        .shift-item .p {
+            font-size: 14px;
+            color: var(--slate-600);
+            line-height: 1.5;
+        }
+        .shift-item .p strong { color: var(--dark-2); font-weight: 700; }
+        .shift-closing {
+            margin-top: 18px;
+            padding-top: 16px;
+            border-top: 1px solid var(--slate-200);
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 19px;
+            line-height: 1.3;
+            color: var(--dark-2);
+            text-align: center;
+        }
+        .shift-closing .red { color: var(--red); }
+
+        /* ===== MEET STACKTIC (CHAPTER 3) ===== */
+        .meet-statement {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 26px;
+            line-height: 1.2;
+            color: #fff;
+            margin-bottom: 18px;
+        }
+        .meet-features {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .meet-feature {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .meet-check {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--indigo);
+            font-weight: 900;
+            font-size: 14px;
+        }
+        .meet-feature .h {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+        .meet-feature .p {
+            font-size: 12px;
+            color: rgba(255,255,255,0.78);
+            line-height: 1.4;
+        }
+
+        /* ===== HOW IT WORKS (CHAPTER 4) ===== */
+        .steps { display: flex; flex-direction: column; gap: 12px; }
+        .step {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid var(--slate-200);
+            background: #fff;
+        }
+        .step-num {
+            flex-shrink: 0;
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-family: 'DM Serif Display', serif;
+            font-size: 22px;
+            font-weight: 900;
+        }
+        .step.s1 .step-num { background: var(--indigo); }
+        .step.s2 .step-num { background: var(--purple); }
+        .step.s3 .step-num { background: var(--cyan); }
+        .step.s4 .step-num { background: var(--green); }
+        .step .h {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--dark-2);
+            margin-bottom: 3px;
+            letter-spacing: -0.2px;
+        }
+        .step .p {
+            font-size: 14px;
+            color: var(--slate-500);
+            line-height: 1.5;
+        }
+
+        /* ===== PROOF (CHAPTER 5) ===== */
+        .proof-scenario {
+            background: rgba(255,255,255,0.06);
+            border-left: 3px solid var(--amber);
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: var(--slate-300);
+            margin-bottom: 18px;
+        }
+        .proof-scenario strong { color: #fff; }
+        .proof-bars { display: flex; flex-direction: column; gap: 18px; margin-bottom: 20px; }
+        .proof-row-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .proof-row .lab {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--slate-400);
+            flex: 1;
+        }
+        .saves {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .saves .amount {
+            font-family: 'DM Serif Display', serif;
+            font-size: 17px;
+            font-weight: 900;
+            color: var(--green-light);
+            line-height: 1;
+            letter-spacing: -0.3px;
+        }
+        .saves .pct {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--green-light);
+            background: rgba(52,211,153,0.15);
+            padding: 3px 7px;
+            border-radius: 4px;
+            letter-spacing: 0.3px;
+        }
+        .proof-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+        .proof-bar .badge {
+            flex-shrink: 0;
+            width: 72px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .proof-bar .bar {
+            flex: 1;
+            height: 22px;
+            border-radius: 4px;
+            position: relative;
+        }
+        .proof-bar .val {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
+            white-space: nowrap;
+        }
+        .proof-bar.trad .badge { color: var(--slate-400); }
+        .proof-bar.trad .bar { background: var(--slate-600); }
+        .proof-bar.stk .badge { color: var(--green-light); }
+        .proof-bar.stk .bar { background: linear-gradient(90deg, var(--green), var(--green-light)); }
+
+        .roi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .roi-tile {
+            border-radius: 12px;
+            padding: 14px 10px;
+            text-align: center;
+        }
+        .roi-tile .num {
+            font-family: 'DM Serif Display', serif;
+            font-size: 26px;
+            line-height: 1;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+        .roi-tile .lab {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-top: 7px;
+            color: var(--slate-300);
+            font-weight: 600;
+        }
+        .roi-1 { background: rgba(52,211,153,0.12); border: 1px solid rgba(52,211,153,0.25); }
+        .roi-1 .num { color: var(--green-light); }
+        .roi-2 { background: rgba(129,140,248,0.12); border: 1px solid rgba(129,140,248,0.25); }
+        .roi-2 .num { color: var(--indigo-light); }
+        .roi-3 { background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.25); }
+        .roi-3 .num { color: var(--amber); }
+
+        /* ===== PROOF — SIMPLIFIED ===== */
+        .proof-headline {
+            text-align: center;
+            padding: 26px 0 24px;
+            margin: 18px 0 22px;
+            border-top: 1px solid rgba(255,255,255,0.10);
+            border-bottom: 1px solid rgba(255,255,255,0.10);
+        }
+        .proof-headline .big {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 72px;
+            line-height: 0.95;
+            font-weight: 900;
+            color: var(--green-light);
+            letter-spacing: -2px;
+        }
+        .proof-headline .small {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            color: var(--slate-300);
+            margin-top: 10px;
+            font-weight: 700;
+        }
+        .savings-list { display: flex; flex-direction: column; margin-bottom: 22px; }
+        .savings-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 0;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .savings-row:first-child { border-top: none; padding-top: 4px; }
+        .savings-row .pct {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 30px;
+            line-height: 1;
+            font-weight: 900;
+            color: var(--green-light);
+            flex-shrink: 0;
+            min-width: 92px;
+            letter-spacing: -1px;
+        }
+        .savings-row.r2 .pct { color: #67e8f9; }
+        .savings-row.r3 .pct { color: var(--indigo-light); }
+        .savings-row.r4 .pct { color: var(--amber); }
+        .savings-row.r5 .pct { color: #f9a8d4; }
+        .savings-row .text {
+            flex: 1;
+            font-size: 14px;
+            color: var(--slate-300);
+            line-height: 1.5;
+        }
+        .savings-row .text .head {
+            display: block;
+            color: #fff;
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 3px;
+            letter-spacing: -0.2px;
+        }
+        .savings-row .roles {
+            display: inline-flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+        .savings-row .role {
+            background: rgba(255,255,255,0.08);
+            border-radius: 4px;
+            padding: 2px 7px;
+            font-size: 10px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 0.3px;
+        }
+        .payback-line {
+            text-align: center;
+            background: rgba(251,191,36,0.10);
+            border: 1px solid rgba(251,191,36,0.25);
+            border-radius: 10px;
+            padding: 16px;
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 22px;
+            color: var(--amber);
+            line-height: 1.2;
+            letter-spacing: -0.3px;
+        }
+        .payback-line strong { color: #fff; font-weight: normal; }
+
+        /* ===== DEMOS (CHAPTER 6) ===== */
+        .demos { display: flex; flex-direction: column; gap: 16px; }
+        .demo {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            padding: 14px;
+        }
+        .demo video {
+            width: 100%;
+            border-radius: 10px;
+            background: #000;
+            display: block;
+        }
+        .demo .h {
+            font-size: 17px;
+            font-weight: 800;
+            color: #fff;
+            margin: 14px 0 4px;
+            letter-spacing: -0.2px;
+        }
+        .demo .p {
+            font-size: 14px;
+            color: var(--slate-400);
+            line-height: 1.55;
+        }
+        .demo .lnk {
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--indigo-light);
+            text-decoration: none;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .demo .lnk:hover { text-decoration: underline; }
+
+        /* ===== WHERE IT FITS (CHAPTER 7) ===== */
+        .fits { display: flex; flex-direction: column; gap: 12px; }
+        .fit {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            padding: 14px;
+            background: #fff;
+            border: 1px solid var(--slate-200);
+            border-radius: 12px;
+            border-left-width: 4px;
+        }
+        .fit .icon {
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .fit .h {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--dark-2);
+            margin-bottom: 4px;
+            letter-spacing: -0.2px;
+        }
+        .fit .p {
+            font-size: 14px;
+            color: var(--slate-500);
+            line-height: 1.5;
+        }
+        .fit.f1 { border-left-color: var(--indigo); }
+        .fit.f1 .icon { background: rgba(79,70,229,0.12); color: var(--indigo); }
+        .fit.f2 { border-left-color: var(--purple); }
+        .fit.f2 .icon { background: rgba(124,58,237,0.12); color: var(--purple); }
+        .fit.f3 { border-left-color: var(--cyan); }
+        .fit.f3 .icon { background: rgba(8,145,178,0.12); color: var(--cyan); }
+        .fit.f4 { border-left-color: var(--green); }
+        .fit.f4 .icon { background: rgba(5,150,105,0.12); color: var(--green); }
+        .fit.f5 { border-left-color: var(--red); }
+        .fit.f5 .icon { background: rgba(220,38,38,0.12); color: var(--red); }
+
+        /* ===== DEPLOY (CHAPTER 8) ===== */
+        .deploy-line {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 24px;
+            line-height: 1.2;
+            color: var(--green);
+            margin-bottom: 14px;
+        }
+        .deploy-line strong { color: var(--dark-2); font-weight: normal; }
+        .deploy-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+        .chip {
+            background: #fff;
+            border: 1px solid #a7f3d0;
+            border-radius: 20px;
+            padding: 7px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #065f46;
+        }
+        .deploy-note {
+            font-size: 13px;
+            color: var(--green);
+            font-weight: 700;
+        }
+
+        /* ===== CTA (CHAPTER 9) ===== */
+        .cta {
+            text-align: center;
+            padding: 30px 22px;
+        }
+        .cta-line {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 26px;
+            line-height: 1.25;
+            color: #fff;
+            margin-bottom: 18px;
+        }
+        .cta-btn {
+            display: inline-block;
+            background: #fff;
+            color: var(--indigo);
+            font-weight: 800;
+            font-size: 14px;
+            padding: 14px 28px;
+            border-radius: 10px;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+        }
+        .cta-meta {
+            margin-top: 14px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* ===== DESKTOP ===== */
+        @media (min-width: 768px) {
+            .page { max-width: 720px; padding: 40px 32px; }
+            h1.hero-title { font-size: 50px; }
+            h2.section-title { font-size: 36px; }
+            .meet-statement { font-size: 32px; }
+            .demos { display: grid; grid-template-columns: 1fr 1fr; }
+            .hero-pillars { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        /* ===== PRINT / PDF (mobile-fit) ===== */
+        @page { size: 90mm 297mm; margin: 0; }
+        @media print {
+            html, body { background: #fff; }
+            .page { max-width: 100%; padding: 8mm 6mm; }
+            .card, .step, .fit, .demo { break-inside: avoid; page-break-inside: avoid; }
+            .demo video { display: none; }
+            .demo::after {
+                content: "Scan QR or open URL below to watch";
+                display: block;
+                background: rgba(255,255,255,0.06);
+                color: var(--indigo-light);
+                border-radius: 8px;
+                padding: 22px 14px;
+                text-align: center;
+                font-size: 11px;
+                font-weight: 700;
+                letter-spacing: 1px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <!-- ==================== HERO ==================== -->
+    <div class="hero">
+        <div class="brand">
+            <div>
+                <div class="logo">Stacktic</div>
+                <div class="tagline">THE APP FACTORY</div>
+            </div>
+            <div class="contact">
+                <div class="url">stacktic.io</div>
+                <div class="email">info@stacktic.io</div>
+            </div>
+        </div>
+
+        <h1 class="hero-title">
+            Stacktic builds, secures, and operates your entire software stack, <span class="accent">automatically.</span>
+        </h1>
+
+        <div class="hero-subline">
+            One definition. Any cloud. Every regulation. <strong>Built once. Runs everywhere. Compliant forever.</strong>
+        </div>
+
+        <div class="hero-pillars">
+            <div class="hero-pill">
+                <div class="val">-80%</div>
+                <div class="lab">Ops Cost</div>
+            </div>
+            <div class="hero-pill p2">
+                <div class="val">-40%</div>
+                <div class="lab">Infra &amp; Licensing</div>
+            </div>
+            <div class="hero-pill p3">
+                <div class="val">+10×</div>
+                <div class="lab">Faster Delivery</div>
+            </div>
+            <div class="hero-pill p4">
+                <div class="val">0</div>
+                <div class="lab">Vendor Lock-in</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== CH 1: THE PAIN ==================== -->
+    <div class="chapter">
+        <span class="chapter-num">01</span>
+        <span class="chapter-label">The Problem</span>
+    </div>
+
+    <div class="card card-dark">
+        <h2 class="section-title on-dark">AI rewrote the rules. <span class="red">Your apps haven't.</span></h2>
+        <div class="lede on-dark">Apps now face four demands. All at once.</div>
+
+        <div class="demands">
+            <div class="demand">
+                <div class="num">01</div>
+                <div class="h">Run at machine speed</div>
+            </div>
+            <div class="demand">
+                <div class="num">02</div>
+                <div class="h">Adapt to new tech daily</div>
+            </div>
+            <div class="demand">
+                <div class="num">03</div>
+                <div class="h">Automate every operation</div>
+            </div>
+            <div class="demand">
+                <div class="num">04</div>
+                <div class="h">Prove compliance daily</div>
+            </div>
+        </div>
+
+        <div class="pain-list">
+            <div class="pain-item">
+                <div class="pain-icon">$</div>
+                <div class="pain-content">
+                    <div class="h">Engineering is in survival mode.</div>
+                    <div class="p">AI adoption. New frameworks. Constant fires. Engineers spend 70% surviving the stack. The other 30% builds the next problem.</div>
+                </div>
+            </div>
+            <div class="pain-item">
+                <div class="pain-icon">↗</div>
+                <div class="pain-content">
+                    <div class="h">Licensing and cloud are eating you.</div>
+                    <div class="p">SaaS renewals get pricier. Cloud bills compound. Managed services replace one bill with three.</div>
+                </div>
+            </div>
+            <div class="pain-item">
+                <div class="pain-icon">⏱</div>
+                <div class="pain-content">
+                    <div class="h">Compliance costs millions and takes months.</div>
+                    <div class="p">PCI, HIPAA, SOC 2, DORA. Each takes months. Each costs a fortune. Changes reset the clock.</div>
+                </div>
+            </div>
+            <div class="pain-item">
+                <div class="pain-icon">⚙</div>
+                <div class="pain-content">
+                    <div class="h">Legacy is freezing your stack.</div>
+                    <div class="p">Rebuilds stall for years. New technology cannot land. Innovation waits in line.</div>
+                </div>
+            </div>
+            <div class="pain-item">
+                <div class="pain-icon">🔒</div>
+                <div class="pain-content">
+                    <div class="h">Vendor lock-in is now a board-level risk.</div>
+                    <div class="p">Cloud bills rise. Switching becomes impossible. Strategy bends to the vendor, not the business.</div>
+                </div>
+            </div>
+            <div class="pain-item">
+                <div class="pain-icon">!</div>
+                <div class="pain-content">
+                    <div class="h">Politics still owns your roadmap.</div>
+                    <div class="p">Past choices, internal silos and protected fiefdoms dictate the stack. The business comes second.</div>
+                </div>
+            </div>
+            <div class="pain-item">
+                <div class="pain-icon">≠</div>
+                <div class="pain-content">
+                    <div class="h">No two stacks look alike.</div>
+                    <div class="p">Standards drift. Quality varies between teams. Auditors find gaps no one knew existed.</div>
+                </div>
+            </div>
+            <div class="pain-item">
+                <div class="pain-icon icon-tight">P</div>
+                <div class="pain-content">
+                    <div class="h">Private data is leaving the building.</div>
+                    <div class="p">Customer, financial and IP data flows into clouds and AI models you don't control. You'll find out the next time it's on the front page.</div>
+                </div>
+            </div>
+            <div class="pain-item">
+                <div class="pain-icon icon-tight">AI</div>
+                <div class="pain-content">
+                    <div class="h">AI is running with the keys.</div>
+                    <div class="p">Agents act on your data, your systems and your customers. No oversight. No audit trail. No kill switch.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pain-closing">Those who fail to automate and adapt will be left behind.</div>
+    </div>
+
+    <!-- ==================== CH 2: WHY NOW ==================== -->
+    <div class="chapter">
+        <span class="chapter-num">02</span>
+        <span class="chapter-label">Why It Can't Wait</span>
+    </div>
+
+    <div class="card card-light">
+        <h2 class="section-title">Three forces are <span class="indigo">colliding now.</span></h2>
+        <div class="lede">Any one of these would strain your stack. All three are happening at once.</div>
+
+        <div class="shift-list">
+            <div class="shift-item">
+                <div class="shift-num">1</div>
+                <div>
+                    <div class="h">The stack is exploding.</div>
+                    <div class="p">Businesses need more software. More layers. More integrations. <strong>Open source is growing 25% a year. AI tooling is growing faster.</strong></div>
+                </div>
+            </div>
+            <div class="shift-item">
+                <div class="shift-num">2</div>
+                <div>
+                    <div class="h">Dependency is becoming dangerous.</div>
+                    <div class="p">Sovereignty rules, rising cloud costs and geopolitics are forcing enterprises to <strong>reduce hyperscaler dependency.</strong> Portability is now a strategy, not a preference.</div>
+                </div>
+            </div>
+            <div class="shift-item">
+                <div class="shift-num">3</div>
+                <div>
+                    <div class="h">AI attacks at machine speed.</div>
+                    <div class="p">Attackers automate too. Breach windows shrink from days to minutes. <strong>Manual security cannot match it.</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="shift-closing">
+            Complexity now grows faster than engineering.<br>
+            <span class="red">You cannot hire your way out.</span>
+        </div>
+    </div>
+
+    <!-- ==================== CH 3: MEET STACKTIC ==================== -->
+    <div class="chapter chapter-dark">
+        <span class="chapter-num">03</span>
+        <span class="chapter-label">Meet Stacktic</span>
+    </div>
+
+    <div class="card card-feature">
+        <div class="kicker" style="color: rgba(255,255,255,0.8);">The Answer</div>
+        <div class="meet-statement">
+            Four guarantees. Every stack. Every time.
+        </div>
+
+        <div class="meet-features">
+            <div class="meet-feature">
+                <div class="meet-check">✓</div>
+                <div>
+                    <div class="h">Compliance built in</div>
+                    <div class="p">PCI-DSS, HIPAA, SOC 2 and DORA ship with the stack. Not bolted on later.</div>
+                </div>
+            </div>
+            <div class="meet-feature">
+                <div class="meet-check">✓</div>
+                <div>
+                    <div class="h">Ships ready, not "ready later"</div>
+                    <div class="p">No long platform projects. No "we'll harden it next quarter." Stacks ship hardened.</div>
+                </div>
+            </div>
+            <div class="meet-feature">
+                <div class="meet-check">✓</div>
+                <div>
+                    <div class="h">Runs anywhere</div>
+                    <div class="p">Any cloud. On-premise. Air-gapped. Edge. Same definition, any target.</div>
+                </div>
+            </div>
+            <div class="meet-feature">
+                <div class="meet-check">✓</div>
+                <div>
+                    <div class="h">AI-native, AI-governed</div>
+                    <div class="p">Build with AI safely. Govern AI agents from day one. Ready for what's next.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== CH 4: HOW IT WORKS ==================== -->
+    <div class="chapter">
+        <span class="chapter-num">04</span>
+        <span class="chapter-label">How It Works</span>
+    </div>
+
+    <h2 class="section-title">Four steps. <span class="indigo">Every stack.</span></h2>
+    <div class="lede">What used to take a platform team six months now runs as a single, repeatable process.</div>
+
+    <div class="steps">
+        <div class="step s1">
+            <div class="step-num">1</div>
+            <div>
+                <div class="h">Connect</div>
+                <div class="p">Choose the components your business needs. Stacktic knows how they fit together.</div>
+            </div>
+        </div>
+        <div class="step s2">
+            <div class="step-num">2</div>
+            <div>
+                <div class="h">Automate</div>
+                <div class="p">Component relationships are auto-resolved. No manual wiring.</div>
+            </div>
+        </div>
+        <div class="step s3">
+            <div class="step-num">3</div>
+            <div>
+                <div class="h">Generate</div>
+                <div class="p">A complete, versioned, production-ready stack, delivered as code, ready to deploy.</div>
+            </div>
+        </div>
+        <div class="step s4">
+            <div class="step-num">4</div>
+            <div>
+                <div class="h">Govern</div>
+                <div class="p">Ongoing operations, security, upgrades and audits are handled by the platform, not your team.</div>
+            </div>
+        </div>
+    </div>
+
+    <div style="height: 22px;"></div>
+
+    <!-- ==================== CH 5: THE PROOF ==================== -->
+    <div class="chapter chapter-dark">
+        <span class="chapter-num">05</span>
+        <span class="chapter-label">The Proof</span>
+    </div>
+
+    <div class="card card-dark">
+        <h2 class="section-title on-dark">The math, <span class="amber">on a real scenario.</span></h2>
+        <div class="lede on-dark">20 engineers. 10 production stacks. $4M+ annual stack budget.</div>
+
+        <div class="proof-headline">
+            <div class="big">$5M+</div>
+            <div class="small">Recovered. Year one.</div>
+        </div>
+
+        <div class="savings-list">
+            <div class="savings-row r1">
+                <div class="pct">−80%</div>
+                <div class="text">
+                    <span class="head">Specialized ops teams, replaced.</span>
+                    All of these roles are automated by Stacktic.
+                    <div class="roles">
+                        <span class="role">DataOps</span>
+                        <span class="role">SecOps</span>
+                        <span class="role">DevOps</span>
+                        <span class="role">SRE</span>
+                        <span class="role">NetOps</span>
+                    </div>
+                </div>
+            </div>
+            <div class="savings-row r2">
+                <div class="pct">−70%</div>
+                <div class="text">
+                    <span class="head">Operations cost.</span>
+                    $3M annual budget drops to $900K. <strong style="color:#fff;">$2.1M back, annually</strong>.
+                </div>
+            </div>
+            <div class="savings-row r3">
+                <div class="pct">−63%</div>
+                <div class="text">
+                    <span class="head">Licensing &amp; infrastructure.</span>
+                    $1.2M annual drops to $450K. Open source replaces SaaS. Multi-cloud portable.
+                </div>
+            </div>
+            <div class="savings-row r4">
+                <div class="pct">−100%</div>
+                <div class="text">
+                    <span class="head">Compliance project, eliminated.</span>
+                    8 months and $400K per app to pass PCI / HIPAA / SOC 2 / DORA. With Stacktic, it ships built in.
+                </div>
+            </div>
+            <div class="savings-row r5">
+                <div class="pct">+10×</div>
+                <div class="text">
+                    <span class="head">Faster to production.</span>
+                    Stack delivery drops from 6–9 months to 1–2. Products reach market sooner.
+                </div>
+            </div>
+        </div>
+
+        <div class="payback-line">
+            Payback in <strong>under 12 months.</strong>
+        </div>
+    </div>
+
+    <!-- ==================== CH 6: SEE IT LIVE ==================== -->
+    <div class="chapter chapter-dark">
+        <span class="chapter-num">06</span>
+        <span class="chapter-label">See It Live</span>
+    </div>
+
+    <div class="card card-dark">
+        <h2 class="section-title on-dark">Two minutes. <span class="indigo" style="color: var(--indigo-light);">Two demos.</span></h2>
+        <div class="lede on-dark">Watch Stacktic build and validate a complete stack, end to end.</div>
+
+        <div class="demos">
+            <div class="demo">
+                <video controls preload="metadata" playsinline>
+                    <source src="https://video.wixstatic.com/video/06ddae_f04851cf3d8344c387c51363260cfee9/1080p/mp4/file.mp4" type="video/mp4">
+                </video>
+                <div class="h">From idea to running stack</div>
+                <div class="p">See how Stacktic turns a stack definition into a complete, production-ready system, automatically.</div>
+                <a class="lnk" href="https://video.wixstatic.com/video/06ddae_f04851cf3d8344c387c51363260cfee9/1080p/mp4/file.mp4" target="_blank">Watch demo &rarr;</a>
+            </div>
+            <div class="demo">
+                <video controls preload="metadata" playsinline>
+                    <source src="https://video.wixstatic.com/video/06ddae_5df7d01bdd864007bc94cee77fc9f2cd/1080p/mp4/file.mp4" type="video/mp4">
+                </video>
+                <div class="h">How Stacktic knows your stack is right</div>
+                <div class="p">Beyond monitoring. Stacktic understands all relationships in your stack and validates them continuously.</div>
+                <a class="lnk" href="https://video.wixstatic.com/video/06ddae_5df7d01bdd864007bc94cee77fc9f2cd/1080p/mp4/file.mp4" target="_blank">Watch demo &rarr;</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== CH 7: WHERE IT FITS ==================== -->
+    <div class="chapter">
+        <span class="chapter-num">07</span>
+        <span class="chapter-label">Where It Fits</span>
+    </div>
+
+    <h2 class="section-title">Built for the <span class="indigo">hardest software problems.</span></h2>
+    <div class="lede">If you recognize yourself in any of these, you should be talking to us.</div>
+
+    <div class="fits">
+        <div class="fit f1">
+            <div class="icon">🛡</div>
+            <div>
+                <div class="h">Private AI you can trust</div>
+                <div class="p">Run AI and RAG in air-gapped or regulated environments. Secure, isolated and fully compliant.</div>
+            </div>
+        </div>
+        <div class="fit f2">
+            <div class="icon">🌐</div>
+            <div>
+                <div class="h">Multi-cloud data pipelines</div>
+                <div class="p">Distributed messaging and data flows across clouds and regions, PCI-DSS ready out of the box.</div>
+            </div>
+        </div>
+        <div class="fit f3">
+            <div class="icon">⚡</div>
+            <div>
+                <div class="h">Modern apps with 80% less operations</div>
+                <div class="p">Strict security, full automation, production-ready. Freeing your team to build, not maintain.</div>
+            </div>
+        </div>
+        <div class="fit f4">
+            <div class="icon">📦</div>
+            <div>
+                <div class="h">A standard factory for new products</div>
+                <div class="p">Versioned. Rollback-ready. Fully logged. Teams build the same way. The right way.</div>
+            </div>
+        </div>
+        <div class="fit f5">
+            <div class="icon">$</div>
+            <div>
+                <div class="h">Compliance without the price tag</div>
+                <div class="p">PCI-DSS, HIPAA, SOC 2 and DORA built in. Not a million-dollar project per app.</div>
+            </div>
+        </div>
+    </div>
+
+    <div style="height: 22px;"></div>
+
+    <!-- ==================== CH 8: DEPLOY ==================== -->
+    <div class="chapter">
+        <span class="chapter-num">08</span>
+        <span class="chapter-label">Deploy Anywhere</span>
+    </div>
+
+    <div class="card card-green">
+        <div class="deploy-line"><strong>Same definition.</strong> Any target. Zero rewrites.</div>
+        <div class="deploy-chips">
+            <span class="chip">AWS</span>
+            <span class="chip">Azure</span>
+            <span class="chip">GCP</span>
+            <span class="chip">On-Premise</span>
+            <span class="chip">Air-Gapped</span>
+            <span class="chip">Edge / In-Vehicle</span>
+        </div>
+        <div class="deploy-note">Sovereign by design. Portable by default.</div>
+    </div>
+
+    <!-- ==================== CH 9: CTA ==================== -->
+    <div class="card card-feature cta">
+        <div class="cta-line">
+            The bill grows. The pace accelerates.<br>
+            <span style="opacity: 0.85;">Your next stack ships in weeks.</span>
+        </div>
+        <a class="cta-btn" href="https://stacktic.io">stacktic.io &rarr;</a>
+        <div class="cta-meta">info@stacktic.io</div>
+    </div>
+
+</div>
+</body>
+</html>

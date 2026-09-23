@@ -1,0 +1,481 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stacktic — Open Source &amp; Sovereignty</title>
+<style>
+  :root{
+    --page:#eef1f7; --card:#fff; --ink:#0c1222; --mut:#5c6785; --faint:#98a1b8; --line:#e6e9f2; --line2:#dde1ec;
+    --emerald:#10b981; --violet:#8b5cf6; --indigo:#6366f1; --sky:#0ea5e9; --amber:#f59e0b; --rose:#f43f5e; --teal:#14b8a6;
+    --disp:"Inter","SF Pro Display","Helvetica Neue",system-ui,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-reduced-motion:reduce){*{animation-duration:.001s!important;transition:none!important}}
+  *{box-sizing:border-box;margin:0}
+  html,body{height:100%;background:var(--page);font-family:var(--disp);color:var(--ink);-webkit-font-smoothing:antialiased}
+  .deck{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;height:100vh;scrollbar-width:none}.deck::-webkit-scrollbar{display:none}
+  .frame{flex:0 0 100%;height:100vh;scroll-snap-align:center;display:flex;align-items:center;justify-content:center;padding:2.4vh 2.4vw}
+  .slide{position:relative;width:min(1320px,96vw);aspect-ratio:16/9;max-height:95vh;border-radius:22px;overflow:hidden;background:var(--card);
+    border:1px solid var(--line);box-shadow:0 40px 100px -50px rgba(20,30,60,.4);container-type:inline-size;--u:1cqw;display:flex;flex-direction:column}
+  .bgblob{position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(42% 52% at 88% 6%,color-mix(in srgb,var(--acc) 14%,transparent),transparent 70%),radial-gradient(40% 52% at 5% 98%,color-mix(in srgb,var(--acc) 9%,transparent),transparent 70%);animation:blob 17s ease-in-out infinite alternate}
+  @keyframes blob{to{transform:translateY(-3%) scale(1.06)}}
+  .grid-tex{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.5;background-image:linear-gradient(rgba(20,30,60,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(20,30,60,.035) 1px,transparent 1px);background-size:50px 50px;mask-image:radial-gradient(92% 92% at 50% 40%,#000,transparent 92%)}
+  .pad{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;padding:clamp(18px,2.6vw,44px) clamp(26px,3.4vw,56px);min-height:0}
+  svg.i{width:1em;height:1em;display:block}
+  .chrome{display:flex;justify-content:space-between;align-items:flex-start}
+  .eyebrow{display:flex;align-items:center;gap:calc(var(--u)*1);font-family:var(--mono);font-size:calc(var(--u)*1.02)}
+  .logo{letter-spacing:.12em;color:var(--mut)}.logo b{color:var(--ink)}
+  .tick{width:calc(var(--u)*2.6);height:1px;background:linear-gradient(90deg,var(--acc),transparent)}
+  .kicker{letter-spacing:.28em;font-weight:700;color:var(--acc)}
+  .idx{font-family:var(--mono);font-size:calc(var(--u)*1.02);color:var(--faint);text-align:right;line-height:1.7}.idx b{color:var(--acc)}
+  h1{font-weight:800;letter-spacing:-.03em;line-height:1.03;margin:calc(var(--u)*1) 0 0;font-size:calc(var(--u)*3.6);text-wrap:balance}
+  h1 em{font-style:normal;color:var(--acc)}
+  h1 .sub{display:block;font-weight:500;color:var(--mut);font-size:calc(var(--u)*1.82);margin-top:.28em;letter-spacing:-.01em}
+  .foot{display:flex;justify-content:space-between;align-items:baseline;margin-top:auto;padding-top:calc(var(--u)*1);border-top:1px solid var(--line)}
+  .foot .q{font-family:var(--mono);font-size:calc(var(--u)*1.12);color:var(--mut)}.foot .q i{font-style:normal;color:var(--acc);margin-right:.5em;font-weight:700}.foot .q b{color:var(--ink)}
+  .foot .brand{font-family:var(--mono);font-size:calc(var(--u)*.86);color:var(--faint);letter-spacing:.12em}
+  .rise{opacity:0;transform:translateY(16px)}
+  .frame.live .rise{animation:rise .6s cubic-bezier(.2,.8,.25,1) both}
+  .frame.live .d1{animation-delay:.05s}.frame.live .d2{animation-delay:.14s}.frame.live .d3{animation-delay:.24s}.frame.live .d4{animation-delay:.34s}.frame.live .d5{animation-delay:.44s}.frame.live .d6{animation-delay:.54s}
+  @keyframes rise{to{opacity:1;transform:none}}
+  @keyframes pop{to{opacity:1;transform:none}}
+  @keyframes dash{to{stroke-dashoffset:-18}}
+  .stage{position:relative;flex:1;min-height:0;display:flex;align-items:center;margin:calc(var(--u)*1) 0}
+
+  /* chips / cards shared */
+  .kard{position:relative;border-radius:16px;padding:calc(var(--u)*1.3);overflow:hidden;background:linear-gradient(160deg,color-mix(in srgb,var(--t) 6%,var(--card)),var(--card));
+    border:1px solid color-mix(in srgb,var(--t) 22%,var(--line));box-shadow:0 22px 46px -30px color-mix(in srgb,var(--t) 30%,rgba(20,30,60,.5));display:flex;flex-direction:column;gap:calc(var(--u)*.55);transition:transform .3s,box-shadow .3s}
+  .kard:hover{transform:translateY(-6px);box-shadow:0 40px 70px -34px color-mix(in srgb,var(--t) 45%,rgba(20,30,60,.5))}
+  .kico{width:calc(var(--u)*3);height:calc(var(--u)*3);border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*1.6);color:#fff;background:linear-gradient(150deg,var(--t),color-mix(in srgb,var(--t) 55%,#fff));box-shadow:0 8px 20px -8px color-mix(in srgb,var(--t) 60%,transparent)}
+  .ktop{display:flex;align-items:center;gap:.6em}.kname{font-weight:800;font-size:calc(var(--u)*1.28);letter-spacing:-.015em;line-height:1.1}
+  .ksub{color:var(--mut);font-size:calc(var(--u)*1);line-height:1.35}.kmeta{margin-top:auto;font-family:var(--mono);font-size:calc(var(--u)*.82);color:var(--t);font-weight:700}
+
+  /* S1 foundations */
+  .founds{display:grid;grid-template-columns:repeat(5,1fr);gap:calc(var(--u)*1);flex:1;align-content:center;position:relative;z-index:1}
+  .found{border-radius:14px;border:1px solid var(--line2);background:var(--card);padding:calc(var(--u)*1.1);box-shadow:0 16px 36px -26px rgba(20,30,60,.4);display:flex;flex-direction:column;gap:calc(var(--u)*.6)}
+  .found .fh{display:flex;align-items:center;gap:.5em;font-weight:800;font-size:calc(var(--u)*1.06);letter-spacing:-.01em}
+  .found .fi{width:calc(var(--u)*2.4);height:calc(var(--u)*2.4);border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*1.35);color:#fff;background:var(--t)}
+  .tool{display:flex;align-items:center;gap:.45em;font-family:var(--mono);font-size:calc(var(--u)*.92);color:var(--mut);background:color-mix(in srgb,var(--t) 6%,var(--card));border:1px solid color-mix(in srgb,var(--t) 16%,var(--line));border-radius:7px;padding:calc(var(--u)*.4) calc(var(--u)*.6)}
+  .tool svg{color:var(--t);font-size:calc(var(--u)*1.15);flex:none}
+  .tangle{position:absolute;inset:0;z-index:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+  .tangle path{fill:none;stroke:var(--rose);stroke-width:1;stroke-dasharray:3 4;opacity:.35;animation:dash 3s linear infinite}
+  .strip{margin-top:calc(var(--u)*1);text-align:center;font-family:var(--mono);font-weight:700;font-size:calc(var(--u)*1.2);color:var(--rose)}
+  .strip b{color:var(--ink)}
+
+  /* S2 web + donut */
+  .split2{display:grid;grid-template-columns:1.1fr 1fr;gap:calc(var(--u)*2);flex:1;align-items:center}
+  .web{position:relative;height:100%;min-height:calc(var(--u)*22)}
+  .web svg{width:100%;height:100%;overflow:visible}
+  .web .wl{stroke:#c9d0e2;stroke-width:1.1;fill:none}
+  .web .wf{stroke:var(--amber);stroke-width:1.3;fill:none;stroke-dasharray:2 4;animation:dash 2.4s linear infinite;opacity:.8}
+  .weblbl{position:absolute;left:calc(var(--u)*1);top:calc(var(--u)*.5);font-family:var(--mono);font-weight:700;font-size:calc(var(--u)*.98);color:var(--mut)}
+  .donutwrap{display:flex;align-items:center;gap:calc(var(--u)*1.6)}
+  .donut{width:calc(var(--u)*20);height:calc(var(--u)*20);border-radius:50%;position:relative;flex:none;
+    background:conic-gradient(var(--rose) 0 27%,var(--indigo) 27% 43.2%,var(--sky) 43.2% 56.7%,var(--violet) 56.7% 67.5%,var(--amber) 67.5% 75.6%,var(--teal) 75.6% 81%,var(--line) 81% 100%);
+    box-shadow:0 24px 50px -28px rgba(20,30,60,.4);transform:rotate(-90deg) scale(.8);opacity:0}
+  .frame.live .donut{animation:donutin .9s cubic-bezier(.2,.8,.2,1) forwards}
+  @keyframes donutin{to{transform:rotate(-90deg) scale(1);opacity:1}}
+  .donut::before{content:"";position:absolute;inset:24%;border-radius:50%;background:var(--card);box-shadow:inset 0 2px 8px rgba(20,30,60,.08)}
+  .donut .dc{position:absolute;inset:0;transform:rotate(90deg);display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .donut .dc .n{font-weight:800;font-size:calc(var(--u)*3);letter-spacing:-.04em;color:var(--ink);font-variant-numeric:tabular-nums}
+  .donut .dc .k{font-family:var(--mono);font-size:calc(var(--u)*.8);letter-spacing:.1em;color:var(--mut)}
+  .legend{display:flex;flex-direction:column;gap:calc(var(--u)*.7)}
+  .lg{display:flex;align-items:center;gap:.6em;font-size:calc(var(--u)*1.06)}
+  .lg .dot{width:.8em;height:.8em;border-radius:3px;flex:none}.lg b{font-weight:800;font-variant-numeric:tabular-nums;margin-left:auto;font-family:var(--mono)}
+
+  /* S3 glue / S6 flow — columns + hub */
+  .flow3{display:grid;grid-template-columns:.9fr auto 1.1fr auto .9fr;align-items:center;gap:calc(var(--u)*1.2);flex:1;min-height:0}
+  .colh{display:flex;align-items:center;gap:.5em;font-family:var(--mono);letter-spacing:.1em;font-weight:700;font-size:calc(var(--u)*.9);margin-bottom:calc(var(--u)*.9);color:var(--t2,var(--mut))}
+  .cstack{display:flex;flex-direction:column;gap:calc(var(--u)*.7)}
+  .cchip{display:flex;align-items:center;gap:.55em;font-weight:700;font-size:calc(var(--u)*1.04);padding:calc(var(--u)*.62) calc(var(--u)*.9);border-radius:11px;border:1px solid var(--line2);background:var(--card);box-shadow:0 8px 20px -14px rgba(20,30,60,.35);white-space:nowrap;transition:transform .25s,box-shadow .25s}
+  .cchip:hover{transform:translateX(3px)}
+  .cchip svg{font-size:calc(var(--u)*1.4);flex:none}
+  .cchip.dim{color:var(--mut);border-style:dashed;box-shadow:none;background:color-mix(in srgb,var(--rose) 3%,var(--card))}
+  .arrowcol{display:flex;align-items:center;gap:calc(var(--u)*.28);color:var(--faint)}
+  .chev{font-size:calc(var(--u)*1.7);font-weight:700;animation:chev 1.8s ease-in-out infinite}.chev:nth-child(2){animation-delay:.2s}.chev:nth-child(3){animation-delay:.4s}
+  @keyframes chev{0%,100%{opacity:.2;transform:translateX(-12%)}50%{opacity:1;transform:translateX(12%)}}
+  .glue{position:relative;aspect-ratio:1.15;border-radius:22px;border:1px solid color-mix(in srgb,var(--t) 30%,var(--line));background:radial-gradient(70% 70% at 50% 42%,color-mix(in srgb,var(--t) 12%,var(--card)),var(--card));box-shadow:0 26px 60px -32px color-mix(in srgb,var(--t) 45%,rgba(20,30,60,.5));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*.5);text-align:center}
+  .glue .gcore{width:calc(var(--u)*7);height:calc(var(--u)*7);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*3.2);color:#fff;background:linear-gradient(150deg,var(--t),color-mix(in srgb,var(--t) 50%,#fff));box-shadow:0 16px 38px -12px color-mix(in srgb,var(--t) 70%,transparent);animation:corepulse 3s ease-in-out infinite}
+  @keyframes corepulse{0%,100%{box-shadow:0 16px 38px -12px color-mix(in srgb,var(--t) 70%,transparent),0 0 0 0 color-mix(in srgb,var(--t) 40%,transparent)}50%{box-shadow:0 16px 38px -12px color-mix(in srgb,var(--t) 70%,transparent),0 0 0 calc(var(--u)*1.4) transparent}}
+  .glue .gname{font-weight:800;font-size:calc(var(--u)*1.5);letter-spacing:-.02em}
+  .glue .gtag{font-family:var(--mono);font-size:calc(var(--u)*.8);letter-spacing:.12em;color:var(--t)}
+  .opstack{display:flex;flex-direction:column;gap:calc(var(--u)*.5)}
+  .lay{display:flex;align-items:center;gap:.55em;font-weight:700;font-size:calc(var(--u)*1.02);padding:calc(var(--u)*.6) calc(var(--u)*.9);border-radius:10px;color:#fff;background:linear-gradient(120deg,var(--t),color-mix(in srgb,var(--t) 55%,#fff));box-shadow:0 10px 22px -12px color-mix(in srgb,var(--t) 60%,transparent)}
+  .lay svg{flex:none;font-size:calc(var(--u)*1.35)}
+  /* S3 AI chat */
+  .s3wrap{flex:1;min-height:0;display:flex;flex-direction:column;gap:calc(var(--u)*1);margin-top:calc(var(--u)*.9)}
+  .chatwin{flex:1;min-height:0;border-radius:16px;border:1px solid var(--line2);background:#fff;box-shadow:0 24px 55px -34px rgba(20,30,60,.4);overflow:hidden;display:flex;flex-direction:column}
+  .chatbar{display:flex;align-items:center;gap:.6em;padding:calc(var(--u)*.6) calc(var(--u)*1.1);border-bottom:1px solid var(--line);background:#f7f9fc}
+  .chatbar .dots{display:flex;gap:.4em}.chatbar .dots i{width:calc(var(--u)*.7);height:calc(var(--u)*.7);border-radius:50%;display:block}
+  .chatbar .t{font-family:var(--mono);font-weight:700;font-size:calc(var(--u)*.86);color:var(--mut);letter-spacing:.04em}
+  .chatbody{flex:1;padding:calc(var(--u)*.9) calc(var(--u)*1);display:flex;flex-direction:column;gap:calc(var(--u)*.7);justify-content:center}
+  .bubble{max-width:96%;padding:calc(var(--u)*.68) calc(var(--u)*.9);border-radius:13px;font-size:calc(var(--u)*1);line-height:1.4}
+  /* S3 result diagram */
+  .s3grid{display:grid;grid-template-columns:.9fr 1.2fr;gap:calc(var(--u)*1.3);flex:1;min-height:0;align-items:stretch;margin-top:calc(var(--u)*.9)}
+  .result{border-radius:16px;border:1px solid color-mix(in srgb,var(--emerald) 26%,var(--line));background:linear-gradient(180deg,color-mix(in srgb,var(--emerald) 5%,var(--card)),var(--card));box-shadow:0 24px 55px -34px color-mix(in srgb,var(--emerald) 30%,rgba(20,30,60,.5));display:flex;flex-direction:column;padding:calc(var(--u)*1.2) calc(var(--u)*1.3);gap:calc(var(--u)*.9)}
+  .result .rh{font-family:var(--mono);font-weight:700;letter-spacing:.08em;font-size:calc(var(--u)*.9);color:var(--emerald);display:flex;align-items:center;gap:.4em}
+  .rflow{flex:1;display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*.6)}
+  .rnode{display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.5);width:calc(var(--u)*10)}
+  .rc{width:calc(var(--u)*5);height:calc(var(--u)*5);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*2.3);color:#fff;background:linear-gradient(150deg,var(--t),color-mix(in srgb,var(--t) 55%,#fff));box-shadow:0 12px 26px -10px color-mix(in srgb,var(--t) 65%,transparent)}
+  .rl{font-weight:700;font-size:calc(var(--u)*.98);text-align:center;line-height:1.12}
+  .rconn{color:var(--emerald);font-weight:800;font-size:calc(var(--u)*1.7);animation:chev 1.6s ease-in-out infinite}
+  .compat{align-self:center;display:inline-flex;align-items:center;gap:.5em;font-family:var(--mono);font-weight:700;font-size:calc(var(--u)*1.02);color:var(--emerald);background:color-mix(in srgb,var(--emerald) 12%,var(--card));border:1px solid color-mix(in srgb,var(--emerald) 32%,var(--line));border-radius:99px;padding:calc(var(--u)*.5) calc(var(--u)*1.05)}
+  .wired{display:flex;gap:calc(var(--u)*.5);justify-content:center;flex-wrap:wrap}
+  .wchip{font-family:var(--mono);font-size:calc(var(--u)*.84);font-weight:700;color:var(--mut);background:var(--card);border:1px solid var(--line2);border-radius:8px;padding:calc(var(--u)*.38) calc(var(--u)*.65);display:flex;align-items:center;gap:.35em}
+  .wchip svg{color:var(--emerald);font-size:calc(var(--u)*1.05)}
+  .arch{position:relative;flex:1;min-height:calc(var(--u)*15)}
+  .archlinks{position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-index:1;pointer-events:none}
+  .anode{position:absolute;transform:translate(-50%,-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.3);width:calc(var(--u)*13);text-align:center}
+  .anode .ab{width:calc(var(--u)*5);height:calc(var(--u)*5);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*2.2);color:#fff;background:linear-gradient(150deg,var(--t),color-mix(in srgb,var(--t) 55%,#fff));box-shadow:0 12px 26px -10px color-mix(in srgb,var(--t) 65%,transparent)}
+  .anode .al{font-weight:800;font-size:calc(var(--u)*.98);line-height:1.05}
+  .anode .av{font-family:var(--mono);font-size:calc(var(--u)*.78);color:var(--mut)}
+  .anode.small{width:calc(var(--u)*10)}
+  .anode.small .ab{width:calc(var(--u)*3.5);height:calc(var(--u)*3.5);font-size:calc(var(--u)*1.6);border-radius:11px}
+  .anode.small .al{font-size:calc(var(--u)*.84);color:var(--mut);font-weight:700}
+  /* IT ecosystem constellation */
+  .eco{position:relative;flex:1;min-height:calc(var(--u)*20);margin-top:calc(var(--u)*.4)}
+  .ecolinks{position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-index:1;pointer-events:none}
+  .ecocore{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.25);
+    padding:calc(var(--u)*.95) calc(var(--u)*1.3);border-radius:16px;background:linear-gradient(150deg,#8b5cf6,#6d4ff0);color:#fff;box-shadow:0 18px 42px -14px rgba(124,92,245,.85),inset 0 1px 0 rgba(255,255,255,.5);animation:corepulse 3s ease-in-out infinite}
+  .ecocore .ec{width:calc(var(--u)*4.2);height:calc(var(--u)*4.2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*2.3);background:rgba(255,255,255,.16)}
+  .ecocore .ecn{font-weight:800;font-size:calc(var(--u)*1);letter-spacing:-.01em}
+  .econode{position:absolute;transform:translate(-50%,-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.25);width:calc(var(--u)*11);text-align:center}
+  .econode .en{width:calc(var(--u)*4.2);height:calc(var(--u)*4.2);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*2);color:#fff;background:linear-gradient(150deg,var(--t),color-mix(in srgb,var(--t) 55%,#fff));box-shadow:0 12px 26px -10px color-mix(in srgb,var(--t) 65%,transparent);border:2px solid transparent;transition:transform .25s}
+  .econode:hover .en{transform:scale(1.09)}
+  .econode .el{font-weight:800;font-size:calc(var(--u)*.92);line-height:1.05}
+  .econode .es{font-family:var(--mono);font-size:calc(var(--u)*.72);color:var(--mut)}
+  .econode.hot .en{width:calc(var(--u)*4.9);height:calc(var(--u)*4.9);border-color:#fff;box-shadow:0 14px 30px -8px color-mix(in srgb,var(--t) 78%,transparent),0 0 0 3px color-mix(in srgb,var(--t) 28%,transparent)}
+  .ecostrip{display:flex;gap:calc(var(--u)*.9);justify-content:center;flex-wrap:wrap;margin-top:calc(var(--u)*.5)}
+  .ecpill{display:flex;align-items:center;gap:.5em;font-weight:700;font-size:calc(var(--u)*1.06);padding:calc(var(--u)*.55) calc(var(--u)*1.1);border-radius:99px;border:1px solid color-mix(in srgb,var(--t) 28%,var(--line));background:color-mix(in srgb,var(--t) 9%,var(--card));color:color-mix(in srgb,var(--t) 78%,var(--ink));box-shadow:0 10px 24px -16px color-mix(in srgb,var(--t) 45%,transparent)}
+  .ecpill svg{font-size:calc(var(--u)*1.3);color:var(--t)}
+  .bubble .who{display:block;font-family:var(--mono);font-size:calc(var(--u)*.76);font-weight:700;letter-spacing:.08em;margin-bottom:.3em}
+  .bubble b{font-weight:800}.bubble .ok{color:var(--emerald);font-weight:800;margin-right:.2em}
+  .bubble.user{align-self:flex-end;background:color-mix(in srgb,var(--indigo) 12%,var(--card));border:1px solid color-mix(in srgb,var(--indigo) 24%,var(--line));border-bottom-right-radius:5px}
+  .bubble.user .who{color:var(--indigo)}
+  .bubble.ai{align-self:flex-start;background:color-mix(in srgb,var(--emerald) 9%,var(--card));border:1px solid color-mix(in srgb,var(--emerald) 26%,var(--line));border-bottom-left-radius:5px}
+  .bubble.ai .who{color:var(--emerald)}
+  .gluestrip{display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*1);flex-wrap:wrap}
+  .gset{display:flex;gap:calc(var(--u)*.5);flex-wrap:wrap;justify-content:center}
+  .garrow{color:var(--faint);font-weight:700;font-size:calc(var(--u)*1.7)}
+  .gnode{display:flex;align-items:center;gap:.5em;font-weight:800;font-size:calc(var(--u)*1.14);padding:calc(var(--u)*.65) calc(var(--u)*1.05);border-radius:12px;color:#fff;background:linear-gradient(150deg,var(--violet),#7c5cf5);box-shadow:0 14px 30px -12px rgba(139,92,246,.7)}
+  .gnode svg{font-size:calc(var(--u)*1.45)}
+  .gstack{display:flex;align-items:center;gap:.5em;font-weight:800;font-size:calc(var(--u)*1.1);padding:calc(var(--u)*.65) calc(var(--u)*1.05);border-radius:12px;color:#fff;background:linear-gradient(150deg,var(--emerald),#0ea472);box-shadow:0 14px 30px -12px rgba(16,185,129,.6)}
+  .gstack svg{font-size:calc(var(--u)*1.4)}
+
+  /* S4 & S6 feature cards grid */
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--u)*1);flex:1;align-content:center}
+
+  /* S5 sovereignty portability */
+  .sov{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+  .sovsvg{width:100%;height:100%;overflow:visible}
+  .sovsvg .sl{stroke:#cfd6e6;stroke-width:1.3;fill:none}
+  .sovsvg .sf{stroke:var(--emerald);stroke-width:1.6;fill:none;stroke-dasharray:2 3.5;animation:dash 2s linear infinite}
+  .sovcap{position:absolute;bottom:calc(var(--u)*.2);left:0;right:0;text-align:center;font-family:var(--mono);font-weight:700;color:var(--emerald);font-size:calc(var(--u)*1.1)}
+  /* IT-sovereignty SaaS swaps */
+  .swapgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(var(--u)*1);flex:1;align-content:center}
+  .swap{display:flex;align-items:center;gap:.7em;border-radius:13px;border:1px solid color-mix(in srgb,var(--t) 20%,var(--line));background:linear-gradient(160deg,color-mix(in srgb,var(--t) 6%,var(--card)),var(--card));padding:calc(var(--u)*.95) calc(var(--u)*1.05);box-shadow:0 18px 40px -30px color-mix(in srgb,var(--t) 30%,rgba(20,30,60,.5));transition:transform .25s,box-shadow .25s}
+  .swap:hover{transform:translateY(-4px);box-shadow:0 34px 56px -30px color-mix(in srgb,var(--t) 42%,rgba(20,30,60,.5))}
+  .swap .si{width:calc(var(--u)*3.1);height:calc(var(--u)*3.1);border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*1.6);color:#fff;background:linear-gradient(150deg,var(--t),color-mix(in srgb,var(--t) 55%,#fff));box-shadow:0 8px 20px -8px color-mix(in srgb,var(--t) 60%,transparent)}
+  .swap .sr{display:flex;flex-direction:column;gap:.05em;min-width:0}
+  .swap .scat{font-family:var(--mono);font-size:calc(var(--u)*.76);color:var(--t);font-weight:700;letter-spacing:.05em}
+  .swap .snew{font-weight:800;font-size:calc(var(--u)*1.28);letter-spacing:-.015em;line-height:1.05}
+  .swap .sl{font-family:var(--mono);font-size:calc(var(--u)*.82);color:var(--faint);text-decoration:line-through}
+  .savebanner{display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*1.4);flex-wrap:wrap;margin-top:calc(var(--u)*1);padding:calc(var(--u)*.9) calc(var(--u)*1.4);border-radius:14px;background:linear-gradient(120deg,color-mix(in srgb,var(--emerald) 12%,var(--card)),color-mix(in srgb,var(--sky) 10%,var(--card)));border:1px solid color-mix(in srgb,var(--emerald) 26%,var(--line))}
+  .savebanner .big{font-weight:800;font-size:calc(var(--u)*2.4);letter-spacing:-.03em;color:var(--emerald)}
+  .savebanner .bt{font-family:var(--mono);font-size:calc(var(--u)*1);color:var(--mut);font-weight:700}
+  .savebanner .sep{width:1px;height:calc(var(--u)*2.4);background:var(--line2)}
+
+  /* S7 gauges */
+  .gauges{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(var(--u)*1.5);flex:1;align-content:center;margin-top:calc(var(--u)*1)}
+  .gauge{display:flex;flex-direction:column;align-items:center;text-align:center;gap:calc(var(--u)*.6)}
+  .ring{position:relative;width:calc(var(--u)*14);height:calc(var(--u)*14)}
+  .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+  .ring .trk{fill:none;stroke:color-mix(in srgb,var(--t) 12%,var(--line));stroke-width:8}
+  .ring .val{fill:none;stroke:var(--t);stroke-width:8;stroke-linecap:round;stroke-dasharray:251.2;stroke-dashoffset:251.2;filter:drop-shadow(0 0 8px color-mix(in srgb,var(--t) 55%,transparent));transition:stroke-dashoffset 1.6s cubic-bezier(.2,.8,.2,1)}
+  .frame.live .ring .val{stroke-dashoffset:var(--off)}
+  .ring .ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .ring .ctr .n{font-weight:800;font-size:calc(var(--u)*2.5);letter-spacing:-.04em;color:var(--t);line-height:1;font-variant-numeric:tabular-nums}
+  .ring .ctr .k{font-family:var(--mono);font-size:calc(var(--u)*.78);letter-spacing:.1em;color:var(--mut);margin-top:.2em}
+  .gauge .gt{font-weight:700;font-size:calc(var(--u)*1.2)}.gauge .gp{color:var(--mut);font-size:calc(var(--u)*.94);line-height:1.3;max-width:15ch}
+  .getline{text-align:center;font-weight:700;font-size:calc(var(--u)*1.36);color:var(--mut);margin-top:calc(var(--u)*1.1)}.getline em{font-style:normal;color:var(--emerald);font-weight:800}
+
+  .nav{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.92);border:1px solid var(--line2);border-radius:40px;padding:7px 12px;backdrop-filter:blur(12px);box-shadow:0 12px 34px -16px rgba(20,30,60,.4)}
+  .nav button{font-family:var(--mono);font-size:15px;color:var(--mut);background:transparent;border:none;cursor:pointer;padding:2px 8px;border-radius:8px}.nav button:hover{color:var(--ink);background:var(--page)}
+  .dots{display:flex;gap:5px}
+  .nd{width:26px;height:26px;border-radius:8px;background:var(--page);border:1px solid var(--line2);color:var(--mut);font-family:var(--mono);font-size:12px;font-weight:700;cursor:pointer;transition:.2s}
+  .nd.on{background:var(--ink);color:#fff;border-color:var(--ink);transform:translateY(-1px)}
+  :focus-visible{outline:2px solid var(--indigo);outline-offset:3px}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="gem" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4285F4"/><stop offset="1" stop-color="#9B72CB"/></linearGradient>
+  <symbol id="ic-ai" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2c.7 5 3.3 7.6 8 8.3-4.7.7-7.3 3.3-8 8.3-.7-5-3.3-7.6-8-8.3 4.7-.7 7.3-3.3 8-8.3z"/></symbol>
+  <symbol id="ic-shield" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.5l7.5 2.8V11c0 4.6-3.2 7.9-7.5 9.3C7.7 18.9 4.5 15.6 4.5 11V5.3z"/><path fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M8.6 12l2.2 2.2 4.6-4.6"/></symbol>
+  <symbol id="ic-bolt" viewBox="0 0 24 24"><path fill="currentColor" d="M13 2L4 14h6l-1 8 9-12h-6z"/></symbol>
+  <symbol id="ic-k8s" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M12 2.5l8.2 4.75v9.5L12 21.5 3.8 16.75v-9.5z"/><circle cx="12" cy="12" r="2.3" fill="currentColor"/></symbol>
+  <symbol id="ic-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.4" fill="none" stroke="currentColor" stroke-width="1.7"/><path stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.2 5.2l2.1 2.1M16.7 16.7l2.1 2.1M18.8 5.2l-2.1 2.1M7.3 16.7l-2.1 2.1"/></symbol>
+  <symbol id="ic-cloud" viewBox="0 0 24 24"><path fill="currentColor" d="M7 18h9.5a3.5 3.5 0 0 0 .4-6.98A5.5 5.5 0 0 0 6.5 9.8 3.6 3.6 0 0 0 7 18z"/></symbol>
+  <symbol id="ic-layers" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3l9 5-9 5-9-5 9-5z"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M3 13l9 5 9-5"/></symbol>
+  <symbol id="ic-server" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="6.5" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="4" y="13.5" width="16" height="6.5" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="8" cy="7.2" r="1" fill="currentColor"/><circle cx="8" cy="16.7" r="1" fill="currentColor"/></symbol>
+  <symbol id="ic-db" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path fill="none" stroke="currentColor" stroke-width="1.7" d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></symbol>
+  <symbol id="ic-key" viewBox="0 0 24 24"><circle cx="8" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M11 11l7 7M15.5 15.5l2-2M17.5 17.5l2-2"/></symbol>
+  <symbol id="ic-network" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.3" fill="currentColor"/><circle cx="5" cy="18" r="2.3" fill="currentColor"/><circle cx="19" cy="18" r="2.3" fill="currentColor"/><path stroke="currentColor" stroke-width="1.6" d="M12 7.3v3.4M11 10.5l-5 5.2M13 10.5l5 5.2"/></symbol>
+  <symbol id="ic-eye" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.6" fill="currentColor"/></symbol>
+  <symbol id="ic-badge" viewBox="0 0 24 24"><path d="M12 2l6 3v6c0 4-2.7 6.8-6 8-3.3-1.2-6-4-6-8V5z" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M9 11.5l2 2 4-4.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="ic-sliders" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M4 7h8M17 7h3M4 12h3M12 12h8M4 17h6M15 17h5"/><circle cx="14" cy="7" r="2" fill="currentColor"/><circle cx="9" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="17" r="2" fill="currentColor"/></symbol>
+  <symbol id="ic-x" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.3" stroke-linecap="round" d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
+  <symbol id="ic-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" d="M5 12.5l4.2 4.2L19 7"/></symbol>
+  <symbol id="ic-map" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path stroke="currentColor" stroke-width="1.6" d="M9 4v14M15 6v14"/></symbol>
+  <symbol id="ic-audit" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 13l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="ic-refresh" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M20 4v4h-4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="ic-fleet" viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="7.5" rx="1.6" fill="currentColor"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.6" fill="currentColor"/></symbol>
+  <symbol id="ic-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.7"/><path fill="none" stroke="currentColor" stroke-width="1.4" d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></symbol>
+  <symbol id="ic-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="9.5" rx="2.2" fill="currentColor"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="ic-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6" fill="currentColor"/><path fill="currentColor" d="M5 20c0-3.9 3.1-6.5 7-6.5s7 2.6 7 6.5z"/></symbol>
+  <symbol id="ic-puzzle" viewBox="0 0 24 24"><path fill="currentColor" d="M10 3a2 2 0 0 1 4 0v1h3a1 1 0 0 1 1 1v3h1a2 2 0 0 1 0 4h-1v3a1 1 0 0 1-1 1h-3v-1a2 2 0 0 0-4 0v1H7a1 1 0 0 1-1-1v-3H5a2 2 0 0 1 0-4h1V5a1 1 0 0 1 1-1h3z"/></symbol>
+  <symbol id="ic-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M4 7.5l8 5.5 8-5.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+  <symbol id="br-claude" viewBox="0 0 24 24"><g stroke="#D97757" stroke-width="2.3" stroke-linecap="round"><path d="M12 3.5v17M3.5 12h17M5.9 5.9l12.2 12.2M18.1 5.9L5.9 18.1"/></g></symbol>
+  <symbol id="br-openai" viewBox="0 0 24 24"><g fill="#10A37F" fill-opacity=".9"><ellipse cx="12" cy="12" rx="2.9" ry="8.4"/><ellipse cx="12" cy="12" rx="2.9" ry="8.4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="2.9" ry="8.4" transform="rotate(120 12 12)"/></g></symbol>
+  <symbol id="br-gemini" viewBox="0 0 24 24"><path d="M12 2c.8 5.2 4 8.4 10 9-6 .8-9.2 4-10 9-.8-5.2-4-8.4-10-9 6-.8 9.2-4 10-9z" fill="url(#gem)"/></symbol>
+  <symbol id="br-aws" viewBox="0 0 24 24"><path d="M3 16c5 3.4 13 3.4 18 0" stroke="#FF9900" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M17.5 14l3 1-.7 3.1" stroke="#FF9900" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="br-azure" viewBox="0 0 24 24"><path d="M10.5 4L4.5 19h4L13 8z" fill="#0089D6"/><path d="M12.5 9l6.5 10H9.5z" fill="#0089D6" opacity=".8"/></symbol>
+  <symbol id="br-gcp" viewBox="0 0 24 24"><circle cx="7.5" cy="7.5" r="3" fill="#4285F4"/><circle cx="16.5" cy="7.5" r="3" fill="#EA4335"/><circle cx="7.5" cy="16.5" r="3" fill="#FBBC05"/><circle cx="16.5" cy="16.5" r="3" fill="#34A853"/></symbol>
+</defs></svg>
+
+<div class="deck" id="deck">
+
+  <!-- 1 CHAOS -->
+  <div class="frame"><section class="slide" style="--acc:var(--rose)">
+    <div class="bgblob"></div><div class="grid-tex"></div>
+    <div class="pad">
+      <div class="chrome rise d1"><div class="eyebrow"><span class="logo">{ <b>STACKTIC</b> }</span><span class="tick"></span><span class="kicker">OPEN SOURCE</span></div><div class="idx"><b>01</b> — 08<br><span style="color:var(--faint)">the chaos</span></div></div>
+      <h1 class="rise d2">Open source is a <em>Tower of Babel.</em><span class="sub">Dozens of foundations, thousands of tools — none of them speak the same language.</span></h1>
+      <div class="stage">
+        <svg class="tangle" viewBox="0 0 100 40" preserveAspectRatio="none"><path d="M10,8 C40,30 60,8 90,32"/><path d="M30,6 C50,36 70,10 88,8"/><path d="M12,34 C45,6 65,34 92,12"/><path d="M50,6 C40,34 60,30 50,34"/></svg>
+        <div class="founds">
+          <div class="found rise d2" style="--t:var(--rose)"><div class="fh"><span class="fi"><svg class="i"><use href="#ic-fleet"/></svg></span>Apache</div><div class="tool"><svg class="i"><use href="#ic-network"/></svg>Kafka</div><div class="tool"><svg class="i"><use href="#ic-bolt"/></svg>Spark</div><div class="tool"><svg class="i"><use href="#ic-gear"/></svg>Airflow</div></div>
+          <div class="found rise d3" style="--t:var(--sky)"><div class="fh"><span class="fi"><svg class="i"><use href="#ic-k8s"/></svg></span>CNCF</div><div class="tool"><svg class="i"><use href="#ic-k8s"/></svg>Kubernetes</div><div class="tool"><svg class="i"><use href="#ic-eye"/></svg>Prometheus</div><div class="tool"><svg class="i"><use href="#ic-refresh"/></svg>Argo</div></div>
+          <div class="found rise d3" style="--t:var(--indigo)"><div class="fh"><span class="fi"><svg class="i"><use href="#ic-shield"/></svg></span>OpenSSF</div><div class="tool"><svg class="i"><use href="#ic-badge"/></svg>Sigstore</div><div class="tool"><svg class="i"><use href="#ic-shield"/></svg>Scorecard</div><div class="tool"><svg class="i"><use href="#ic-audit"/></svg>Trivy</div></div>
+          <div class="found rise d4" style="--t:var(--violet)"><div class="fh"><span class="fi"><svg class="i"><use href="#ic-layers"/></svg></span>Eclipse</div><div class="tool"><svg class="i"><use href="#ic-refresh"/></svg>Debezium</div><div class="tool"><svg class="i"><use href="#ic-server"/></svg>Temurin</div><div class="tool"><svg class="i"><use href="#ic-gear"/></svg>Che</div></div>
+          <div class="found rise d4" style="--t:var(--amber)"><div class="fh"><span class="fi"><svg class="i"><use href="#ic-server"/></svg></span>Linux F.</div><div class="tool"><svg class="i"><use href="#ic-db"/></svg>Percona</div><div class="tool"><svg class="i"><use href="#ic-network"/></svg>Strimzi</div><div class="tool"><svg class="i"><use href="#ic-key"/></svg>Keycloak</div></div>
+        </div>
+      </div>
+      <div class="strip rise d5">5 foundations · 1,000s of tools · <b>zero coordination.</b></div>
+      <div class="foot rise d6"><div class="q"><i>›</i>The power is there — <b>but who makes it work together?</b></div><div class="brand">STACKTIC · 2026</div></div>
+    </div>
+  </section></div>
+
+  <!-- 2 RELATIONSHIPS -->
+  <div class="frame"><section class="slide" style="--acc:var(--amber)">
+    <div class="bgblob"></div><div class="grid-tex"></div>
+    <div class="pad">
+      <div class="chrome rise d1"><div class="eyebrow"><span class="logo">{ <b>STACKTIC</b> }</span><span class="tick"></span><span class="kicker">THE BLOCKER</span></div><div class="idx"><b>02</b> — 08<br><span style="color:var(--faint)">why OSS stalls</span></div></div>
+      <h1 class="rise d2"><em>90%</em> of engineering is wiring OSS together.<span class="sub">Not building product — managing relationships between tools that were never meant to connect.</span></h1>
+      <div class="split2">
+        <div class="web rise d3"><div class="weblbl">the relationship tangle</div>
+          <svg viewBox="0 0 100 60" preserveAspectRatio="xMidYMid meet">
+            <path class="wl" d="M14,14 L40,10 M40,10 L70,16 M70,16 L86,10 M14,14 L30,34 M30,34 L58,30 M58,30 L84,38 M40,10 L58,30 M70,16 L58,30 M30,34 L52,52 M52,52 L80,50 M84,38 L80,50 M14,44 L30,34 M14,44 L52,52"/>
+            <path class="wf" d="M14,14 L40,10 M40,10 L58,30 M58,30 L84,38 M30,34 L52,52 M70,16 L58,30"/>
+            <g fill="var(--amber)"><circle cx="14" cy="14" r="3.2"/><circle cx="40" cy="10" r="3.2"/><circle cx="70" cy="16" r="3.2"/><circle cx="86" cy="10" r="3.2"/><circle cx="30" cy="34" r="3.2"/><circle cx="58" cy="30" r="3.6"/><circle cx="84" cy="38" r="3.2"/><circle cx="52" cy="52" r="3.2"/><circle cx="80" cy="50" r="3.2"/><circle cx="14" cy="44" r="3.2"/></g>
+          </svg>
+        </div>
+        <div class="donutwrap rise d4">
+          <div class="donut"><div class="dc"><div class="n"><span class="count" data-to="81" data-suf="%">0%</span></div><div class="k">OSS EFFORT</div></div></div>
+          <div class="legend">
+            <div class="lg"><span class="dot" style="background:var(--rose)"></span>DevSecOps<b>27%</b></div>
+            <div class="lg"><span class="dot" style="background:var(--indigo)"></span>Versioning<b>16%</b></div>
+            <div class="lg"><span class="dot" style="background:var(--sky)"></span>Observability<b>14%</b></div>
+            <div class="lg"><span class="dot" style="background:var(--violet)"></span>DataOps<b>11%</b></div>
+            <div class="lg"><span class="dot" style="background:var(--amber)"></span>Migrations<b>8%</b></div>
+            <div class="lg"><span class="dot" style="background:var(--teal)"></span>Resilience<b>5%</b></div>
+          </div>
+        </div>
+      </div>
+      <div class="foot rise d6"><div class="q"><i>›</i>The skill gap is the adoption gap. <b>What if the wiring was automatic?</b></div><div class="brand">STACKTIC · 2026</div></div>
+    </div>
+  </section></div>
+
+  <!-- 3 GLUE -->
+  <div class="frame"><section class="slide" style="--acc:var(--violet)">
+    <div class="bgblob"></div><div class="grid-tex"></div>
+    <div class="pad">
+      <div class="chrome rise d1"><div class="eyebrow"><span class="logo">{ <b>STACKTIC</b> }</span><span class="tick"></span><span class="kicker">THE SOLUTION</span></div><div class="idx"><b>03</b> — 08<br><span style="color:var(--faint)">the glue</span></div></div>
+      <h1 class="rise d2"><em>Stacktic</em> is the glue for open source — <em style="color:var(--sky)">and the bridge for AI to run it.</em><span class="sub">It wires every OSS tool into one governed stack — then lets AI operate it by prompt.</span></h1>
+      <div class="s3grid">
+        <div class="chatwin rise d2">
+          <div class="chatbar"><span class="dots"><i style="background:var(--rose)"></i><i style="background:var(--amber)"></i><i style="background:var(--emerald)"></i></span><span class="t">stacktic · ai console</span></div>
+          <div class="chatbody">
+            <div class="bubble user rise d3"><span class="who">YOU</span>Add Kafka Connect with a sink connector from my <b>CNPG Postgres</b> DB — is the connector compatible with my DB version?</div>
+            <div class="bubble ai rise d4"><span class="who">◈ STACKTIC · AI</span><span class="ok">✓</span> Done. Connector <b>v2.5</b> is compatible with <b>PostgreSQL 16</b> — wired, secured, versioned &amp; deployed.</div>
+          </div>
+        </div>
+        <div class="result rise d3">
+          <div class="rh"><svg class="i"><use href="#ic-check"/></svg>RESULT · WIRED &amp; DEPLOYED</div>
+          <div class="arch">
+            <svg class="archlinks" id="archlinks"></svg>
+            <div class="anode small" id="an-sec" style="left:50%;top:13%"><div class="ab" style="--t:var(--indigo)"><svg class="i"><use href="#ic-key"/></svg></div><div class="al">Secrets · TLS</div></div>
+            <div class="anode" id="an-kafka" style="left:15%;top:49%"><div class="ab" style="--t:var(--sky)"><svg class="i"><use href="#ic-network"/></svg></div><div class="al">Kafka topic</div></div>
+            <div class="anode" id="an-sink" style="left:50%;top:49%"><div class="ab" style="--t:var(--amber)"><svg class="i"><use href="#ic-refresh"/></svg></div><div class="al">Debezium sink</div><div class="av">connector v2.5</div></div>
+            <div class="anode" id="an-cnpg" style="left:85%;top:49%"><div class="ab" style="--t:var(--violet)"><svg class="i"><use href="#ic-db"/></svg></div><div class="al">CNPG</div><div class="av">PostgreSQL 16</div></div>
+            <div class="anode small" id="an-mon" style="left:50%;top:85%"><div class="ab" style="--t:var(--emerald)"><svg class="i"><use href="#ic-eye"/></svg></div><div class="al">Monitoring</div></div>
+          </div>
+          <div class="compat"><svg class="i"><use href="#ic-check"/></svg>connector v2.5 ✓ compatible with PostgreSQL 16 — versioned &amp; deployed</div>
+        </div>
+      </div>
+      <div class="foot rise d6"><div class="q"><i>›</i>So AI can wire a connector. <b>Can it run an entire IT department?</b></div><div class="brand">STACKTIC · 2026</div></div>
+    </div>
+  </section></div>
+
+  <!-- 4 AI-OPERATED IT ECOSYSTEM -->
+  <div class="frame"><section class="slide" style="--acc:var(--violet)">
+    <div class="bgblob"></div><div class="grid-tex"></div>
+    <div class="pad">
+      <div class="chrome rise d1"><div class="eyebrow"><span class="logo">{ <b>STACKTIC</b> }</span><span class="tick"></span><span class="kicker">IT SOVEREIGNTY</span></div><div class="idx"><b>04</b> — 08<br><span style="color:var(--faint)">the whole business</span></div></div>
+      <h1 class="rise d2">A whole IT department — <em>open source, run by AI.</em><span class="sub">Stacktic builds your full IT ecosystem in open source — then lets AI control CRM &amp; ERP data, operate the workflows and deploy the changes.</span></h1>
+      <div class="eco rise d2">
+        <svg class="ecolinks" id="ecolinks"></svg>
+        <div class="ecocore" id="eco-core"><div class="ec"><svg class="i"><use href="#ic-ai"/></svg></div><div class="ecn">STACKTIC · AI</div></div>
+        <div class="econode hot" id="eco-crm" style="left:50%;top:15%;--t:#8b5cf6"><div class="en"><svg class="i"><use href="#ic-user"/></svg></div><div class="el">CRM</div><div class="es">SuiteCRM</div></div>
+        <div class="econode hot" id="eco-erp" style="left:77%;top:26%;--t:#6366f1"><div class="en"><svg class="i"><use href="#ic-fleet"/></svg></div><div class="el">ERP</div><div class="es">ERPNext</div></div>
+        <div class="econode" id="eco-files" style="left:88%;top:50%;--t:#0ea5e9"><div class="en"><svg class="i"><use href="#ic-cloud"/></svg></div><div class="el">Files</div><div class="es">Nextcloud</div></div>
+        <div class="econode" id="eco-chat" style="left:77%;top:74%;--t:#14b8a6"><div class="en"><svg class="i"><use href="#ic-network"/></svg></div><div class="el">Chat</div><div class="es">Zulip</div></div>
+        <div class="econode" id="eco-auto" style="left:50%;top:85%;--t:#f59e0b"><div class="en"><svg class="i"><use href="#ic-gear"/></svg></div><div class="el">Automation</div><div class="es">n8n</div></div>
+        <div class="econode" id="eco-mail" style="left:23%;top:74%;--t:#f43f5e"><div class="en"><svg class="i"><use href="#ic-mail"/></svg></div><div class="el">Mail</div><div class="es">Mailu</div></div>
+        <div class="econode" id="eco-id" style="left:12%;top:50%;--t:#10b981"><div class="en"><svg class="i"><use href="#ic-key"/></svg></div><div class="el">Identity</div><div class="es">Keycloak</div></div>
+        <div class="econode" id="eco-wiki" style="left:23%;top:26%;--t:#a855f7"><div class="en"><svg class="i"><use href="#ic-audit"/></svg></div><div class="el">Wiki</div><div class="es">BookStack</div></div>
+      </div>
+      <div class="ecostrip rise d5">
+        <div class="ecpill" style="--t:var(--emerald)"><svg class="i"><use href="#ic-money"/></svg>No license fees</div>
+        <div class="ecpill" style="--t:var(--indigo)"><svg class="i"><use href="#ic-lock"/></svg>Data privacy</div>
+        <div class="ecpill" style="--t:var(--violet)"><svg class="i"><use href="#ic-shield"/></svg>100% sovereign</div>
+        <div class="ecpill" style="--t:var(--sky)"><svg class="i"><use href="#ic-server"/></svg>Lower infra cost</div>
+      </div>
+      <div class="foot rise d6"><div class="q"><i>›</i>Your entire business — open source, integrated, AI-run. <b>And enterprise-grade?</b></div><div class="brand">STACKTIC · 2026</div></div>
+    </div>
+  </section></div>
+
+  <!-- 5 ENTERPRISE FEATURES -->
+  <div class="frame"><section class="slide" style="--acc:var(--indigo)">
+    <div class="bgblob"></div><div class="grid-tex"></div>
+    <div class="pad">
+      <div class="chrome rise d1"><div class="eyebrow"><span class="logo">{ <b>STACKTIC</b> }</span><span class="tick"></span><span class="kicker">ENTERPRISE-GRADE OSS</span></div><div class="idx"><b>05</b> — 08<br><span style="color:var(--faint)">the missing layer</span></div></div>
+      <h1 class="rise d2">Enterprise-grade — <em>on pure open source.</em><span class="sub">The layer OSS never had: versioning, compliance, security, HA — added automatically, no vendor.</span></h1>
+      <div class="cards">
+        <div class="kard rise d2" style="--t:var(--indigo)"><div class="ktop"><div class="kico"><svg class="i"><use href="#ic-refresh"/></svg></div><div class="kname">Versioning &amp; rollback</div></div><div class="ksub">Snapshot the whole stack; roll any state back in seconds.</div><div class="kmeta">no more drift</div></div>
+        <div class="kard rise d2" style="--t:var(--emerald)"><div class="ktop"><div class="kico"><svg class="i"><use href="#ic-badge"/></svg></div><div class="kname">Automated compliance</div></div><div class="ksub">PCI · ISO · SOC enforced across OSS tools — evidence per action.</div><div class="kmeta">audit-ready</div></div>
+        <div class="kard rise d3" style="--t:var(--violet)"><div class="ktop"><div class="kico"><svg class="i"><use href="#ic-puzzle"/></svg></div><div class="kname">Cross-foundation glue</div></div><div class="ksub">Apache · CNCF · Eclipse · OpenSSF — wired into one coherent stack.</div><div class="kmeta">it just connects</div></div>
+        <div class="kard rise d3" style="--t:var(--rose)"><div class="ktop"><div class="kico"><svg class="i"><use href="#ic-key"/></svg></div><div class="kname">Security &amp; RBAC</div></div><div class="ksub">Secrets, certs, network policies &amp; least-privilege — generated for you.</div><div class="kmeta">zero-trust default</div></div>
+        <div class="kard rise d4" style="--t:var(--sky)"><div class="ktop"><div class="kico"><svg class="i"><use href="#ic-fleet"/></svg></div><div class="kname">HA &amp; scale</div></div><div class="ksub">Autoscaling, replicas &amp; resilience baked into every component.</div><div class="kmeta">production-hardened</div></div>
+        <div class="kard rise d4" style="--t:var(--amber)"><div class="ktop"><div class="kico"><svg class="i"><use href="#ic-eye"/></svg></div><div class="kname">Full observability</div></div><div class="ksub">Metrics, logs &amp; traces unified across the whole OSS stack.</div><div class="kmeta">one pane of glass</div></div>
+      </div>
+      <div class="foot rise d6"><div class="q"><i>›</i>Open source, with the enterprise layer built in. <b>And who owns it? You do.</b></div><div class="brand">STACKTIC · 2026</div></div>
+    </div>
+  </section></div>
+
+  <!-- 5 SOVEREIGNTY -->
+  <div class="frame"><section class="slide" style="--acc:var(--emerald)">
+    <div class="bgblob"></div><div class="grid-tex"></div>
+    <div class="pad">
+      <div class="chrome rise d1"><div class="eyebrow"><span class="logo">{ <b>STACKTIC</b> }</span><span class="tick"></span><span class="kicker">IT SOVEREIGNTY</span></div><div class="idx"><b>06</b> — 08<br><span style="color:var(--faint)">replace every SaaS</span></div></div>
+      <h1 class="rise d2">Sovereign IT — <em>every SaaS, replaced by open source.</em><span class="sub">Salesforce · Slack · Google · Zoom · Zendesk → open source, wired into one integrated stack by Stacktic — the layer one vendor used to own.</span></h1>
+      <div class="swapgrid rise d3">
+        <div class="swap" style="--t:var(--violet)"><div class="si"><svg class="i"><use href="#ic-user"/></svg></div><div class="sr"><div class="scat">CRM</div><div class="snew">SuiteCRM</div><div class="sl">was Salesforce</div></div></div>
+        <div class="swap" style="--t:var(--sky)"><div class="si"><svg class="i"><use href="#ic-network"/></svg></div><div class="sr"><div class="scat">TEAM CHAT</div><div class="snew">Zulip</div><div class="sl">was Slack</div></div></div>
+        <div class="swap" style="--t:var(--emerald)"><div class="si"><svg class="i"><use href="#ic-cloud"/></svg></div><div class="sr"><div class="scat">OFFICE &amp; FILES</div><div class="snew">Nextcloud</div><div class="sl">was Google Workspace</div></div></div>
+        <div class="swap" style="--t:var(--indigo)"><div class="si"><svg class="i"><use href="#ic-globe"/></svg></div><div class="sr"><div class="scat">VIDEO</div><div class="snew">Jitsi</div><div class="sl">was Zoom</div></div></div>
+        <div class="swap" style="--t:var(--amber)"><div class="si"><svg class="i"><use href="#ic-audit"/></svg></div><div class="sr"><div class="scat">WIKI / DOCS</div><div class="snew">BookStack</div><div class="sl">was Confluence</div></div></div>
+        <div class="swap" style="--t:var(--rose)"><div class="si"><svg class="i"><use href="#ic-gear"/></svg></div><div class="sr"><div class="scat">AUTOMATION</div><div class="snew">n8n</div><div class="sl">was Zapier</div></div></div>
+        <div class="swap" style="--t:var(--violet)"><div class="si"><svg class="i"><use href="#ic-key"/></svg></div><div class="sr"><div class="scat">IDENTITY · SSO</div><div class="snew">Keycloak</div><div class="sl">was Okta</div></div></div>
+        <div class="swap" style="--t:var(--sky)"><div class="si"><svg class="i"><use href="#ic-eye"/></svg></div><div class="sr"><div class="scat">OBSERVABILITY</div><div class="snew">Grafana</div><div class="sl">was Datadog</div></div></div>
+      </div>
+      <div class="savebanner rise d5"><div class="big">~$15M<span style="font-size:.45em;color:var(--mut);font-weight:700"> /yr</span></div><div class="bt">saved on a 10K-employee IT estate</div><div class="sep"></div><div class="big" style="color:var(--sky)">100%</div><div class="bt">sovereign · any cloud · air-gapped</div></div>
+      <div class="foot rise d6"><div class="q"><i>›</i>Your whole IT estate — sovereign, integrated, ~$15M cheaper. <b>Now — what about AI?</b></div><div class="brand">STACKTIC · 2026</div></div>
+    </div>
+  </section></div>
+
+  <!-- 6 AI INTO OSS -->
+  <div class="frame"><section class="slide" style="--acc:var(--sky)">
+    <div class="bgblob"></div><div class="grid-tex"></div>
+    <div class="pad">
+      <div class="chrome rise d1"><div class="eyebrow"><span class="logo">{ <b>STACKTIC</b> }</span><span class="tick"></span><span class="kicker">AI × OPEN SOURCE</span></div><div class="idx"><b>07</b> — 08<br><span style="color:var(--faint)">the breakthrough</span></div></div>
+      <h1 class="rise d2">Stacktic lets AI <em>run open source in production.</em><span class="sub">Claude, ChatGPT &amp; Gemini piece together the production operation of your OSS stack — automating private AI models &amp; complex apps for full private-AI adoption.</span></h1>
+      <div class="flow3 rise d3">
+        <div><div class="colh" style="--t2:var(--sky)"><svg class="i" style="color:var(--sky)"><use href="#ic-ai"/></svg>AI CLIENTS</div><div class="cstack">
+          <div class="cchip"><svg class="i"><use href="#br-claude"/></svg>Claude</div>
+          <div class="cchip"><svg class="i"><use href="#br-openai"/></svg>ChatGPT</div>
+          <div class="cchip"><svg class="i"><use href="#br-gemini"/></svg>Gemini</div>
+          <div class="cchip"><svg class="i" style="color:var(--violet)"><use href="#ic-user"/></svg>User · approve</div>
+        </div></div>
+        <div class="arrowcol" style="color:var(--sky)"><span class="chev">›</span><span class="chev">›</span><span class="chev">›</span></div>
+        <div class="glue" style="--t:var(--sky)"><div class="gcore"><svg class="i"><use href="#ic-map"/></svg></div><div class="gname">STACKTIC</div><div class="gtag">PROMPT → OPERATE OSS</div></div>
+        <div class="arrowcol" style="color:var(--emerald)"><span class="chev">›</span><span class="chev">›</span><span class="chev">›</span></div>
+        <div><div class="colh" style="--t2:var(--emerald)"><svg class="i" style="color:var(--emerald)"><use href="#ic-check"/></svg>PRIVATE AI ON OSS</div><div class="opstack">
+          <div class="lay" style="--t:var(--violet)"><svg class="i"><use href="#ic-ai"/></svg>Private LLM · vLLM</div>
+          <div class="lay" style="--t:var(--sky)"><svg class="i"><use href="#ic-db"/></svg>Vector DB · RAG</div>
+          <div class="lay" style="--t:var(--indigo)"><svg class="i"><use href="#ic-network"/></svg>Agents &amp; pipelines</div>
+          <div class="lay" style="--t:var(--emerald)"><svg class="i"><use href="#ic-shield"/></svg>Governed &amp; sovereign</div>
+        </div></div>
+      </div>
+      <div class="foot rise d6"><div class="q"><i>›</i>AI finally speaks open source — <b>private, complex, fully adopted.</b></div><div class="brand">STACKTIC · 2026</div></div>
+    </div>
+  </section></div>
+
+  <!-- 7 PAYOFF -->
+  <div class="frame"><section class="slide" style="--acc:var(--emerald)">
+    <div class="bgblob"></div><div class="grid-tex"></div>
+    <div class="pad">
+      <div class="chrome rise d1"><div class="eyebrow"><span class="logo">{ <b>STACKTIC</b> }</span><span class="tick"></span><span class="kicker">THE PAYOFF</span></div><div class="idx"><b>08</b> — 08<br><span style="color:var(--faint)">the outcome</span></div></div>
+      <h1 class="rise d2">Open source, finally <em>enterprise-ready</em> — and AI-operated.<span class="sub">Sovereign, compliant, versioned, and driven by AI. The full adoption OSS always promised.</span></h1>
+      <div class="gauges">
+        <div class="gauge rise d2" style="--t:var(--emerald)"><div class="ring"><svg viewBox="0 0 100 100"><circle class="trk" cx="50" cy="50" r="40"/><circle class="val" cx="50" cy="50" r="40" style="--off:25.1"/></svg><div class="ctr"><div class="n"><span class="count" data-to="90" data-suf="%">0%</span></div><div class="k">LESS WIRING</div></div></div><div class="gt">Engineers build product</div><div class="gp">Not plumbing between OSS tools.</div></div>
+        <div class="gauge rise d3" style="--t:var(--violet)"><div class="ring"><svg viewBox="0 0 100 100"><circle class="trk" cx="50" cy="50" r="40"/><circle class="val" cx="50" cy="50" r="40" style="--off:0"/></svg><div class="ctr"><div class="n">Zero</div><div class="k">LOCK-IN</div></div></div><div class="gt">Sovereign &amp; portable</div><div class="gp">Any cloud, on-prem, air-gapped.</div></div>
+        <div class="gauge rise d4" style="--t:var(--indigo)"><div class="ring"><svg viewBox="0 0 100 100"><circle class="trk" cx="50" cy="50" r="40"/><circle class="val" cx="50" cy="50" r="40" style="--off:0"/></svg><div class="ctr"><div class="n"><span class="count" data-to="100" data-suf="%">0%</span></div><div class="k">COMPLIANT</div></div></div><div class="gt">Audit-ready OSS</div><div class="gp">PCI · ISO · SOC, automatically.</div></div>
+        <div class="gauge rise d5" style="--t:var(--sky)"><div class="ring"><svg viewBox="0 0 100 100"><circle class="trk" cx="50" cy="50" r="40"/><circle class="val" cx="50" cy="50" r="40" style="--off:0"/></svg><div class="ctr"><div class="n"><svg class="i" style="font-size:calc(var(--u)*2.6);color:var(--sky)"><use href="#ic-ai"/></svg></div><div class="k">AI-DRIVEN</div></div></div><div class="gt">Private AI, adopted</div><div class="gp">Complex apps, operated by prompt.</div></div>
+      </div>
+      <div class="getline rise d6"><em>Stacktic</em> — the operational &amp; sovereignty layer that makes open source, and private AI, finally enterprise-real.</div>
+      <div class="foot rise d6"><div class="q"><i>›</i><b>The glue for open source. The bridge for AI. The key to sovereignty.</b></div><div class="brand">STACKTIC · 2026</div></div>
+    </div>
+  </section></div>
+
+</div>
+
+<div class="nav"><button id="prev">‹</button><div class="dots" id="dots"></div><button id="next">›</button></div>
+<script>
+function countUp(el){if(el.dataset.done)return;el.dataset.done=1;const to=+el.dataset.to,suf=el.dataset.suf||'';let s=null;
+  function step(t){if(s===null)s=t;const p=Math.min(1,(t-s)/1300);const e=1-Math.pow(1-p,3);el.textContent=Math.round(e*to)+suf;if(p<1)requestAnimationFrame(step);}
+  setTimeout(()=>requestAnimationFrame(step),450);}
+function drawArch(){const arch=document.querySelector('.arch'),links=document.getElementById('archlinks');if(!arch||!links)return;
+  const r=arch.getBoundingClientRect();if(!r.width)return;links.setAttribute('viewBox','0 0 '+r.width+' '+r.height);
+  const NS='http://www.w3.org/2000/svg';const ctr=id=>{const e=document.getElementById(id);if(!e)return null;const b=e.getBoundingClientRect();return [b.left+b.width/2-r.left,b.top+b.height/2-r.top];};
+  const K=ctr('an-kafka'),S=ctr('an-sink'),C=ctr('an-cnpg'),SE=ctr('an-sec'),MO=ctr('an-mon');if(!K||!S||!C)return;
+  links.innerHTML='<defs><marker id="ah" markerWidth="7" markerHeight="7" refX="5.6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#10b981"/></marker><marker id="ahg" markerWidth="6" markerHeight="6" refX="5" refY="2.6" orient="auto"><path d="M0,0 L5.2,2.6 L0,5.2 Z" fill="#9aa6c4"/></marker></defs>';
+  function edge(a,b,o){o=o||{};const dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy)||1,ux=dx/len,uy=dy/len,sh=o.shorten||30;
+    const A=[a[0]+ux*sh,a[1]+uy*sh],B=[b[0]-ux*sh,b[1]-uy*sh],d='M'+A[0]+','+A[1]+' L'+B[0]+','+B[1];
+    const p=document.createElementNS(NS,'path');p.setAttribute('d',d);p.setAttribute('fill','none');p.setAttribute('stroke',o.color||'#10b981');p.setAttribute('stroke-width',o.w||2.4);p.setAttribute('stroke-linecap','round');p.setAttribute('marker-end','url(#'+(o.mk||'ah')+')');
+    if(o.dash){p.setAttribute('stroke-dasharray','5 5');p.setAttribute('opacity','.7');}links.appendChild(p);
+    if(o.main){for(let i=0;i<2;i++){const c=document.createElementNS(NS,'circle');c.setAttribute('r','3.6');c.setAttribute('fill',o.color||'#10b981');const am=document.createElementNS(NS,'animateMotion');am.setAttribute('dur','1.8s');am.setAttribute('repeatCount','indefinite');am.setAttribute('begin',(i*0.9)+'s');am.setAttribute('path',d);c.appendChild(am);links.appendChild(c);}}}
+  edge(K,S,{main:true});edge(S,C,{main:true});
+  if(SE)edge(SE,S,{mk:'ahg',color:'#9aa6c4',w:1.5,dash:true,shorten:22});
+  if(MO)edge(S,MO,{mk:'ahg',color:'#9aa6c4',w:1.5,dash:true,shorten:22});}
+function drawEco(){const eco=document.querySelector('.eco'),links=document.getElementById('ecolinks');if(!eco||!links)return;
+  const r=eco.getBoundingClientRect();if(!r.width)return;links.setAttribute('viewBox','0 0 '+r.width+' '+r.height);links.innerHTML='';
+  const NS='http://www.w3.org/2000/svg';const rel=el=>{const b=el.getBoundingClientRect();return [b.left+b.width/2-r.left,b.top+b.height/2-r.top];};
+  const coreEl=document.getElementById('eco-core');if(!coreEl)return;const core=rel(coreEl);
+  const ids=['eco-crm','eco-erp','eco-files','eco-chat','eco-auto','eco-mail','eco-id','eco-wiki'];
+  const nodes=ids.map(id=>{const e=document.getElementById(id);if(!e)return null;return {c:rel(e),col:(getComputedStyle(e).getPropertyValue('--t')||'#8b5cf6').trim()};}).filter(Boolean);
+  if(!nodes.length)return;
+  for(let i=0;i<nodes.length;i++){const a=nodes[i].c,b=nodes[(i+1)%nodes.length].c;const p=document.createElementNS(NS,'path');p.setAttribute('d','M'+a[0]+','+a[1]+' L'+b[0]+','+b[1]);p.setAttribute('stroke','#d4dae8');p.setAttribute('stroke-width','1.2');p.setAttribute('fill','none');p.setAttribute('stroke-dasharray','4 5');links.appendChild(p);}
+  nodes.forEach((n,i)=>{const a=core,b=n.c,dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy)||1,ux=dx/len,uy=dy/len;
+    const A=[a[0]+ux*34,a[1]+uy*30],B=[b[0]-ux*30,b[1]-uy*30],d='M'+A[0]+','+A[1]+' L'+B[0]+','+B[1];
+    const p=document.createElementNS(NS,'path');p.setAttribute('d',d);p.setAttribute('stroke',n.col);p.setAttribute('stroke-width','2');p.setAttribute('fill','none');p.setAttribute('opacity','.55');p.setAttribute('stroke-linecap','round');links.appendChild(p);
+    const c=document.createElementNS(NS,'circle');c.setAttribute('r','3');c.setAttribute('fill',n.col);const am=document.createElementNS(NS,'animateMotion');am.setAttribute('dur','2.2s');am.setAttribute('repeatCount','indefinite');am.setAttribute('begin',(i*0.26)+'s');am.setAttribute('path',d);c.appendChild(am);links.appendChild(c);});}
+function redraw(){drawArch();drawEco();}
+addEventListener('resize',()=>requestAnimationFrame(redraw));
+const deck=document.getElementById('deck'),frames=[...document.querySelectorAll('.frame')],dots=document.getElementById('dots');
+frames.forEach((f,i)=>{const b=document.createElement('button');b.className='nd';b.textContent=i+1;b.onclick=()=>f.scrollIntoView({behavior:'smooth',inline:'center'});dots.appendChild(b);});
+const nds=[...dots.children];let cur=0;
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){cur=frames.indexOf(e.target);e.target.classList.add('live');e.target.querySelectorAll('[data-to]').forEach(countUp);requestAnimationFrame(redraw);nds.forEach((d,j)=>d.classList.toggle('on',j===cur));}}),{root:deck,threshold:.5});
+frames.forEach(f=>io.observe(f));
+requestAnimationFrame(()=>requestAnimationFrame(redraw));
+const go=d=>{cur=Math.max(0,Math.min(frames.length-1,cur+d));frames[cur].scrollIntoView({behavior:'smooth',inline:'center'});};
+document.getElementById('next').onclick=()=>go(1);document.getElementById('prev').onclick=()=>go(-1);
+addEventListener('keydown',e=>{if(['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)){e.preventDefault();go(1);}if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();go(-1);}});
+</script>
+</body></html>

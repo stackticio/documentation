@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stacktic — Mark Sketches</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+:root{
+  --ink:#0e1426; --body:#3c4566; --soft:#5b6486; --faint:#8b93b0;
+  --bg:#f6f7fb; --line:#e3e7f3; --line2:#ccd3e8; --dark:#2A2847;
+  --indigo:#5158e8; --purple:#7c4ddf; --cyan:#0a9bdb; --emerald:#0da370; --rose:#e5476b;
+  --disp:'Sora',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+}
+body{background:var(--bg);color:var(--ink);font-family:var(--disp);font-size:15px;line-height:1.6;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(16px,4vw,44px) 110px}
+
+.head{padding:66px 0 34px}
+.head .kicker{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--indigo)}
+.head h1{font-size:clamp(30px,5.4vw,50px);font-weight:800;letter-spacing:-.04em;line-height:1.04;margin-top:12px}
+.head p{margin-top:14px;max-width:64ch;color:var(--body);font-size:16.5px}
+.head p b{color:var(--ink);font-weight:700}
+
+h2{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-top:64px}
+h2 .n{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.2em;
+  color:var(--faint);display:block;margin-bottom:6px}
+h2+p{margin-top:8px;max-width:66ch;color:var(--body);font-size:14.5px}
+
+.sheet{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:16px;margin-top:24px}
+.sk{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;
+  display:flex;flex-direction:column}
+.sk.rec{border-color:#bfe8d7;background:#f8fdfb}
+.sk .stage{height:132px;display:flex;align-items:center;justify-content:center;
+  border-radius:11px;background:#fbfcff;border:1px dashed var(--line2)}
+.sk.rec .stage{background:#fff;border-color:#cfeadd}
+.sk .stage svg{height:84px;width:auto}
+.sk .mini{display:flex;align-items:center;justify-content:center;gap:16px;
+  padding:14px 0 12px;margin-top:12px;border-top:1px solid var(--line)}
+.sk .mini svg{display:block}
+.sk .lab{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink);margin-top:2px}
+.sk .lab i{font-style:normal;color:var(--faint);margin-right:7px}
+.sk .why{font-size:12.5px;color:var(--body);line-height:1.6;margin-top:7px;flex:1}
+.sk .tag{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;margin-top:11px;padding:4px 9px;border-radius:999px;
+  background:#eef0fc;color:var(--indigo);align-self:flex-start}
+.sk .tag.go{background:#e4f7ef;color:#087a54}
+.sk .tag.no{background:#fdeff3;color:#b8244a}
+
+.strip{margin-top:26px;background:var(--dark);border-radius:16px;padding:30px;
+  display:flex;align-items:center;gap:34px;flex-wrap:wrap;justify-content:center}
+.strip svg{height:56px;width:auto}
+
+.tk{font-family:var(--mono);font-size:12px;color:var(--soft);line-height:1.8;margin-top:26px;
+  border-left:3px solid var(--indigo);padding-left:20px;max-width:76ch}
+.tk b{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="g1" x1="0" y1="1" x2="1" y2="0">
+    <stop offset="0%" stop-color="#7c4ddf"/><stop offset="52%" stop-color="#0a9bdb"/>
+    <stop offset="100%" stop-color="#0da370"/>
+  </linearGradient>
+  <mask id="kcut">
+    <rect x="0" y="0" width="100" height="100" fill="#fff"/>
+    <g stroke="#000" stroke-width="9" stroke-linecap="round" fill="none">
+      <path d="M34 24 V76"/><path d="M34 50 L64 24"/><path d="M34 50 L64 76"/>
+    </g>
+    <circle cx="34" cy="50" r="9" fill="#000"/>
+  </mask>
+</defs></svg>
+
+<div class="wrap">
+
+<header class="head">
+  <div class="kicker">Mark sketches · round 2</div>
+  <h1>Git branches, and something more modern.</h1>
+  <p>Same rule throughout: <b>nothing is added for a meaning</b> — the meanings have to be found
+     in geometry that was going to be there anyway. Every sketch is monoline, one ink, and shown
+     at 16px so you can see which ones actually survive.</p>
+</header>
+
+<!-- ══════ GIT FAMILY ══════ -->
+<h2><span class="n">Family A</span>Git — branches, commits, merge</h2>
+<p>Git is the substrate Stacktic writes to. The question is whether that can be said inside a
+   letterform, or whether it forces you out of one.</p>
+
+<div class="sheet">
+
+  <!-- 06 GIT-K -->
+  <div class="sk rec">
+    <div class="stage">
+      <svg viewBox="0 0 100 100">
+        <g fill="none" stroke="var(--ink)" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 12 V88"/>
+          <path d="M22 50 H44 L72 20"/>
+          <path d="M22 50 H44 L72 80"/>
+        </g>
+        <g fill="var(--ink)">
+          <circle cx="22" cy="12" r="7.5"/><circle cx="22" cy="88" r="7.5"/>
+          <circle cx="72" cy="20" r="7.5"/><circle cx="72" cy="80" r="7.5"/>
+        </g>
+        <circle cx="22" cy="50" r="12.5" fill="var(--indigo)"/>
+      </svg>
+    </div>
+    <div class="mini">
+      <svg width="28" height="28" viewBox="0 0 100 100"><g fill="none" stroke="var(--ink)" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12 V88"/><path d="M22 50 H44 L72 20"/><path d="M22 50 H44 L72 80"/></g><g fill="var(--ink)"><circle cx="22" cy="12" r="7.5"/><circle cx="22" cy="88" r="7.5"/><circle cx="72" cy="20" r="7.5"/><circle cx="72" cy="80" r="7.5"/></g><circle cx="22" cy="50" r="12.5" fill="var(--indigo)"/></svg>
+      <svg width="20" height="20" viewBox="0 0 100 100"><g fill="none" stroke="var(--ink)" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12 V88"/><path d="M22 50 H44 L72 20"/><path d="M22 50 H44 L72 80"/></g><g fill="var(--ink)"><circle cx="22" cy="12" r="7.5"/><circle cx="22" cy="88" r="7.5"/><circle cx="72" cy="20" r="7.5"/><circle cx="72" cy="80" r="7.5"/></g><circle cx="22" cy="50" r="12.5" fill="var(--indigo)"/></svg>
+      <svg width="16" height="16" viewBox="0 0 100 100"><g fill="none" stroke="var(--ink)" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12 V88"/><path d="M22 50 H44 L72 20"/><path d="M22 50 H44 L72 80"/></g><g fill="var(--ink)"><circle cx="22" cy="12" r="7.5"/><circle cx="22" cy="88" r="7.5"/><circle cx="72" cy="20" r="7.5"/><circle cx="72" cy="80" r="7.5"/></g><circle cx="22" cy="50" r="12.5" fill="var(--indigo)"/></svg>
+    </div>
+    <div class="lab"><i>06</i>Git-K</div>
+    <p class="why">Trunk with commit nodes; the branch point sits mid-mainline and two branches
+      diverge from it. Reads as a <b>git graph</b> and as a <b>K</b> at the same time — the only
+      sketch here that manages both.</p>
+    <span class="tag go">strongest new idea</span>
+  </div>
+
+  <!-- 07 MERGE LOOP -->
+  <div class="sk">
+    <div class="stage">
+      <svg viewBox="0 0 100 100">
+        <g fill="none" stroke="var(--ink)" stroke-width="8.5" stroke-linecap="round">
+          <path d="M26 10 V90"/>
+          <path d="M26 32 H50 Q70 32 70 50 Q70 68 50 68 H26"/>
+        </g>
+        <g fill="var(--ink)"><circle cx="26" cy="32" r="8"/><circle cx="26" cy="68" r="8"/></g>
+        <circle cx="26" cy="10" r="6" fill="var(--ink)"/><circle cx="26" cy="90" r="6" fill="var(--ink)"/>
+      </svg>
+    </div>
+    <div class="mini">
+      <svg width="28" height="28" viewBox="0 0 100 100"><g fill="none" stroke="var(--ink)" stroke-width="8.5" stroke-linecap="round"><path d="M26 10 V90"/><path d="M26 32 H50 Q70 32 70 50 Q70 68 50 68 H26"/></g><g fill="var(--ink)"><circle cx="26" cy="32" r="8"/><circle cx="26" cy="68" r="8"/><circle cx="26" cy="10" r="6"/><circle cx="26" cy="90" r="6"/></g></svg>
+      <svg width="20" height="20" viewBox="0 0 100 100"><g fill="none" stroke="var(--ink)" stroke-width="8.5" stroke-linecap="round"><path d="M26 10 V90"/><path d="M26 32 H50 Q70 32 70 50 Q70 68 50 68 H26"/></g><g fill="var(--ink)"><circle cx="26" cy="32" r="8"/><circle cx="26" cy="68" r="8"/><circle cx="26" cy="10" r="6"/><circle cx="26" cy="90" r="6"/></g></svg>
+      <svg width="16" height="16" viewBox="0 0 100 100"><g fill="none" stroke="var(--ink)" stroke-width="8.5" stroke-linecap="round"><path d="M26 10 V90"/><path d="M26 32 H50 Q70 32 70 50 Q70 68 50 68 H26"/></g><g fill="var(--ink)"><circle cx="26" cy="32" r="8"/><circle cx="26" cy="68" r="8"/><circle cx="26" cy="10" r="6"/><circle cx="26" cy="90" r="6"/></g></svg>
+    </div>
+    <div class="lab"><i>07</i>Merge loop</div>
+    <p class="why">Branch leaves the mainline and <b>always merges back</b>. The cleanest possible
+      statement of "divergence reconverges to one truth". But it isn't a K — it reads closer to
+      a <b>D</b>, so it can't be a letterform lockup.</p>
+    <span class="tag">meaning wins, letter lost</span>
+  </div>
+
+  <!-- 08 TREE-K -->
+  <div class="sk">
+    <div class="stage">
+      <svg viewBox="0 0 100 100">
+        <g fill="none" stroke="var(--ink)" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 50 H36"/>
+          <path d="M36 50 L54 28 M36 50 L54 72"/>
+          <path d="M54 28 L74 16 M54 28 L74 34"/>
+          <path d="M54 72 L74 66 M54 72 L74 84"/>
+          <path d="M18 14 V86"/>
+        </g>
+        <g fill="var(--ink)"><circle cx="74" cy="16" r="6"/><circle cx="74" cy="34" r="6"/>
+          <circle cx="74" cy="66" r="6"/><circle cx="74" cy="84" r="6"/></g>
+      </svg>
+    </div>
+    <div class="mini">
+      <svg width="28" height="28" viewBox="0 0 100 100"><g fill="none" stroke="var(--ink)" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 50 H36"/><path d="M36 50 L54 28 M36 50 L54 72"/><path d="M54 28 L74 16 M54 28 L74 34"/><path d="M54 72 L74 66 M54 72 L74 84"/><path d="M18 14 V86"/></g><g fill="var(--ink)"><circle cx="74" cy="16" r="6"/><circle cx="74" cy="34" r="6"/><circle cx="74" cy="66" r="6"/><circle cx="74" cy="84" r="6"/></g></svg>
+      <svg width="20" height="20" viewBox="0 0 100 100"><g fill="none" stroke="var(--ink)" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 50 H36"/><path d="M36 50 L54 28 M36 50 L54 72"/><path d="M54 28 L74 16 M54 28 L74 34"/><path d="M54 72 L74 66 M54 72 L74 84"/><path d="M18 14 V86"/></g><g fill="var(--ink)"><circle cx="74" cy="16" r="6"/><circle cx="74" cy="34" r="6"/><circle cx="74" cy="66" r="6"/><circle cx="74" cy="84" r="6"/></g></svg>
+      <svg width="16" height="16" viewBox="0 0 100 100"><g fill="none" stroke="var(--ink)" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 50 H36"/><path d="M36 50 L54 28 M36 50 L54 72"/><path d="M54 28 L74 16 M54 28 L74 34"/><path d="M54 72 L74 66 M54 72 L74 84"/><path d="M18 14 V86"/></g><g fill="var(--ink)"><circle cx="74" cy="16" r="6"/><circle cx="74" cy="34" r="6"/><circle cx="74" cy="66" r="6"/><circle cx="74" cy="84" r="6"/></g></svg>
+    </div>
+    <div class="lab"><i>08</i>Tree-K</div>
+    <p class="why">Branches subdivide twice — the most literal "tree". Look at the 16px: it turns
+      to mush. It also reads <b>organic</b>, which is the wrong register for
+      <i>accurate, compliant, automated</i>.</p>
+    <span class="tag no">too busy · wrong register</span>
+  </div>
+</div>
+
+<!-- ══════ MODERN FAMILY ══════ -->
+<h2><span class="n">Family B</span>Modern — reduction, negative space, versions</h2>
+<p>"Modern" here means fewer parts, not more effects. The test is how much you can remove before
+   the meaning breaks.</p>
+
+<div class="sheet">
+
+  <!-- 09 TWO-STROKE -->
+  <div class="sk rec">
+    <div class="stage">
+      <svg viewBox="0 0 100 100">
+        <g fill="none" stroke="var(--ink)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M26 12 V88"/>
+          <path d="M76 12 L36 50 L76 88"/>
+        </g>
+      </svg>
+    </div>
+    <div class="mini">
+      <svg width="28" height="28" viewBox="0 0 100 100"><g fill="none" stroke="var(--ink)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="M26 12 V88"/><path d="M76 12 L36 50 L76 88"/></g></svg>
+      <svg width="20" height="20" viewBox="0 0 100 100"><g fill="none" stroke="var(--ink)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="M26 12 V88"/><path d="M76 12 L36 50 L76 88"/></g></svg>
+      <svg width="16" height="16" viewBox="0 0 100 100"><g fill="none" stroke="var(--ink)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="M26 12 V88"/><path d="M76 12 L36 50 L76 88"/></g></svg>
+    </div>
+    <div class="lab"><i>09</i>Two-stroke</div>
+    <p class="why">A K is <b>mathematically undrawable in one stroke</b> — two is the floor.
+      So this is the most reduced honest mark that exists: stem + chevron, nothing else. Holds
+      stack, graph, chevron, K. Loses the source-of-truth vertex.</p>
+    <span class="tag go">most reduced</span>
+  </div>
+
+  <!-- 10 TWO-STROKE + HUB -->
+  <div class="sk rec">
+    <div class="stage">
+      <svg viewBox="0 0 100 100">
+        <g fill="none" stroke="var(--ink)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M26 12 V88"/>
+          <path d="M76 12 L36 50 L76 88"/>
+        </g>
+        <circle cx="26" cy="50" r="14" fill="var(--indigo)"/>
+      </svg>
+    </div>
+    <div class="mini">
+      <svg width="28" height="28" viewBox="0 0 100 100"><g fill="none" stroke="var(--ink)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="M26 12 V88"/><path d="M76 12 L36 50 L76 88"/></g><circle cx="26" cy="50" r="14" fill="var(--indigo)"/></svg>
+      <svg width="20" height="20" viewBox="0 0 100 100"><g fill="none" stroke="var(--ink)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="M26 12 V88"/><path d="M76 12 L36 50 L76 88"/></g><circle cx="26" cy="50" r="14" fill="var(--indigo)"/></svg>
+      <svg width="16" height="16" viewBox="0 0 100 100"><g fill="none" stroke="var(--ink)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="M26 12 V88"/><path d="M76 12 L36 50 L76 88"/></g><circle cx="26" cy="50" r="14" fill="var(--indigo)"/></svg>
+    </div>
+    <div class="lab"><i>10</i>Two-stroke + hub</div>
+    <p class="why">The same two strokes plus <b>one dot</b>. Three parts total, and the dot buys
+      back the graph vertex and the source of truth. Open ends read as "connects onward" —
+      an extensible graph, not a closed shape.</p>
+    <span class="tag go">smart-basic candidate</span>
+  </div>
+
+  <!-- 11 CHECK LEG -->
+  <div class="sk">
+    <div class="stage">
+      <svg viewBox="0 0 100 100">
+        <g fill="none" stroke="var(--ink)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M26 12 V88"/>
+          <path d="M64 12 L30 50"/>
+          <path d="M30 50 L48 82 L88 18"/>
+        </g>
+        <circle cx="26" cy="50" r="14" fill="var(--indigo)"/>
+      </svg>
+    </div>
+    <div class="mini">
+      <svg width="28" height="28" viewBox="0 0 100 100"><g fill="none" stroke="var(--ink)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="M26 12 V88"/><path d="M64 12 L30 50"/><path d="M30 50 L48 82 L88 18"/></g><circle cx="26" cy="50" r="14" fill="var(--indigo)"/></svg>
+      <svg width="20" height="20" viewBox="0 0 100 100"><g fill="none" stroke="var(--ink)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="M26 12 V88"/><path d="M64 12 L30 50"/><path d="M30 50 L48 82 L88 18"/></g><circle cx="26" cy="50" r="14" fill="var(--indigo)"/></svg>
+      <svg width="16" height="16" viewBox="0 0 100 100"><g fill="none" stroke="var(--ink)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="M26 12 V88"/><path d="M64 12 L30 50"/><path d="M30 50 L48 82 L88 18"/></g><circle cx="26" cy="50" r="14" fill="var(--indigo)"/></svg>
+    </div>
+    <div class="lab"><i>11</i>Check leg + hub</div>
+    <p class="why">Adds validation: the leg overshoots into a <b>tick</b>. Says the most of any
+      sketch — but check the 16px. The overshoot is the first thing to blur, and it makes the
+      glyph noticeably wider than the others.</p>
+    <span class="tag">says most · widest</span>
+  </div>
+
+  <!-- 12 NEGATIVE TILE -->
+  <div class="sk">
+    <div class="stage">
+      <svg viewBox="0 0 100 100">
+        <rect x="2" y="2" width="96" height="96" rx="24" fill="url(#g1)" mask="url(#kcut)"/>
+      </svg>
+    </div>
+    <div class="mini">
+      <svg width="28" height="28" viewBox="0 0 100 100"><rect x="2" y="2" width="96" height="96" rx="24" fill="url(#g1)" mask="url(#kcut)"/></svg>
+      <svg width="20" height="20" viewBox="0 0 100 100"><rect x="2" y="2" width="96" height="96" rx="24" fill="url(#g1)" mask="url(#kcut)"/></svg>
+      <svg width="16" height="16" viewBox="0 0 100 100"><rect x="2" y="2" width="96" height="96" rx="24" fill="url(#g1)" mask="url(#kcut)"/></svg>
+    </div>
+    <div class="lab"><i>12</i>Negative tile</div>
+    <p class="why">Same K, knocked out of a gradient rounded square. Not a separate idea — it's
+      the <b>app-icon form</b> of whichever mark wins. Worth having, but it can't be the primary:
+      it dies in one colour and in print.</p>
+    <span class="tag">app icon only</span>
+  </div>
+
+  <!-- 13 VERSION OFFSET -->
+  <div class="sk">
+    <div class="stage">
+      <svg viewBox="0 0 100 100">
+        <g fill="none" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"
+           stroke-linejoin="round" opacity=".26">
+          <path d="M12 16 V84"/><path d="M56 16 L20 50 L56 84"/>
+        </g>
+        <g fill="none" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"
+           stroke-linejoin="round" opacity=".5">
+          <path d="M24 16 V84"/><path d="M68 16 L32 50 L68 84"/>
+        </g>
+        <g fill="none" stroke="var(--ink)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M38 16 V84"/><path d="M84 16 L46 50 L84 84"/>
+        </g>
+      </svg>
+    </div>
+    <div class="mini">
+      <svg width="28" height="28" viewBox="0 0 100 100"><g fill="none" stroke="var(--ink)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity=".26"><path d="M12 16 V84"/><path d="M56 16 L20 50 L56 84"/></g><g fill="none" stroke="var(--ink)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity=".5"><path d="M24 16 V84"/><path d="M68 16 L32 50 L68 84"/></g><g fill="none" stroke="var(--ink)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path d="M38 16 V84"/><path d="M84 16 L46 50 L84 84"/></g></svg>
+      <svg width="20" height="20" viewBox="0 0 100 100"><g fill="none" stroke="var(--ink)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity=".26"><path d="M12 16 V84"/><path d="M56 16 L20 50 L56 84"/></g><g fill="none" stroke="var(--ink)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity=".5"><path d="M24 16 V84"/><path d="M68 16 L32 50 L68 84"/></g><g fill="none" stroke="var(--ink)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path d="M38 16 V84"/><path d="M84 16 L46 50 L84 84"/></g></svg>
+      <svg width="16" height="16" viewBox="0 0 100 100"><g fill="none" stroke="var(--ink)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity=".26"><path d="M12 16 V84"/><path d="M56 16 L20 50 L56 84"/></g><g fill="none" stroke="var(--ink)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity=".5"><path d="M24 16 V84"/><path d="M68 16 L32 50 L68 84"/></g><g fill="none" stroke="var(--ink)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path d="M38 16 V84"/><path d="M84 16 L46 50 L84 84"/></g></svg>
+    </div>
+    <div class="lab"><i>13</i>Version offset</div>
+    <p class="why">The same K repeated and faded back — <b>snapshots of the whole stack over
+      time</b>. A genuinely distinctive idea and true to the product. But it collapses into a
+      smudge below 28px, so it's a <b>motion/hero device</b>, not a mark.</p>
+    <span class="tag">motion device, not a mark</span>
+  </div>
+</div>
+
+<!-- ══════ ON DARK ══════ -->
+<h2><span class="n">Check</span>The shortlist on #2A2847</h2>
+<p>Nothing is decided until it works reversed on the site background.</p>
+<div class="strip">
+  <svg viewBox="0 0 100 100"><g fill="none" stroke="#fff" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12 V88"/><path d="M22 50 H44 L72 20"/><path d="M22 50 H44 L72 80"/></g><g fill="#fff"><circle cx="22" cy="12" r="7.5"/><circle cx="22" cy="88" r="7.5"/><circle cx="72" cy="20" r="7.5"/><circle cx="72" cy="80" r="7.5"/></g><circle cx="22" cy="50" r="12.5" fill="#60d5ff"/></svg>
+  <svg viewBox="0 0 100 100"><g fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="M26 12 V88"/><path d="M76 12 L36 50 L76 88"/></g></svg>
+  <svg viewBox="0 0 100 100"><g fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="M26 12 V88"/><path d="M76 12 L36 50 L76 88"/></g><circle cx="26" cy="50" r="14" fill="#60d5ff"/></svg>
+  <svg viewBox="0 0 100 100"><g fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="M26 12 V88"/><path d="M64 12 L30 50"/><path d="M30 50 L48 82 L88 18"/></g><circle cx="26" cy="50" r="14" fill="#60d5ff"/></svg>
+</div>
+
+<p class="tk">
+  <b>What the 16px row tells you.</b> 08 and 13 are out — detail count, not concept, kills them.
+  07 is the best <i>meaning</i> and the worst <i>fit</i>: it stops being a K.<br><br>
+  <b>Real shortlist: 06, 10, 11.</b> They differ on one axis — how much you're willing to
+  carry at small size. 10 says stack + graph + truth in three parts. 11 adds validation and
+  gets wider. 06 adds git and gets busier, but it's the only one where the mark names the
+  substrate you actually write to.
+</p>
+
+</div>
+</body>
+</html>

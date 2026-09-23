@@ -1,0 +1,83 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stacktic Brand</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Sora,sans-serif;background:#f6f7fb;color:#0e1426;line-height:1.6}
+.w{max-width:1000px;margin:0 auto;padding:56px 28px 100px}
+h1{font-size:40px;font-weight:800;letter-spacing:-.04em}
+h2{font-size:12px;font-family:'JetBrains Mono',monospace;font-weight:700;letter-spacing:.2em;
+   text-transform:uppercase;color:#8b93b0;margin:56px 0 16px;padding-bottom:9px;border-bottom:1px solid #e3e7f3}
+.box{background:#fff;border:1px solid #e3e7f3;border-radius:16px;padding:34px;margin-bottom:14px}
+.box.d{background:#2A2847;border-color:#3b3860}
+.row{display:flex;align-items:center;gap:46px;flex-wrap:wrap}
+.wm{font-size:46px;font-weight:800;letter-spacing:.02em;line-height:1;white-space:nowrap}
+.wm .q{font-weight:200;color:#8b93b0}
+.d .wm{color:#fff}.d .wm .q{color:#7b83ad}
+.cap{font-family:'JetBrains Mono',monospace;font-size:11px;color:#8b93b0;letter-spacing:.1em;margin-top:14px}
+.d .cap{color:#7b83ad}
+.sizes{display:flex;align-items:flex-end;gap:26px;margin-top:26px;padding-top:22px;border-top:1px solid #e3e7f3}
+.sizes div{text-align:center}.sizes span{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;color:#8b93b0;margin-top:8px}
+.icons{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
+.ic{background:#fff;border:1px solid #e3e7f3;border-radius:12px;padding:18px 8px;text-align:center;color:#0e1426}
+.ic .b{display:flex;justify-content:center;margin-bottom:10px}
+.ic span{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:#8b93b0;word-break:break-all}
+.t{font-size:15px;color:#3c4566;max-width:64ch}
+.t b{color:#0e1426}
+code{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:#eef0fc;color:#3d44b8;padding:2px 7px;border-radius:5px}
+.spec{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:#5b6486;line-height:2.1}
+.spec b{color:#0e1426}
+</style></head><body><div class="w">
+
+<h1>Stacktic — logo, font, icons</h1>
+
+<h2>Logo</h2>
+<div class="box"><div class="row">
+  <img src="assets/logo/stacktic-mark.svg" width="104" height="104">
+  <div><div class="wm"><span class="q">S</span>TAC<span class="q">K</span>TIC</div>
+  <div class="cap">Sora &nbsp;800 / 200 &nbsp;·&nbsp; the S and K drop to ExtraLight so TACTIC reads</div></div>
+</div>
+<div class="sizes">
+  <div><img src="assets/logo/stacktic-mark.svg" width="48" height="48"><span>48</span></div>
+  <div><img src="assets/logo/stacktic-mark.svg" width="32" height="32"><span>32</span></div>
+  <div><img src="assets/logo/stacktic-mark.svg" width="24" height="24"><span>24</span></div>
+  <div><img src="assets/logo/favicon.svg" width="16" height="16"><span>16 favicon</span></div>
+  <div><img src="assets/logo/stacktic-app-icon.svg" width="56" height="56"><span>app icon</span></div>
+</div></div>
+
+<div class="box d"><div class="row">
+  <img src="assets/logo/stacktic-mark-reversed.svg" width="104" height="104" style="border-radius:14px">
+  <div><div class="wm"><span class="q">S</span>TAC<span class="q">K</span>TIC</div>
+  <div class="cap">reversed on the live site background #2A2847</div></div>
+</div></div>
+
+<p class="t" style="margin-top:18px">The mark is a <b>K</b>: the vertical is the stack, the two
+edges are the graph, and the dot is the one junction everything routes through — the source of
+truth. Three parts, nothing decorative. In plain text where you can't set weights, write it
+<code>sTACkTIC</code> — same idea, no artwork needed.</p>
+
+<h2>Font</h2>
+<div class="box"><div class="spec">
+<b>Sora 800</b> — wordmark and headlines &nbsp;<span style="letter-spacing:-.04em;font-family:Sora;font-size:22px;font-weight:800">AI writes one layer</span><br>
+<b>Sora 400/600</b> — body text &nbsp;<span style="font-family:Sora;font-size:15px">the whole stack moves with it</span><br>
+<b>JetBrains Mono 700</b> — labels, numbers, the chain &nbsp;<span style="font-family:'JetBrains Mono';font-size:13px;letter-spacing:.16em">AI › STACKTIC › GIT › CLUSTER</span>
+</div>
+<p class="t" style="margin-top:20px">One line to paste into any page:</p>
+<p style="margin-top:10px"><code>&lt;link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;400;600;800&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"&gt;</code></p>
+<p class="t" style="margin-top:16px">This replaces <b>Fira Code</b> in home.html, product.html and solution.html — those three are the only files still on the old font.</p>
+</div>
+
+<h2>Icons — 16</h2>
+<div class="icons"><div class="ic"><div class="b"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5 14 9.6 21 12 14 14.4 12 21.5 10 14.4 3 12 10 9.6Z"/></svg></div><span>ai</span></div><div class="ic"><div class="b"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.2" width="18" height="15.6" rx="2.6"/><path d="M3 9.4h18"/><circle cx="6.6" cy="6.8" r=".9" fill="currentColor"/></svg></div><span>app</span></div><div class="ic"><div class="b"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.2 12a8.2 8.2 0 1 1-2.6-6"/><path d="M17.6 1.9v4.4h-4.4"/></svg></div><span>automate</span></div><div class="ic"><div class="b"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3.5"/><circle cx="8.5" cy="8.5" r="1.7" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.7" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.7" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.7" fill="currentColor"/></svg></div><span>cluster</span></div><div class="ic"><div class="b"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.6 20 5.6v6.2c0 5.2-8 9.6-8 9.6s-8-4.4-8-9.6V5.6Z"/><path d="M8.4 11.9 11 14.6 15.8 9.3"/></svg></div><span>compliance</span></div><div class="ic"><div class="b"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8v11.4"/><path d="M8 6.8 12 2.8 16 6.8"/><path d="M3.6 15 12 19.6 20.4 15"/></svg></div><span>deploy</span></div><div class="ic"><div class="b"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.4 5v14M19.6 5v14"/><path d="M8.6 12h7"/><path d="M12.6 9 15.6 12 12.6 15"/></svg></div><span>gateway</span></div><div class="ic"><div class="b"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7.5v9"/><circle cx="6" cy="5" r="2.2"/><circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="8" r="2.2"/><path d="M6 14h4.5c4 0 7.5-1 7.5-3.7"/></svg></div><span>git-branch</span></div><div class="ic"><div class="b"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6 12 17M18 6 12 17M6 6 18 6"/><circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="12" cy="18.6" r="2.4" fill="currentColor"/></svg></div><span>graph</span></div><div class="ic"><div class="b"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.6 12h4.6l2.2-5.4 3.6 11.2 2.2-5.8h6.2"/></svg></div><span>observe</span></div><div class="ic"><div class="b"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.8h7.4L18 7.4V21.2H6Z"/><path d="M13.4 2.8v4.6H18"/><path d="M9 14.2 11 16.3 15 11.9"/></svg></div><span>policy</span></div><div class="ic"><div class="b"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.8" cy="10.8" r="6.4"/><path d="M15.5 15.5 21 21"/><path d="M7.6 10.8h6.4"/></svg></div><span>scan</span></div><div class="ic"><div class="b"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15" r="4.2"/><path d="M10.6 12 20 2.6"/><path d="M16.6 6 19 8.4"/><path d="M14.2 8.4l2.4 2.4"/></svg></div><span>secret</span></div><div class="ic"><div class="b"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12 5 5M12 12 19 5M12 12 5 19M12 12 19 19"/><circle cx="5" cy="5" r="1.7"/><circle cx="19" cy="5" r="1.7"/><circle cx="5" cy="19" r="1.7"/><circle cx="19" cy="19" r="1.7"/><circle cx="12" cy="12" r="3.4" fill="currentColor"/></svg></div><span>source-of-truth</span></div><div class="ic"><div class="b"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 7.5 12 12 4 7.5Z"/><path d="M4 12 12 16.5 20 12"/><path d="M4 16.5 12 21 20 16.5"/></svg></div><span>stack</span></div><div class="ic"><div class="b"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M15 5.5H6.5A1.5 1.5 0 0 0 5 7v8.5"/><path d="M11.5 3H4a1 1 0 0 0-1 1v7.5" opacity=".45"/></svg></div><span>version</span></div></div>
+<p class="t" style="margin-top:20px">24×24, 2px monoline, round caps, <code>currentColor</code> —
+so they take the colour of whatever text they sit next to. Same drawing rules as the logo.</p>
+
+<h2>Files</h2>
+<div class="box"><div class="spec">
+<b>assets/logo/</b> — stacktic-mark.svg · -onecolor · -reversed · -gradient ·
+stacktic-logo-horizontal.svg · -reversed · stacktic-app-icon.svg · favicon.svg<br>
+<b>assets/icons/</b> — ai · app · automate · cluster · compliance · deploy · gateway · git-branch · graph · observe · policy · scan · secret · source-of-truth · stack · version
+</div></div>
+
+</div></body></html>

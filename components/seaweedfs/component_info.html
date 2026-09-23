@@ -129,6 +129,43 @@
                 </table>
             </div>
 
+            <!-- remote_bucket -->
+            <div style="background-color: #e9d5ff; padding: 16px; border-radius: 6px; margin-bottom: 12px;">
+                <h4 style="color: #5b21b6; margin: 0 0 8px 0; font-size: 14px;">remote_bucket - Remote S3 Backup</h4>
+                <p style="color: #6b21a8; font-size: 12px; margin-bottom: 8px;">Continuous backup of a local swbucket to any S3-compatible remote endpoint (AWS S3, MinIO, SeaweedFS, GCS). Uses <code>weed filer.backup</code> with change-log subscription for near-real-time replication. Linked via <code>swbucket-remote_bucket</code>.</p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                    <thead>
+                        <tr style="background-color: #c4b5fd;">
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Attribute</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Example</th>
+                            <th style="padding: 6px; border: 1px solid #a78bfa; text-align: left;">Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #1e1b4b;">
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>bucket</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>remote-backup</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Destination bucket name on the remote S3 endpoint</td>
+                        </tr>
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>access_key</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>remote-user</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Remote S3 access key &rarr; stored in <code>{name}-credentials</code> Secret</td>
+                        </tr>
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>secret_key</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>secret123</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Remote S3 secret key &rarr; stored in <code>{name}-credentials</code> Secret</td>
+                        </tr>
+                        <tr style="background-color: #fef3c7; border-left: 3px solid #f59e0b;">
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>endpoint</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;"><code>http://remote-s3:8333</code></td>
+                            <td style="padding: 4px 6px; border: 1px solid #a78bfa;">Remote S3-compatible endpoint URL (SeaweedFS, AWS S3, MinIO, GCS)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
             <!-- pv -->
             <div style="background-color: #e9d5ff; padding: 16px; border-radius: 6px;">
                 <h4 style="color: #5b21b6; margin: 0 0 8px 0; font-size: 14px;">pv - PersistentVolume (CSI)</h4>
@@ -249,6 +286,11 @@
                         <td style="padding: 6px 8px; border: 1px solid #475569;">App &rarr; pv</td>
                         <td style="padding: 6px 8px; border: 1px solid #475569;">PVC + volumeMount auto-generated on the app. Link attribute: <code>mount_path</code> (e.g. <code>/data</code>)</td>
                     </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>swbucket-remote_bucket</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">swbucket &rarr; remote_bucket</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">Deployment running <code>weed filer.backup</code> — continuous replication of source bucket to remote S3 endpoint</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -299,6 +341,16 @@
                         <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/pv.yaml</code></td>
                         <td style="padding: 6px 8px; border: 1px solid #475569;">If pv sub-components</td>
                         <td style="padding: 6px 8px; border: 1px solid #475569;">One PersistentVolume per pv sub-component (CSI driver, Retain reclaim policy)</td>
+                    </tr>
+                    <tr style="background-color: #0f172a;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/remote-bucket-backup.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">If remote_bucket sub-components</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">One Deployment per remote_bucket running <code>weed filer.backup</code> with <code>replication.toml</code> [sink.s3] config</td>
+                    </tr>
+                    <tr style="background-color: #1e293b;">
+                        <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/secret/remote-bucket-secret.yaml</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">If remote_bucket sub-components (SOPS)</td>
+                        <td style="padding: 6px 8px; border: 1px solid #475569;">One Secret per remote_bucket: <code>{name}-credentials</code> with access-key, secret-key, endpoint, bucket</td>
                     </tr>
                     <tr style="background-color: #0f172a;">
                         <td style="padding: 6px 8px; border: 1px solid #475569;"><code>k8s/deploy/base/patch/resource-{size}.yaml</code></td>

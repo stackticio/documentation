@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stacktic — 20 Marks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+:root{
+  --ink:#0e1426; --body:#3c4566; --soft:#5b6486; --faint:#8b93b0;
+  --bg:#f6f7fb; --line:#e3e7f3; --line2:#ccd3e8; --dark:#2A2847;
+  --indigo:#5158e8; --purple:#7c4ddf; --cyan:#0a9bdb; --emerald:#0da370; --rose:#e5476b;
+  --disp:'Sora',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+}
+body{background:var(--bg);color:var(--ink);font-family:var(--disp);font-size:15px;line-height:1.6;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1280px;margin:0 auto;padding:0 clamp(16px,4vw,44px) 120px}
+
+/* ── head ── */
+.head{padding:68px 0 30px}
+.head .kicker{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--indigo)}
+.head h1{font-size:clamp(30px,5.4vw,52px);font-weight:800;letter-spacing:-.045em;line-height:1.03;margin-top:12px}
+.head p{margin-top:16px;max-width:66ch;color:var(--body);font-size:16.5px}
+.head p b{color:var(--ink);font-weight:700}
+
+/* ── interlock diagram ── */
+.lock{margin-top:34px;padding:32px 30px;background:#fff;border:1px solid var(--line);
+  border-radius:18px;box-shadow:0 18px 50px -32px rgba(23,32,72,.24)}
+.lockrow{font-family:var(--mono);font-weight:800;font-size:clamp(17px,3.4vw,30px);
+  letter-spacing:.30em;line-height:1.42;white-space:nowrap;overflow-x:auto}
+.lockrow .dim{color:var(--line2)}
+.lockrow .s{color:var(--purple)}
+.lockrow .k{color:var(--emerald)}
+.lockrow .tac{color:var(--ink)}
+.lockrow .tic{color:var(--ink)}
+.lockcap{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--faint);margin-top:4px}
+.lockcap b{color:var(--ink)}
+.locknote{margin-top:22px;font-size:14.5px;color:var(--body);max-width:70ch}
+.locknote b{color:var(--ink)}
+
+/* ── section head ── */
+h2{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-top:66px}
+h2 .n{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.2em;
+  color:var(--faint);display:block;margin-bottom:6px}
+h2+p{margin-top:8px;max-width:70ch;color:var(--body);font-size:14.5px}
+
+/* ── card grid ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:16px;margin-top:26px}
+.c{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px 20px 18px;
+  display:flex;flex-direction:column}
+.c.rec{border-color:#bfe8d7;background:#f9fdfb}
+.c .num{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.16em;color:var(--faint)}
+.c .icon{height:112px;display:flex;align-items:center;justify-content:center;margin-top:6px}
+.c .icon svg{height:76px;width:auto;color:var(--ink)}
+.c .wmbox{border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  padding:20px 4px;margin-top:10px;display:flex;align-items:center;justify-content:center;
+  min-height:78px;overflow-x:auto}
+.c .tiny{display:flex;gap:13px;align-items:center;justify-content:center;padding:12px 0 4px}
+.c .tiny svg{color:var(--ink)}
+.c .name{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;margin-top:4px}
+.c .why{font-size:12.5px;color:var(--body);line-height:1.6;margin-top:7px;flex:1}
+.c .why b{color:var(--ink)}
+.c .tag{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;margin-top:12px;padding:4px 9px;border-radius:999px;
+  background:#eef0fc;color:var(--indigo);align-self:flex-start}
+.c .tag.go{background:#e4f7ef;color:#087a54}
+.c .tag.no{background:#fdeff3;color:#b8244a}
+
+/* ══════ WORDMARK BASE ══════ */
+.wm{font-family:var(--disp);font-weight:800;font-size:27px;letter-spacing:.02em;line-height:1;
+  display:inline-flex;align-items:baseline;color:var(--ink);white-space:nowrap}
+.wm b{font-weight:800;display:inline-block}
+.wm .kg{display:inline-block;height:.74em;width:auto;align-self:center}
+
+/* ── 20 treatments ── */
+.t01 .s,.t01 .k{font-weight:200;color:var(--faint)}
+.t02 .s,.t02 .k{text-transform:lowercase;font-weight:600;color:var(--faint)}
+.t03 .s,.t03 .k{color:var(--purple)}
+.t04 .s,.t04 .k{opacity:.24}
+.t05 .s,.t05 .k{color:transparent;-webkit-text-stroke:1.4px var(--ink)}
+.t06 .s,.t06 .k{font-family:var(--mono);font-weight:500;font-size:.84em;color:var(--soft)}
+.t07 .tac,.t07 .tic{border-bottom:3px solid var(--emerald);padding-bottom:4px}
+.t07 .s,.t07 .k{color:var(--faint)}
+.t08 .tac,.t08 .tic{border-top:3px solid var(--indigo);padding-top:5px}
+.t08 .s,.t08 .k{color:var(--faint);font-weight:400}
+.t09 .tac::before{content:'⟨';color:var(--indigo);font-weight:300;margin-right:.05em}
+.t09 .tic::after{content:'⟩';color:var(--indigo);font-weight:300;margin-left:.05em}
+.t09 .s,.t09 .k{color:var(--faint)}
+.t10 .k{background:var(--ink);color:#fff;padding:.04em .16em;border-radius:.16em;margin:0 .05em}
+.t10 .s{color:var(--faint)}
+.t15 .k{margin:0 .30em;color:var(--indigo)}
+.t15 .s{margin-right:.30em;color:var(--indigo)}
+.t16 .s,.t16 .k{font-size:.62em;color:var(--soft);position:relative;top:-.02em}
+.t17 .k{position:relative;top:-.16em;font-size:.80em;color:var(--emerald)}
+.t17 .s{position:relative;top:-.16em;font-size:.80em;color:var(--emerald)}
+.t18 .s,.t18 .k{opacity:.34;text-decoration:line-through;text-decoration-thickness:2px;
+  text-decoration-color:var(--rose)}
+.t20 .s,.t20 .k{background:linear-gradient(140deg,var(--purple),var(--cyan) 55%,var(--emerald));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+
+/* two-line interlock */
+.ilock{font-family:var(--mono);font-weight:800;font-size:clamp(14px,3vw,19px);
+  letter-spacing:.34em;line-height:1.48;text-align:left}
+.ilock .r1{display:block;color:var(--ink)}
+.ilock .r2{display:block;color:var(--purple);margin-left:calc(1ch + .34em)}
+.ilock .r1 em{font-style:normal;color:var(--emerald)}
+
+/* ── dark strip ── */
+.strip{margin-top:26px;background:var(--dark);border-radius:16px;padding:34px 30px;
+  display:flex;align-items:center;gap:38px;flex-wrap:wrap;justify-content:center}
+.strip svg{height:54px;width:auto;color:#fff}
+.strip .wm{color:#fff;font-size:30px}
+.strip .wm .s,.strip .wm .k{color:#7b83ad;font-weight:200}
+
+/* ── closing ── */
+.tk{font-family:var(--mono);font-size:12.5px;color:var(--soft);line-height:1.85;margin-top:28px;
+  border-left:3px solid var(--indigo);padding-left:22px;max-width:80ch}
+.tk b{color:var(--ink)}
+.tk .h{display:block;color:var(--ink);font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  font-size:11px;margin:16px 0 4px}
+.tk .h:first-child{margin-top:0}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ ICON LIBRARY ═══════════ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="g1" x1="0" y1="1" x2="1" y2="0">
+    <stop offset="0%" stop-color="#7c4ddf"/><stop offset="52%" stop-color="#0a9bdb"/>
+    <stop offset="100%" stop-color="#0da370"/>
+  </linearGradient>
+  <mask id="mk14">
+    <rect width="100" height="100" fill="#fff"/>
+    <g stroke="#000" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M30 26 V74"/><path d="M70 26 L40 50 L70 74"/>
+    </g>
+  </mask>
+  <mask id="mk15">
+    <rect width="100" height="100" fill="#fff"/>
+    <path d="M96 4 L40 50 L96 96 Z" fill="#000"/>
+  </mask>
+
+  <!-- 01 node-K -->
+  <g id="i01"><g fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M26 12 V88"/><path d="M76 12 L36 50 L76 88"/></g>
+    <circle cx="26" cy="50" r="14" fill="var(--indigo)"/></g>
+  <!-- 02 two-stroke -->
+  <g id="i02"><g fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M26 12 V88"/><path d="M76 12 L36 50 L76 88"/></g></g>
+  <!-- 03 check-leg -->
+  <g id="i03"><g fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M24 12 V88"/><path d="M62 12 L28 50"/><path d="M28 50 L46 82 L88 16"/></g>
+    <circle cx="24" cy="50" r="13" fill="var(--indigo)"/></g>
+  <!-- 04 git-K -->
+  <g id="i04"><g fill="none" stroke="currentColor" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 12 V88"/><path d="M22 50 H44 L72 20"/><path d="M22 50 H44 L72 80"/></g>
+    <g fill="currentColor"><circle cx="22" cy="12" r="7.5"/><circle cx="22" cy="88" r="7.5"/>
+      <circle cx="72" cy="20" r="7.5"/><circle cx="72" cy="80" r="7.5"/></g>
+    <circle cx="22" cy="50" r="12.5" fill="var(--indigo)"/></g>
+  <!-- 05 merge loop -->
+  <g id="i05"><g fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round">
+    <path d="M26 10 V90"/><path d="M26 32 H50 Q70 32 70 50 Q70 68 50 68 H26"/></g>
+    <g fill="currentColor"><circle cx="26" cy="10" r="6"/><circle cx="26" cy="90" r="6"/></g>
+    <circle cx="26" cy="32" r="9" fill="var(--indigo)"/><circle cx="26" cy="68" r="9" fill="var(--emerald)"/></g>
+  <!-- 06 layer-spine -->
+  <g id="i06"><g fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round">
+    <path d="M22 16 V84"/><path d="M22 50 L68 14"/><path d="M22 50 L68 86"/></g>
+    <g fill="currentColor"><circle cx="22" cy="16" r="10" opacity=".42"/><circle cx="22" cy="84" r="10" opacity=".42"/>
+      <circle cx="68" cy="14" r="8" opacity=".7"/><circle cx="68" cy="86" r="8" opacity=".7"/></g>
+    <circle cx="22" cy="50" r="14" fill="var(--indigo)"/></g>
+  <!-- 07 chevron-in-K -->
+  <g id="i07"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 12 V88" stroke-width="10"/>
+    <path d="M40 26 L60 50 L40 74" stroke-width="8" opacity=".38"/>
+    <path d="M60 12 L88 50 L60 88" stroke-width="10"/></g></g>
+  <!-- 08 triple chevron -->
+  <g id="i08"><g fill="none" stroke="currentColor" stroke-width="11" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M16 10 L50 34 L84 10" opacity=".34"/><path d="M16 38 L50 62 L84 38" opacity=".66"/>
+    <path d="M16 66 L50 90 L84 66"/></g></g>
+  <!-- 09 bracketed vertex -->
+  <g id="i09"><g fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M34 14 L12 50 L34 86"/><path d="M66 14 L88 50 L66 86"/></g>
+    <circle cx="50" cy="50" r="14" fill="var(--indigo)"/></g>
+  <!-- 10 slab K -->
+  <g id="i10"><g fill="currentColor">
+    <rect x="16" y="10" width="15" height="80" rx="3"/>
+    <path d="M39 44 L72 12 L84 24 L51 56 Z"/><path d="M39 56 L51 44 L84 76 L72 88 Z"/></g></g>
+  <!-- 11 convergence fan -->
+  <g id="i11"><g fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round">
+    <path d="M16 14 L62 50"/><path d="M16 38 L62 50"/><path d="M16 62 L62 50"/><path d="M16 86 L62 50"/>
+    <path d="M62 50 H92"/></g>
+    <g fill="currentColor"><circle cx="16" cy="14" r="7"/><circle cx="16" cy="38" r="7"/>
+      <circle cx="16" cy="62" r="7"/><circle cx="16" cy="86" r="7"/></g>
+    <circle cx="62" cy="50" r="15" fill="var(--indigo)"/></g>
+  <!-- 12 registry ring -->
+  <g id="i12"><circle cx="50" cy="50" r="34" fill="none" stroke="currentColor" stroke-width="8"/>
+    <g fill="currentColor"><circle cx="50" cy="16" r="9"/><circle cx="79" cy="67" r="9"/><circle cx="21" cy="67" r="9"/></g>
+    <circle cx="50" cy="50" r="13" fill="var(--indigo)"/></g>
+  <!-- 13 bars + tick -->
+  <g id="i13"><g fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M16 22 H62" opacity=".34"/><path d="M16 46 H62" opacity=".66"/><path d="M16 70 H44"/>
+    <path d="M44 70 L60 88 L92 30"/></g></g>
+  <!-- 14 aperture K -->
+  <g id="i14"><rect x="2" y="2" width="96" height="96" rx="26" fill="url(#g1)" mask="url(#mk14)"/></g>
+  <!-- 15 split square -->
+  <g id="i15"><rect x="4" y="4" width="92" height="92" rx="24" fill="currentColor" mask="url(#mk15)"/>
+    <circle cx="40" cy="50" r="13" fill="var(--indigo)"/></g>
+  <!-- 16 version offset -->
+  <g id="i16"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <g stroke-width="4" opacity=".24"><path d="M12 16 V84"/><path d="M56 16 L20 50 L56 84"/></g>
+    <g stroke-width="4" opacity=".5"><path d="M25 16 V84"/><path d="M69 16 L33 50 L69 84"/></g>
+    <g stroke-width="9"><path d="M38 16 V84"/><path d="M84 16 L46 50 L84 84"/></g></g></g>
+  <!-- 17 graph-K -->
+  <g id="i17"><g fill="none" stroke="currentColor" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M24 14 V86"/><path d="M74 14 L34 50 L74 86"/></g>
+    <g fill="currentColor"><circle cx="24" cy="14" r="7"/><circle cx="24" cy="86" r="7"/>
+      <circle cx="74" cy="14" r="7"/><circle cx="74" cy="86" r="7"/>
+      <circle cx="54" cy="32" r="5.5"/><circle cx="54" cy="68" r="5.5"/></g>
+    <circle cx="26" cy="50" r="13" fill="var(--indigo)"/></g>
+  <!-- 18 iso layers + node -->
+  <g id="i18"><g fill="none" stroke="currentColor" stroke-width="7" stroke-linejoin="round">
+    <path d="M50 60 L14 78 L50 96 L86 78 Z"/><path d="M14 58 L50 76 L86 58" opacity=".6"/>
+    <path d="M14 38 L50 56 L86 38" opacity=".34"/></g>
+    <circle cx="50" cy="18" r="13" fill="var(--indigo)"/>
+    <path d="M50 31 V44" stroke="currentColor" stroke-width="7" stroke-linecap="round"/></g>
+  <!-- 19 K in a circle -->
+  <g id="i19"><circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="7"/>
+    <g fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M36 26 V74"/><path d="M70 26 L44 50 L70 74"/></g>
+    <circle cx="36" cy="50" r="10" fill="var(--indigo)"/></g>
+  <!-- 20 stack → tick -->
+  <g id="i20"><g fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 12 L44 34 L74 12" opacity=".32"/><path d="M14 42 L44 64 L74 42" opacity=".6"/>
+    <path d="M14 70 L44 90 L92 22"/></g></g>
+</defs></svg>
+
+<div class="wrap">
+
+<header class="head">
+  <div class="kicker">20 marks · text + icon</div>
+  <h1>Twenty ways to make the tactic visible.</h1>
+  <p>Every wordmark below does one job: <b>quiet the S and the K so TACTIC surfaces</b>.
+     Every icon is monoline, one ink, and shown at 16px — because a mark that only works big
+     is a decoration. Nothing here is added for a meaning; the meanings are found in geometry
+     that had to be there anyway.</p>
+
+  <div class="lock">
+    <div class="lockrow"><span class="s">S</span><span class="tac">TAC</span><span class="k">K</span><span class="tic">TIC</span></div>
+    <div class="lockrow"><span class="s">S</span><span class="tac">TAC</span><span class="k">K</span><span class="dim">TIC</span></div>
+    <div class="lockcap">↑ <b>S + TAC + K = STACK</b></div>
+    <div class="lockrow" style="margin-top:14px"><span class="dim">S</span><span class="tac">TAC</span><span class="dim">K</span><span class="tic">TIC</span></div>
+    <div class="lockcap">↑ <b>TAC + TIC = TACTIC</b> — whole, just interrupted by the K</div>
+    <p class="locknote"><b>TAC is shared.</b> STACK and TACTIC overlap on it, and the K is the
+      letter STACK drives into TACTIC. Two words, one form, nothing invented — that's the entire
+      brand argument, and it's already sitting in the name.</p>
+  </div>
+</header>
+
+<!-- ══════ GRID ══════ -->
+<h2><span class="n">01 — 20</span>The set</h2>
+<p>Read each card as a pair: the icon is the mark, the type below it is how the same idea is
+   carried in the wordmark. They ship together or not at all.</p>
+
+<div class="grid">
+
+<!-- 01 -->
+<div class="c rec">
+  <div class="num">01</div>
+  <div class="icon"><svg viewBox="0 0 100 100"><use href="#i01"/></svg></div>
+  <div class="wmbox"><div class="wm t01"><b class="s">S</b><b class="tac">TAC</b><b class="k">K</b><b class="tic">TIC</b></div></div>
+  <div class="tiny">
+    <svg width="26" height="26" viewBox="0 0 100 100"><use href="#i01"/></svg>
+    <svg width="20" height="20" viewBox="0 0 100 100"><use href="#i01"/></svg>
+    <svg width="16" height="16" viewBox="0 0 100 100"><use href="#i01"/></svg>
+  </div>
+  <div class="name">Weight split</div>
+  <p class="why">S and K drop to ExtraLight; <b>TACTIC stays ExtraBold</b> and reads first.
+    Icon: stem + chevron + hub — stack, graph, source of truth in three parts.</p>
+  <span class="tag go">shortlist</span>
+</div>
+
+<!-- 02 -->
+<div class="c rec">
+  <div class="num">02</div>
+  <div class="icon"><svg viewBox="0 0 100 100"><use href="#i02"/></svg></div>
+  <div class="wmbox"><div class="wm t02"><b class="s">S</b><b class="tac">TAC</b><b class="k">K</b><b class="tic">TIC</b></div></div>
+  <div class="tiny">
+    <svg width="26" height="26" viewBox="0 0 100 100"><use href="#i02"/></svg>
+    <svg width="20" height="20" viewBox="0 0 100 100"><use href="#i02"/></svg>
+    <svg width="16" height="16" viewBox="0 0 100 100"><use href="#i02"/></svg>
+  </div>
+  <div class="name">Case split</div>
+  <p class="why"><b>sTACkTIC</b> — lowercase the two intruders and TACTIC pops without any
+    colour, weight or rule. Works in plain text, email signatures, a terminal. Icon is the
+    two-stroke K: a K can't be drawn in one stroke, so two is the floor.</p>
+  <span class="tag go">works in plain text</span>
+</div>
+
+<!-- 03 -->
+<div class="c">
+  <div class="num">03</div>
+  <div class="icon"><svg viewBox="0 0 100 100"><use href="#i03"/></svg></div>
+  <div class="wmbox"><div class="wm t03"><b class="s">S</b><b class="tac">TAC</b><b class="k">K</b><b class="tic">TIC</b></div></div>
+  <div class="tiny">
+    <svg width="26" height="26" viewBox="0 0 100 100"><use href="#i03"/></svg>
+    <svg width="20" height="20" viewBox="0 0 100 100"><use href="#i03"/></svg>
+    <svg width="16" height="16" viewBox="0 0 100 100"><use href="#i03"/></svg>
+  </div>
+  <div class="name">Colour split</div>
+  <p class="why">S and K in purple, TACTIC in ink. Loudest reveal — but it <b>dies in one-colour
+    print and fax-grade PDFs</b>, so it can only ever be a web treatment, never the master.</p>
+  <span class="tag">web only</span>
+</div>
+
+<!-- 04 -->
+<div class="c rec">
+  <div class="num">04</div>
+  <div class="icon"><svg viewBox="0 0 100 100"><use href="#i04"/></svg></div>
+  <div class="wmbox"><div class="wm t04"><b class="s">S</b><b class="tac">TAC</b><b class="k">K</b><b class="tic">TIC</b></div></div>
+  <div class="tiny">
+    <svg width="26" height="26" viewBox="0 0 100 100"><use href="#i04"/></svg>
+    <svg width="20" height="20" viewBox="0 0 100 100"><use href="#i04"/></svg>
+    <svg width="16" height="16" viewBox="0 0 100 100"><use href="#i04"/></svg>
+  </div>
+  <div class="name">Opacity fade</div>
+  <p class="why">Same idea as weight split but keeps one font weight — safer for a variable
+    font. Icon: <b>git-K</b> — trunk with commit nodes, branch point mid-mainline. The only
+    mark here that names the substrate you actually write to.</p>
+  <span class="tag go">git in a letterform</span>
+</div>
+
+<!-- 05 -->
+<div class="c">
+  <div class="num">05</div>
+  <div class="icon"><svg viewBox="0 0 100 100"><use href="#i05"/></svg></div>
+  <div class="wmbox"><div class="wm t05"><b class="s">S</b><b class="tac">TAC</b><b class="k">K</b><b class="tic">TIC</b></div></div>
+  <div class="tiny">
+    <svg width="26" height="26" viewBox="0 0 100 100"><use href="#i05"/></svg>
+    <svg width="20" height="20" viewBox="0 0 100 100"><use href="#i05"/></svg>
+    <svg width="16" height="16" viewBox="0 0 100 100"><use href="#i05"/></svg>
+  </div>
+  <div class="name">Outline S &amp; K</div>
+  <p class="why">Hollow letters, solid TACTIC. Elegant large, <b>gone by 16px</b> — hairlines
+    are the first casualty. Icon: merge loop — divergence always reconverges. Best meaning
+    on the sheet, but it stops being a K.</p>
+  <span class="tag no">fails small</span>
+</div>
+
+<!-- 06 -->
+<div class="c">
+  <div class="num">06</div>
+  <div class="icon"><svg viewBox="0 0 100 100"><use href="#i06"/></svg></div>
+  <div class="wmbox"><div class="wm t06"><b class="s">S</b><b class="tac">TAC</b><b class="k">K</b><b class="tic">TIC</b></div></div>
+  <div class="tiny">
+    <svg width="26" height="26" viewBox="0 0 100 100"><use href="#i06"/></svg>
+    <svg width="20" height="20" viewBox="0 0 100 100"><use href="#i06"/></svg>
+    <svg width="16" height="16" viewBox="0 0 100 100"><use href="#i06"/></svg>
+  </div>
+  <div class="name">Mono S &amp; K</div>
+  <p class="why">The intruders set in JetBrains Mono — <b>the machine parts are literally
+    machine type</b>. Ties the wordmark to the label/evidence typeface. Icon: three-node
+    spine with edges fanning out.</p>
+  <span class="tag">ties to the type system</span>
+</div>
+
+<!-- 07 -->
+<div class="c">
+  <div class="num">07</div>
+  <div class="icon"><svg viewBox="0 0 100 100"><use href="#i07"/></svg></div>
+  <div class="wmbox"><div class="wm t07"><b class="s">S</b><b class="tac">TAC</b><b class="k">K</b><b class="tic">TIC</b></div></div>
+  <div class="tiny">
+    <svg width="26" height="26" viewBox="0 0 100 100"><use href="#i07"/></svg>
+    <svg width="20" height="20" viewBox="0 0 100 100"><use href="#i07"/></svg>
+    <svg width="16" height="16" viewBox="0 0 100 100"><use href="#i07"/></svg>
+  </div>
+  <div class="name">Underline · skip the K</div>
+  <p class="why">A rule runs under TAC and TIC and <b>lifts over the K</b> — you can see the
+    word being interrupted. Most explicit of all, and it survives one-colour.</p>
+  <span class="tag">most explicit</span>
+</div>
+
+<!-- 08 -->
+<div class="c">
+  <div class="num">08</div>
+  <div class="icon"><svg viewBox="0 0 100 100"><use href="#i08"/></svg></div>
+  <div class="wmbox"><div class="wm t08"><b class="s">S</b><b class="tac">TAC</b><b class="k">K</b><b class="tic">TIC</b></div></div>
+  <div class="tiny">
+    <svg width="26" height="26" viewBox="0 0 100 100"><use href="#i08"/></svg>
+    <svg width="20" height="20" viewBox="0 0 100 100"><use href="#i08"/></svg>
+    <svg width="16" height="16" viewBox="0 0 100 100"><use href="#i08"/></svg>
+  </div>
+  <div class="name">Overline bridge</div>
+  <p class="why">Same device inverted — the rule sits above, so it reads as a <b>span or a
+    bracket over the name</b> rather than an underline. Icon: three chevrons, which are also
+    three ticks: layers, flow and validation are one shape.</p>
+  <span class="tag">stack = flow = check</span>
+</div>
+
+<!-- 09 -->
+<div class="c">
+  <div class="num">09</div>
+  <div class="icon"><svg viewBox="0 0 100 100"><use href="#i09"/></svg></div>
+  <div class="wmbox"><div class="wm t09"><b class="s">S</b><b class="tac">TAC</b><b class="k">K</b><b class="tic">TIC</b></div></div>
+  <div class="tiny">
+    <svg width="26" height="26" viewBox="0 0 100 100"><use href="#i09"/></svg>
+    <svg width="20" height="20" viewBox="0 0 100 100"><use href="#i09"/></svg>
+    <svg width="16" height="16" viewBox="0 0 100 100"><use href="#i09"/></svg>
+  </div>
+  <div class="name">Angle brackets</div>
+  <p class="why">⟨TACTIC⟩ delimited by chevrons — the same glyph as the chain separator.
+    Icon drops the letter entirely: <b>one vertex held between two chevrons</b>. The truth,
+    bracketed by flow.</p>
+  <span class="tag">non-letterform</span>
+</div>
+
+<!-- 10 -->
+<div class="c">
+  <div class="num">10</div>
+  <div class="icon"><svg viewBox="0 0 100 100"><use href="#i10"/></svg></div>
+  <div class="wmbox"><div class="wm t10"><b class="s">S</b><b class="tac">TAC</b><b class="k">K</b><b class="tic">TIC</b></div></div>
+  <div class="tiny">
+    <svg width="26" height="26" viewBox="0 0 100 100"><use href="#i10"/></svg>
+    <svg width="20" height="20" viewBox="0 0 100 100"><use href="#i10"/></svg>
+    <svg width="16" height="16" viewBox="0 0 100 100"><use href="#i10"/></svg>
+  </div>
+  <div class="name">K in a tile</div>
+  <p class="why">The K sits in a filled chip — <b>the inserted part looks inserted</b>.
+    Doubles as the favicon: crop the tile and you already have the app icon. Icon: solid slab K,
+    the heaviest form on the sheet.</p>
+  <span class="tag">favicon falls out of it</span>
+</div>
+
+<!-- 11 -->
+<div class="c">
+  <div class="num">11</div>
+  <div class="icon"><svg viewBox="0 0 100 100"><use href="#i11"/></svg></div>
+  <div class="wmbox"><div class="wm"><b class="s" style="color:var(--faint);font-weight:200">S</b><b class="tac">TAC</b><svg class="kg" viewBox="0 0 30 100" style="width:.34em;margin:0 .08em"><circle cx="15" cy="50" r="14" fill="var(--indigo)"/></svg><b class="tic">TIC</b></div></div>
+  <div class="tiny">
+    <svg width="26" height="26" viewBox="0 0 100 100"><use href="#i11"/></svg>
+    <svg width="20" height="20" viewBox="0 0 100 100"><use href="#i11"/></svg>
+    <svg width="16" height="16" viewBox="0 0 100 100"><use href="#i11"/></svg>
+  </div>
+  <div class="name">K as node</div>
+  <p class="why">The K is <b>replaced by the graph vertex</b> — S·TAC ● TIC. Reads
+    "stac[node]tic". Icon: four sources converge on one node and one truth leaves it.
+    Risk: replacing a letter with a dot can read as a typo.</p>
+  <span class="tag">brave · risky</span>
+</div>
+
+<!-- 12 -->
+<div class="c">
+  <div class="num">12</div>
+  <div class="icon"><svg viewBox="0 0 100 100"><use href="#i12"/></svg></div>
+  <div class="wmbox"><div class="wm"><b class="s" style="color:var(--faint);font-weight:200">S</b><b class="tac">TAC</b><svg class="kg" viewBox="0 0 40 100" style="width:.4em;margin:0 .06em"><path d="M12 24 L30 50 L12 76" fill="none" stroke="var(--indigo)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/></svg><b class="tic">TIC</b></div></div>
+  <div class="tiny">
+    <svg width="26" height="26" viewBox="0 0 100 100"><use href="#i12"/></svg>
+    <svg width="20" height="20" viewBox="0 0 100 100"><use href="#i12"/></svg>
+    <svg width="16" height="16" viewBox="0 0 100 100"><use href="#i12"/></svg>
+  </div>
+  <div class="name">K as chevron</div>
+  <p class="why">S·TAC › TIC — the K becomes the <b>separator from AI › STACKTIC › GIT ›
+    CLUSTER</b>, so the name and the chain device share one glyph. Icon: the registry ring —
+    a closed system with one hub.</p>
+  <span class="tag">name = chain</span>
+</div>
+
+<!-- 13 -->
+<div class="c">
+  <div class="num">13</div>
+  <div class="icon"><svg viewBox="0 0 100 100"><use href="#i13"/></svg></div>
+  <div class="wmbox"><div class="wm"><b class="s" style="color:var(--faint);font-weight:200">S</b><b class="tac">TAC</b><svg class="kg" viewBox="0 0 46 100" style="width:.46em;margin:0 .05em"><path d="M8 52 L20 72 L40 26" fill="none" stroke="var(--emerald)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/></svg><b class="tic">TIC</b></div></div>
+  <div class="tiny">
+    <svg width="26" height="26" viewBox="0 0 100 100"><use href="#i13"/></svg>
+    <svg width="20" height="20" viewBox="0 0 100 100"><use href="#i13"/></svg>
+    <svg width="16" height="16" viewBox="0 0 100 100"><use href="#i13"/></svg>
+  </div>
+  <div class="name">K as check</div>
+  <p class="why">The interrupting letter becomes a <b>tick</b> — the tactic is validated
+    mid-word. Strong for a compliance pitch. Icon: three layers where the bottom one runs on
+    into the check.</p>
+  <span class="tag">compliance-forward</span>
+</div>
+
+<!-- 14 -->
+<div class="c">
+  <div class="num">14</div>
+  <div class="icon"><svg viewBox="0 0 100 100"><use href="#i14"/></svg></div>
+  <div class="wmbox"><div class="wm"><svg class="kg" viewBox="0 0 100 100" style="width:.86em;height:.86em;margin-right:.24em"><use href="#i14"/></svg><b class="s" style="color:var(--faint);font-weight:200">S</b><b class="tac">TAC</b><b class="k" style="color:var(--faint);font-weight:200">K</b><b class="tic">TIC</b></div></div>
+  <div class="tiny">
+    <svg width="26" height="26" viewBox="0 0 100 100"><use href="#i14"/></svg>
+    <svg width="20" height="20" viewBox="0 0 100 100"><use href="#i14"/></svg>
+    <svg width="16" height="16" viewBox="0 0 100 100"><use href="#i14"/></svg>
+  </div>
+  <div class="name">Aperture tile</div>
+  <p class="why">The K knocked out of a gradient rounded square, used as a lockup prefix.
+    <b>App-icon native</b> — but it can't be the master: it has no one-colour or print form.</p>
+  <span class="tag">app icon only</span>
+</div>
+
+<!-- 15 -->
+<div class="c">
+  <div class="num">15</div>
+  <div class="icon"><svg viewBox="0 0 100 100"><use href="#i15"/></svg></div>
+  <div class="wmbox"><div class="wm t15"><b class="s">S</b><b class="tac">TAC</b><b class="k">K</b><b class="tic">TIC</b></div></div>
+  <div class="tiny">
+    <svg width="26" height="26" viewBox="0 0 100 100"><use href="#i15"/></svg>
+    <svg width="20" height="20" viewBox="0 0 100 100"><use href="#i15"/></svg>
+    <svg width="16" height="16" viewBox="0 0 100 100"><use href="#i15"/></svg>
+  </div>
+  <div class="name">Kerning gap</div>
+  <p class="why">Pure spacing: air around S and K, none inside TACTIC. <b>No colour, no weight,
+    no rules</b> — the most typographically disciplined answer, and the quietest.
+    Icon: a solid tile split by the K's diagonal, node on the seam.</p>
+  <span class="tag">quietest</span>
+</div>
+
+<!-- 16 -->
+<div class="c">
+  <div class="num">16</div>
+  <div class="icon"><svg viewBox="0 0 100 100"><use href="#i16"/></svg></div>
+  <div class="wmbox"><div class="wm t16"><b class="s">S</b><b class="tac">TAC</b><b class="k">K</b><b class="tic">TIC</b></div></div>
+  <div class="tiny">
+    <svg width="26" height="26" viewBox="0 0 100 100"><use href="#i16"/></svg>
+    <svg width="20" height="20" viewBox="0 0 100 100"><use href="#i16"/></svg>
+    <svg width="16" height="16" viewBox="0 0 100 100"><use href="#i16"/></svg>
+  </div>
+  <div class="name">Size drop</div>
+  <p class="why">S and K set smaller — TACTIC becomes the dominant mass. Icon: the same K
+    repeated and faded back = <b>snapshots of the whole stack over time</b>. True to the
+    product, but a smudge below 28px — motion device, not a mark.</p>
+  <span class="tag no">icon fails small</span>
+</div>
+
+<!-- 17 -->
+<div class="c">
+  <div class="num">17</div>
+  <div class="icon"><svg viewBox="0 0 100 100"><use href="#i17"/></svg></div>
+  <div class="wmbox"><div class="wm t17"><b class="s">S</b><b class="tac">TAC</b><b class="k">K</b><b class="tic">TIC</b></div></div>
+  <div class="tiny">
+    <svg width="26" height="26" viewBox="0 0 100 100"><use href="#i17"/></svg>
+    <svg width="20" height="20" viewBox="0 0 100 100"><use href="#i17"/></svg>
+    <svg width="16" height="16" viewBox="0 0 100 100"><use href="#i17"/></svg>
+  </div>
+  <div class="name">Baseline shift</div>
+  <p class="why">S and K lift off the baseline like <b>superscript operators</b> — machine
+    parts riding on top of the word. Icon: the K with nodes on every terminal and edge — the
+    graph reading made fully explicit.</p>
+  <span class="tag">graph, explicit</span>
+</div>
+
+<!-- 18 -->
+<div class="c">
+  <div class="num">18</div>
+  <div class="icon"><svg viewBox="0 0 100 100"><use href="#i18"/></svg></div>
+  <div class="wmbox"><div class="wm t18"><b class="s">S</b><b class="tac">TAC</b><b class="k">K</b><b class="tic">TIC</b></div></div>
+  <div class="tiny">
+    <svg width="26" height="26" viewBox="0 0 100 100"><use href="#i18"/></svg>
+    <svg width="20" height="20" viewBox="0 0 100 100"><use href="#i18"/></svg>
+    <svg width="16" height="16" viewBox="0 0 100 100"><use href="#i18"/></svg>
+  </div>
+  <div class="name">Strikethrough</div>
+  <p class="why">Struck S and K show the extraction literally. Good as a <b>one-off editorial
+    device</b> in a deck; wrong as a permanent logo — a struck-through name reads as cancelled.
+    Icon: the legacy layer stack with a node above it.</p>
+  <span class="tag no">deck only</span>
+</div>
+
+<!-- 19 -->
+<div class="c">
+  <div class="num">19</div>
+  <div class="icon"><svg viewBox="0 0 100 100"><use href="#i19"/></svg></div>
+  <div class="wmbox"><div class="ilock"><span class="r1">STAC<em>K</em></span><span class="r2">TACTIC</span></div></div>
+  <div class="tiny">
+    <svg width="26" height="26" viewBox="0 0 100 100"><use href="#i19"/></svg>
+    <svg width="20" height="20" viewBox="0 0 100 100"><use href="#i19"/></svg>
+    <svg width="16" height="16" viewBox="0 0 100 100"><use href="#i19"/></svg>
+  </div>
+  <div class="name">Two-line interlock</div>
+  <p class="why">STACK over TACTIC with <b>TAC vertically aligned</b> — the overlap shown rather
+    than described. The clearest explanation of the name, and the least usable as a logo.
+    Belongs on the about page and slide one.</p>
+  <span class="tag">explainer, not logo</span>
+</div>
+
+<!-- 20 -->
+<div class="c">
+  <div class="num">20</div>
+  <div class="icon"><svg viewBox="0 0 100 100"><use href="#i20"/></svg></div>
+  <div class="wmbox"><div class="wm t20"><b class="s">S</b><b class="tac">TAC</b><b class="k">K</b><b class="tic">TIC</b></div></div>
+  <div class="tiny">
+    <svg width="26" height="26" viewBox="0 0 100 100"><use href="#i20"/></svg>
+    <svg width="20" height="20" viewBox="0 0 100 100"><use href="#i20"/></svg>
+    <svg width="16" height="16" viewBox="0 0 100 100"><use href="#i20"/></svg>
+  </div>
+  <div class="name">Gradient intruders</div>
+  <p class="why">S and K carry the brand gradient, TACTIC stays ink. Looks best of the twenty
+    on screen — and is the <b>hardest to reproduce anywhere else</b>. Keep it as a hero-only
+    treatment with a flat master behind it.</p>
+  <span class="tag">hero only</span>
+</div>
+
+</div>
+
+<!-- ══════ ON DARK ══════ -->
+<h2><span class="n">Check</span>Shortlist on #2A2847</h2>
+<p>Nothing is decided until it holds reversed on the site background.</p>
+<div class="strip">
+  <svg viewBox="0 0 100 100"><use href="#i01"/></svg>
+  <svg viewBox="0 0 100 100"><use href="#i02"/></svg>
+  <svg viewBox="0 0 100 100"><use href="#i04"/></svg>
+  <svg viewBox="0 0 100 100"><use href="#i03"/></svg>
+  <div class="wm t01"><b class="s">S</b><b class="tac">TAC</b><b class="k">K</b><b class="tic">TIC</b></div>
+</div>
+
+<p class="tk">
+  <span class="h">What the 16px row decides</span>
+  05, 16 and 18 are out on execution, not concept — hairlines, ghosting and strikethroughs are
+  the first things to die. 14 has no one-colour form. 19 explains the name better than anything
+  else here and is still not a logo.
+
+  <span class="h">Real shortlist</span>
+  <b>Text:</b> 01 (weight split) or 02 (case split). 02 is the sleeper — <b>sTACkTIC</b> needs
+  no colour, no rules and no custom artwork, so it survives a plain-text email, a terminal and
+  a partner's slide deck untouched.<br>
+  <b>Icon:</b> 01 (stem + chevron + hub) or 04 (git-K). 01 is the smart-basic answer — three
+  parts, and every one of them load-bearing. 04 says more and costs you legibility at 16px.
+
+  <span class="h">The one open trade</span>
+  Whether the mark should name <b>git</b> explicitly (04) or stay at the level of
+  <b>graph + source of truth</b> (01). 01 is truer to what Stacktic is — git is where it writes,
+  not what it is.
+</p>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>The Open-Source IT Ecosystem</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&family=DM+Serif+Display&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{width:1440px;height:810px;overflow:hidden;font-family:'DM Sans',sans-serif;background:#060913}
+  canvas{display:block}
+</style>
+</head>
+<body>
+<canvas id="c" width="2880" height="1620"></canvas>
+<script>
+const C=document.getElementById('c');
+C.style.width='1440px';C.style.height='810px';
+const X=C.getContext('2d');
+const W=2880,H=1620;
+
+function easeOutExpo(t){return t===1?1:1-Math.pow(2,-10*t)}
+function easeOutBack(t){const c=1.7;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2)}
+function clamp01(t){return Math.max(0,Math.min(1,t))}
+function lerp(a,b,t){return a+(b-a)*t}
+function P(n,f,t){return clamp01((n-f)/(t-f))}
+
+// ─── Categories ───
+const cats=[
+  {name:'CRM & SALES',    color:'#ef4444', replaces:'Salesforce, HubSpot, Dynamics'},
+  {name:'ERP & FINANCE',  color:'#f97316', replaces:'SAP, Oracle, NetSuite'},
+  {name:'EMAIL',          color:'#06b6d4', replaces:'Microsoft 365, Google Workspace'},
+  {name:'COLLABORATION',  color:'#8b5cf6', replaces:'SharePoint, Notion, Google Docs'},
+  {name:'VIDEO',          color:'#3b82f6', replaces:'Zoom, Teams, Google Meet'},
+  {name:'HELPDESK',       color:'#10b981', replaces:'Zendesk, Freshdesk, ServiceNow'},
+  {name:'HR',             color:'#ec4899', replaces:'Workday, BambooHR, SAP HCM'},
+];
+
+// ─── Tools with real icons ───
+const tools=[
+  {name:'SuiteCRM',   cat:0, desc:'Customer relationship management',
+   img:'https://avatars.githubusercontent.com/u/45451151?s=200&v=4'},
+  {name:'ERPNext',    cat:1, desc:'Enterprise resource planning',
+   img:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Erpnext_logo.svg/960px-Erpnext_logo.svg.png'},
+  {name:'Akaunting',  cat:1, desc:'Accounting & invoicing',
+   img:'https://assets.akaunting.com/site/img/logo/akaunting-logo.png'},
+  {name:'Mailu',      cat:2, desc:'Full email server with webmail',
+   img:'https://static.wixstatic.com/shapes/06ddae_14c99aae97ba4db887f009f9e741f2df.svg'},
+  {name:'Nextcloud',  cat:3, desc:'Files, calendar, contacts, office',
+   img:'https://static.wixstatic.com/shapes/06ddae_1fb8b10a21524672b30c46c094b37d0b.svg'},
+  {name:'Collabora',  cat:3, desc:'Office document editing',
+   img:'https://static.wixstatic.com/shapes/06ddae_64c501fc9ee34d0487325c72e1270957.svg'},
+  {name:'Jitsi Meet', cat:4, desc:'Video conferencing & calls',
+   img:'https://gen-europe.org/wp-content/uploads/2024/02/jitsi-logo-square-1014453210.png'},
+  {name:'FreeScout',  cat:5, desc:'Helpdesk & ticket management',
+   img:'https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/freescout.png'},
+  {name:'HRMS',       cat:6, desc:'Human resource management',
+   img:'https://tiimg.tistatic.com/fp/1/003/412/hrms-human-resource-management-system--623.jpg'},
+];
+
+// preload images
+const imgs={};
+let loadedCount=0;
+tools.forEach(t=>{
+  const im=new Image();
+  im.crossOrigin='anonymous';
+  im.onload=()=>{imgs[t.name]=im;loadedCount++;};
+  im.onerror=()=>{loadedCount++;};
+  im.src=t.img;
+});
+
+// ─── Layout: 3x3 grid ───
+const cols=3,rows=3;
+const cellW=780,cellH=420;
+const gridW=cols*cellW,gridH=rows*cellH;
+const offX=(W-gridW)/2+cellW/2, offY=340+cellH/2;
+
+tools.forEach((t,i)=>{
+  const col=i%cols, row=Math.floor(i/cols);
+  t.x=offX+col*cellW;
+  t.y=offY+row*cellH;
+  t.phase=Math.random()*Math.PI*2;
+});
+
+// connections
+const conns=[];
+for(let i=0;i<tools.length;i++){
+  for(let j=i+1;j<tools.length;j++){
+    const dx=tools[i].x-tools[j].x,dy=tools[i].y-tools[j].y;
+    if(Math.sqrt(dx*dx+dy*dy)<900) conns.push([i,j]);
+  }
+}
+
+// stars
+const stars=[];
+for(let i=0;i<180;i++){
+  stars.push({x:Math.random()*W,y:Math.random()*H,r:0.5+Math.random()*1.5,
+    speed:0.2+Math.random()*0.5,phase:Math.random()*Math.PI*2});
+}
+
+let startTime=0;
+
+function frame(ts){
+  if(!startTime)startTime=ts;
+  const now=(ts-startTime)/1000;
+  X.clearRect(0,0,W,H);
+
+  // BG
+  const bg=X.createRadialGradient(W/2,H/2,100,W/2,H/2,W*0.7);
+  bg.addColorStop(0,'#0c1024');bg.addColorStop(1,'#060913');
+  X.fillStyle=bg;X.fillRect(0,0,W,H);
+
+  stars.forEach(s=>{
+    X.save();X.globalAlpha=(0.3+0.7*Math.sin(now*s.speed+s.phase))*0.35;
+    X.beginPath();X.arc(s.x,s.y,s.r,0,Math.PI*2);
+    X.fillStyle='#e2e8f0';X.fill();X.restore();
+  });
+
+  // ── Title ──
+  const tA=easeOutExpo(P(now,0,2));
+  const tFade=1-easeOutExpo(P(now,22,24));
+  if(tA*tFade>0.01){
+    X.save();X.globalAlpha=tA*tFade;
+    X.fillStyle='#4f46e5';X.fillRect(0,0,W,6);
+    X.font='400 52px "DM Serif Display"';X.fillStyle='#64748b';
+    X.textAlign='center';X.textBaseline='middle';
+    X.fillText('The open-source ecosystem behind',W/2,100);
+    X.font='700 60px "DM Sans"';X.fillStyle='#e2e8f0';
+    X.fillText('IT sovereignty',W/2,175);
+    X.restore();
+  }
+
+  const subA=easeOutExpo(P(now,2,4))*tFade;
+  if(subA>0.01){
+    X.save();X.globalAlpha=subA*0.5;
+    X.font='400 28px "DM Sans"';X.fillStyle='#475569';
+    X.textAlign='center';X.textBaseline='middle';
+    X.fillText('Each tool replaces a commercial SaaS product — deployed, integrated, and operated as one stack.',W/2,245);
+    X.restore();
+  }
+
+  // ── Connections ──
+  const connStart=6;
+  conns.forEach((c,ci)=>{
+    const cS=connStart+ci*0.2;
+    const cA=easeOutExpo(P(now,cS,cS+1.2))*0.1;
+    if(cA<0.005)return;
+    const a=tools[c[0]],b=tools[c[1]];
+    X.save();X.globalAlpha=cA;
+    X.beginPath();X.moveTo(a.x,a.y);X.lineTo(b.x,b.y);
+    const g=X.createLinearGradient(a.x,a.y,b.x,b.y);
+    g.addColorStop(0,cats[a.cat].color+'50');g.addColorStop(1,cats[b.cat].color+'50');
+    X.strokeStyle=g;X.lineWidth=1.5;X.stroke();X.restore();
+  });
+
+  // ── Tool cards ──
+  tools.forEach((t,i)=>{
+    const tS=3+i*1.0;
+    const appearA=easeOutExpo(P(now,tS,tS+1.2));
+    const scale=easeOutBack(P(now,tS,tS+1.0));
+    if(appearA<0.01)return;
+
+    const cat=cats[t.cat];
+    const fx=Math.sin(now*0.25+t.phase)*5;
+    const fy=Math.cos(now*0.35+t.phase*1.3)*4;
+    const px=t.x+fx,py=t.y+fy;
+
+    X.save();X.globalAlpha=appearA;
+    X.translate(px,py);X.scale(scale,scale);
+
+    const cW=640,cH=280;
+
+    // card bg
+    X.beginPath();X.roundRect(-cW/2,-cH/2,cW,cH,20);
+    X.fillStyle='rgba(15,18,37,0.75)';
+    X.strokeStyle=cat.color+'35';X.lineWidth=2;
+    X.fill();X.stroke();
+
+    // left accent
+    X.fillStyle=cat.color;
+    X.fillRect(-cW/2+2,-cH/2+4,5,cH-8);
+
+    // icon
+    const iconSize=90;
+    const im=imgs[t.name];
+    if(im){
+      X.save();
+      // circular clip
+      X.beginPath();X.arc(-cW/2+80,-cH/2+cH/2,iconSize/2,0,Math.PI*2);X.clip();
+      try{X.drawImage(im,-cW/2+80-iconSize/2,-cH/2+cH/2-iconSize/2,iconSize,iconSize);}catch(e){}
+      X.restore();
+      // ring around icon
+      X.beginPath();X.arc(-cW/2+80,-cH/2+cH/2,iconSize/2+3,0,Math.PI*2);
+      X.strokeStyle=cat.color+'50';X.lineWidth=2;X.stroke();
+    } else {
+      // fallback circle with initials
+      X.beginPath();X.arc(-cW/2+80,0,iconSize/2,0,Math.PI*2);
+      X.fillStyle=cat.color+'20';X.strokeStyle=cat.color+'60';X.lineWidth=2;
+      X.fill();X.stroke();
+      X.font='700 28px "DM Sans"';X.fillStyle=cat.color;
+      X.textAlign='center';X.textBaseline='middle';
+      X.fillText(t.name.substring(0,2).toUpperCase(),-cW/2+80,0);
+    }
+
+    // text area (right of icon)
+    const textX=-cW/2+145;
+
+    // category badge
+    X.font='700 18px "DM Sans"';
+    const badgeW=X.measureText(cat.name).width+24;
+    X.beginPath();X.roundRect(textX,-cH/2+22,badgeW,30,6);
+    X.fillStyle=cat.color+'18';X.strokeStyle=cat.color+'40';X.lineWidth=1;
+    X.fill();X.stroke();
+    X.fillStyle=cat.color;X.textAlign='left';X.textBaseline='middle';
+    X.fillText(cat.name,textX+12,-cH/2+37);
+
+    // tool name
+    X.font='800 48px "DM Sans"';X.fillStyle='#e2e8f0';
+    X.textAlign='left';X.textBaseline='middle';
+    X.fillText(t.name,textX,10);
+
+    // description
+    X.font='400 24px "DM Sans"';X.fillStyle='#64748b';
+    X.fillText(t.desc,textX,55);
+
+    // replaces line
+    X.font='400 20px "DM Sans"';X.fillStyle='#475569';
+    X.fillText('replaces  ',textX,cH/2-30);
+    const repW=X.measureText('replaces  ').width;
+    X.font='600 20px "DM Sans"';X.fillStyle='#94a3b8';
+    X.fillText(cat.replaces,textX+repW,cH/2-30);
+
+    // pulse dot
+    X.beginPath();X.arc(cW/2-28,-cH/2+28,7,0,Math.PI*2);
+    const pulse=0.4+0.6*Math.sin(now*2+i);
+    X.fillStyle=cat.color;X.globalAlpha=appearA*pulse*0.6;
+    X.shadowColor=cat.color;X.shadowBlur=14;
+    X.fill();X.shadowBlur=0;
+
+    X.restore();
+  });
+
+  // ── Finale ──
+  const finA=easeOutExpo(P(now,26,29));
+  if(finA>0){
+    X.save();X.globalAlpha=finA;
+    X.fillStyle='rgba(6,9,19,0.97)';X.fillRect(0,0,W,H);
+    X.fillStyle='#4f46e5';X.fillRect(0,0,W,6);
+
+    const countA=easeOutExpo(P(now,27,29));
+
+    X.font='800 200px "DM Sans"';X.fillStyle='#4f46e5';
+    X.textAlign='center';X.textBaseline='middle';
+    X.shadowColor='#4f46e5';X.shadowBlur=60;
+    X.fillText(Math.floor(9*countA)+'',W/2,H/2-160);
+    X.shadowBlur=0;
+
+    X.font='500 52px "DM Sans"';X.fillStyle='#64748b';
+    X.fillText('open-source tools',W/2,H/2-40);
+
+    X.font='400 56px "DM Serif Display"';X.fillStyle='#e2e8f0';
+    X.fillText('replacing millions in SaaS licenses',W/2,H/2+50);
+
+    X.beginPath();X.moveTo(W/2-400,H/2+120);X.lineTo(W/2+400,H/2+120);
+    X.strokeStyle='#4f46e5';X.lineWidth=3;X.stroke();
+
+    X.font='700 42px "DM Sans"';X.fillStyle='#4f46e5';
+    X.fillText('All deployed. All integrated. All automated.',W/2,H/2+185);
+
+    X.font='500 32px "DM Sans"';X.fillStyle='#475569';
+    X.fillText('by one platform.',W/2,H/2+250);
+
+    X.restore();
+  }
+
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stacktic — The Story of Control</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #2A2847;
+      --bg-deep: #1a1830;
+      --purple: #a78bfa;
+      --purple-bright: #c084fc;
+      --cyan: #60d5ff;
+      --cyan-bright: #38bdf8;
+      --amber: #fbbf24;
+      --amber-bright: #f59e0b;
+      --green: #34d399;
+      --green-bright: #10b981;
+      --red: #f87171;
+      --white: #ffffff;
+      --slate-200: #e2e8f0;
+      --slate-300: #cbd5e1;
+      --slate-400: #94a3b8;
+      --slate-500: #64748b;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    /* Hide scrollbars visually but keep scroll working — Wix iframe fix */
+    html { scrollbar-width: none; -ms-overflow-style: none; }
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+    body {
+      font-family: 'Fira Code', monospace;
+      background:
+        radial-gradient(ellipse at 20% 0%, rgba(167, 139, 250, 0.12), transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(96, 213, 255, 0.10), transparent 50%),
+        var(--bg);
+      color: var(--slate-200);
+      min-height: 100vh;
+      overflow-x: hidden;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    /* ── Ambient particle drift ── */
+    .ambient {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .ambient::before,
+    .ambient::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 15% 25%, rgba(192, 132, 252, 0.5) 0, transparent 2px),
+        radial-gradient(circle at 75% 65%, rgba(96, 213, 255, 0.5) 0, transparent 2px),
+        radial-gradient(circle at 45% 85%, rgba(52, 211, 153, 0.5) 0, transparent 2px),
+        radial-gradient(circle at 90% 15%, rgba(251, 191, 36, 0.4) 0, transparent 2px),
+        radial-gradient(circle at 30% 55%, rgba(167, 139, 250, 0.4) 0, transparent 2px);
+      background-size: 280px 280px;
+      animation: drift 60s linear infinite;
+      opacity: 0.7;
+    }
+    .ambient::after {
+      background-size: 420px 420px;
+      animation-duration: 100s;
+      animation-direction: reverse;
+      opacity: 0.4;
+    }
+    @keyframes drift {
+      from { transform: translate(0, 0); }
+      to { transform: translate(-280px, -280px); }
+    }
+
+    /* ── Page chrome ── */
+    .top-brand {
+      position: fixed;
+      top: 22px;
+      left: 32px;
+      z-index: 100;
+      font-size: 14px;
+      font-weight: 700;
+      background: rgba(42, 40, 71, 0.7);
+      backdrop-filter: blur(8px);
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .top-brand .br { color: var(--purple); }
+    .top-brand .tx {
+      background: linear-gradient(135deg, var(--purple), var(--cyan), var(--green));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* ── Scroll progress line ── */
+    .scroll-rail {
+      position: fixed;
+      right: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 100;
+    }
+    .rail-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    .rail-dot.active {
+      background: var(--green);
+      box-shadow: 0 0 14px var(--green);
+      transform: scale(1.4);
+    }
+    .rail-dot::after {
+      content: attr(data-label);
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: var(--slate-400);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      white-space: nowrap;
+    }
+    .rail-dot:hover::after,
+    .rail-dot.active::after { opacity: 1; }
+
+    /* ── Scene container ── */
+    .scene {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 90px 48px;
+      z-index: 10;
+    }
+    .scene + .scene {
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .scene-tag {
+      font-size: 11px;
+      letter-spacing: 5px;
+      color: var(--slate-400);
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .scene-tag .dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 12px var(--green);
+      animation: blink 1.5s ease-in-out infinite;
+    }
+    .scene-tag .line-h {
+      width: 40px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--slate-400), transparent);
+    }
+    @keyframes blink { 50% { opacity: 0.3; } }
+
+    /* ── Lines (typography) ── */
+    .line {
+      font-size: 32px;
+      font-weight: 500;
+      text-align: center;
+      max-width: 1000px;
+      line-height: 1.4;
+      letter-spacing: -0.5px;
+      color: var(--white);
+    }
+    .line.huge {
+      font-size: 58px;
+      font-weight: 700;
+      letter-spacing: -2px;
+    }
+    .line.big {
+      font-size: 44px;
+      font-weight: 700;
+      letter-spacing: -1.2px;
+    }
+    .line.small {
+      font-size: 18px;
+      color: var(--slate-300);
+      font-weight: 400;
+    }
+    .line.comment {
+      font-size: 15px;
+      color: var(--slate-400);
+      letter-spacing: 0.5px;
+    }
+    .line .grad {
+      background: linear-gradient(135deg, var(--purple), var(--cyan), var(--green));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 24px rgba(96, 213, 255, 0.4));
+    }
+    .line .purple { color: var(--purple-bright); text-shadow: 0 0 24px rgba(192, 132, 252, 0.5); }
+    .line .cyan { color: var(--cyan); text-shadow: 0 0 24px rgba(96, 213, 255, 0.5); }
+    .line .amber { color: var(--amber); text-shadow: 0 0 24px rgba(251, 191, 36, 0.5); }
+    .line .green { color: var(--green); text-shadow: 0 0 24px rgba(52, 211, 153, 0.5); }
+    .line .red { color: var(--red); text-shadow: 0 0 18px rgba(248, 113, 113, 0.5); }
+    .line + .line { margin-top: 18px; }
+
+    /* ── In-view animation system ── */
+    .anim {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.9s ease, transform 0.9s ease;
+    }
+    .scene.in-view .anim { opacity: 1; transform: translateY(0); }
+    .scene.in-view .anim.d1 { transition-delay: 0.1s; }
+    .scene.in-view .anim.d2 { transition-delay: 0.3s; }
+    .scene.in-view .anim.d3 { transition-delay: 0.6s; }
+    .scene.in-view .anim.d4 { transition-delay: 0.9s; }
+    .scene.in-view .anim.d5 { transition-delay: 1.2s; }
+    .scene.in-view .anim.d6 { transition-delay: 1.5s; }
+    .scene.in-view .anim.d7 { transition-delay: 1.8s; }
+
+    /* zoom-in variant for visuals */
+    .anim.zoom { transform: scale(0.85); }
+    .scene.in-view .anim.zoom { transform: scale(1); }
+
+    /* ╭───────────────────────────────────╮
+       │ SCENE 1 — Two Worlds              │
+       ╰───────────────────────────────────╯ */
+    .twoworlds {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 80px;
+      width: 100%;
+      max-width: 1200px;
+      margin: 40px 0;
+    }
+    .world {
+      position: relative;
+      height: 320px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+    }
+    .world-label {
+      font-size: 12px;
+      letter-spacing: 6px;
+      color: var(--white);
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .world.ai .world-label { color: var(--purple-bright); text-shadow: 0 0 18px rgba(192, 132, 252, 0.6); }
+    .world.prod .world-label { color: var(--cyan); text-shadow: 0 0 18px rgba(96, 213, 255, 0.6); }
+
+    .ai-orb {
+      width: 240px; height: 240px;
+      border-radius: 50%;
+      position: relative;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(192, 132, 252, 1.0), rgba(167, 139, 250, 0.6) 35%, rgba(96, 213, 255, 0.2) 70%, transparent 90%);
+      box-shadow:
+        0 0 120px rgba(167, 139, 250, 0.6),
+        0 0 60px rgba(192, 132, 252, 0.4),
+        inset 0 0 60px rgba(255,255,255,0.15);
+      animation: orbPulse 3.5s ease-in-out infinite;
+    }
+    .ai-orb::before,
+    .ai-orb::after {
+      content: '';
+      position: absolute;
+      inset: -28px;
+      border-radius: 50%;
+      border: 1.5px dashed rgba(192, 132, 252, 0.55);
+      animation: orbit 8s linear infinite;
+    }
+    .ai-orb::after {
+      inset: -56px;
+      border-color: rgba(96, 213, 255, 0.4);
+      border-style: dotted;
+      animation-duration: 12s;
+      animation-direction: reverse;
+    }
+    @keyframes orbPulse {
+      0%, 100% { transform: scale(1); filter: hue-rotate(0deg); }
+      50% { transform: scale(1.08); filter: hue-rotate(25deg); }
+    }
+    @keyframes orbit { to { transform: rotate(360deg); } }
+
+    .ai-label-inner {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -2px;
+      text-shadow: 0 0 24px rgba(255,255,255,0.9);
+    }
+
+    .prod-grid {
+      width: 240px; height: 240px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(5, 1fr);
+      gap: 8px;
+      padding: 10px;
+      border: 1.5px solid rgba(96, 213, 255, 0.45);
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(96, 213, 255, 0.12), transparent 70%);
+      box-shadow:
+        0 0 60px rgba(96, 213, 255, 0.25),
+        inset 0 0 30px rgba(96, 213, 255, 0.08);
+    }
+    .prod-cell {
+      background: rgba(96, 213, 255, 0.10);
+      border: 1px solid rgba(96, 213, 255, 0.22);
+      border-radius: 4px;
+      animation: cellOn 3s ease-in-out infinite;
+    }
+    .prod-cell:nth-child(2n) { animation-delay: 0.2s; }
+    .prod-cell:nth-child(3n) { animation-delay: 0.4s; }
+    .prod-cell:nth-child(5n) { animation-delay: 0.6s; }
+    .prod-cell:nth-child(7n) { animation-delay: 0.8s; }
+    @keyframes cellOn {
+      0%, 100% { background: rgba(96, 213, 255, 0.08); box-shadow: none; }
+      50% { background: rgba(96, 213, 255, 0.28); box-shadow: 0 0 14px rgba(96, 213, 255, 0.5); }
+    }
+
+    .world-sub {
+      font-size: 13px;
+      color: var(--slate-300);
+      letter-spacing: 1.5px;
+    }
+    .world.ai .world-sub { color: rgba(192, 132, 252, 0.85); }
+    .world.prod .world-sub { color: rgba(96, 213, 255, 0.85); }
+
+    .versus {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 8px;
+      color: var(--red);
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      animation: vsBlink 2s ease-in-out infinite;
+      padding: 18px 8px;
+      border-left: 1px dashed rgba(248, 113, 113, 0.4);
+      border-right: 1px dashed rgba(248, 113, 113, 0.4);
+    }
+    @keyframes vsBlink {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; text-shadow: 0 0 18px var(--red); }
+    }
+
+    /* ╭───────────────────────────────────╮
+       │ SCENE 2 — The Gap                 │
+       ╰───────────────────────────────────╯ */
+    .gap-visual {
+      position: relative;
+      width: 100%;
+      max-width: 1000px;
+      height: 260px;
+      margin: 50px 0;
+      display: flex;
+      align-items: center;
+    }
+    .gap-side {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 150px; height: 150px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-align: center;
+    }
+    .gap-side.left {
+      left: 0;
+      background: radial-gradient(circle, rgba(167, 139, 250, 0.4), rgba(167, 139, 250, 0.05) 70%, transparent);
+      color: var(--purple-bright);
+      border: 1.5px solid rgba(167, 139, 250, 0.5);
+      box-shadow: 0 0 60px rgba(167, 139, 250, 0.4);
+      text-shadow: 0 0 14px rgba(192, 132, 252, 0.6);
+    }
+    .gap-side.right {
+      right: 0;
+      background: radial-gradient(circle, rgba(96, 213, 255, 0.4), rgba(96, 213, 255, 0.05) 70%, transparent);
+      color: var(--cyan);
+      border: 1.5px solid rgba(96, 213, 255, 0.5);
+      box-shadow: 0 0 60px rgba(96, 213, 255, 0.4);
+      text-shadow: 0 0 14px rgba(96, 213, 255, 0.6);
+    }
+    .gap-center {
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    .gap-question {
+      font-size: 120px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--purple), var(--cyan), var(--green));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: questionPulse 2.5s ease-in-out infinite;
+      line-height: 1;
+    }
+    @keyframes questionPulse {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 24px rgba(167, 139, 250, 0.5)); }
+      50% { transform: scale(1.1); filter: drop-shadow(0 0 40px rgba(96, 213, 255, 0.8)); }
+    }
+    .gap-question-sub {
+      font-size: 11px;
+      letter-spacing: 5px;
+      color: var(--white);
+      margin-top: 8px;
+      font-weight: 600;
+    }
+    .gap-arrow {
+      position: absolute;
+      top: 50%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transform: translateY(-50%);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .gap-arrow.l { left: 150px; right: 60%; }
+    .gap-arrow.r { right: 150px; left: 60%; }
+    .gap-arrow::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 40%; height: 100%;
+    }
+    .gap-arrow.l::after {
+      background: linear-gradient(90deg, transparent, var(--purple-bright), transparent);
+      animation: gapFlowL 2.5s linear infinite;
+      box-shadow: 0 0 16px var(--purple);
+    }
+    .gap-arrow.r::after {
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      animation: gapFlowR 2.5s linear infinite;
+      box-shadow: 0 0 16px var(--cyan);
+    }
+    @keyframes gapFlowL {
+      from { transform: translateX(-100%); }
+      to { transform: translateX(400%); }
+    }
+    @keyframes gapFlowR {
+      from { transform: translateX(400%); }
+      to { transform: translateX(-100%); }
+    }
+
+    /* ╭───────────────────────────────────╮
+       │ SCENE 3 — Framework               │
+       ╰───────────────────────────────────╯ */
+    .framework {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 22px;
+      width: 100%;
+      max-width: 1100px;
+      margin: 44px 0 36px;
+    }
+    .pillar {
+      position: relative;
+      padding: 32px 22px 26px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.08), transparent 70%),
+        linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      text-align: center;
+      box-shadow:
+        0 8px 32px rgba(0,0,0,0.2),
+        inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+    .pillar::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: 14px 14px 0 0;
+    }
+    .pillar.p1::before { background: linear-gradient(90deg, var(--purple), var(--purple-bright)); box-shadow: 0 0 20px var(--purple); }
+    .pillar.p2::before { background: linear-gradient(90deg, var(--cyan), var(--cyan-bright)); box-shadow: 0 0 20px var(--cyan); }
+    .pillar.p3::before { background: linear-gradient(90deg, var(--amber), var(--amber-bright)); box-shadow: 0 0 20px var(--amber); }
+    .pillar.p4::before { background: linear-gradient(90deg, var(--green), var(--green-bright)); box-shadow: 0 0 20px var(--green); }
+    .pillar .icon {
+      font-size: 36px;
+      margin-bottom: 14px;
+      display: block;
+      line-height: 1;
+    }
+    .pillar.p1 .icon { color: var(--purple-bright); text-shadow: 0 0 24px rgba(192, 132, 252, 0.6); }
+    .pillar.p2 .icon { color: var(--cyan); text-shadow: 0 0 24px rgba(96, 213, 255, 0.6); }
+    .pillar.p3 .icon { color: var(--amber); text-shadow: 0 0 24px rgba(251, 191, 36, 0.6); }
+    .pillar.p4 .icon { color: var(--green); text-shadow: 0 0 24px rgba(52, 211, 153, 0.6); }
+    .pillar .h {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .pillar.p1 .h { color: var(--purple-bright); }
+    .pillar.p2 .h { color: var(--cyan); }
+    .pillar.p3 .h { color: var(--amber); }
+    .pillar.p4 .h { color: var(--green); }
+    .pillar .s {
+      font-size: 11px;
+      color: var(--slate-300);
+      margin-top: 10px;
+      letter-spacing: 0.8px;
+    }
+
+    .stamps {
+      display: flex;
+      gap: 18px;
+      margin-top: 28px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .stamp {
+      padding: 10px 20px;
+      border-radius: 8px;
+      background: rgba(52, 211, 153, 0.10);
+      border: 1.5px solid rgba(52, 211, 153, 0.4);
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      box-shadow: 0 0 24px rgba(52, 211, 153, 0.15);
+      text-shadow: 0 0 12px rgba(52, 211, 153, 0.5);
+    }
+    .stamp .ck {
+      margin-right: 8px;
+      color: var(--green);
+    }
+
+    /* ╭───────────────────────────────────╮
+       │ SCENE 4 — Flow                    │
+       ╰───────────────────────────────────╯ */
+    .flow-stage {
+      display: grid;
+      grid-template-columns: auto 1fr auto 1fr auto;
+      align-items: center;
+      gap: 0;
+      width: 100%;
+      max-width: 1100px;
+      margin: 50px 0 30px;
+    }
+    .flow-node {
+      padding: 26px 32px;
+      border-radius: 14px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+    .flow-node.ai-node {
+      background: radial-gradient(circle, rgba(167, 139, 250, 0.30), rgba(167, 139, 250, 0.05));
+      border: 1.5px solid rgba(167, 139, 250, 0.55);
+      color: var(--purple-bright);
+      box-shadow:
+        0 0 50px rgba(167, 139, 250, 0.35),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+      text-shadow: 0 0 14px rgba(192, 132, 252, 0.6);
+    }
+    .flow-node.fw-node {
+      background:
+        linear-gradient(135deg, rgba(167, 139, 250, 0.25), rgba(96, 213, 255, 0.18), rgba(52, 211, 153, 0.25));
+      border: 1.5px solid rgba(255,255,255,0.25);
+      padding: 32px 36px;
+      box-shadow:
+        0 0 80px rgba(96, 213, 255, 0.30),
+        0 0 40px rgba(167, 139, 250, 0.20),
+        inset 0 1px 0 rgba(255,255,255,0.15);
+    }
+    .flow-node.fw-node .fw-title {
+      font-size: 18px;
+      background: linear-gradient(135deg, var(--purple), var(--cyan), var(--green));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+      filter: drop-shadow(0 0 12px rgba(96, 213, 255, 0.5));
+    }
+    .flow-node.fw-node .fw-sub {
+      font-size: 10px;
+      color: var(--white);
+      letter-spacing: 4px;
+      opacity: 0.85;
+    }
+    .flow-node.prod-node {
+      background: radial-gradient(circle, rgba(96, 213, 255, 0.30), rgba(96, 213, 255, 0.05));
+      border: 1.5px solid rgba(96, 213, 255, 0.55);
+      color: var(--cyan);
+      box-shadow:
+        0 0 50px rgba(96, 213, 255, 0.35),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+      text-shadow: 0 0 14px rgba(96, 213, 255, 0.6);
+    }
+
+    .flow-pipe {
+      height: 4px;
+      position: relative;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .flow-pipe::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -35%;
+      width: 35%; height: 100%;
+      animation: pipeFlow 1.8s linear infinite;
+    }
+    .flow-pipe.p1::after {
+      background: linear-gradient(90deg, transparent, var(--purple-bright), transparent);
+      box-shadow: 0 0 14px var(--purple);
+    }
+    .flow-pipe.p2::after {
+      background: linear-gradient(90deg, transparent, var(--green), transparent);
+      box-shadow: 0 0 14px var(--green);
+    }
+    @keyframes pipeFlow {
+      to { left: 100%; }
+    }
+
+    .flow-label {
+      position: absolute;
+      top: -26px;
+      left: 0; right: 0;
+      text-align: center;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--white);
+      opacity: 0.7;
+      font-weight: 600;
+    }
+    .flow-pipe-wrap {
+      position: relative;
+      margin: 0 8px;
+    }
+
+    /* ╭───────────────────────────────────╮
+       │ SCENE 5 — Reveal                  │
+       ╰───────────────────────────────────╯ */
+    .reveal-stage {
+      text-align: center;
+      width: 100%;
+    }
+    .stacktic-logo {
+      font-size: 110px;
+      font-weight: 700;
+      letter-spacing: -4px;
+      background: linear-gradient(135deg, var(--purple), var(--cyan), var(--green));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+      margin-bottom: 8px;
+      filter: drop-shadow(0 0 40px rgba(167, 139, 250, 0.4));
+      animation: logoFloat 4s ease-in-out infinite;
+    }
+    .stacktic-logo .br {
+      color: var(--purple);
+      -webkit-text-fill-color: var(--purple);
+    }
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0); filter: drop-shadow(0 0 40px rgba(167, 139, 250, 0.4)); }
+      50% { transform: translateY(-8px); filter: drop-shadow(0 16px 50px rgba(96, 213, 255, 0.5)); }
+    }
+    .stacktic-tag {
+      font-size: 13px;
+      letter-spacing: 8px;
+      color: var(--white);
+      margin-bottom: 40px;
+      text-transform: uppercase;
+      font-weight: 600;
+      opacity: 0.85;
+    }
+    .transform-line {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      margin: 30px 0 36px;
+      font-size: 22px;
+      letter-spacing: 1px;
+      flex-wrap: wrap;
+    }
+    .transform-from {
+      color: var(--slate-300);
+      text-decoration: line-through;
+      text-decoration-color: rgba(248, 113, 113, 0.8);
+      text-decoration-thickness: 2px;
+    }
+    .transform-arrow {
+      color: var(--cyan);
+      font-size: 32px;
+      animation: arrowSlide 1.5s ease-in-out infinite;
+      text-shadow: 0 0 18px var(--cyan);
+    }
+    @keyframes arrowSlide {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(8px); }
+    }
+    .transform-to {
+      color: var(--green);
+      font-weight: 700;
+      text-shadow: 0 0 18px rgba(52, 211, 153, 0.6);
+    }
+
+    /* ── Bottom CTA ── */
+    .end-cta {
+      margin-top: 50px;
+      padding: 20px 36px;
+      background:
+        linear-gradient(135deg, rgba(167, 139, 250, 0.18), rgba(96, 213, 255, 0.12), rgba(52, 211, 153, 0.18));
+      border: 1.5px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--white);
+      box-shadow: 0 0 40px rgba(96, 213, 255, 0.2);
+    }
+    .end-cta .cursor-mini {
+      display: inline-block;
+      width: 7px; height: 14px;
+      background: var(--green);
+      border-radius: 1px;
+      animation: blink 1s step-end infinite;
+    }
+    .end-cta .green { color: var(--green); }
+
+    /* ── Responsive ── */
+    @media (max-width: 1024px) {
+      .line { font-size: 26px; }
+      .line.huge { font-size: 42px; }
+      .line.big { font-size: 34px; }
+      .twoworlds { gap: 40px; }
+      .ai-orb, .prod-grid { width: 180px; height: 180px; }
+      .ai-label-inner { font-size: 36px; }
+      .gap-side { width: 120px; height: 120px; font-size: 12px; }
+      .gap-arrow.l { left: 120px; }
+      .gap-arrow.r { right: 120px; }
+      .gap-question { font-size: 90px; }
+      .framework { grid-template-columns: repeat(2, 1fr); }
+      .stacktic-logo { font-size: 78px; }
+      .flow-node { font-size: 14px; padding: 20px 22px; }
+      .scroll-rail { right: 14px; }
+    }
+    @media (max-width: 700px) {
+      .scene { padding: 80px 22px; min-height: auto; padding-top: 100px; padding-bottom: 100px; }
+      .twoworlds { grid-template-columns: 1fr; gap: 26px; }
+      .versus {
+        writing-mode: horizontal-tb;
+        padding: 6px 28px;
+        border-left: none; border-right: none;
+        border-top: 1px dashed rgba(248, 113, 113, 0.4);
+        border-bottom: 1px dashed rgba(248, 113, 113, 0.4);
+      }
+      .flow-stage { grid-template-columns: 1fr; gap: 16px; }
+      .flow-pipe { height: 32px; width: 4px; margin: 0 auto; }
+      .flow-pipe::after { width: 100%; height: 35%; }
+      .gap-visual { height: 200px; }
+      .gap-question { font-size: 64px; }
+      .stacktic-logo { font-size: 56px; }
+      .line { font-size: 22px; }
+      .line.huge { font-size: 32px; }
+      .line.big { font-size: 26px; }
+      .scroll-rail { display: none; }
+      .top-brand { left: 14px; font-size: 12px; padding: 6px 10px; }
+      .framework { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient"></div>
+
+  <!-- Brand chip -->
+  <div class="top-brand">
+    <span class="br">{</span><span class="tx">Stacktic</span><span class="br">}</span>
+  </div>
+
+  <!-- Scroll rail -->
+  <div class="scroll-rail">
+    <div class="rail-dot active" data-label="TENSION" data-target="1"></div>
+    <div class="rail-dot" data-label="GAP" data-target="2"></div>
+    <div class="rail-dot" data-label="FRAMEWORK" data-target="3"></div>
+    <div class="rail-dot" data-label="FLOW" data-target="4"></div>
+    <div class="rail-dot" data-label="PROMISE" data-target="5"></div>
+  </div>
+
+  <!-- ╭─ SCENE 1 — The Tension ─╮ -->
+  <section class="scene" id="scene-1" data-index="1">
+    <div class="scene-tag anim d1">
+      <span class="dot"></span>01 · The Tension<span class="line-h"></span>
+    </div>
+
+    <div class="line huge anim d2">
+      AI is <span class="purple">powerful</span>,<br>but <span class="red">inconsistent</span>.
+    </div>
+
+    <div class="twoworlds anim zoom d3">
+      <div class="world ai">
+        <div class="world-label">AI</div>
+        <div class="ai-orb"><div class="ai-label-inner">AI</div></div>
+        <div class="world-sub">// creative · unpredictable</div>
+      </div>
+      <div class="versus">VS</div>
+      <div class="world prod">
+        <div class="world-label">PRODUCTION</div>
+        <div class="prod-grid" id="prodGrid"></div>
+        <div class="world-sub">// strict · deterministic</div>
+      </div>
+    </div>
+
+    <div class="line big anim d5">
+      Production environments <span class="cyan">cannot be</span>.
+    </div>
+  </section>
+
+  <!-- ╭─ SCENE 2 — The Gap ─╮ -->
+  <section class="scene" id="scene-2" data-index="2">
+    <div class="scene-tag anim d1">
+      <span class="dot"></span>02 · The Gap<span class="line-h"></span>
+    </div>
+
+    <div class="line anim d2">
+      Somewhere between <span class="purple">AI's creativity</span>
+    </div>
+    <div class="line anim d3">
+      and <span class="cyan">production's requirements</span>...
+    </div>
+
+    <div class="gap-visual anim zoom d4">
+      <div class="gap-side left">CREATIVITY</div>
+      <div class="gap-arrow l"></div>
+      <div class="gap-center">
+        <div class="gap-question">?</div>
+        <div class="gap-question-sub">CONTROL LAYER</div>
+      </div>
+      <div class="gap-arrow r"></div>
+      <div class="gap-side right">REQUIREMENTS</div>
+    </div>
+
+    <div class="line huge anim d6">
+      a <span class="grad">new control layer</span> is needed.
+    </div>
+  </section>
+
+  <!-- ╭─ SCENE 3 — The Framework ─╮ -->
+  <section class="scene" id="scene-3" data-index="3">
+    <div class="scene-tag anim d1">
+      <span class="dot"></span>03 · The Framework<span class="line-h"></span>
+    </div>
+
+    <div class="line big anim d2">
+      Imagine AI operating within a <span class="grad">framework</span>
+    </div>
+    <div class="line comment anim d3">
+      // that continuously enforces governance, security, compliance &amp; operational standards
+    </div>
+
+    <div class="framework anim d4">
+      <div class="pillar p1">
+        <span class="icon">⊕</span>
+        <div class="h">GOVERNANCE</div>
+        <div class="s">policies · roles · audit</div>
+      </div>
+      <div class="pillar p2">
+        <span class="icon">⚿</span>
+        <div class="h">SECURITY</div>
+        <div class="s">secrets · scopes · zero-trust</div>
+      </div>
+      <div class="pillar p3">
+        <span class="icon">✓</span>
+        <div class="h">COMPLIANCE</div>
+        <div class="s">PCI · HIPAA · SOC2 · DORA</div>
+      </div>
+      <div class="pillar p4">
+        <span class="icon">⏱</span>
+        <div class="h">OPERATIONAL</div>
+        <div class="s">SLOs · health · rollback</div>
+      </div>
+    </div>
+
+    <div class="stamps anim d5">
+      <div class="stamp"><span class="ck">✓</span>TRACEABLE</div>
+      <div class="stamp"><span class="ck">✓</span>VALIDATED</div>
+      <div class="stamp"><span class="ck">✓</span>ALIGNED</div>
+    </div>
+
+    <div class="line small anim d6" style="margin-top: 24px;">
+      Every change traced. Every action validated. Every outcome aligned with <span class="green">production reality</span>.
+    </div>
+  </section>
+
+  <!-- ╭─ SCENE 4 — The Flow ─╮ -->
+  <section class="scene" id="scene-4" data-index="4">
+    <div class="scene-tag anim d1">
+      <span class="dot"></span>04 · The Flow<span class="line-h"></span>
+    </div>
+
+    <div class="line huge anim d2">
+      Welcome to the <span class="grad">next generation</span>
+    </div>
+    <div class="line big anim d3">
+      of <span class="cyan">platform engineering</span>.
+    </div>
+
+    <div class="flow-stage anim zoom d4">
+      <div class="flow-node ai-node">AI</div>
+      <div class="flow-pipe-wrap">
+        <div class="flow-label">// VALIDATED</div>
+        <div class="flow-pipe p1"></div>
+      </div>
+      <div class="flow-node fw-node">
+        <div class="fw-title">STACKTIC</div>
+        <div class="fw-sub">CONTROL LAYER</div>
+      </div>
+      <div class="flow-pipe-wrap">
+        <div class="flow-label">// COMPLIANT</div>
+        <div class="flow-pipe p2"></div>
+      </div>
+      <div class="flow-node prod-node">PROD</div>
+    </div>
+
+    <div class="line anim d6">
+      AI now operates in production — <span class="green">with no risk</span>.
+    </div>
+  </section>
+
+  <!-- ╭─ SCENE 5 — The Promise ─╮ -->
+  <section class="scene" id="scene-5" data-index="5">
+    <div class="scene-tag anim d1">
+      <span class="dot"></span>05 · The Promise<span class="line-h"></span>
+    </div>
+
+    <div class="reveal-stage">
+      <div class="stacktic-logo anim zoom d2">
+        <span class="br">{</span>Stacktic<span class="br">}</span>
+      </div>
+      <div class="stacktic-tag anim d3">
+        the production interface for ai
+      </div>
+
+      <div class="line anim d4">
+        Stacktic transforms AI from a
+      </div>
+
+      <div class="transform-line anim d5">
+        <span class="transform-from">powerful assistant</span>
+        <span class="transform-arrow">→</span>
+        <span class="transform-to">trusted operator</span>
+      </div>
+
+      <div class="line small anim d6" style="max-width: 820px; margin: 0 auto;">
+        capable of automating complex systems while maintaining the
+        <span class="purple">control</span>,
+        <span class="cyan">consistency</span>, and
+        <span class="green">assurance</span>
+        required in production environments.
+      </div>
+
+      <div class="anim d7" style="margin-top: 40px;">
+        <div class="end-cta">
+          <span class="cursor-mini"></span>
+          <span>AI IN PRODUCTION — <span class="green">ZERO RISK</span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<script>
+(function() {
+  // Build production grid cells
+  const grid = document.getElementById('prodGrid');
+  if (grid) {
+    for (let i = 0; i < 25; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'prod-cell';
+      grid.appendChild(cell);
+    }
+  }
+
+  // Reveal scenes as they scroll into view
+  const scenes = document.querySelectorAll('.scene');
+  const dots = document.querySelectorAll('.rail-dot');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+        const idx = entry.target.dataset.index;
+        dots.forEach(d => d.classList.toggle('active', d.dataset.target === idx));
+      }
+    });
+  }, { threshold: 0.30 });
+
+  scenes.forEach(s => observer.observe(s));
+
+  // Rail dot click → jump to scene
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const target = document.getElementById('scene-' + dot.dataset.target);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+})();
+</script>
+</body>
+</html>

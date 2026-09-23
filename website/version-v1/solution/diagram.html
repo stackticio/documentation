@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stack Relations Architecture</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #e2e8f0;
+            overflow-x: auto;
+            overflow-y: hidden;
+            height: 400px;
+            position: relative;
+        }
+
+        .canvas {
+            position: absolute;
+            width: 2400px;
+            height: 380px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .node {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            padding: 10px 14px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(99, 102, 241, 0.2);
+        }
+
+        .node-icon {
+            width: 28px;
+            height: 28px;
+            display: block;
+            margin: 0 auto 5px;
+            border-radius: 7px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.3));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+        }
+
+        .node-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 3px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .node-type {
+            font-size: 0.55rem;
+            text-align: center;
+            color: rgba(147, 197, 253, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+        }
+
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+            opacity: 1;
+        }
+
+        .connection {
+            stroke: url(#grad);
+            stroke-width: 3;
+            fill: none;
+            opacity: 0.6;
+            stroke-dasharray: 10, 8;
+        }
+
+        .particle {
+            fill: #ffd700;
+            opacity: 0.8;
+        }
+
+        .connection-label {
+            fill: rgba(255, 215, 0, 0.85);
+            font-size: 0.52rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            text-anchor: middle;
+            pointer-events: none;
+            text-shadow: 0 0 3px rgba(0, 0, 0, 0.9);
+            letter-spacing: 0.03em;
+        }
+
+        .layer-1 { z-index: 10; }
+        .layer-2 { z-index: 8; }
+
+        .glow {
+            filter: drop-shadow(0 0 12px rgba(99, 102, 241, 0.5));
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+
+        /* Ambient background effects */
+        .bg-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.12;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #6366f1, transparent);
+            top: 10%;
+            left: 20%;
+        }
+
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, #8b5cf6, transparent);
+            bottom: 15%;
+            right: 25%;
+        }
+
+        .orb-3 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, #ec4899, transparent);
+            top: 50%;
+            left: 50%;
+        }
+
+        /* Gradient mesh overlay */
+        .mesh-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(at 20% 30%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+                radial-gradient(at 80% 70%, rgba(139, 92, 246, 0.08) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(236, 72, 153, 0.04) 0px, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Logo styling */
+        .logo-nginx { background: linear-gradient(135deg, rgba(0, 150, 57, 0.4), rgba(0, 200, 83, 0.4)); }
+        .logo-fastapi { background: linear-gradient(135deg, rgba(0, 150, 136, 0.4), rgba(0, 188, 212, 0.4)); }
+        .logo-node { background: linear-gradient(135deg, rgba(51, 153, 51, 0.4), rgba(102, 187, 106, 0.4)); }
+        .logo-spring { background: linear-gradient(135deg, rgba(109, 179, 63, 0.4), rgba(139, 195, 74, 0.4)); }
+        .logo-airflow { background: linear-gradient(135deg, rgba(0, 194, 203, 0.4), rgba(0, 172, 193, 0.4)); }
+        .logo-prometheus { background: linear-gradient(135deg, rgba(230, 83, 60, 0.4), rgba(255, 108, 80, 0.4)); }
+        .logo-vector { background: linear-gradient(135deg, rgba(220, 71, 125, 0.4), rgba(233, 30, 99, 0.4)); }
+        .logo-redis { background: linear-gradient(135deg, rgba(220, 56, 45, 0.4), rgba(255, 82, 82, 0.4)); }
+        .logo-postgres { background: linear-gradient(135deg, rgba(51, 103, 145, 0.4), rgba(92, 107, 192, 0.4)); }
+        .logo-mongo { background: linear-gradient(135deg, rgba(71, 162, 72, 0.4), rgba(102, 187, 106, 0.4)); }
+        .logo-elastic { background: linear-gradient(135deg, rgba(0, 85, 113, 0.4), rgba(0, 188, 212, 0.4)); }
+        .logo-rabbit { background: linear-gradient(135deg, rgba(255, 102, 0, 0.4), rgba(255, 152, 0, 0.4)); }
+        .logo-kafka { background: linear-gradient(135deg, rgba(35, 31, 32, 0.4), rgba(66, 66, 66, 0.4)); }
+        .logo-kong { background: linear-gradient(135deg, rgba(0, 212, 147, 0.4), rgba(0, 255, 135, 0.4)); }
+        .logo-s3 { background: linear-gradient(135deg, rgba(255, 153, 0, 0.4), rgba(255, 183, 77, 0.4)); }
+        .logo-grafana { background: linear-gradient(135deg, rgba(244, 104, 0, 0.4), rgba(255, 152, 0, 0.4)); }
+        .logo-snowflake { background: linear-gradient(135deg, rgba(41, 182, 246, 0.4), rgba(33, 150, 243, 0.4)); }
+        .logo-traefik { background: linear-gradient(135deg, rgba(0, 163, 255, 0.4), rgba(0, 133, 255, 0.4)); }
+        .logo-keycloak { background: linear-gradient(135deg, rgba(233, 30, 99, 0.4), rgba(194, 24, 91, 0.4)); }
+    </style>
+</head>
+<body>
+    <!-- Background ambient orbs -->
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+    <div class="mesh-gradient"></div>
+
+    <div class="canvas" id="canvas">
+        <!-- Connection lines below nodes -->
+        <svg id="connections" xmlns="http://www.w3.org/2000/svg" style="z-index: 1;">
+            <defs>
+                <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:rgba(99, 102, 241, 0.6);stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:rgba(139, 92, 246, 0.6);stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:rgba(236, 72, 153, 0.6);stop-opacity:1" />
+                </linearGradient>
+            </defs>
+        </svg>
+        
+        <!-- Labels above everything -->
+        <svg id="labels" xmlns="http://www.w3.org/2000/svg" style="z-index: 15; position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
+        </svg>
+
+        <!-- Entry Layer -->
+        <div class="node layer-1 glow" style="left: 50px; top: 50%;" data-id="0">
+            <div class="node-icon">→</div>
+            <div class="node-title">Client</div>
+            <div class="node-type">Entry</div>
+        </div>
+
+        <!-- Load Balancing Layer -->
+        <div class="node layer-1" style="left: 200px; top: 35%;" data-id="1">
+            <div class="node-icon logo-traefik">T</div>
+            <div class="node-title">Traefik</div>
+            <div class="node-type">Ingress</div>
+        </div>
+
+        <div class="node layer-2" style="left: 200px; top: 70%;" data-id="2">
+            <div class="node-icon logo-keycloak">K</div>
+            <div class="node-title">Keycloak</div>
+            <div class="node-type">OAuth/SSO</div>
+        </div>
+
+        <!-- API Gateway -->
+        <div class="node layer-1 glow" style="left: 370px; top: 50%;" data-id="3">
+            <div class="node-icon logo-kong">K</div>
+            <div class="node-title">Kong Gateway</div>
+            <div class="node-type">API GW</div>
+        </div>
+
+        <!-- Backend Services Layer -->
+        <div class="node layer-1" style="left: 540px; top: 22%;" data-id="4">
+            <div class="node-icon logo-fastapi">F</div>
+            <div class="node-title">FastAPI</div>
+            <div class="node-type">REST API</div>
+        </div>
+
+        <div class="node layer-1" style="left: 540px; top: 50%;" data-id="5">
+            <div class="node-icon logo-node">G</div>
+            <div class="node-title">GraphQL</div>
+            <div class="node-type">Apollo</div>
+        </div>
+
+        <div class="node layer-1" style="left: 540px; top: 78%;" data-id="6">
+            <div class="node-icon logo-spring">S</div>
+            <div class="node-title">Spring Boot</div>
+            <div class="node-type">Microservice</div>
+        </div>
+
+        <!-- Processing Layer -->
+        <div class="node layer-2 glow" style="left: 710px; top: 18%;" data-id="7">
+            <div class="node-icon logo-airflow">A</div>
+            <div class="node-title">Airflow</div>
+            <div class="node-type">Orchestration</div>
+        </div>
+
+        <div class="node layer-2" style="left: 710px; top: 50%;" data-id="8">
+            <div class="node-icon logo-prometheus">P</div>
+            <div class="node-title">Prometheus</div>
+            <div class="node-type">Metrics</div>
+        </div>
+
+        <div class="node layer-2" style="left: 710px; top: 82%;" data-id="9">
+            <div class="node-icon logo-vector">V</div>
+            <div class="node-title">Vector DB</div>
+            <div class="node-type">Embeddings</div>
+        </div>
+
+        <!-- Cache Layer -->
+        <div class="node layer-2" style="left: 880px; top: 32%;" data-id="10">
+            <div class="node-icon logo-redis">R</div>
+            <div class="node-title">Redis</div>
+            <div class="node-type">Cache</div>
+        </div>
+
+        <div class="node layer-2" style="left: 880px; top: 68%;" data-id="11">
+            <div class="node-icon logo-elastic">E</div>
+            <div class="node-title">Elasticsearch</div>
+            <div class="node-type">Search</div>
+        </div>
+
+        <!-- Database Layer -->
+        <div class="node layer-1" style="left: 1050px; top: 35%;" data-id="12">
+            <div class="node-icon logo-postgres">P</div>
+            <div class="node-title">PostgreSQL</div>
+            <div class="node-type">RDBMS</div>
+        </div>
+
+        <div class="node layer-1" style="left: 1050px; top: 68%;" data-id="13">
+            <div class="node-icon logo-mongo">M</div>
+            <div class="node-title">MongoDB</div>
+            <div class="node-type">NoSQL</div>
+        </div>
+
+        <!-- Storage Layer -->
+        <div class="node layer-2" style="left: 1220px; top: 50%;" data-id="14">
+            <div class="node-icon logo-s3">S</div>
+            <div class="node-title">S3 Bucket</div>
+            <div class="node-type">Object Store</div>
+        </div>
+
+        <!-- Message Queue Layer -->
+        <div class="node layer-1 glow" style="left: 1390px; top: 35%;" data-id="15">
+            <div class="node-icon logo-rabbit">R</div>
+            <div class="node-title">RabbitMQ</div>
+            <div class="node-type">AMQP</div>
+        </div>
+
+        <div class="node layer-2" style="left: 1390px; top: 68%;" data-id="16">
+            <div class="node-icon logo-kafka">K</div>
+            <div class="node-title">Kafka</div>
+            <div class="node-type">Streaming</div>
+        </div>
+
+        <!-- Analytics Layer -->
+        <div class="node layer-1" style="left: 1560px; top: 38%;" data-id="17">
+            <div class="node-icon logo-snowflake">S</div>
+            <div class="node-title">Snowflake</div>
+            <div class="node-type">Data Lake</div>
+        </div>
+
+        <div class="node layer-2" style="left: 1560px; top: 70%;" data-id="18">
+            <div class="node-icon logo-grafana">G</div>
+            <div class="node-title">Grafana</div>
+            <div class="node-type">Dashboards</div>
+        </div>
+
+        <!-- Final Sink -->
+        <div class="node layer-1 glow" style="left: 1730px; top: 50%;" data-id="19">
+            <div class="node-icon">◉</div>
+            <div class="node-title">BI Tools</div>
+            <div class="node-type">Analytics</div>
+        </div>
+    </div>
+
+    <script>
+        const nodes = document.querySelectorAll('.node');
+
+        // Define connections with labels
+        const connections = [
+            { from: 0, to: 1, label: 'HTTPS' },
+            { from: 0, to: 2, label: 'Auth' },
+            { from: 1, to: 3, label: 'Route' },
+            { from: 2, to: 3, label: 'JWT' },
+            { from: 3, to: 4, label: 'API' },
+            { from: 3, to: 5, label: 'Query' },
+            { from: 3, to: 6, label: 'REST' },
+            { from: 4, to: 7, label: 'DAG' },
+            { from: 4, to: 8, label: 'Metrics' },
+            { from: 5, to: 8, label: 'Metrics' },
+            { from: 5, to: 9, label: 'Vectors' },
+            { from: 6, to: 9, label: 'Embeddings' },
+            { from: 4, to: 10, label: 'Session' },
+            { from: 5, to: 10, label: 'Cache' },
+            { from: 6, to: 11, label: 'Index' },
+            { from: 7, to: 12, label: 'SQL' },
+            { from: 8, to: 12, label: 'Store' },
+            { from: 8, to: 13, label: 'Time-Series' },
+            { from: 9, to: 13, label: 'Docs' },
+            { from: 10, to: 12, label: 'Persist' },
+            { from: 11, to: 13, label: 'Search' },
+            { from: 12, to: 14, label: 'Backup' },
+            { from: 13, to: 14, label: 'Archive' },
+            { from: 12, to: 15, label: 'Events' },
+            { from: 13, to: 16, label: 'CDC' },
+            { from: 14, to: 16, label: 'Connector' },
+            { from: 15, to: 17, label: 'Definition.json' },
+            { from: 16, to: 17, label: 'Stream' },
+            { from: 16, to: 18, label: 'Metrics' },
+            { from: 17, to: 19, label: 'ETL' },
+            { from: 18, to: 19, label: 'Dashboard' },
+            { from: 8, to: 18, label: 'Visualize' }
+        ];
+
+        function getNodeCenter(node) {
+            const rect = node.getBoundingClientRect();
+            const canvasRect = document.getElementById('canvas').getBoundingClientRect();
+            return {
+                x: rect.left - canvasRect.left + rect.width / 2,
+                y: rect.top - canvasRect.top + rect.height / 2
+            };
+        }
+
+        function drawConnections() {
+            const svg = document.getElementById('connections');
+            const labelsSvg = document.getElementById('labels');
+            
+            svg.querySelectorAll('path, circle').forEach(el => el.remove());
+            labelsSvg.querySelectorAll('text').forEach(el => el.remove());
+
+            connections.forEach(({from, to, label}, index) => {
+                const fromNode = nodes[from];
+                const toNode = nodes[to];
+                
+                const start = getNodeCenter(fromNode);
+                const end = getNodeCenter(toNode);
+
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                
+                const dx = end.x - start.x;
+                const dy = end.y - start.y;
+                const cx1 = start.x + dx * 0.3;
+                const cy1 = start.y;
+                const cx2 = start.x + dx * 0.7;
+                const cy2 = end.y;
+
+                const d = `M ${start.x} ${start.y} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${end.x} ${end.y}`;
+                
+                path.setAttribute('d', d);
+                path.setAttribute('class', 'connection');
+                path.setAttribute('id', `path-${from}-${to}`);
+                svg.appendChild(path);
+
+                // Add label to separate labels layer
+                if (label) {
+                    const labelText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    
+                    // Calculate midpoint with smart positioning
+                    const midX = start.x + dx * 0.5;
+                    const midY = start.y + dy * 0.5;
+                    
+                    // Smart offset to avoid overlaps
+                    let labelOffsetY = -10;
+                    
+                    // Special positioning for crowded areas
+                    if (to === 14 || from === 14) { // S3 bucket connections
+                        if (from === 12) labelOffsetY = -18; // Postgres to S3
+                        else if (from === 13) labelOffsetY = 18; // MongoDB to S3
+                        else if (to === 14 && from === 14) labelOffsetY = 0;
+                    }
+                    
+                    // Adjust for vertical connections
+                    if (Math.abs(dy) > Math.abs(dx)) {
+                        labelOffsetY = dx > 0 ? -12 : 12;
+                    }
+                    
+                    // Additional offset for parallel connections
+                    if (index % 2 === 0 && Math.abs(dy) < 30) {
+                        labelOffsetY -= 8;
+                    }
+                    
+                    labelText.setAttribute('x', midX);
+                    labelText.setAttribute('y', midY + labelOffsetY);
+                    labelText.setAttribute('class', 'connection-label');
+                    labelText.textContent = label;
+                    labelsSvg.appendChild(labelText);
+                }
+
+                // Add particle animation
+                const particle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                particle.setAttribute('r', '4');
+                particle.setAttribute('class', 'particle');
+                
+                const animateMotion = document.createElementNS('http://www.w3.org/2000/svg', 'animateMotion');
+                animateMotion.setAttribute('dur', `${8 + Math.random() * 4}s`);
+                animateMotion.setAttribute('repeatCount', 'indefinite');
+                animateMotion.setAttribute('begin', `${Math.random() * 8}s`);
+                
+                const mpath = document.createElementNS('http://www.w3.org/2000/svg', 'mpath');
+                mpath.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', `#path-${from}-${to}`);
+                
+                animateMotion.appendChild(mpath);
+                particle.appendChild(animateMotion);
+                svg.appendChild(particle);
+            });
+        }
+
+        drawConnections();
+
+        // Debounced resize for better performance
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(drawConnections, 200);
+        });
+    </script>
+</body>
+</html>

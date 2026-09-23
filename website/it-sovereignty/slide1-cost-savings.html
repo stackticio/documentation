@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>IT Sovereignty - Cost Savings</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&family=DM+Serif+Display&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{width:1440px;height:810px;overflow:hidden;font-family:'DM Sans',sans-serif;background:#080b16}
+  canvas{display:block}
+</style>
+</head>
+<body>
+<canvas id="c" width="2880" height="1620"></canvas>
+<script>
+const C = document.getElementById('c');
+C.style.width = '1440px';
+C.style.height = '810px';
+const X = C.getContext('2d');
+const W = 2880, H = 1620;
+
+function easeOutExpo(t){ return t===1?1:1-Math.pow(2,-10*t) }
+function easeOutBack(t){ const c=1.70158; return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2) }
+function easeInOutCubic(t){ return t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2 }
+function easeOutElastic(t){ if(t===0||t===1)return t; return Math.pow(2,-10*t)*Math.sin((t-0.075)*2*Math.PI/0.3)+1 }
+function lerp(a,b,t){ return a+(b-a)*t }
+function clamp01(t){ return Math.max(0,Math.min(1,t)) }
+
+// ─── Data ───
+const leftSlices = [
+  { label:'CRM',            val:1.2, color:'#e11d63' },
+  { label:'Middleware',      val:0.8, color:'#a855f7' },
+  { label:'Data Platform',  val:1.5, color:'#6366f1' },
+  { label:'Email & Office', val:2.0, color:'#818cf8' },
+  { label:'Support',        val:2.3, color:'#38bdf8' },
+  { label:'HelpDesk',       val:1.0, color:'#22d3ee' },
+  { label:'ERP',            val:2.0, color:'#2dd4bf' },
+  { label:'Infra',          val:2.2, color:'#86efac' },
+];
+const rightSlices = [
+  { label:'Migration', val:0.5, color:'#e11d63' },
+  { label:'Infra',     val:0.8, color:'#86efac' },
+  { label:'Ops',       val:0.3, color:'#2dd4bf' },
+  { label:'License',   val:0.4, color:'#06b6d4' },
+];
+
+const leftTotal  = leftSlices.reduce((s,d)=>s+d.val,0);
+const rightTotal = rightSlices.reduce((s,d)=>s+d.val,0);
+
+function computeAngles(slices, total){
+  let a = -Math.PI/2;
+  return slices.map(s=>{
+    const sweep = (s.val/total)*Math.PI*2;
+    const obj = {...s, start:a, end:a+sweep, mid:a+sweep/2, pct: s.val/total};
+    a+=sweep;
+    return obj;
+  });
+}
+const leftAngles  = computeAngles(leftSlices, leftTotal);
+const rightAngles = computeAngles(rightSlices, rightTotal);
+
+const PIE_R = 440;
+const LEFT_CX = 660;
+const RIGHT_CX = 2220;
+const PIE_CY = 900;
+const TITLE_Y = 120;
+
+let startTime = 0;
+function t(now, from, to){ return clamp01((now-from)/(to-from)) }
+
+// ─── BG ───
+function drawBG(){
+  const bg=X.createRadialGradient(W/2,H/2,200,W/2,H/2,W*0.6);
+  bg.addColorStop(0,'#0d1025');bg.addColorStop(1,'#080b16');
+  X.fillStyle=bg;X.fillRect(0,0,W,H);
+  // subtle dots
+  X.save();X.globalAlpha=0.02;X.fillStyle='#4f46e5';
+  for(let gx=0;gx<W;gx+=50)for(let gy=0;gy<H;gy+=50){
+    X.beginPath();X.arc(gx,gy,1,0,Math.PI*2);X.fill();
+  }
+  X.restore();
+}
+
+// ─── Draw title ───
+function drawTitle(alpha, offsetY){
+  if(alpha <= 0) return;
+  X.save();
+  X.globalAlpha = alpha;
+
+  X.fillStyle = '#4f46e5';
+  X.fillRect(0, 0, W, 8);
+
+  const x = 110;
+  const y = TITLE_Y + offsetY;
+
+  X.font = '800 68px "DM Sans"';
+  X.fillStyle = '#4f46e5';
+  X.textAlign = 'left';
+  X.textBaseline = 'top';
+  X.fillText('SOVEREIGNTY', x, y);
+
+  const sovW = X.measureText('SOVEREIGNTY').width;
+  X.font = '400 64px "DM Serif Display"';
+  X.fillStyle = '#64748b';
+  X.fillText(' EVOLVED ', x + sovW, y + 4);
+
+  const evW = X.measureText(' EVOLVED ').width;
+  X.font = '700 64px "DM Serif Display"';
+  X.fillStyle = '#e2e8f0';
+  X.fillText('FROM A PRIVACY & SECURITY ', x + sovW + evW, y + 4);
+
+  const secW = X.measureText('FROM A PRIVACY & SECURITY ').width;
+  X.font = '400 64px "DM Serif Display"';
+  X.fillStyle = '#64748b';
+  X.fillText('CONCERN,', x + sovW + evW + secW, y + 4);
+
+  const y2 = y + 84;
+  X.font = '400 64px "DM Serif Display"';
+  X.fillStyle = '#64748b';
+  X.fillText('INTO A FUNDAMENTAL ', x, y2);
+
+  const funW = X.measureText('INTO A FUNDAMENTAL ').width;
+  X.font = '700 64px "DM Serif Display"';
+  X.fillStyle = '#e2e8f0';
+  X.fillText('COST-OPTIMIZATION STRATEGY', x + funW, y2);
+
+  X.restore();
+}
+
+// ─── Draw Pie ───
+function drawPie(cx, cy, R, angles, total, sweepProg, labelAlpha, totalAlpha, totalStr){
+  const currentAngle = -Math.PI/2 + sweepProg * Math.PI*2;
+
+  // shadow
+  if(sweepProg > 0){
+    X.save();
+    X.beginPath();
+    X.arc(cx+10, cy+14, R+6, 0, Math.PI*2);
+    X.fillStyle = 'rgba(0,0,0,0.15)';
+    X.fill();
+    X.restore();
+  }
+
+  // slices
+  for(const s of angles){
+    if(s.start >= currentAngle) break;
+    const end = Math.min(s.end, currentAngle);
+    X.beginPath();
+    X.moveTo(cx,cy);
+    X.arc(cx,cy,R, s.start, end);
+    X.closePath();
+    X.fillStyle = s.color;
+    X.fill();
+  }
+
+  // separators
+  if(sweepProg > 0.05){
+    for(const s of angles){
+      if(s.start >= currentAngle) break;
+      X.beginPath();
+      X.moveTo(cx,cy);
+      X.lineTo(cx+Math.cos(s.start)*(R+2), cy+Math.sin(s.start)*(R+2));
+      X.strokeStyle = 'rgba(8,11,22,0.5)';
+      X.lineWidth = 3.5;
+      X.stroke();
+    }
+  }
+
+  // labels inside
+  if(labelAlpha > 0){
+    X.save();
+    X.globalAlpha = labelAlpha;
+    for(const s of angles){
+      const labelR = R * (s.pct < 0.08 ? 0.78 : 0.62);
+      const lx = cx + Math.cos(s.mid) * labelR;
+      const ly = cy + Math.sin(s.mid) * labelR;
+
+      X.textAlign = 'center';
+      X.textBaseline = 'middle';
+      X.shadowColor = 'rgba(0,0,0,0.6)';
+      X.shadowBlur = 12;
+
+      const fs1 = s.pct < 0.08 ? 22 : (s.pct < 0.12 ? 28 : 32);
+      X.font = `700 ${fs1}px "DM Sans"`;
+      X.fillStyle = '#fff';
+      X.fillText(s.label, lx, ly - (s.pct < 0.08 ? 12 : 18));
+
+      const fs2 = s.pct < 0.08 ? 20 : (s.pct < 0.12 ? 26 : 30);
+      X.font = `600 ${fs2}px "DM Sans"`;
+      X.fillStyle = 'rgba(255,255,255,0.85)';
+      X.fillText(s.val.toFixed(1), lx, ly + (s.pct < 0.08 ? 12 : 16));
+
+      X.shadowBlur = 0;
+      X.shadowColor = 'transparent';
+    }
+    X.restore();
+  }
+
+  // center total
+  if(totalAlpha > 0){
+    const scale = easeOutBack(totalAlpha);
+    X.save();
+    X.translate(cx, cy);
+    X.scale(scale, scale);
+
+    X.beginPath();
+    X.arc(0, 0, 100, 0, Math.PI*2);
+    X.fillStyle = 'rgba(13,16,37,0.9)';
+    X.fill();
+    X.strokeStyle = 'rgba(79,70,229,0.3)';
+    X.lineWidth = 4;
+    X.stroke();
+
+    X.font = '800 80px "DM Sans"';
+    X.fillStyle = '#e2e8f0';
+    X.textAlign = 'center';
+    X.textBaseline = 'middle';
+    X.fillText(totalStr, 0, 4);
+
+    X.restore();
+  }
+}
+
+// ─── Column titles ───
+function drawColTitle(text, cx, alpha){
+  if(alpha <= 0) return;
+  X.save();
+  X.globalAlpha = alpha;
+  X.font = '700 42px "DM Sans"';
+  X.fillStyle = '#94a3b8';
+  X.textAlign = 'center';
+  X.textBaseline = 'top';
+  X.fillText(text, cx, 370);
+  X.restore();
+}
+
+// ─── Frame ───
+function frame(ts){
+  if(!startTime) startTime = ts;
+  const now = (ts - startTime) / 1000;
+
+  X.clearRect(0,0,W,H);
+  drawBG();
+
+  // title
+  const titleT = easeOutExpo(t(now, 0, 1.0));
+  drawTitle(titleT, lerp(-50, 0, titleT));
+
+  // left title
+  drawColTitle('Traditional Commercial Off-The-Shelf', LEFT_CX, easeOutExpo(t(now, 0.8, 1.5)));
+
+  // left pie
+  drawPie(LEFT_CX, PIE_CY, PIE_R, leftAngles, leftTotal,
+    easeInOutCubic(t(now, 1.2, 3.5)),
+    easeOutExpo(t(now, 3.0, 4.0)),
+    clamp01(t(now, 3.2, 4.0)),
+    '13M');
+
+  // right title
+  drawColTitle('Modern Ops Open-Source', RIGHT_CX, easeOutExpo(t(now, 4.2, 5.0)));
+
+  // right pie
+  drawPie(RIGHT_CX, PIE_CY, PIE_R, rightAngles, rightTotal,
+    easeInOutCubic(t(now, 4.5, 6.5)),
+    easeOutExpo(t(now, 6.0, 7.0)),
+    clamp01(t(now, 6.2, 7.0)),
+    '1.9M');
+
+  // ── Savings badge ──
+  const badgeT = easeOutElastic(t(now, 7.2, 8.5));
+  if(badgeT > 0){
+    const bcx = W/2, bcy = PIE_CY;
+    X.save();
+    X.translate(bcx, bcy);
+    X.scale(badgeT, badgeT);
+
+    const glow = X.createRadialGradient(0,0,70,0,0,160);
+    glow.addColorStop(0, 'rgba(5,150,105,0.3)');
+    glow.addColorStop(1, 'rgba(5,150,105,0)');
+    X.beginPath();
+    X.arc(0,0,160,0,Math.PI*2);
+    X.fillStyle = glow;
+    X.fill();
+
+    X.beginPath();
+    X.arc(0, 0, 120, 0, Math.PI*2);
+    const grd = X.createRadialGradient(0,-40,20,0,40,120);
+    grd.addColorStop(0, '#10b981');
+    grd.addColorStop(1, '#047857');
+    X.fillStyle = grd;
+    X.shadowColor = 'rgba(5,150,105,0.5)';
+    X.shadowBlur = 60;
+    X.fill();
+    X.shadowBlur = 0;
+
+    X.beginPath();
+    X.arc(0, 0, 120, 0, Math.PI*2);
+    X.strokeStyle = 'rgba(255,255,255,0.3)';
+    X.lineWidth = 5;
+    X.stroke();
+
+    X.font = '800 88px "DM Sans"';
+    X.fillStyle = '#fff';
+    X.textAlign = 'center';
+    X.textBaseline = 'middle';
+    X.fillText('-85%', 0, -10);
+
+    X.font = '600 24px "DM Sans"';
+    X.fillStyle = 'rgba(255,255,255,0.85)';
+    X.fillText('COST REDUCTION', 0, 48);
+
+    X.restore();
+
+    // pulsing arrows
+    const arrowA = clamp01(t(now, 8.0, 8.5));
+    if(arrowA > 0){
+      X.save();
+      const pulse = Math.sin(now * 2.5) * 0.3 + 0.7;
+      for(let i=0;i<3;i++){
+        X.globalAlpha = arrowA * pulse * (1 - i*0.28);
+        X.font = '700 56px "DM Sans"';
+        X.fillStyle = '#059669';
+        X.textAlign = 'center';
+        X.fillText('›', bcx - 165 - i*48, bcy + 6);
+        X.fillText('›', bcx + 165 + i*48, bcy + 6);
+      }
+      X.restore();
+    }
+  }
+
+  requestAnimationFrame(frame);
+}
+
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

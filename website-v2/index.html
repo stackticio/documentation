@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stacktic — website v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#2A2847;--purple:#a78bfa;--cyan:#60d5ff;--amber:#fbbf24;--green:#34d399;
+  --white:#fff;--s3:#cbd5e1;--s4:#94a3b8;--s5:#64748b;--hair2:rgba(255,255,255,.14);
+  --font:'Fira Code',ui-monospace,monospace}
+html{scrollbar-width:none}html::-webkit-scrollbar{display:none}
+body{font-family:var(--font);min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:60px 24px;color:var(--s3);
+  background:radial-gradient(ellipse at 20% 0%,rgba(167,139,250,.12),transparent 50%),
+             radial-gradient(ellipse at 80% 100%,rgba(96,213,255,.10),transparent 50%),var(--bg)}
+.wrap{max-width:1080px;width:100%;text-align:center}
+h1{font-size:clamp(26px,4vw,44px);font-weight:700;color:var(--white);letter-spacing:-.035em;line-height:1.15}
+.gr{background:linear-gradient(120deg,var(--purple),var(--cyan) 52%,var(--green));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+p.s{margin-top:20px;font-size:14px;line-height:1.8;color:var(--s4)}
+.g{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:48px;text-align:left}
+a{display:block;text-decoration:none;color:inherit;border-radius:14px;padding:24px 22px;
+  background:linear-gradient(165deg,color-mix(in srgb,var(--c) 14%,#241f42),#1b1735);
+  border:1px solid color-mix(in srgb,var(--c) 30%,transparent);
+  transition:transform .45s cubic-bezier(.2,.8,.2,1),border-color .4s,box-shadow .4s}
+a:hover{transform:translateY(-6px);border-color:color-mix(in srgb,var(--c) 60%,transparent);
+  box-shadow:0 30px 60px -34px #000,0 0 40px -18px var(--c)}
+a b{font-size:9.5px;letter-spacing:.22em;color:var(--c);display:block}
+a h2{font-size:19px;color:var(--white);margin-top:12px;font-weight:700;letter-spacing:-.02em}
+a p{font-size:12px;line-height:1.65;color:var(--s4);margin-top:9px}
+a u{display:block;margin-top:16px;font-size:10px;letter-spacing:.18em;color:var(--c);text-decoration:none}
+.n{margin-top:40px;font-size:10.5px;letter-spacing:.16em;color:var(--s5);line-height:2}
+@media(max-width:900px){.g{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.g{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Five pages.<br><span class="gr">One argument.</span></h1>
+  <p class="s">Each page is one self-contained HTML file — one full-width Wix embed.</p>
+
+  <div class="g">
+    <a style="--c:var(--amber)" href="home/home.html">
+      <b>01</b><h2>Home</h2>
+      <p>A live topology that builds, breaks under scale, then holds. Six acts, one scroll.</p>
+      <u>OPEN →</u>
+    </a>
+    <a style="--c:var(--red,#ff4d6d)" href="solution/solution.html">
+      <b>02</b><h2>Solution</h2>
+      <p>Day two. The blast radius of one version bump — found late, or calculated first.</p>
+      <u>OPEN →</u>
+    </a>
+    <a style="--c:var(--cyan)" href="product/product.html">
+      <b>03</b><h2>Product</h2>
+      <p>Pick a feature — log in, photos, search. Watch what has to be built underneath it.</p>
+      <u>OPEN →</u>
+    </a>
+    <a style="--c:var(--green)" href="vision/vision.html">
+      <b>04</b><h2>Vision</h2>
+      <p>Not one stack — an app factory. Stacks linked across clusters, and moved through time.</p>
+      <u>OPEN →</u>
+    </a>
+    <a style="--c:var(--purple)" href="demo/demo.html">
+      <b>05</b><h2>Demo</h2>
+      <p>Three videos. The AI framework explained, the same automation by hand, then validation by metadata.</p>
+      <u>OPEN →</u>
+    </a>
+  </div>
+
+  <div class="n">fira code · #2a2847 · the stacktic font and background<br>
+    every diagram is built from data in the page — nothing is a picture</div>
+</div>
+</body>
+</html>

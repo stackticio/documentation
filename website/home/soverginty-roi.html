@@ -1,0 +1,2160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IT Sovereignty ROI Calculator — Stacktic</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --primary: #667eea;
+      --primary-dark: #5568d3;
+      --secondary: #764ba2;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+      --sovereignty: #1e3a5f;
+      --sovereignty-light: #2d5a8e;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #312e81 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: var(--gray-900);
+      line-height: 1.6;
+    }
+
+    .container { max-width: 1600px; margin: 0 auto; }
+
+    /* Header */
+    .header {
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      margin-bottom: 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    }
+    .header h1 {
+      font-size: 36px;
+      background: linear-gradient(135deg, var(--sovereignty), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 15px;
+      font-weight: 800;
+    }
+    .header-subtitle { font-size: 18px; color: var(--gray-600); margin-bottom: 25px; }
+    .methodology-note {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border-left: 4px solid var(--sovereignty);
+      padding: 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    .methodology-note strong { color: var(--sovereignty); display: block; margin-bottom: 10px; font-size: 16px; }
+
+    /* Cards */
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--gray-100);
+    }
+    .card-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--gray-900);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Badges */
+    .badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: inline-block;
+    }
+    .badge-excellent { background: #d1fae5; color: #065f46; }
+    .badge-good { background: #dbeafe; color: #1e40af; }
+    .badge-medium { background: #fef3c7; color: #92400e; }
+    .badge-low { background: #fee2e2; color: #991b1b; }
+    .badge-parity {
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+    }
+
+    /* Step Indicator */
+    .steps {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+      background: white;
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+    .step-indicator {
+      flex: 1;
+      text-align: center;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--gray-400);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .step-indicator.active {
+      background: linear-gradient(135deg, var(--sovereignty), var(--secondary));
+      color: white;
+      box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
+    }
+    .step-indicator.completed { color: var(--success); }
+    .step-content { display: none; }
+    .step-content.active { display: block; }
+
+    /* Form Elements */
+    .form-group { margin-bottom: 20px; }
+    .form-label {
+      display: block;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--gray-700);
+      margin-bottom: 8px;
+    }
+    .form-label-info { font-weight: 400; color: var(--gray-500); font-size: 13px; margin-left: 5px; }
+    .form-input, .form-select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--gray-200);
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      background: white;
+    }
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+    .slider-container { display: flex; align-items: center; gap: 15px; }
+    .slider-container input[type="range"] { flex: 1; }
+    .slider-value { min-width: 80px; text-align: right; font-weight: 700; font-size: 18px; color: var(--sovereignty); }
+
+    /* Tool Table */
+    .tool-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .tool-table th, .tool-table td {
+      padding: 10px 8px;
+      text-align: left;
+      border-bottom: 1px solid var(--gray-200);
+      vertical-align: middle;
+    }
+    .tool-table th {
+      background: var(--gray-50);
+      font-weight: 600;
+      color: var(--gray-700);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .tool-table tr:hover { background: var(--gray-50); }
+    .tool-table tr.disabled { opacity: 0.4; }
+    .tool-table input[type="number"], .tool-table input[type="text"] {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid var(--gray-300);
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    .tool-table input:focus { outline: none; border-color: var(--primary); }
+    .tool-table input[type="range"] { width: 70px; vertical-align: middle; }
+
+    /* Toggle Switch */
+    .toggle { position: relative; width: 44px; height: 24px; cursor: pointer; display: inline-block; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--gray-300);
+      border-radius: 24px;
+      transition: 0.3s;
+    }
+    .toggle-slider::before {
+      content: "";
+      position: absolute;
+      width: 18px; height: 18px;
+      left: 3px; bottom: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+    .toggle input:checked + .toggle-slider { background: var(--success); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+    /* Compromise tooltip */
+    .compromise-cell { position: relative; cursor: help; }
+    .compromise-detail {
+      display: none;
+      position: absolute;
+      bottom: 100%;
+      left: 0;
+      width: 350px;
+      background: var(--gray-900);
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.6;
+      z-index: 100;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    .compromise-cell:hover .compromise-detail { display: block; }
+    .compromise-detail ul { margin: 8px 0 0 16px; }
+    .compromise-detail li { margin-bottom: 4px; }
+    .compromise-detail strong { color: var(--warning); }
+
+    /* Metric Cards */
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+    .metric-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+      border-left: 4px solid var(--primary);
+      transition: all 0.3s ease;
+    }
+    .metric-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); }
+    .metric-label {
+      font-size: 12px; font-weight: 600; color: var(--gray-600);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;
+    }
+    .metric-value { font-size: 32px; font-weight: 700; color: var(--gray-900); margin-bottom: 5px; line-height: 1; }
+    .metric-sub { font-size: 13px; color: var(--gray-500); }
+
+    /* Results Hero */
+    .results-hero {
+      background: linear-gradient(135deg, var(--sovereignty) 0%, var(--secondary) 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 50px;
+      text-align: center;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 40px rgba(30, 58, 95, 0.3);
+    }
+    .results-hero h2 { font-size: 22px; font-weight: 600; margin-bottom: 20px; opacity: 0.9; }
+    .roi-amount { font-size: 64px; font-weight: 800; margin-bottom: 10px; text-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+    .roi-subtitle { font-size: 16px; opacity: 0.85; }
+
+    /* Gains & Compromises */
+    .gains-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+    .gain-card {
+      padding: 20px;
+      border-radius: 10px;
+      border-left: 4px solid var(--success);
+      background: #f0fdf4;
+    }
+    .gain-card h4 { color: #065f46; margin-bottom: 8px; font-size: 15px; }
+    .gain-card p { color: #166534; font-size: 13px; }
+    .compromise-card {
+      padding: 20px;
+      border-radius: 10px;
+      border-left: 4px solid var(--warning);
+      background: #fffbeb;
+    }
+    .compromise-card h4 { color: #92400e; margin-bottom: 8px; font-size: 15px; }
+    .compromise-card p { color: #a16207; font-size: 13px; }
+
+    /* Year ROI Table */
+    .roi-table { width: 100%; border-collapse: collapse; }
+    .roi-table th, .roi-table td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--gray-200); }
+    .roi-table th {
+      background: var(--gray-50); font-weight: 600; font-size: 13px;
+      color: var(--gray-600); text-transform: uppercase;
+    }
+    .roi-table td { font-size: 15px; }
+    .roi-table .total-row { font-weight: 700; background: #f0fdf4; }
+    .roi-table .negative { color: var(--danger); }
+    .roi-table .positive { color: var(--success); }
+
+    /* Charts */
+    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+    .chart-container { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+    .chart-container h3 { font-size: 16px; margin-bottom: 15px; color: var(--gray-800); }
+    .chart-container canvas { max-height: 300px; }
+
+    /* Tool Comparison Cards (detail view) */
+    .tool-cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; margin-bottom: 30px; }
+    .tool-detail-card {
+      background: white; border-radius: 12px; padding: 24px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06); border-top: 4px solid var(--primary);
+    }
+    .tool-detail-card h4 { font-size: 16px; margin-bottom: 4px; }
+    .tool-detail-card .saas-vs-oss { font-size: 13px; color: var(--gray-500); margin-bottom: 12px; }
+    .tool-detail-card .compromises-list { list-style: none; padding: 0; margin: 12px 0; }
+    .tool-detail-card .compromises-list li {
+      padding: 6px 0; font-size: 13px; color: var(--gray-700);
+      border-bottom: 1px solid var(--gray-100);
+      padding-left: 20px;
+      position: relative;
+    }
+    .tool-detail-card .compromises-list li::before {
+      content: "!"; position: absolute; left: 0;
+      color: var(--warning); font-weight: 700;
+    }
+    .tool-detail-card .real-deployments {
+      background: var(--gray-50); border-radius: 6px; padding: 10px;
+      font-size: 12px; color: var(--gray-600); margin-top: 10px;
+    }
+
+    /* Expandable */
+    .expandable-header {
+      cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+      padding: 20px 30px; background: white; border-radius: 12px; margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08); font-weight: 700; font-size: 18px; color: var(--gray-800);
+    }
+    .expandable-header:hover { background: var(--gray-50); }
+    .expandable-header .arrow { transition: transform 0.3s; font-size: 20px; }
+    .expandable-header.open .arrow { transform: rotate(180deg); }
+    .expandable-body { display: none; }
+    .expandable-body.open { display: block; }
+
+    /* Navigation Buttons */
+    .nav-buttons { display: flex; justify-content: space-between; margin-top: 30px; }
+    .btn {
+      padding: 14px 32px; border: none; border-radius: 8px; font-size: 15px;
+      font-weight: 600; cursor: pointer; transition: all 0.3s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--sovereignty), var(--secondary));
+      color: white; box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(30, 58, 95, 0.4); }
+    .btn-secondary { background: var(--gray-200); color: var(--gray-700); }
+    .btn-secondary:hover { background: var(--gray-300); }
+
+    /* Integration Value */
+    .integration-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+    .integration-item {
+      padding: 15px; border-radius: 8px;
+      background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      border-left: 3px solid var(--sovereignty);
+    }
+    .integration-item strong { font-size: 13px; color: var(--sovereignty); display: block; margin-bottom: 4px; }
+    .integration-item span { font-size: 12px; color: var(--gray-600); }
+
+    @media (max-width: 768px) {
+      .header { padding: 20px; }
+      .header h1 { font-size: 24px; }
+      .gains-grid, .charts-grid { grid-template-columns: 1fr; }
+      .tool-table { font-size: 11px; }
+      .tool-table th, .tool-table td { padding: 6px 4px; }
+      .roi-amount { font-size: 40px; }
+      .results-hero { padding: 30px; }
+      .steps { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <h1>IT Sovereignty ROI Calculator</h1>
+    <p class="header-subtitle">
+      Calculate the true cost and impact of replacing SaaS vendor tools with sovereign open-source alternatives, managed by Stacktic on Kubernetes.
+    </p>
+    <div class="methodology-note">
+      <strong>Methodology &amp; Data Sources</strong>
+      <strong style="font-size:14px;margin-top:8px">Pricing:</strong> Default SaaS prices are based on publicly listed vendor pricing pages (March 2026). Where vendors don't publish pricing (e.g., ServiceNow), we use industry analyst estimates and note this explicitly. All prices are editable — adjust to match your actual contracts.<br>
+      <strong style="font-size:14px;margin-top:8px">Feature Parity:</strong> Two scores per tool. <em>Core</em> = coverage of daily-use features (communication, data entry, reporting, admin) based on feature-by-feature comparison against vendor documentation. <em>Full</em> = coverage of the entire vendor ecosystem including marketplace, AI, niche modules. Scores are internal assessments, not third-party audits — treat as directional, not absolute.<br>
+      <strong style="font-size:14px;margin-top:8px">Migration Hours:</strong> Estimates cover data migration effort only (Stacktic handles deployment and configuration). Based on typical mid-market implementations. Actual hours vary significantly by data volume, customizations, and integrations. Shown as single estimates — plan ±50% variance.<br>
+      <strong style="font-size:14px;margin-top:8px">Infrastructure:</strong> Node costs based on GKE e2-standard-4 (4 vCPU, 16GB RAM) at ~$350/mo including persistent disks and network. Ops overhead set at 20% of infra cost, covering monitoring, patching, and incident response for a Stacktic-managed environment (vs. 40-60% for unmanaged self-hosting).<br>
+      <strong style="font-size:14px;margin-top:8px">Ramp-Up:</strong> Year 1: 40%, Year 2: 75%, Year 3: 95% of tools migrated. Based on typical enterprise migration timelines where tools are migrated in phases, not all at once. Adjust expectations based on your team's capacity.<br>
+      <span style="margin-top:10px;display:block;padding:10px;background:rgba(30,58,95,0.08);border-radius:6px;font-weight:600;color:var(--sovereignty)">All values are editable. Default numbers are starting points — always adjust to match your actual vendor contracts and environment.</span>
+    </div>
+  </div>
+
+  <!-- Step Indicators -->
+  <div class="steps">
+    <div class="step-indicator active" onclick="goToStep(1)">Step 1: Company Profile</div>
+    <div class="step-indicator" onclick="goToStep(2)">Step 2: Tool Selection & Migration</div>
+    <div class="step-indicator" onclick="goToStep(3)">Step 3: Results</div>
+  </div>
+
+  <!-- STEP 1: Company Profile -->
+  <div class="step-content active" id="step-1">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Company Profile</div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Scenario</label>
+          <select class="form-select" id="scenario" onchange="toggleScenario(); calculate()">
+            <option value="sovereignty">IT Sovereignty</option>
+            <option value="carveout">M&A Carve-Out</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Number of Employees</label>
+          <div class="slider-container">
+            <input type="range" id="employees" min="10" max="20000" value="500" step="10" oninput="updateEmployeeDisplay(); calculate();">
+            <div class="slider-value" id="employees-display">500</div>
+          </div>
+          <input type="number" id="employees-input" value="500" min="10" max="100000" style="margin-top:8px"
+            oninput="document.getElementById('employees').value=Math.min(this.value,20000); updateEmployeeDisplay(); calculate();">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Region <span class="form-label-info">(affects sovereignty urgency)</span></label>
+          <select class="form-select" id="region" onchange="calculate()">
+            <option value="eu">European Union (GDPR)</option>
+            <option value="gov">Government / Regulated</option>
+            <option value="us">United States</option>
+            <option value="apac">Asia Pacific</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Industry</label>
+          <select class="form-select" id="industry" onchange="calculate()">
+            <option value="tech">Technology</option>
+            <option value="finance">Finance / Banking</option>
+            <option value="healthcare">Healthcare</option>
+            <option value="manufacturing">Manufacturing</option>
+            <option value="government">Government / Public Sector</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Internal Hourly Rate <span class="form-label-info">(for migration cost calc)</span></label>
+          <input type="number" class="form-input" id="hourly-rate" value="150" min="50" max="500" oninput="calculate()">
+        </div>
+      </div>
+
+      <!-- Carve-Out Fields (hidden by default) -->
+      <div id="carveout-fields" style="display:none;margin-top:20px;">
+        <div style="padding:20px;background:linear-gradient(135deg,#fef3c7,#fff7ed);border-radius:12px;border:2px solid #f59e0b;margin-bottom:20px">
+          <h3 style="font-size:16px;color:#92400e;margin-bottom:8px">M&A Carve-Out Parameters</h3>
+          <p style="font-size:13px;color:#a16207;margin-bottom:15px">When a division is carved out, it inherits the parent's IT stack — often oversized and over-licensed. The goal is to stand up an independent, right-sized IT environment before the TSA expires.</p>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Parent Company Employees <span class="form-label-info">(the org you're separating from)</span></label>
+              <input type="number" class="form-input" id="parent-employees" value="10000" min="100" max="500000" oninput="calculate()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">TSA Monthly Cost <span class="form-label-info">(what parent charges for IT services)</span></label>
+              <div style="display:flex;align-items:center;gap:8px">
+                <input type="number" class="form-input" id="tsa-monthly" value="150000" min="0" max="10000000" oninput="calculate()">
+                <span style="font-size:12px;color:var(--gray-500);white-space:nowrap">$/month</span>
+              </div>
+              <div style="margin-top:4px;font-size:11px;color:var(--gray-500)">Typically 110-130% of actual IT cost. Parent has no incentive to reduce.</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">TSA Duration Remaining <span class="form-label-info">(deadline to exit)</span></label>
+              <div style="display:flex;align-items:center;gap:8px">
+                <input type="number" class="form-input" id="tsa-months" value="18" min="3" max="36" oninput="calculate()">
+                <span style="font-size:12px;color:var(--gray-500);white-space:nowrap">months</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">EBITDA Multiple <span class="form-label-info">(for valuation impact)</span></label>
+              <div style="display:flex;align-items:center;gap:8px">
+                <input type="number" class="form-input" id="ebitda-multiple" value="10" min="1" max="30" step="0.5" oninput="calculate()">
+                <span style="font-size:12px;color:var(--gray-500);white-space:nowrap">&times; multiple</span>
+              </div>
+              <div style="margin-top:4px;font-size:11px;color:var(--gray-500)">PE firms typically value at 8-12x EBITDA. IT cost reduction directly increases valuation.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Stacktic Migration Services <span class="form-label-info">(Stacktic experts handle your entire migration)</span></label>
+          <select class="form-select" id="stacktic-ps" onchange="calculate()">
+            <option value="15000" selected>Starter ($15K — up to 5 tools)</option>
+            <option value="40000">Standard ($40K — up to 10 tools)</option>
+            <option value="80000">Enterprise ($80K — full stack + custom integrations)</option>
+          </select>
+          <div style="margin-top:6px;font-size:12px;color:var(--gray-500);line-height:1.6">
+            Stacktic specialists handle IT process mapping, migration planning, tool configuration, data migration, integration wiring, and user onboarding. You don't need an IT team.
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Your Internal Coordination Hours <span class="form-label-info">(reviews, approvals & feedback)</span></label>
+          <input type="number" class="form-input" id="it-planning-hours" value="40" min="0" max="2000" oninput="calculate()">
+          <div style="margin-top:6px;font-size:12px;color:var(--gray-500)">
+            Your team's time for approvals, feedback, and acceptance testing — Stacktic handles the technical work.
+          </div>
+        </div>
+      </div>
+      <!-- How Stacktic Saves You Money -->
+      <div style="margin-top:25px;padding:25px;background:linear-gradient(135deg,#f0fdf4,#dbeafe);border-radius:12px;border:1px solid var(--gray-200)">
+        <h3 style="font-size:18px;color:var(--sovereignty);margin-bottom:8px">How Does Stacktic Save You Money?</h3>
+        <p style="font-size:14px;color:var(--gray-600);margin-bottom:18px">Stacktic replaces your SaaS vendor subscriptions with open-source tools running on your own infrastructure. Here's the difference:</p>
+        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:stretch">
+          <div style="padding:18px;background:white;border-radius:8px;border-left:4px solid var(--danger)">
+            <div style="font-size:13px;font-weight:700;color:#991b1b;text-transform:uppercase;margin-bottom:10px">What You Pay Today</div>
+            <div style="font-size:14px;color:var(--gray-800);line-height:1.8">
+              You pay SaaS vendors like Salesforce, Slack, and Google a <strong>per-employee monthly fee</strong> for each tool.<br>
+              <span style="font-size:13px;color:var(--gray-500)">Example: Salesforce charges $80/user/month. For 150 CRM users, that's <strong>$144,000/year</strong> — just for CRM.</span>
+            </div>
+            <div style="margin-top:12px;padding:10px;background:#fef2f2;border-radius:6px;font-size:13px;color:#991b1b;font-weight:600">
+              Hire 100 more people? Your SaaS bill goes up by $10K-$100K/year.
+            </div>
+          </div>
+          <div style="font-size:32px;color:var(--sovereignty);font-weight:800;display:flex;align-items:center">&rarr;</div>
+          <div style="padding:18px;background:white;border-radius:8px;border-left:4px solid var(--success)">
+            <div style="font-size:13px;font-weight:700;color:#065f46;text-transform:uppercase;margin-bottom:10px">What You Pay With Stacktic</div>
+            <div style="font-size:14px;color:var(--gray-800);line-height:1.8">
+              You pay for <strong>server infrastructure</strong> (Kubernetes cluster) + <strong>Stacktic license</strong>. That's it.<br>
+              <span style="font-size:13px;color:var(--gray-500)">The same cluster runs CRM, Email, Chat, BI, and more. Adding more users costs almost nothing.</span>
+            </div>
+            <div style="margin-top:12px;padding:10px;background:#f0fdf4;border-radius:6px;font-size:13px;color:#065f46;font-weight:600">
+              Hire 100 more people? Your infrastructure cost stays the same.
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:18px;padding:14px;background:white;border-radius:8px;border:2px solid var(--sovereignty)">
+          <div style="font-size:15px;color:var(--sovereignty);font-weight:700;margin-bottom:6px">What does Stacktic actually do?</div>
+          <div style="font-size:13px;color:var(--gray-700);line-height:1.7">
+            Stacktic is <strong>NOT just open-source tools</strong>. Without Stacktic, you'd need a team of DevOps engineers to install, configure, integrate, secure, update, and monitor every tool.
+            Stacktic automates all of that: <strong>one-click deployment</strong>, shared SSO (single login for all tools), unified monitoring, automated security patches, backups, and Day 2 operations.
+            You get the savings of self-hosting without the pain of managing it yourself.
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <div></div>
+        <button class="btn btn-primary" onclick="goToStep(2)">Next: Select Your Tools &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: Tool Selection & Migration -->
+  <div class="step-content" id="step-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Your IT Tool Ecosystem</div>
+        <div style="font-size:13px;color:var(--gray-500);">Toggle on the tools you currently use. Adjust pricing and usage to match your org. Hover compromises for details.</div>
+        <div style="margin-top:12px;padding:12px 16px;background:#eff6ff;border-radius:8px;border:1px solid #bfdbfe;font-size:13px;color:#1e40af;line-height:1.6">
+          <strong>How to read this table:</strong> Not every employee uses every tool. For example, all 500 employees use Email (100%), but only 150 use CRM (30%).
+          The <strong>"How Many Use It"</strong> column sets how many employees use each tool — this determines your SaaS cost.<br>
+          <strong>Coverage has two numbers:</strong> <span style="background:#22c55e;color:white;padding:1px 6px;border-radius:4px;font-size:11px;font-weight:700">Core</span> = coverage of features most orgs use daily, including Stacktic integrations (SSO, monitoring, backups, storage).
+          <span style="color:var(--gray-500)">/ Full</span> = coverage of the entire vendor ecosystem (marketplace apps, AI features, niche modules).<br>
+          <strong>Pricing (*):</strong> Defaults from vendor pricing pages (March 2026). Where vendors don't publish pricing (ServiceNow, Workday), analyst estimates are used. <strong>Always adjust $/User/Mo to match your actual contracts.</strong>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="tool-table" id="tool-table">
+          <thead>
+            <tr>
+              <th style="width:40px">Use</th>
+              <th>Category</th>
+              <th style="width:130px">Current Vendor</th>
+              <th style="width:80px" title="Default prices from vendor pricing pages (March 2026). Where pricing is not published, analyst estimates are used. Always adjust to match your actual contract.">$/User/Mo *</th>
+              <th style="width:130px" title="How many of your employees actively use this tool? Example: 100% use email, but only 30% use CRM">How Many Use It</th>
+              <th style="width:100px" title="Your annual SaaS cost for this tool based on users and price">Your Annual Cost</th>
+              <th>OSS Alternative</th>
+              <th style="width:120px" title="Core = coverage of features most orgs use daily (with Stacktic SSO, monitoring, backups). Full = coverage of entire vendor ecosystem including niche features, marketplace, AI">Coverage (Core / Full)</th>
+              <th style="width:70px">Maturity</th>
+              <th style="width:80px" title="How hard is it to replace this tool? Accounts for integrations, data migration, user retraining, and ecosystem dependencies">Complexity</th>
+              <th style="width:180px">Key Differences</th>
+              <th style="width:90px" title="Data migration effort only — Stacktic handles deployment, configuration, SSO wiring, and monitoring automatically. Estimates based on typical mid-market implementations. Plan ±50% variance based on data volume and customizations.">Migration Hrs (±50%)</th>
+            </tr>
+          </thead>
+          <tbody id="tool-table-body"></tbody>
+        </table>
+      </div>
+
+      <!-- Cost Summary in Step 2 -->
+      <div id="step2-cost-summary" style="margin-top:20px;display:grid;grid-template-columns:1fr auto 1fr;gap:15px;align-items:stretch">
+        <div style="padding:18px;background:#fef2f2;border-radius:10px;border:2px solid #fecaca">
+          <div style="font-size:12px;font-weight:700;color:#991b1b;text-transform:uppercase;margin-bottom:6px">Your Total SaaS Cost</div>
+          <div style="font-size:28px;font-weight:800;color:#991b1b" id="step2-saas-total">$0/yr</div>
+          <div style="font-size:12px;color:var(--gray-500);margin-top:4px">Per-user licensing across all enabled tools</div>
+        </div>
+        <div style="font-size:24px;color:var(--sovereignty);font-weight:800;display:flex;align-items:center">vs</div>
+        <div style="padding:18px;background:#f0fdf4;border-radius:10px;border:2px solid #bbf7d0">
+          <div style="font-size:12px;font-weight:700;color:#065f46;text-transform:uppercase;margin-bottom:6px">Stacktic Self-Hosted Cost</div>
+          <div style="font-size:28px;font-weight:800;color:#065f46" id="step2-self-total">$0/yr</div>
+          <div style="font-size:12px;color:var(--gray-500);margin-top:4px">
+            <span id="step2-infra-detail"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Per-Tool Migration Timeline -->
+      <div id="migration-timeline" style="margin-top:20px"></div>
+
+      <div class="nav-buttons">
+        <button class="btn btn-secondary" onclick="goToStep(1)">&larr; Back</button>
+        <button class="btn btn-primary" onclick="goToStep(3)">See Results &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4: Results -->
+  <div class="step-content" id="step-3">
+
+    <!-- Where Savings Come From -->
+    <div class="card" style="border-left:4px solid var(--sovereignty)">
+      <div class="card-header">
+        <div class="card-title">Your SaaS Bill vs Self-Hosted Cost</div>
+        <div style="font-size:13px;color:var(--gray-500)">This is where the savings come from — your current per-user SaaS licensing vs fixed infrastructure cost</div>
+      </div>
+      <div id="savings-equation"></div>
+    </div>
+
+    <!-- Hero -->
+    <div class="results-hero" id="results-hero">
+      <h2>Estimated 3-Year Net Savings</h2>
+      <div class="roi-amount" id="roi-3yr">$0</div>
+      <div class="roi-subtitle" id="roi-payback">Payback period: calculating...</div>
+    </div>
+
+    <!-- Carve-Out Results (hidden by default) -->
+    <div id="carveout-results" style="display:none">
+      <!-- TSA vs Stacktic -->
+      <div class="card" style="border-left:4px solid #f59e0b;margin-bottom:20px">
+        <div class="card-header">
+          <div class="card-title">M&A Carve-Out Impact</div>
+          <div style="font-size:13px;color:var(--gray-500)">Why exiting the TSA fast directly increases enterprise valuation</div>
+        </div>
+        <div class="metrics-grid" style="margin-bottom:0">
+          <div class="metric-card" style="border-left-color:#f59e0b">
+            <div class="metric-label">TSA Burn (Total Remaining)</div>
+            <div class="metric-value" id="metric-tsa-burn" style="color:#991b1b">$0</div>
+            <div class="metric-sub" id="metric-tsa-burn-sub">$0/mo x 0 months remaining</div>
+          </div>
+          <div class="metric-card" style="border-left-color:var(--success)">
+            <div class="metric-label">Annual Savings (TSA Exit)</div>
+            <div class="metric-value" id="metric-tsa-exit" style="color:#22c55e">$0</div>
+            <div class="metric-sub">TSA annual cost minus self-hosted annual cost</div>
+          </div>
+          <div class="metric-card" style="border-left-color:var(--secondary)">
+            <div class="metric-label">Valuation Impact (EBITDA)</div>
+            <div class="metric-value" id="metric-valuation" style="color:var(--secondary)">$0</div>
+            <div class="metric-sub" id="metric-valuation-sub">Annual savings x 0x multiple</div>
+          </div>
+          <div class="metric-card" style="border-left-color:var(--sovereignty)">
+            <div class="metric-label">TSA Timeline Fit</div>
+            <div class="metric-value" id="metric-timeline-fit" style="font-size:24px">—</div>
+            <div class="metric-sub" id="metric-timeline-sub">Migration vs TSA deadline</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Migration Timeline -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <div class="card-title">Migration Timeline vs TSA Deadline</div>
+        </div>
+        <div id="timeline-visual" style="position:relative;padding:20px 0"></div>
+      </div>
+
+      <!-- Carve-Out Comparison: Traditional vs Stacktic -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <div class="card-title">Traditional Integrator vs Stacktic</div>
+          <div style="font-size:13px;color:var(--gray-500)">Why carve-outs need automation, not consultants billing by the hour</div>
+        </div>
+        <table class="roi-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th style="background:#fef2f2;color:#991b1b">Traditional SI (Accenture, Deloitte, etc.)</th>
+              <th style="background:#f0fdf4;color:#065f46">Stacktic + AI</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Timeline</strong></td>
+              <td>9-12 months</td>
+              <td style="color:#065f46;font-weight:700">3-6 months</td>
+            </tr>
+            <tr>
+              <td><strong>Implementation cost</strong></td>
+              <td id="compare-si-cost">$500K-$2M (manual, billed hourly)</td>
+              <td id="compare-stacktic-cost" style="color:#065f46;font-weight:700">—</td>
+            </tr>
+            <tr>
+              <td><strong>Ongoing annual cost</strong></td>
+              <td id="compare-si-ongoing">New SaaS licensing at retail rates</td>
+              <td id="compare-stacktic-ongoing" style="color:#065f46;font-weight:700">—</td>
+            </tr>
+            <tr>
+              <td><strong>Data migration</strong></td>
+              <td>Manual ETL scripts, weeks of mapping</td>
+              <td style="color:#065f46;font-weight:700">AI-accelerated field mapping, automated transformation</td>
+            </tr>
+            <tr>
+              <td><strong>Vendor lock-in</strong></td>
+              <td>Moves you to new SaaS vendors (same problem)</td>
+              <td style="color:#065f46;font-weight:700">Open source, you own everything</td>
+            </tr>
+            <tr>
+              <td><strong>TSA deadline risk</strong></td>
+              <td style="color:#991b1b;font-weight:700">High — 9-12 months often exceeds TSA window</td>
+              <td style="color:#065f46;font-weight:700">Low — 3-6 months fits within most TSAs</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="metrics-grid">
+      <div class="metric-card" style="border-left-color:var(--danger)">
+        <div class="metric-label">Current Annual SaaS Spend</div>
+        <div class="metric-value" id="metric-saas">$0</div>
+        <div class="metric-sub" id="metric-saas-sub">0 tools enabled</div>
+      </div>
+      <div class="metric-card" style="border-left-color:var(--sovereignty)">
+        <div class="metric-label">Self-Hosted Annual Cost</div>
+        <div class="metric-value" id="metric-self">$0</div>
+        <div class="metric-sub" id="metric-self-sub">Infra + Platform + Ops</div>
+      </div>
+      <div class="metric-card" style="border-left-color:var(--success)">
+        <div class="metric-label">Annual Savings (at full adoption)</div>
+        <div class="metric-value" id="metric-savings">$0</div>
+        <div class="metric-sub" id="metric-savings-pct">0% reduction</div>
+      </div>
+      <div class="metric-card" style="border-left-color:var(--warning)">
+        <div class="metric-label">Total Migration Investment</div>
+        <div class="metric-value" id="metric-migration">$0</div>
+        <div class="metric-sub" id="metric-migration-hrs">0 total hours</div>
+      </div>
+    </div>
+
+    <!-- Per-Tool Licensing Breakdown -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Per-Tool Licensing Cost Breakdown</div>
+        <div style="font-size:13px;color:var(--gray-500)">Where each dollar of your current SaaS spend goes</div>
+      </div>
+      <div id="per-tool-breakdown"></div>
+    </div>
+
+    <!-- What You Gain vs Compromise -->
+    <div class="gains-grid">
+      <div>
+        <h3 style="margin-bottom:15px;color:var(--gray-800);">What You Gain</h3>
+        <div class="gain-card" style="margin-bottom:10px">
+          <h4>Data Sovereignty</h4>
+          <p>Your data stays in your infrastructure, your jurisdiction. Full control over where data lives and who accesses it.</p>
+        </div>
+        <div class="gain-card" style="margin-bottom:10px">
+          <h4>Zero Vendor Lock-in</h4>
+          <p>No contract traps, no price hikes, no forced migrations. You own the stack.</p>
+        </div>
+        <div class="gain-card" style="margin-bottom:10px">
+          <h4>Unified Platform</h4>
+          <p>All tools share Keycloak SSO, Prometheus/Grafana monitoring, LDAP directory. One login, one platform.</p>
+        </div>
+        <div class="gain-card">
+          <h4>Managed by Stacktic</h4>
+          <p>Stacktic handles versions, updates, and security for all tools together. Not DIY open-source chaos.</p>
+        </div>
+      </div>
+      <div>
+        <h3 style="margin-bottom:15px;color:var(--gray-800);">Honest Compromises</h3>
+        <div id="compromise-summary"></div>
+      </div>
+    </div>
+
+    <!-- 3-Year ROI Breakdown -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">3-Year ROI Breakdown</div>
+      </div>
+      <table class="roi-table" id="roi-breakdown-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Year 1<br><span style="font-weight:400;font-size:10px;text-transform:none">40% tools migrated</span></th>
+            <th>Year 2<br><span style="font-weight:400;font-size:10px;text-transform:none">75% tools migrated</span></th>
+            <th>Year 3<br><span style="font-weight:400;font-size:10px;text-transform:none">95% tools migrated</span></th>
+            <th>3-Year Total</th>
+          </tr>
+        </thead>
+        <tbody id="roi-breakdown-body"></tbody>
+      </table>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-grid">
+      <div class="chart-container">
+        <h3>Self-Hosted Annual Cost Breakdown</h3>
+        <canvas id="chart-cost-breakdown"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3>Cumulative Savings Over 3 Years</h3>
+        <canvas id="chart-cumulative"></canvas>
+      </div>
+    </div>
+
+    <!-- Per-Tool Cost Comparison Chart -->
+    <div class="card">
+      <div class="card-header"><div class="card-title">Per-Tool Annual Cost: SaaS vs Self-Hosted</div></div>
+      <canvas id="chart-per-tool" style="max-height:400px;"></canvas>
+    </div>
+
+    <!-- Infrastructure Detail -->
+    <div class="card">
+      <div class="card-header"><div class="card-title">Infrastructure Transparency</div></div>
+      <div id="infra-detail"></div>
+    </div>
+
+    <!-- Expandable: Detailed Tool Comparison -->
+    <div class="expandable-header" onclick="toggleExpand(this, 'detail-tools')">
+      Detailed Tool Comparisons (click to expand) <span class="arrow">&#9660;</span>
+    </div>
+    <div class="expandable-body" id="detail-tools">
+      <div class="tool-cards-grid" id="tool-cards"></div>
+    </div>
+
+    <!-- What Stacktic Automates -->
+    <div class="card">
+      <div class="card-header"><div class="card-title">What Stacktic Automates</div>
+        <div style="font-size:13px;color:var(--gray-500)">This is NOT DIY open-source. Stacktic handles the hard parts.</div>
+      </div>
+      <div class="integration-grid">
+        <div class="integration-item">
+          <strong>One-Click Deployment</strong>
+          <span>Deploy CRM, Email, Chat, Wiki, and more on your K8s cluster with production-ready templates. No manual Helm chart debugging.</span>
+        </div>
+        <div class="integration-item">
+          <strong>Pre-Wired SSO (Keycloak)</strong>
+          <span>Every tool auto-connects to Keycloak via SAML/OIDC/LDAP. One login for all apps. Add employee in HR → auto-provisioned everywhere.</span>
+        </div>
+        <div class="integration-item">
+          <strong>Nextcloud as Hub</strong>
+          <span>Files, Calendar, Contacts, Collabora doc editing, Jitsi video, Chat integration — all wired together. Your Google Workspace replacement.</span>
+        </div>
+        <div class="integration-item">
+          <strong>n8n Workflow Automation</strong>
+          <span>306 pre-built nodes connecting all apps. Deal closes in CRM → creates invoice in ERP → uploads contract to storage → notifies chat. No code needed.</span>
+        </div>
+        <div class="integration-item">
+          <strong>Shared Storage (SeaweedFS)</strong>
+          <span>All tools share S3-compatible object storage. CRM attachments, email archives, document storage — one unified, encrypted storage layer.</span>
+        </div>
+        <div class="integration-item">
+          <strong>Unified Monitoring</strong>
+          <span>Prometheus + Grafana dashboards auto-configured for every tool. Alerting, health checks, performance visibility across the entire stack.</span>
+        </div>
+        <div class="integration-item">
+          <strong>Managed Databases</strong>
+          <span>CNPG (PostgreSQL) and MariaDB Operator with automated backups, failover, and scaling. No manual DBA work.</span>
+        </div>
+        <div class="integration-item">
+          <strong>Day 2 Operations</strong>
+          <span>Version upgrades, security patches, certificate rotation, backup/restore, disaster recovery — automated via ArgoCD GitOps.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="goToStep(2)">&larr; Back to Tool Selection</button>
+      <button class="btn btn-primary" onclick="window.print()">Export / Print</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// TOOL DATA — Pricing from vendor websites, March 2026
+// Sources listed per tool. Where vendors don't publish pricing,
+// analyst estimates are used and marked accordingly.
+// ============================================================
+const TOOLS = [
+  {
+    // Source: salesforce.com/sales/pricing — Pro Suite $100, Enterprise $175
+    // Default $100 = Pro Suite (most common mid-market tier)
+    id: 'crm', category: 'CRM', saasVendor: 'Salesforce', pricePerUser: 100,
+    defaultAdoption: 30, ossAlt: 'SuiteCRM', parity: 38, coreParity: 75, maturity: 'Medium',
+    migrationHours: 120, enabled: true, nodeWeight: 1,
+    complexity: 'Medium', complexityNote: 'Export contacts, deals, and workflows from Salesforce. Import into SuiteCRM. Employees learn new interface (~2hrs).',
+    migrationPhases: [
+      { name: 'Data Export', days: 1, detail: 'Export contacts, deals, accounts, activities via Salesforce API' },
+      { name: 'Deploy & Configure', days: 1, detail: 'Stacktic deploys SuiteCRM, configures modules, custom fields, workflows' },
+      { name: 'Data Import & Mapping', days: 3, detail: 'AI-assisted field mapping, import records, validate relationships' },
+      { name: 'Integration Wiring', days: 2, detail: 'SSO (Keycloak), email sync, n8n workflows for automations' },
+      { name: 'UAT & Validation', days: 3, detail: 'Key users verify deals, contacts, reports. Fix edge cases' },
+      { name: 'Training', days: 2, detail: 'Sales team hands-on sessions, 1-2hrs per group' },
+      { name: 'Parallel Run', days: 10, detail: 'Both systems live, new deals in SuiteCRM, monitor for issues' },
+      { name: 'Cutover', days: 1, detail: 'Decommission Salesforce, final sync, DNS redirect' }
+    ],
+    topCompromise: 'Full CRM workflow engine; no AI predictions or AppExchange marketplace',
+    ossAdvantage: 'Full source code access — customize any workflow, field, or process without paying for "Enterprise" tier',
+    compromises: [
+      'Active community with growing plugin ecosystem (~200 and expanding); Salesforce has 7,000+ but most orgs use <20',
+      'AI/ML features not yet built-in \u2014 can integrate via n8n workflows to external AI services',
+      'Fully customizable source code \u2014 any field, workflow, or module can be tailored without Enterprise licensing',
+      'Migration via CSV export + field mapping; community tools improving'
+    ],
+    realDeployments: '5M+ users, 4.4K GitHub stars, 35K community collaborators, NHS England. 2M+ downloads lifetime. v8.9.3 (March 2026).'
+  },
+  {
+    // Source: NetSuite — $99-$150/user/mo (netsuite.com, custom quotes only)
+    // SAP Business One — not published. Default $130 = mid-range NetSuite estimate.
+    id: 'erp', category: 'ERP', saasVendor: 'SAP / NetSuite', pricePerUser: 130,
+    defaultAdoption: 10, ossAlt: 'ERPNext', parity: 30, coreParity: 65, maturity: 'Medium',
+    migrationHours: 400, enabled: false, nodeWeight: 2,
+    complexity: 'High', complexityNote: 'Map business processes to ERPNext modules. Migrate master data (customers, vendors, items, BOM). Heaviest data migration.',
+    migrationPhases: [
+      { name: 'Process Mapping', days: 5, detail: 'Map current ERP workflows, chart of accounts, BOM structures' },
+      { name: 'Deploy & Configure', days: 2, detail: 'Stacktic deploys ERPNext, configures company, warehouses, tax rules' },
+      { name: 'Master Data Import', days: 5, detail: 'Customers, vendors, items, BOM, pricing lists via API/CSV' },
+      { name: 'Transaction History', days: 5, detail: 'Import open orders, invoices, journal entries. AI-assisted reconciliation' },
+      { name: 'Integration Wiring', days: 3, detail: 'SSO, payment gateways, bank feeds, n8n workflows' },
+      { name: 'UAT & Validation', days: 5, detail: 'Finance team validates balances, generates test reports' },
+      { name: 'Training', days: 3, detail: 'Department-by-department: purchasing, sales, finance, warehouse' },
+      { name: 'Parallel Run', days: 20, detail: 'Run both ERPs in parallel for one accounting period' },
+      { name: 'Cutover', days: 2, detail: 'Final balance migration, close old system, go-live' }
+    ],
+    topCompromise: 'Unified HR + Manufacturing + CRM in one platform; localization best for India/MENA, growing elsewhere',
+    ossAdvantage: 'Built-in HR module (Frappe HR), manufacturing, CRM, website — unified platform vs buying 5 separate SAP modules',
+    compromises: [
+      'All-in-one platform: HR, Manufacturing, CRM, Accounting, Website in a single system \u2014 SAP sells these as separate expensive modules',
+      'Localization strongest for India/MENA, community-driven for EU/US and growing',
+      'Manufacturing covers BOM, work orders, quality; deep industry-specific modules still developing',
+      'Largest deployment: ~4,500 employees (Blinkit India), Nana Saudi (900 emp); growing into mid-market',
+      'MIT licensed, fully open \u2014 no vendor lock-in, no per-user fees'
+    ],
+    realDeployments: '10,000+ businesses, 31.4K GitHub stars, 30K+ ecosystem customers, 200+ partners. Blinkit, Nana Saudi. MIT license, v15.'
+  },
+  {
+    // Source: workspace.google.com/pricing — Business Standard $14/user/mo (annual)
+    // M365 Business Standard ~$12.50. Default $14 = Google Workspace Business Standard.
+    id: 'email', category: 'Email & Office', saasVendor: 'Google Workspace / M365', pricePerUser: 14,
+    defaultAdoption: 100, ossAlt: 'Nextcloud + OnlyOffice', parity: 65, coreParity: 80, maturity: 'Good',
+    migrationHours: 80, enabled: true, nodeWeight: 1.5,
+    complexity: 'Medium', complexityNote: 'Employees move mailboxes (imapsync), sync calendars and contacts. Install Nextcloud desktop/mobile app. ~1hr per employee.',
+    migrationPhases: [
+      { name: 'Deploy & Configure', days: 2, detail: 'Stacktic deploys Nextcloud Hub + mail server + OnlyOffice/Collabora' },
+      { name: 'DNS & Mail Setup', days: 1, detail: 'MX records, SPF/DKIM/DMARC, TLS certificates' },
+      { name: 'Mailbox Migration', days: 3, detail: 'imapsync bulk transfer, calendars via CalDAV, contacts via CardDAV' },
+      { name: 'File Migration', days: 2, detail: 'Google Drive/OneDrive bulk copy via rclone to Nextcloud' },
+      { name: 'Integration Wiring', days: 1, detail: 'SSO (Keycloak), shared storage, Collabora/OnlyOffice editor' },
+      { name: 'UAT & Validation', days: 2, detail: 'Verify mail delivery, calendar sync, file access, mobile apps' },
+      { name: 'Training', days: 2, detail: 'Install desktop/mobile sync client, Nextcloud UI walkthrough' },
+      { name: 'Parallel Run', days: 10, detail: 'Both systems receive mail (forwarding), employees transition' },
+      { name: 'Cutover', days: 1, detail: 'Switch MX records, disable old mailboxes' }
+    ],
+    topCompromise: '400+ apps, E2E encryption, unlimited storage; needs dedicated mail server for sending',
+    ossAdvantage: 'E2E encryption, CalDAV/CardDAV, 400+ apps, unlimited storage — Google charges extra for all of these',
+    compromises: [
+      'Nextcloud Hub = Files + Calendar + Contacts + Office + Talk + Mail client \u2014 true Google Workspace replacement',
+      'Real-time co-editing via Collabora/OnlyOffice works well; Stacktic pre-wires the integration',
+      'Mail server (Stalwart/Postfix) deployed separately \u2014 Stacktic automates the setup',
+      'E2E encryption, CalDAV/CardDAV, 400+ apps \u2014 features Google charges extra for'
+    ],
+    realDeployments: '500K+ servers worldwide, 20M+ users, 33.6K GitHub stars, 1,500+ contributors. French/German/Swedish/Dutch/Austrian govs, EU Commission. Hub 26.'
+  },
+  {
+    // Source: slack.com/pricing — Business+ $12.50/user/mo (annual). Pro $7.25.
+    // Default $12.50 = Business+ (most common for orgs with compliance needs).
+    id: 'comms', category: 'Communication', saasVendor: 'Slack / Teams', pricePerUser: 12.50,
+    defaultAdoption: 80, ossAlt: 'Mattermost', parity: 70, coreParity: 90, maturity: 'Excellent',
+    migrationHours: 20, enabled: true, nodeWeight: 1,
+    complexity: 'Low', complexityNote: 'Create channel structure. Employees log in via SSO and start chatting. History import optional.',
+    migrationPhases: [
+      { name: 'Deploy & Configure', days: 1, detail: 'Stacktic deploys Mattermost, configures teams and channels' },
+      { name: 'Channel Setup', days: 1, detail: 'Recreate channel structure from Slack/Teams export' },
+      { name: 'History Import', days: 1, detail: 'Optional: import Slack JSON export via mmetl tool' },
+      { name: 'Integration Wiring', days: 1, detail: 'SSO (Keycloak), Jitsi video, webhook integrations' },
+      { name: 'Training', days: 1, detail: 'Employees log in via SSO, 30-min walkthrough per team' },
+      { name: 'Cutover', days: 1, detail: 'Announce switch, disable old Slack/Teams' }
+    ],
+    topCompromise: 'US DoD approved, 94 webhook integrations; video via Jitsi integration (pre-wired by Stacktic)',
+    ossAdvantage: 'Topic-based threading (better than Slack channels for async teams), 94 webhook integrations, US DoD approved',
+    compromises: [
+      'Topic-based threading superior for async teams \u2014 better organized than Slack channels',
+      'Video calls via Jitsi integration (Stacktic pre-wires it) \u2014 no separate license needed',
+      '94 webhook integrations cover DevOps, monitoring, CI/CD; n8n fills any gaps via workflow automation',
+      'US Department of Defense approved and deployed at 80,000+ scale \u2014 proven security model'
+    ],
+    realDeployments: '34.2K GitHub stars, 30K+ contributors, US DoD (80K+ Air Force), US military-wide. Enterprise Advanced edition. v11.5.1 (March 2026).'
+  },
+  {
+    // Source: atlassian.com/software/jira/pricing — Standard $7.91, Premium $14.54/user/mo
+    // Real-world cost with plugins: $20-30/user/mo. Default $15 = between Standard and Premium.
+    id: 'pm', category: 'Project Management', saasVendor: 'Jira / Asana', pricePerUser: 15,
+    defaultAdoption: 40, ossAlt: 'OpenProject', parity: 65, coreParity: 85, maturity: 'Good',
+    migrationHours: 40, enabled: true, nodeWeight: 0.5,
+    complexity: 'Low', complexityNote: 'Export issues and boards from Jira. Import via API. Map workflows to OpenProject. Employees learn new UI (~1hr).',
+    migrationPhases: [
+      { name: 'Deploy & Configure', days: 1, detail: 'Stacktic deploys OpenProject, configures project structure' },
+      { name: 'Data Import', days: 2, detail: 'Export Jira issues/boards via API, import into OpenProject' },
+      { name: 'Workflow Mapping', days: 1, detail: 'Map Jira workflows to OpenProject statuses and boards' },
+      { name: 'Integration Wiring', days: 1, detail: 'SSO (Keycloak), Git integration, n8n automations' },
+      { name: 'Training', days: 1, detail: 'PM team walkthrough, 1hr session' },
+      { name: 'Cutover', days: 1, detail: 'New projects in OpenProject, archive Jira' }
+    ],
+    topCompromise: 'Built-in Gantt + time tracking (Jira charges extra); simpler agile boards, fewer plugins',
+    ossAdvantage: 'Built-in Gantt charts + time tracking (Jira charges extra). Jira killed Data Center — forced cloud migration by 2029',
+    compromises: [
+      'Built-in Gantt charts + time tracking included free \u2014 Jira charges extra for both',
+      'Agile boards simpler than Jira \u2014 covers Scrum/Kanban well, fewer advanced reporting features',
+      'Automation via n8n workflows instead of built-in rules \u2014 more flexible, requires initial setup',
+      'Jira killed Data Center edition (EOL 2029) \u2014 forcing all users to cloud. OpenProject is the sovereign alternative'
+    ],
+    realDeployments: '9.5K+ GitHub stars, Gartner recognized (2025). German Bundeswehr (BWI), Deutsche Bahn, Siemens. EU-backed. v16-17.x.'
+  },
+  {
+    // Source: BambooHR — ~$10-17 PEPM (analyst estimates, not published). Workday — not published.
+    // Default $15 = mid-range BambooHR estimate.
+    id: 'hr', category: 'HR / HRIS', saasVendor: 'Workday / BambooHR', pricePerUser: 15,
+    defaultAdoption: 100, ossAlt: 'OrangeHRM', parity: 18, coreParity: 40, maturity: 'Low',
+    migrationPhases: [
+      { name: 'Deploy & Configure', days: 1, detail: 'Stacktic deploys OrangeHRM, configures leave policies, org structure' },
+      { name: 'Employee Data Import', days: 2, detail: 'Import employee records, departments, reporting lines via CSV' },
+      { name: 'Policy Configuration', days: 2, detail: 'Leave types, attendance rules, expense categories, recruitment workflows' },
+      { name: 'Integration Wiring', days: 1, detail: 'SSO (Keycloak), LDAP directory sync' },
+      { name: 'UAT & Validation', days: 2, detail: 'HR team validates employee records, leave balances, reports' },
+      { name: 'Training', days: 1, detail: 'HR team hands-on, 2hrs. Employee self-service walkthrough' },
+      { name: 'Cutover', days: 1, detail: 'Switch to OrangeHRM, disable old HRIS' }
+    ],
+    migrationHours: 80, enabled: false, nodeWeight: 0.5,
+    complexity: 'Medium', complexityNote: 'Import employee records (CSV). Configure leave policies, attendance rules. HR team learns new interface (~2hrs).',
+    topCompromise: 'Leave, attendance, expenses, recruitment built-in; payroll requires paid module or Frappe HR',
+    ossAdvantage: 'Frappe HR (ERPNext module) is far stronger — includes leave, attendance, expenses, recruitment, and integrates with ERP',
+    compromises: [
+      'OrangeHRM covers leave, attendance, recruitment, expenses \u2014 core HR needs for most orgs',
+      'Frappe HR (ERPNext module) is stronger \u2014 includes payroll, integrates directly with ERP and accounting',
+      'Payroll in OrangeHRM requires Advanced edition; Frappe HR includes it in open-source',
+      'Benefits admin (insurance, pension) not built-in \u2014 handled via integrations or manual process',
+      'Growing community; Frappe HR actively developed with monthly releases'
+    ],
+    realDeployments: '5M+ users globally. Frappe HR backed by ERPNext ecosystem (31.4K GitHub stars, 30K+ customers). v5.8 (Nov 2025).'
+  },
+  {
+    // Source: quickbooks.intuit.com/pricing — Plus $115/mo (flat, not per-user), Advanced $275/mo
+    // Per-user equivalent depends on team size. Default $20 = ~$115/mo ÷ 5 accounting users.
+    // Note: QuickBooks is per-company, not per-user. Adjust based on your plan.
+    id: 'accounting', category: 'Accounting', saasVendor: 'QuickBooks / Xero', pricePerUser: 20,
+    defaultAdoption: 5, ossAlt: 'ERPNext Accounting', parity: 45, coreParity: 65, maturity: 'Medium',
+    migrationHours: 120, enabled: false, nodeWeight: 0.5,
+    migrationPhases: [
+      { name: 'Chart of Accounts Setup', days: 2, detail: 'Map existing chart of accounts, tax codes, cost centers' },
+      { name: 'Deploy & Configure', days: 1, detail: 'Stacktic deploys ERPNext Accounting module' },
+      { name: 'Data Import', days: 3, detail: 'Import opening balances, customer/vendor ledgers, bank accounts' },
+      { name: 'Bank Reconciliation', days: 2, detail: 'Configure bank feeds (CSV import), reconcile opening balances' },
+      { name: 'UAT & Validation', days: 3, detail: 'Finance team validates trial balance, generates P&L and balance sheet' },
+      { name: 'Training', days: 2, detail: 'Finance team: invoicing, payments, reconciliation, reporting' },
+      { name: 'Parallel Run', days: 15, detail: 'Run both systems for one accounting period, compare outputs' },
+      { name: 'Cutover', days: 1, detail: 'Final journal entries, close old system' }
+    ],
+    complexity: 'Medium', complexityNote: 'Set up chart of accounts. Import historical transactions. Configure bank reconciliation. Finance team training (~4hrs).',
+    topCompromise: 'Multi-currency, multi-company native; bank feeds via CSV import, no direct tax filing',
+    ossAdvantage: 'Multi-currency, multi-company natively — QuickBooks charges $200/mo extra for multi-entity',
+    compromises: [
+      'Multi-currency, multi-company native \u2014 QuickBooks charges $200/mo extra for multi-entity',
+      'Full double-entry accounting with chart of accounts, journals, reconciliation',
+      'Bank feeds via CSV import; direct bank API integration community-driven and improving',
+      'Tax filing handled via export to local tax software \u2014 no direct submission yet',
+      'Integrated with ERPNext ERP \u2014 invoicing, purchasing, inventory all connected'
+    ],
+    realDeployments: 'ERPNext ecosystem: 10,000+ businesses, 31.4K GitHub stars, 200+ partners. MIT license, v15.'
+  },
+  {
+    // Source: zendesk.com/pricing — Support Professional $55/agent/mo, Enterprise $155/agent/mo
+    // Default $55 = Professional tier (most common). Note: priced per agent, not per employee.
+    id: 'helpdesk', category: 'Support / Helpdesk', saasVendor: 'Zendesk', pricePerUser: 55,
+    defaultAdoption: 10, ossAlt: 'Zammad', parity: 60, coreParity: 82, maturity: 'Good',
+    migrationHours: 40, enabled: false, nodeWeight: 0.5,
+    complexity: 'Low', complexityNote: 'Export ticket history from Zendesk. Import into Zammad. Configure email channels. Support team learns new UI (~1hr).',
+    migrationPhases: [
+      { name: 'Deploy & Configure', days: 1, detail: 'Stacktic deploys Zammad, configures email channels, SLA rules' },
+      { name: 'Ticket History Import', days: 2, detail: 'Export Zendesk tickets via API, import into Zammad' },
+      { name: 'Integration Wiring', days: 1, detail: 'SSO (Keycloak), email piping, webhook notifications' },
+      { name: 'Training', days: 1, detail: 'Support team walkthrough, 1hr session' },
+      { name: 'Cutover', days: 1, detail: 'Redirect support emails to Zammad, disable Zendesk' }
+    ],
+    topCompromise: '90% cost reduction vs Zendesk, unlimited agents; AI features launching in v7.0',
+    ossAdvantage: 'Documented 90% cost reduction vs Zendesk. Unlimited agents — Zendesk charges per agent ($55-$115/agent/mo)',
+    compromises: [
+      'Unlimited agents \u2014 Zendesk charges $55-$115 per agent/month, costs explode with team growth',
+      'Documented 90% cost reduction in real Zendesk-to-Zammad migrations',
+      'AI features launching in v7.0 (March 2026) \u2014 active development, fast-growing feature set',
+      'Integrations via API/webhooks + n8n workflows; Zendesk marketplace has more pre-built but most orgs use <10'
+    ],
+    realDeployments: '5.4K GitHub stars, 3.2M+ downloads (1.7M in 2024 alone). Strong in DACH region. Growing globally. v7.0 (March 2026).'
+  },
+  {
+    // Source: tableau.com/pricing — Explorer $42/user/mo, Creator $75/user/mo, Viewer $15
+    // Default $42 = Explorer tier (typical BI user). Adjust for your mix of Creators vs Viewers.
+    id: 'bi', category: 'BI / Analytics', saasVendor: 'Tableau / Power BI', pricePerUser: 42,
+    defaultAdoption: 20, ossAlt: 'Apache Superset', parity: 55, coreParity: 78, maturity: 'Good',
+    migrationHours: 60, enabled: false, nodeWeight: 1,
+    complexity: 'Medium', complexityNote: 'Recreate dashboards in Superset. Connect to existing databases. Power users learn SQL IDE (~4hrs).',
+    migrationPhases: [
+      { name: 'Deploy & Configure', days: 1, detail: 'Stacktic deploys Apache Superset, configures database connections' },
+      { name: 'Dashboard Recreation', days: 5, detail: 'Rebuild key dashboards and reports in Superset (AI-assisted SQL)' },
+      { name: 'Data Source Wiring', days: 2, detail: 'Connect to existing databases, configure datasets and metrics' },
+      { name: 'UAT & Validation', days: 2, detail: 'Data team validates numbers match old reports' },
+      { name: 'Training', days: 2, detail: 'Power users: SQL IDE, chart builder. Viewers: dashboard navigation' },
+      { name: 'Cutover', days: 1, detail: 'Redirect bookmarks, disable old BI tool' }
+    ],
+    topCompromise: 'Used by Airbnb, Dropbox, AmEx — no per-user licensing; power users need SQL knowledge',
+    ossAdvantage: 'Built by Airbnb, used by Dropbox and AmEx. No per-user licensing — Tableau charges $70/user/mo for Creator',
+    compromises: [
+      'No per-user licensing \u2014 Tableau charges $70/user/mo for Creator, $15/user for Viewer',
+      'Built by Airbnb, battle-tested at Dropbox, American Express, Lyft, Twitter',
+      'SQL-first approach \u2014 powerful for data teams; business users may prefer Metabase for simpler dashboards',
+      'Rich visualization library, 40+ chart types, excellent SQL IDE built-in'
+    ],
+    realDeployments: '71.1K GitHub stars, 430+ contributors. Used by Airbnb, Dropbox, American Express, Lyft, Twitter. Apache Foundation. Superset 4.x.'
+  },
+  {
+    // Source: okta.com/pricing — Starter $6/user/mo, Essentials $17/user/mo
+    // Typical buyer range: $3-12/user/mo depending on modules. Default $8 = mid-range SSO+MFA.
+    id: 'identity', category: 'Identity / SSO', saasVendor: 'Okta / Azure AD', pricePerUser: 8,
+    defaultAdoption: 100, ossAlt: 'Keycloak', parity: 85, coreParity: 95, maturity: 'Excellent',
+    migrationPhases: [
+      { name: 'Deploy & Configure', days: 1, detail: 'Stacktic deploys Keycloak, configures realms, OIDC/SAML providers' },
+      { name: 'User Import', days: 1, detail: 'Import users and groups from Okta/AD via LDAP sync or SCIM' },
+      { name: 'App Federation', days: 2, detail: 'Wire all stack tools to Keycloak SSO (automated by Stacktic)' },
+      { name: 'MFA Setup', days: 1, detail: 'Configure MFA policies, WebAuthn/TOTP enrollment' },
+      { name: 'UAT & Validation', days: 1, detail: 'Test SSO login across all apps, verify group permissions' },
+      { name: 'Cutover', days: 1, detail: 'Switch identity provider, update app redirects' }
+    ],
+    migrationHours: 30, enabled: true, nodeWeight: 0.5,
+    complexity: 'Low', complexityNote: 'Import users and groups from Okta/AD (LDAP sync or CSV). Employees see new login page — same SSO experience.',
+    topCompromise: 'Unlimited users/realms, used by BMW & Airbus at 2M+ scale; no behavioral analytics',
+    ossAdvantage: 'Unlimited users, unlimited realms — Okta charges per user. Used by BMW, Airbus, Bosch at 2M+ scale',
+    compromises: [
+      'Unlimited users, unlimited realms, unlimited protocols \u2014 Okta/Entra charge per user, costs scale linearly',
+      'Full SAML, OIDC, LDAP, OAuth2, WebAuthn, FIDO2 \u2014 everything Entra ID does, self-hosted',
+      'Deployed at BMW, Airbus, Bosch, Deutsche Telekom, Austrian government at 2M+ user scale',
+      'Stacktic pre-wires SSO for every tool in the stack \u2014 one identity provider for all apps'
+    ],
+    realDeployments: '31.6K GitHub stars, 6,400+ verified companies, 1,350 contributors. BMW, Airbus, Bosch, Deutsche Telekom, IBM. CNCF project. v26.5.6.'
+  },
+  {
+    // Source: ServiceNow does NOT publish pricing. Analyst estimates: $70-$100/fulfiller/mo (Standard).
+    // Pro: ~$160+/fulfiller/mo. Default $100 = Standard tier analyst estimate.
+    id: 'itsm', category: 'ITSM', saasVendor: 'ServiceNow', pricePerUser: 100,
+    defaultAdoption: 15, ossAlt: 'GLPI', parity: 25, coreParity: 70, maturity: 'Medium',
+    migrationHours: 120, enabled: false, nodeWeight: 1,
+    migrationPhases: [
+      { name: 'Deploy & Configure', days: 1, detail: 'Stacktic deploys GLPI, configures entities, profiles, SLA rules' },
+      { name: 'CMDB Import', days: 3, detail: 'Import asset inventory, configuration items, relationships' },
+      { name: 'Ticket History Import', days: 2, detail: 'Export ServiceNow incidents/requests, import via API' },
+      { name: 'Business Rules', days: 2, detail: 'Configure assignment rules, escalations, approval workflows' },
+      { name: 'Integration Wiring', days: 1, detail: 'SSO (Keycloak), email notifications, monitoring hooks' },
+      { name: 'UAT & Validation', days: 2, detail: 'IT team validates CMDB, tests ticket workflows end-to-end' },
+      { name: 'Training', days: 1, detail: 'IT team hands-on, end-user self-service portal walkthrough' },
+      { name: 'Parallel Run', days: 10, detail: 'New tickets in GLPI, monitor resolution workflows' },
+      { name: 'Cutover', days: 1, detail: 'Redirect IT portal, disable ServiceNow' }
+    ],
+    complexity: 'Medium', complexityNote: 'Import CMDB and asset inventory. Migrate ticket history. Configure business rules. IT team learns new UI (~2hrs).',
+    topCompromise: 'Solid CMDB + asset management, no per-user pricing; focused on ITSM core, not full platform',
+    ossAdvantage: 'CMDB + asset management genuinely solid. No per-user pricing — ServiceNow is $100+/user/mo',
+    compromises: [
+      'Solid CMDB and IT asset management \u2014 core ITSM workflows fully covered',
+      'No per-user pricing \u2014 ServiceNow charges $100+/user/mo, costs explode with scale',
+      'Focused on ITSM core (ticketing, assets, CMDB); platform features (ITOM, CSM) via integrations',
+      'Active community, strong in EU and Latin America; growing plugin ecosystem'
+    ],
+    realDeployments: '15,000+ organizations worldwide, 5.7K GitHub stars, 301 contributors. Leading ITSM in France for 20 years. GLPI v11.0.5.'
+  },
+  {
+    // Source: dropbox.com/plans — Standard $18/user/mo, Advanced $30/user/mo (annual)
+    // Default $18 = Standard tier.
+    id: 'storage', category: 'File Storage', saasVendor: 'Dropbox / Box', pricePerUser: 18,
+    defaultAdoption: 60, ossAlt: 'Nextcloud', parity: 65, coreParity: 88, maturity: 'Good',
+    migrationHours: 20, enabled: true, nodeWeight: 1,
+    complexity: 'Low', complexityNote: 'Bulk file copy via rclone/rsync. Employees install Nextcloud sync client. Same drag-and-drop experience.',
+    migrationPhases: [
+      { name: 'Deploy & Configure', days: 1, detail: 'Stacktic deploys Nextcloud, configures storage backend (SeaweedFS)' },
+      { name: 'File Migration', days: 2, detail: 'Bulk copy via rclone from Dropbox/Box/GDrive. Preserves folder structure' },
+      { name: 'Permission Mapping', days: 1, detail: 'Map sharing permissions, team folders, external shares' },
+      { name: 'Integration Wiring', days: 1, detail: 'SSO (Keycloak), shared storage layer, desktop/mobile sync client' },
+      { name: 'Training', days: 1, detail: 'Install sync client, drag-and-drop walkthrough, 30min' },
+      { name: 'Cutover', days: 1, detail: 'Disable old storage, redirect links' }
+    ],
+    topCompromise: 'E2E encryption (Dropbox can\'t), 400+ apps, CalDAV/CardDAV; sync slightly slower than Dropbox',
+    ossAdvantage: 'E2E encryption (Dropbox does NOT offer this), unlimited storage, 400+ apps, CalDAV/CardDAV built-in',
+    compromises: [
+      'E2E encryption built-in \u2014 Dropbox does NOT offer this. Full data sovereignty',
+      '400+ apps: Calendar, Contacts, Talk, Office, Mail client, Forms \u2014 way beyond just file storage',
+      'Sync functional and reliable; Dropbox sync marginally faster on large bulk transfers',
+      'Deployed at 20M+ users (Claro Drive / America Movil) across 4 data centers'
+    ],
+    realDeployments: '500K+ servers, 20M+ users, 33.6K GitHub stars. Claro Drive (20M users), EU governments, EU Commission. Customer interest tripled in 2025.'
+  },
+  {
+    // Source: atlassian.com — Confluence Standard $6.05/user/mo, Premium $11.55
+    // Notion Plus $12/user/mo, Business $20. Default $10 = blended Confluence/Notion average.
+    id: 'wiki', category: 'Wiki / Knowledge', saasVendor: 'Confluence / Notion', pricePerUser: 10,
+    defaultAdoption: 50, ossAlt: 'BookStack', parity: 45, coreParity: 75, maturity: 'Medium',
+    migrationHours: 20, enabled: false, nodeWeight: 0.5,
+    complexity: 'Low', complexityNote: 'Export pages from Confluence/Notion. Import via API or HTML. Employees bookmark new URL — same wiki experience.',
+    migrationPhases: [
+      { name: 'Deploy & Configure', days: 1, detail: 'Stacktic deploys BookStack, configures shelves and permissions' },
+      { name: 'Content Migration', days: 2, detail: 'Export Confluence/Notion pages, import via API/HTML. AI-assisted formatting cleanup' },
+      { name: 'Integration Wiring', days: 1, detail: 'SSO (Keycloak), search indexing' },
+      { name: 'Training', days: 1, detail: 'Bookmark new URL, editor walkthrough, 30min' },
+      { name: 'Cutover', days: 1, detail: 'Redirect old wiki URLs, disable old system' }
+    ],
+    topCompromise: 'Clean hierarchy, great search, no per-user pricing; no real-time co-editing yet',
+    compromises: [
+      'Clean hierarchy: Shelves > Books > Chapters > Pages \u2014 better organized than Confluence\'s flat spaces',
+      'No per-user pricing \u2014 Confluence charges $6-9/user/mo, Notion $8-10/user/mo',
+      'Great built-in search, markdown support, WYSIWYG editor, role-based permissions',
+      'Single-user editing (no real-time co-editing yet); monthly releases, actively maintained'
+    ],
+    realDeployments: '10K+ GitHub stars, 45M Docker pulls, 7+ years active development. Monthly releases, growing revenue. BookStack v26.03.1 (March 2026).',
+    ossAdvantage: 'Clean hierarchy (Shelves > Books > Chapters > Pages) beats Confluence\'s chaotic space model. No per-user pricing — Confluence is $6-9/user/mo'
+  }
+];
+
+// Stacktic pricing tiers
+function getStackticPrice(employees) {
+  if (employees <= 200) return 24000;
+  if (employees <= 1000) return 60000;
+  if (employees <= 5000) return 120000;
+  if (employees <= 20000) return 200000;
+  return 350000;
+}
+
+// ============================================================
+// STATE
+// ============================================================
+let toolState = TOOLS.map(t => ({
+  ...t,
+  currentVendor: t.saasVendor,
+  currentPrice: t.pricePerUser,
+  adoption: t.defaultAdoption,
+  migration: t.migrationHours
+}));
+
+let charts = {};
+
+// ============================================================
+// STEP NAVIGATION
+// ============================================================
+function goToStep(step) {
+  document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.step-indicator').forEach((el, i) => {
+    el.classList.remove('active', 'completed');
+    if (i + 1 < step) el.classList.add('completed');
+    if (i + 1 === step) el.classList.add('active');
+  });
+  document.getElementById('step-' + step).classList.add('active');
+  if (step === 3) calculate();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============================================================
+// RENDER TOOL TABLE
+// ============================================================
+function renderToolTable() {
+  var tbody = document.getElementById('tool-table-body');
+  var employees = +(document.getElementById('employees-input').value || 500);
+  tbody.innerHTML = '';
+  toolState.forEach(function(tool, idx) {
+    var parityColor = tool.parity >= 70 ? '#22c55e' : tool.parity >= 50 ? '#3b82f6' : tool.parity >= 35 ? '#f59e0b' : '#ef4444';
+    var matClass = 'badge-' + tool.maturity.toLowerCase();
+    var userCount = Math.round(employees * tool.adoption / 100);
+    var complexColor = tool.complexity === 'Very High' ? '#ef4444' : tool.complexity === 'High' ? '#f59e0b' : tool.complexity === 'Medium' ? '#3b82f6' : '#22c55e';
+    var complexBg = tool.complexity === 'Very High' ? '#fee2e2' : tool.complexity === 'High' ? '#fef3c7' : tool.complexity === 'Medium' ? '#dbeafe' : '#d1fae5';
+    var tr = document.createElement('tr');
+    tr.className = tool.enabled ? '' : 'disabled';
+    tr.innerHTML =
+      '<td>' +
+        '<label class="toggle">' +
+          '<input type="checkbox" ' + (tool.enabled ? 'checked' : '') + ' onchange="toggleTool(' + idx + ', this.checked)">' +
+          '<span class="toggle-slider"></span>' +
+        '</label>' +
+      '</td>' +
+      '<td><strong>' + tool.category + '</strong></td>' +
+      '<td><input type="text" value="' + tool.currentVendor + '" onchange="toolState[' + idx + '].currentVendor=this.value"></td>' +
+      '<td><input type="number" value="' + tool.currentPrice + '" min="0" max="500" style="width:70px" onchange="toolState[' + idx + '].currentPrice=+this.value; calculate()"></td>' +
+      '<td>' +
+        '<div style="display:flex;align-items:center;gap:5px;">' +
+          '<input type="range" min="0" max="100" value="' + tool.adoption + '" style="width:55px" oninput="toolState[' + idx + '].adoption=+this.value; this.parentElement.querySelector(\'.pct-label\').innerHTML=\'<strong>\'+Math.round(employees*this.value/100)+\'</strong> of \'+employees+\' (\'+this.value+\'%)\'; calculate()">' +
+          '<span class="pct-label" style="font-size:11px;min-width:80px;color:var(--gray-600)"><strong>' + userCount + '</strong> of ' + employees + ' (' + tool.adoption + '%)</span>' +
+        '</div>' +
+      '</td>' +
+      '<td style="font-size:13px;font-weight:700;color:#991b1b">' + (tool.enabled ? '$' + Math.round(tool.currentPrice * userCount * 12).toLocaleString() + '/yr' : '-') + '</td>' +
+      '<td style="font-size:12px;font-weight:600;color:var(--sovereignty)">' + tool.ossAlt + '</td>' +
+      '<td>' +
+        '<span class="badge-parity" style="background:#22c55e;font-size:11px">' + tool.coreParity + '%</span> ' +
+        '<span style="font-size:10px;color:var(--gray-400)">/ ' + tool.parity + '%</span>' +
+      '</td>' +
+      '<td><span class="badge ' + matClass + '">' + tool.maturity + '</span></td>' +
+      '<td class="compromise-cell" title="' + tool.complexityNote + '">' +
+        '<span class="badge" style="background:' + complexBg + ';color:' + complexColor + '">' + tool.complexity + '</span>' +
+      '</td>' +
+      '<td class="compromise-cell">' +
+        '<span style="font-size:12px;color:var(--gray-600)">' + tool.topCompromise + '</span>' +
+        '<div class="compromise-detail">' +
+          (tool.ossAdvantage ? '<div style="margin-bottom:10px;padding:8px 10px;background:rgba(34,197,94,0.15);border-left:3px solid #22c55e;border-radius:4px;font-size:12px;color:#d1fae5"><strong style="color:#22c55e">&#9989; OSS Beats Commercial:</strong> ' + tool.ossAdvantage + '</div>' : '') +
+          '<strong>What You Should Know \u2014 ' + tool.ossAlt + '</strong>' +
+          '<ul>' + tool.compromises.map(function(c) { return '<li>' + c + '</li>'; }).join('') + '</ul>' +
+          '<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.2);font-size:11px;opacity:0.8">' +
+            '<strong>Replacement complexity:</strong> ' + tool.complexity + ' \u2014 ' + tool.complexityNote +
+          '</div>' +
+          '<div style="margin-top:4px;font-size:11px;opacity:0.8">' +
+            tool.realDeployments +
+          '</div>' +
+        '</div>' +
+      '</td>' +
+      '<td><input type="number" value="' + tool.migration + '" min="0" max="5000" style="width:80px" onchange="toolState[' + idx + '].migration=+this.value; calculate()"></td>';
+    tbody.appendChild(tr);
+  });
+}
+
+function toggleTool(idx, checked) {
+  toolState[idx].enabled = checked;
+  renderToolTable();
+  calculate();
+}
+
+// ============================================================
+// RENDER MIGRATION TIMELINE (per-tool Gantt)
+// ============================================================
+function renderMigrationTimeline() {
+  var container = document.getElementById('migration-timeline');
+  var employees = +(document.getElementById('employees-input').value || 500);
+  var enabledTools = toolState.filter(function(t) { return t.enabled && t.migrationPhases; });
+  if (enabledTools.length === 0) { container.innerHTML = ''; return; }
+
+  // Employee scaling factor for data-heavy and training phases
+  // Base days are calibrated for ~200 employees. Scale up for larger orgs.
+  var empScale = employees <= 200 ? 1 : employees <= 500 ? 1.2 : employees <= 2000 ? 1.5 : employees <= 5000 ? 2 : 2.5;
+
+  // Phases that scale with employee count
+  var dataPhases = ['Data Export', 'Data Import', 'Data Import & Mapping', 'Master Data Import',
+    'Employee Data Import', 'Mailbox Migration', 'File Migration', 'Content Migration',
+    'Ticket History Import', 'CMDB Import', 'Transaction History', 'User Import'];
+  var trainingPhases = ['Training'];
+
+  // Scale phase days
+  function scaledDays(phase) {
+    var d = phase.days;
+    if (dataPhases.indexOf(phase.name) >= 0) d = Math.ceil(d * empScale);
+    if (trainingPhases.indexOf(phase.name) >= 0) d = Math.ceil(d * empScale);
+    return d;
+  }
+
+  // Calculate max for bar widths
+  var maxDays = 0;
+  enabledTools.forEach(function(t) {
+    var total = t.migrationPhases.reduce(function(s, p) { return s + scaledDays(p); }, 0);
+    if (total > maxDays) maxDays = total;
+  });
+
+  // Phase type categorization and colors
+  var phaseType = {};
+  ['Deploy & Configure'].forEach(function(n) { phaseType[n] = 'deploy'; });
+  dataPhases.concat(['Channel Setup', 'History Import']).forEach(function(n) { phaseType[n] = 'data'; });
+  ['Process Mapping', 'Chart of Accounts Setup', 'Policy Configuration', 'Workflow Mapping',
+   'Business Rules', 'Permission Mapping', 'Dashboard Recreation', 'DNS & Mail Setup'
+  ].forEach(function(n) { phaseType[n] = 'config'; });
+  ['Integration Wiring', 'App Federation', 'MFA Setup', 'Data Source Wiring', 'Bank Reconciliation'
+  ].forEach(function(n) { phaseType[n] = 'integration'; });
+  ['UAT & Validation'].forEach(function(n) { phaseType[n] = 'uat'; });
+  trainingPhases.forEach(function(n) { phaseType[n] = 'training'; });
+  ['Parallel Run'].forEach(function(n) { phaseType[n] = 'parallel'; });
+  ['Cutover'].forEach(function(n) { phaseType[n] = 'cutover'; });
+
+  var typeColors = {
+    deploy: '#1e3a5f', data: '#2d5a8e', config: '#4f46e5', integration: '#7c3aed',
+    uat: '#0891b2', training: '#059669', parallel: '#f59e0b', cutover: '#22c55e'
+  };
+  var typeLabels = {
+    deploy: 'Deploy', data: 'Data Migration', config: 'Config & Mapping',
+    integration: 'Integrations', uat: 'UAT', training: 'Training',
+    parallel: 'Parallel Run', cutover: 'Cutover'
+  };
+
+  function getColor(phaseName) { return typeColors[phaseType[phaseName] || 'deploy'] || '#6b7280'; }
+
+  var html = '<div style="padding:25px;background:white;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.08)">';
+  html += '<div style="margin-bottom:20px">';
+  html += '<strong style="font-size:18px;color:var(--gray-900)">Migration Timeline per Tool</strong>';
+  if (empScale > 1) {
+    html += '<span style="margin-left:10px;font-size:12px;padding:3px 8px;background:#fef3c7;border-radius:4px;color:#92400e">' +
+      employees.toLocaleString() + ' employees &mdash; data migration &amp; training scaled &times;' + empScale + '</span>';
+  }
+  html += '</div>';
+
+  // Legend
+  html += '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;font-size:11px">';
+  Object.keys(typeColors).forEach(function(key) {
+    html += '<div style="display:flex;align-items:center;gap:4px"><div style="width:12px;height:12px;border-radius:2px;background:' + typeColors[key] + '"></div><span style="color:var(--gray-600)">' + typeLabels[key] + '</span></div>';
+  });
+  html += '</div>';
+
+  // Per-tool Gantt + detail table
+  enabledTools.forEach(function(t, tIdx) {
+    var totalDays = t.migrationPhases.reduce(function(s, p) { return s + scaledDays(p); }, 0);
+    var totalWeeks = Math.ceil(totalDays / 5);
+
+    // Gantt bar row
+    html += '<div style="margin-bottom:4px">';
+    html += '<div style="display:grid;grid-template-columns:140px 1fr 70px;gap:10px;align-items:center">';
+    html += '<div style="font-size:13px;font-weight:700;color:var(--gray-800);cursor:pointer" onclick="toggleToolDetail(\'' + t.id + '\')">' +
+      t.category + ' <span style="font-size:10px;color:var(--gray-400)">&#9660;</span></div>';
+    html += '<div style="display:flex;height:28px;border-radius:4px;overflow:hidden;background:var(--gray-100)">';
+
+    t.migrationPhases.forEach(function(phase) {
+      var days = scaledDays(phase);
+      var widthPct = (days / maxDays * 100).toFixed(1);
+      var color = getColor(phase.name);
+      var scaled = days > phase.days;
+      html += '<div title="' + phase.name + ': ' + days + 'd' + (scaled ? ' (scaled from ' + phase.days + 'd)' : '') + '" ' +
+        'style="width:' + widthPct + '%;background:' + color + ';display:flex;align-items:center;justify-content:center;' +
+        'font-size:9px;color:white;font-weight:600;white-space:nowrap;overflow:hidden;border-right:1px solid rgba(255,255,255,0.3);cursor:help">' +
+        (days >= 2 ? days + 'd' : '') + '</div>';
+    });
+
+    html += '</div>';
+    html += '<div style="font-size:12px;font-weight:700;color:var(--sovereignty);text-align:right">' + totalDays + ' days<br><span style="font-size:10px;font-weight:400;color:var(--gray-500)">' + totalWeeks + ' weeks</span></div>';
+    html += '</div>';
+
+    // Expandable detail: phase-by-phase breakdown for this tool
+    html += '<div id="tool-detail-' + t.id + '" style="display:none;margin:4px 0 16px 150px;border-left:3px solid var(--gray-200);padding-left:16px">';
+    html += '<div style="font-size:12px;font-weight:600;color:var(--sovereignty);margin-bottom:8px">' + t.ossAlt + ' &mdash; replacing ' + t.currentVendor + '</div>';
+
+    t.migrationPhases.forEach(function(phase) {
+      var days = scaledDays(phase);
+      var color = getColor(phase.name);
+      var scaled = days > phase.days;
+      html += '<div style="display:grid;grid-template-columns:20px 150px 50px 1fr;gap:8px;align-items:start;margin-bottom:6px;font-size:12px">';
+      html += '<div style="width:10px;height:10px;border-radius:2px;background:' + color + ';margin-top:3px"></div>';
+      html += '<div style="font-weight:600;color:var(--gray-800)">' + phase.name + '</div>';
+      html += '<div style="color:var(--sovereignty);font-weight:700">' + days + 'd' + (scaled ? '<span style="color:var(--gray-400);font-weight:400"> (' + phase.days + ')</span>' : '') + '</div>';
+      html += '<div style="color:var(--gray-600)">' + phase.detail + '</div>';
+      html += '</div>';
+    });
+
+    html += '</div></div>';
+  });
+
+  // Total summary
+  var totalAllDays = enabledTools.reduce(function(s, t) {
+    return s + t.migrationPhases.reduce(function(ss, p) { return ss + scaledDays(p); }, 0);
+  }, 0);
+  var longestTool = maxDays;
+  var sequentialWeeks = Math.ceil(totalAllDays / 5);
+  var parallelWeeks = Math.ceil(totalAllDays / 5 / 2) + Math.ceil(longestTool / 10);
+
+  html += '<div style="margin-top:15px;padding:14px;background:var(--gray-50);border-radius:8px;display:flex;justify-content:space-between;align-items:center">';
+  html += '<div style="font-size:13px;color:var(--gray-600)"><strong>' + enabledTools.length + ' tools</strong> &middot; ' + employees.toLocaleString() + ' employees &middot; ' + totalAllDays + ' total tool-days</div>';
+  html += '<div style="display:flex;gap:20px">';
+  html += '<div style="text-align:center"><div style="font-size:11px;color:var(--gray-500)">Sequential</div><div style="font-size:18px;font-weight:700;color:var(--gray-700)">' + sequentialWeeks + ' wk</div></div>';
+  html += '<div style="text-align:center"><div style="font-size:11px;color:var(--gray-500)">Parallel (2 tools)</div><div style="font-size:18px;font-weight:700;color:var(--sovereignty)">' + parallelWeeks + ' wk</div></div>';
+  html += '</div></div>';
+
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function toggleToolDetail(toolId) {
+  var el = document.getElementById('tool-detail-' + toolId);
+  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+// ============================================================
+// CALCULATION ENGINE
+// ============================================================
+function calculate() {
+  var employees = +(document.getElementById('employees-input').value || document.getElementById('employees').value);
+  var hourlyRate = +(document.getElementById('hourly-rate').value || 150);
+  var enabledTools = toolState.filter(function(t) { return t.enabled; });
+
+  // Current SaaS Spend
+  var annualSaas = 0;
+  enabledTools.forEach(function(t) {
+    annualSaas += t.currentPrice * employees * (t.adoption / 100) * 12;
+  });
+
+  // Infrastructure Cost
+  // K8s shared cluster — all tools run as pods on the SAME nodes
+  // Base: 3 nodes (HA control plane + workloads). Scale by employees, not per-tool.
+  var baseNodes = 3;
+  var employeeNodes = employees <= 500 ? 0 : employees <= 2000 ? 1 : employees <= 5000 ? 3 : Math.ceil(employees / 2000);
+  // Heavy tools (ERP, BI) add marginal capacity, not whole nodes
+  var heavyToolExtra = 0;
+  enabledTools.forEach(function(t) { if (t.nodeWeight >= 1.5) heavyToolExtra += 0.5; });
+  var totalNodes = baseNodes + employeeNodes + Math.ceil(heavyToolExtra);
+  // GKE e2-standard-4 (4 vCPU, 16GB RAM) ~$120/mo compute + ~$80/mo PD-SSD + ~$50/mo network/LB + ~$100/mo GKE mgmt fee
+  // Source: cloud.google.com/compute/vm-instance-pricing, March 2026
+  var nodePrice = 350;
+  var annualInfra = totalNodes * nodePrice * 12;
+
+  // Stacktic License
+  var stackticLicense = getStackticPrice(employees);
+
+  // Ops Overhead (20% of infra)
+  var opsOverhead = annualInfra * 0.20;
+
+  // Total Self-Hosted Annual
+  var annualSelfHosted = annualInfra + stackticLicense + opsOverhead;
+
+  // Stacktic Professional Services
+  var stackticPS = +(document.getElementById('stacktic-ps').value || 0);
+
+  // Internal IT Planning (process mapping, requirements, UAT, project management)
+  var itPlanningHours = +(document.getElementById('it-planning-hours').value || 80);
+  var itPlanningCost = itPlanningHours * hourlyRate;
+
+  // Migration
+  var totalMigrationHours = 0;
+  enabledTools.forEach(function(t) { totalMigrationHours += t.migration; });
+  var migrationCost = totalMigrationHours * hourlyRate;
+
+  // Training — per-tool: complexity determines training time per user
+  // Low complexity = 0.5hr, Medium = 1hr, High = 2hrs per user, at 20% hourly rate (productivity loss only)
+  var trainingCost = 0;
+  enabledTools.forEach(function(t) {
+    var users = Math.round(employees * t.adoption / 100);
+    var hrsPerUser = t.complexity === 'High' || t.complexity === 'Very High' ? 2 : t.complexity === 'Medium' ? 1 : 0.5;
+    trainingCost += users * hrsPerUser * (hourlyRate * 0.2);
+  });
+
+  // Parallel Running — tool-by-tool migration, ~2 months overlap per tool (not all at once)
+  var parallelCost = 0;
+  enabledTools.forEach(function(t) {
+    var toolAnnualSaas = t.currentPrice * Math.round(employees * t.adoption / 100) * 12;
+    parallelCost += toolAnnualSaas * (2 / 12); // 2 months overlap per tool
+  });
+
+  // Annual Savings (at full adoption)
+  var annualSavings = annualSaas - annualSelfHosted;
+
+  // Carve-Out calculations
+  var isCarveout = document.getElementById('scenario').value === 'carveout';
+  var tsaMonthly = 0, tsaMonths = 0, tsaTotalBurn = 0, ebitdaMultiple = 0, valuationImpact = 0;
+  var parentEmployees = 0, rightSizingSavings = 0, tsaExitSavings = 0;
+  if (isCarveout) {
+    parentEmployees = +(document.getElementById('parent-employees').value || 10000);
+    tsaMonthly = +(document.getElementById('tsa-monthly').value || 0);
+    tsaMonths = +(document.getElementById('tsa-months').value || 18);
+    ebitdaMultiple = +(document.getElementById('ebitda-multiple').value || 10);
+    tsaTotalBurn = tsaMonthly * tsaMonths;
+    tsaExitSavings = (tsaMonthly * 12) - annualSelfHosted; // what you save annually by exiting TSA
+    // Right-sizing: parent pays bulk rates, carved-out entity would pay retail SaaS rates (higher per-user)
+    // Estimate: small orgs pay ~20-30% more per user than enterprise rates
+    var retailPremium = employees <= 200 ? 1.30 : employees <= 500 ? 1.20 : 1.10;
+    var retailAnnualSaas = annualSaas * retailPremium;
+    rightSizingSavings = retailAnnualSaas - annualSelfHosted; // what you save vs buying SaaS at retail
+    valuationImpact = tsaExitSavings * ebitdaMultiple; // EBITDA uplift from IT cost reduction
+  }
+
+  // 3-Year ROI with Ramp-Up
+  // Ramp factor applies only to SaaS savings — infra cost is 100% from day 1
+  var year1SaasAvoided = annualSaas * 0.40;
+  var year1Cost = migrationCost + trainingCost + parallelCost + stackticPS + itPlanningCost;
+  var year1Net = year1SaasAvoided - annualSelfHosted - year1Cost;
+
+  var year2SaasAvoided = annualSaas * 0.75;
+  var year2Net = year2SaasAvoided - annualSelfHosted;
+
+  var year3SaasAvoided = annualSaas * 0.95;
+  var year3Net = year3SaasAvoided - annualSelfHosted;
+
+  var total3yr = year1Net + year2Net + year3Net;
+
+  // Payback Period
+  var paybackMonths = 0;
+  if (annualSavings > 0) {
+    var cumulative = -year1Cost;
+    var monthlySavingsY1 = (annualSaas * 0.40 - annualSelfHosted) / 12;
+    var monthlySavingsY2 = (annualSaas * 0.75 - annualSelfHosted) / 12;
+    var monthlySavingsY3 = (annualSaas * 0.95 - annualSelfHosted) / 12;
+    for (var m = 1; m <= 36; m++) {
+      if (m <= 12) cumulative += monthlySavingsY1;
+      else if (m <= 24) cumulative += monthlySavingsY2;
+      else cumulative += monthlySavingsY3;
+      if (cumulative >= 0 && paybackMonths === 0) { paybackMonths = m; break; }
+    }
+    if (paybackMonths === 0) paybackMonths = 36;
+  }
+
+  updateDisplay({
+    annualSaas: annualSaas, annualSelfHosted: annualSelfHosted, annualSavings: annualSavings,
+    annualInfra: annualInfra, stackticLicense: stackticLicense, opsOverhead: opsOverhead,
+    migrationCost: migrationCost, trainingCost: trainingCost, parallelCost: parallelCost,
+    stackticPS: stackticPS, itPlanningCost: itPlanningCost, itPlanningHours: itPlanningHours,
+    totalMigrationHours: totalMigrationHours,
+    year1Net: year1Net, year2Net: year2Net, year3Net: year3Net,
+    year1SaasAvoided: year1SaasAvoided, year2SaasAvoided: year2SaasAvoided, year3SaasAvoided: year3SaasAvoided,
+    year1Cost: year1Cost, total3yr: total3yr, paybackMonths: paybackMonths,
+    enabledTools: enabledTools, employees: employees, totalNodes: totalNodes, nodePrice: nodePrice,
+    employeeNodes: employeeNodes, heavyToolExtra: heavyToolExtra,
+    isCarveout: isCarveout, tsaMonthly: tsaMonthly, tsaMonths: tsaMonths, tsaTotalBurn: tsaTotalBurn,
+    tsaExitSavings: tsaExitSavings, rightSizingSavings: rightSizingSavings,
+    valuationImpact: valuationImpact, ebitdaMultiple: ebitdaMultiple, parentEmployees: parentEmployees
+  });
+
+  // Update Step 2 cost summary
+  var fmtS = function(n) { return '$' + Math.round(n).toLocaleString(); };
+  document.getElementById('step2-saas-total').textContent = fmtS(annualSaas) + '/yr';
+  document.getElementById('step2-self-total').textContent = fmtS(annualSelfHosted) + '/yr';
+  document.getElementById('step2-infra-detail').innerHTML =
+    'Infra: ' + fmtS(annualInfra) + ' + License: ' + fmtS(stackticLicense) + ' + Ops: ' + fmtS(opsOverhead);
+
+  renderMigrationTimeline();
+  saveToLocalStorage();
+}
+
+function updateDisplay(d) {
+  function fmt(n) { return (n < 0 ? '-' : '') + '$' + Math.abs(Math.round(n)).toLocaleString(); }
+  function fmtK(n) {
+    var abs = Math.abs(Math.round(n));
+    if (abs >= 1000000) return (n < 0 ? '-' : '') + '$' + (abs / 1000000).toFixed(1) + 'M';
+    if (abs >= 1000) return (n < 0 ? '-' : '') + '$' + (abs / 1000).toFixed(0) + 'K';
+    return fmt(n);
+  }
+
+  // Savings Equation
+  var avgPrice = d.enabledTools.length > 0 ? Math.round(d.enabledTools.reduce(function(s,t){ return s + t.currentPrice; }, 0) / d.enabledTools.length) : 0;
+  document.getElementById('savings-equation').innerHTML =
+    '<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:start">' +
+      '<div style="padding:20px;background:#fef2f2;border-radius:10px;border:1px solid #fecaca">' +
+        '<div style="font-size:13px;font-weight:700;color:#991b1b;text-transform:uppercase;margin-bottom:10px">Your Current SaaS Cost</div>' +
+        '<div style="font-size:14px;color:var(--gray-700);line-height:2">' +
+          '<div>' + d.enabledTools.length + ' tools, weighted by adoption (not all employees use every tool)</div>' +
+          '<div style="font-size:24px;font-weight:800;color:#991b1b;margin-top:5px">' + fmt(d.annualSaas) + '/year</div>' +
+          '<div style="font-size:12px;color:var(--gray-500);margin-top:4px">SaaS vendors charge per-user licensing that scales linearly with headcount</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="font-size:28px;color:var(--sovereignty);font-weight:800;padding-top:40px">vs</div>' +
+      '<div style="padding:20px;background:#f0fdf4;border-radius:10px;border:1px solid #bbf7d0">' +
+        '<div style="font-size:13px;font-weight:700;color:#065f46;text-transform:uppercase;margin-bottom:10px">Self-Hosted Cost (Stacktic)</div>' +
+        '<div style="font-size:14px;color:var(--gray-700);line-height:2">' +
+          '<div>K8s cluster: ' + d.totalNodes + ' nodes &times; $' + d.nodePrice + '/mo &times; 12 = ' + fmt(d.annualInfra) + '</div>' +
+          '<div>Stacktic platform license = ' + fmt(d.stackticLicense) + '</div>' +
+          '<div>Ops overhead (20%) = ' + fmt(d.opsOverhead) + '</div>' +
+          '<div style="font-size:24px;font-weight:800;color:#065f46;margin-top:5px">' + fmt(d.annualSelfHosted) + '/year</div>' +
+          '<div style="font-size:12px;color:var(--gray-500);margin-top:4px">Infrastructure cost is mostly FIXED \u2014 doesn\'t scale per-user</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div style="margin-top:15px;display:grid;grid-template-columns:1fr 1fr;gap:15px">' +
+      '<div style="padding:15px;background:var(--gray-50);border-radius:8px;text-align:center;font-size:15px">' +
+        '<strong>Annual savings: </strong>' +
+        '<span style="font-size:20px;font-weight:800;color:' + (d.annualSavings >= 0 ? '#22c55e' : '#ef4444') + '">' + fmt(d.annualSavings) + '</span>' +
+        '<span style="color:var(--gray-500)"> (' + (d.annualSaas > 0 ? Math.round(d.annualSavings/d.annualSaas*100) : 0) + '% reduction)</span>' +
+      '</div>' +
+      '<div style="padding:15px;background:#fef3c7;border-radius:8px;text-align:center;font-size:15px;border:1px solid #fcd34d">' +
+        '<strong>One-time migration cost: </strong>' +
+        '<span style="font-size:20px;font-weight:800;color:#92400e">' + fmt(d.year1Cost) + '</span>' +
+        '<span style="color:#a16207"> (' + d.totalMigrationHours.toLocaleString() + ' hrs + training + parallel running)</span>' +
+      '</div>' +
+    '</div>';
+
+  // Per-Tool Licensing Breakdown
+  var breakdownDiv = document.getElementById('per-tool-breakdown');
+  var breakdownHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">';
+  d.enabledTools.forEach(function(t) {
+    var userCount = Math.round(d.employees * t.adoption / 100);
+    var annualCost = t.currentPrice * userCount * 12;
+    var complexColor = t.complexity === 'Very High' ? '#ef4444' : t.complexity === 'High' ? '#f59e0b' : t.complexity === 'Medium' ? '#3b82f6' : '#22c55e';
+    breakdownHTML +=
+      '<div style="padding:14px;background:var(--gray-50);border-radius:8px;border-left:3px solid ' + complexColor + '">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
+          '<strong style="font-size:14px">' + t.category + '</strong>' +
+          '<span style="font-size:16px;font-weight:700;color:#991b1b">' + fmt(annualCost) + '/yr</span>' +
+        '</div>' +
+        '<div style="font-size:12px;color:var(--gray-500)">' +
+          userCount.toLocaleString() + ' users &times; $' + t.currentPrice + '/mo &times; 12 = ' + fmt(annualCost) +
+        '</div>' +
+        '<div style="font-size:12px;color:var(--gray-500);margin-top:4px">' +
+          'Replaced by <strong style="color:var(--sovereignty)">' + t.ossAlt + '</strong> on shared infrastructure' +
+        '</div>' +
+        '<div style="display:flex;gap:6px;margin-top:6px">' +
+          '<span class="badge" style="background:' + (t.complexity === 'Very High' ? '#fee2e2' : t.complexity === 'High' ? '#fef3c7' : t.complexity === 'Medium' ? '#dbeafe' : '#d1fae5') + ';color:' + complexColor + ';font-size:10px">Complexity: ' + t.complexity + '</span>' +
+          '<span style="font-size:11px;color:var(--gray-400)">' + t.migration.toLocaleString() + ' hrs migration</span>' +
+        '</div>' +
+      '</div>';
+  });
+  breakdownHTML += '</div>';
+  breakdownDiv.innerHTML = breakdownHTML;
+
+  // Hero
+  document.getElementById('roi-3yr').textContent = fmtK(d.total3yr);
+  document.getElementById('roi-3yr').style.color = d.total3yr >= 0 ? 'white' : '#fca5a5';
+  var heroEl = document.getElementById('results-hero');
+  heroEl.style.background = d.total3yr >= 0
+    ? 'linear-gradient(135deg, #1e3a5f 0%, #312e81 100%)'
+    : 'linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%)';
+  document.getElementById('roi-payback').textContent = d.total3yr > 0
+    ? 'Payback period: ' + d.paybackMonths + ' months'
+    : 'Warning: Self-hosted costs exceed SaaS costs with current selection';
+
+  // Metrics
+  document.getElementById('metric-saas').textContent = fmtK(d.annualSaas);
+  document.getElementById('metric-saas-sub').textContent = d.enabledTools.length + ' tools enabled, ' + d.employees.toLocaleString() + ' employees';
+  document.getElementById('metric-self').textContent = fmtK(d.annualSelfHosted);
+  document.getElementById('metric-self-sub').textContent = fmt(d.annualInfra) + ' infra + ' + fmt(d.stackticLicense) + ' platform + ' + fmt(d.opsOverhead) + ' ops';
+  document.getElementById('metric-savings').textContent = fmtK(d.annualSavings);
+  document.getElementById('metric-savings').style.color = d.annualSavings >= 0 ? '#22c55e' : '#ef4444';
+  var pct = d.annualSaas > 0 ? Math.round((d.annualSavings / d.annualSaas) * 100) : 0;
+  document.getElementById('metric-savings-pct').textContent = pct + '% ' + (pct >= 0 ? 'reduction' : 'increase') + ' vs SaaS';
+  document.getElementById('metric-migration').textContent = fmtK(d.year1Cost);
+  document.getElementById('metric-migration-hrs').textContent = d.totalMigrationHours.toLocaleString() + ' hrs + training + parallel running';
+
+  // Compromise summary
+  var compDiv = document.getElementById('compromise-summary');
+  var weakTools = d.enabledTools.filter(function(t) { return t.coreParity < 60; });
+  var medTools = d.enabledTools.filter(function(t) { return t.coreParity >= 60 && t.coreParity < 80; });
+  var strongTools = d.enabledTools.filter(function(t) { return t.coreParity >= 80; });
+  var compHTML = '';
+  if (weakTools.length > 0) {
+    compHTML += '<div class="compromise-card" style="margin-bottom:10px"><h4>High Risk Areas</h4>';
+    weakTools.forEach(function(t) {
+      compHTML += '<p style="margin-bottom:4px"><strong>' + t.category + '</strong> (' + t.ossAlt + ', ' + t.coreParity + '% core coverage): ' + t.topCompromise + '</p>';
+    });
+    compHTML += '</div>';
+  }
+  if (medTools.length > 0) {
+    compHTML += '<div class="compromise-card" style="margin-bottom:10px;border-left-color:var(--info);background:#eff6ff"><h4 style="color:#1e40af">Medium Gaps</h4>';
+    medTools.forEach(function(t) {
+      compHTML += '<p style="margin-bottom:4px;color:#1e40af"><strong>' + t.category + '</strong> (' + t.ossAlt + ', ' + t.coreParity + '% core coverage): ' + t.topCompromise + '</p>';
+    });
+    compHTML += '</div>';
+  }
+  if (strongTools.length > 0) {
+    compHTML += '<div class="gain-card" style="margin-bottom:10px"><h4>Strong Alternatives</h4>';
+    strongTools.forEach(function(t) {
+      compHTML += '<p style="margin-bottom:4px"><strong>' + t.category + '</strong> (' + t.ossAlt + ', ' + t.coreParity + '% core coverage) \u2014 enterprise-proven</p>';
+    });
+    compHTML += '</div>';
+  }
+  compDiv.innerHTML = compHTML;
+
+  // ROI Table
+  var roiBody = document.getElementById('roi-breakdown-body');
+  roiBody.innerHTML =
+    '<tr style="background:#f0fdf4">' +
+      '<td><strong>SaaS Licenses You Stop Paying</strong><br><span style="font-size:11px;color:var(--gray-500)">Vendor subscriptions eliminated as tools migrate</span></td>' +
+      '<td class="positive">' + fmt(d.year1SaasAvoided) + '</td>' +
+      '<td class="positive">' + fmt(d.year2SaasAvoided) + '</td>' +
+      '<td class="positive">' + fmt(d.year3SaasAvoided) + '</td>' +
+      '<td class="positive">' + fmt(d.year1SaasAvoided + d.year2SaasAvoided + d.year3SaasAvoided) + '</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td><strong>Stacktic Platform Cost</strong><br><span style="font-size:11px;color:var(--gray-500)">K8s infra (' + fmt(d.annualInfra) + ') + license (' + fmt(d.stackticLicense) + ') + ops (' + fmt(d.opsOverhead) + ')</span></td>' +
+      '<td class="negative">' + fmt(-d.annualSelfHosted) + '</td>' +
+      '<td class="negative">' + fmt(-d.annualSelfHosted) + '</td>' +
+      '<td class="negative">' + fmt(-d.annualSelfHosted) + '</td>' +
+      '<td class="negative">' + fmt(-d.annualSelfHosted * 3) + '</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td><strong>Data Migration</strong><br><span style="font-size:11px;color:var(--gray-500)">' + d.totalMigrationHours.toLocaleString() + ' hours &times; ' + fmt(+(document.getElementById('hourly-rate').value || 150)) + '/hr</span></td>' +
+      '<td class="negative">' + fmt(-d.migrationCost) + '</td>' +
+      '<td>$0</td>' +
+      '<td>$0</td>' +
+      '<td class="negative">' + fmt(-d.migrationCost) + '</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td><strong>Employee Training</strong><br><span style="font-size:11px;color:var(--gray-500)">Productivity loss while employees learn new tools</span></td>' +
+      '<td class="negative">' + fmt(-d.trainingCost) + '</td>' +
+      '<td>$0</td>' +
+      '<td>$0</td>' +
+      '<td class="negative">' + fmt(-d.trainingCost) + '</td>' +
+    '</tr>' +
+    '<tr>' +
+      '<td><strong>Parallel Running</strong><br><span style="font-size:11px;color:var(--gray-500)">Paying for old SaaS + new system during 2-month overlap per tool</span></td>' +
+      '<td class="negative">' + fmt(-d.parallelCost) + '</td>' +
+      '<td>$0</td>' +
+      '<td>$0</td>' +
+      '<td class="negative">' + fmt(-d.parallelCost) + '</td>' +
+    '</tr>' +
+    (d.stackticPS > 0 ? '<tr>' +
+      '<td><strong>Stacktic Migration Services</strong><br><span style="font-size:11px;color:var(--gray-500)">Stacktic experts handle process mapping, configuration & onboarding</span></td>' +
+      '<td class="negative">' + fmt(-d.stackticPS) + '</td>' +
+      '<td>$0</td>' +
+      '<td>$0</td>' +
+      '<td class="negative">' + fmt(-d.stackticPS) + '</td>' +
+    '</tr>' : '') +
+    (d.itPlanningCost > 0 ? '<tr>' +
+      '<td><strong>Your Internal Coordination</strong><br><span style="font-size:11px;color:var(--gray-500)">' + d.itPlanningHours + ' hrs — reviews, approvals & acceptance testing</span></td>' +
+      '<td class="negative">' + fmt(-d.itPlanningCost) + '</td>' +
+      '<td>$0</td>' +
+      '<td>$0</td>' +
+      '<td class="negative">' + fmt(-d.itPlanningCost) + '</td>' +
+    '</tr>' : '') +
+    '<tr class="total-row" style="font-size:16px">' +
+      '<td><strong>Net Savings</strong></td>' +
+      '<td class="' + (d.year1Net >= 0 ? 'positive' : 'negative') + '"><strong>' + fmt(d.year1Net) + '</strong></td>' +
+      '<td class="' + (d.year2Net >= 0 ? 'positive' : 'negative') + '"><strong>' + fmt(d.year2Net) + '</strong></td>' +
+      '<td class="' + (d.year3Net >= 0 ? 'positive' : 'negative') + '"><strong>' + fmt(d.year3Net) + '</strong></td>' +
+      '<td class="' + (d.total3yr >= 0 ? 'positive' : 'negative') + '"><strong>' + fmt(d.total3yr) + '</strong></td>' +
+    '</tr>';
+
+  // Infrastructure detail
+  document.getElementById('infra-detail').innerHTML =
+    '<div style="margin-bottom:15px;padding:12px 16px;background:#eff6ff;border-radius:8px;border:1px solid #bfdbfe;font-size:13px;color:#1e40af;line-height:1.6">' +
+      '<strong>Node spec:</strong> GKE e2-standard-4 (4 vCPU, 16GB RAM). ' +
+      'Cost per node: ~$120 compute + ~$80 PD-SSD storage + ~$50 network/LB + ~$100 GKE mgmt = <strong>$350/mo</strong>. ' +
+      'Source: cloud.google.com/compute/vm-instance-pricing. Does not include egress, backup storage, or DR.' +
+    '</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;">' +
+      '<div style="padding:15px;background:var(--gray-50);border-radius:8px;">' +
+        '<div style="font-size:12px;color:var(--gray-500);text-transform:uppercase;margin-bottom:5px">Base Nodes</div>' +
+        '<div style="font-size:24px;font-weight:700">3</div>' +
+        '<div style="font-size:12px;color:var(--gray-500)">Control plane, monitoring, ingress</div>' +
+      '</div>' +
+      '<div style="padding:15px;background:var(--gray-50);border-radius:8px;">' +
+        '<div style="font-size:12px;color:var(--gray-500);text-transform:uppercase;margin-bottom:5px">Employee Nodes</div>' +
+        '<div style="font-size:24px;font-weight:700">+' + d.employeeNodes + '</div>' +
+        '<div style="font-size:12px;color:var(--gray-500)">Scales with employee count</div>' +
+      '</div>' +
+      '<div style="padding:15px;background:var(--gray-50);border-radius:8px;">' +
+        '<div style="font-size:12px;color:var(--gray-500);text-transform:uppercase;margin-bottom:5px">Tool Nodes</div>' +
+        '<div style="font-size:24px;font-weight:700">+' + Math.ceil(d.heavyToolExtra) + '</div>' +
+        '<div style="font-size:12px;color:var(--gray-500)">Heavy tools (ERP, BI, etc.)</div>' +
+      '</div>' +
+      '<div style="padding:15px;background:var(--gray-50);border-radius:8px;">' +
+        '<div style="font-size:12px;color:var(--gray-500);text-transform:uppercase;margin-bottom:5px">Total</div>' +
+        '<div style="font-size:24px;font-weight:700">' + d.totalNodes + ' nodes</div>' +
+        '<div style="font-size:12px;color:var(--gray-500)">' + fmt(d.nodePrice) + '/node/month = ' + fmt(d.annualInfra) + '/year</div>' +
+      '</div>' +
+    '</div>' +
+    '<div style="margin-top:15px;padding:12px 16px;background:#fef3c7;border-radius:8px;border:1px solid #fcd34d;font-size:12px;color:#92400e;line-height:1.6">' +
+      '<strong>Ops overhead (20%):</strong> Covers monitoring, patching, and incident response in a Stacktic-managed environment. ' +
+      'Unmanaged self-hosting typically requires 40-60% ops overhead or 1-2 dedicated FTEs. ' +
+      'This estimate does NOT include backup storage costs, disaster recovery infrastructure, or egress fees.' +
+    '</div>';
+
+  // Tool detail cards
+  var cardsDiv = document.getElementById('tool-cards');
+  cardsDiv.innerHTML = '';
+  d.enabledTools.forEach(function(t) {
+    var parityColor = t.parity >= 70 ? '#22c55e' : t.parity >= 50 ? '#3b82f6' : t.parity >= 35 ? '#f59e0b' : '#ef4444';
+    var annualCostSaas = t.currentPrice * d.employees * (t.adoption / 100) * 12;
+    cardsDiv.innerHTML +=
+      '<div class="tool-detail-card" style="border-top-color:' + parityColor + '">' +
+        '<h4>' + t.category + ' \u2014 ' + t.ossAlt + '</h4>' +
+        '<div class="saas-vs-oss">Replacing ' + t.currentVendor + ' (' + fmt(annualCostSaas) + '/yr)</div>' +
+        '<div style="display:flex;gap:8px;margin-bottom:12px;">' +
+          '<span class="badge-parity" style="background:#22c55e">Core: ' + t.coreParity + '%</span> ' +
+          '<span class="badge-parity" style="background:' + parityColor + '">Full: ' + t.parity + '%</span>' +
+          '<span class="badge badge-' + t.maturity.toLowerCase() + '">' + t.maturity + '</span>' +
+        '</div>' +
+        (t.ossAdvantage ? '<div style="margin-bottom:12px;padding:10px 12px;background:rgba(34,197,94,0.08);border-left:3px solid #22c55e;border-radius:6px;font-size:13px;color:var(--gray-700)"><strong style="color:#16a34a">&#9989; Where OSS Beats Commercial:</strong> ' + t.ossAdvantage + '</div>' : '') +
+        '<ul class="compromises-list">' +
+          t.compromises.map(function(c) { return '<li>' + c + '</li>'; }).join('') +
+        '</ul>' +
+        '<div class="real-deployments"><strong>Real deployments:</strong> ' + t.realDeployments + '</div>' +
+        '<div style="margin-top:10px;font-size:13px;color:var(--gray-600)">' +
+          'Migration: ' + t.migration.toLocaleString() + ' hours (' + fmt(t.migration * (+document.getElementById('hourly-rate').value || 150)) + ')' +
+        '</div>' +
+      '</div>';
+  });
+
+  // Carve-Out Results
+  if (d.isCarveout) {
+    document.getElementById('carveout-results').style.display = 'block';
+
+    document.getElementById('metric-tsa-burn').textContent = fmtK(d.tsaTotalBurn);
+    document.getElementById('metric-tsa-burn-sub').textContent = fmt(d.tsaMonthly) + '/mo \u00d7 ' + d.tsaMonths + ' months remaining';
+    document.getElementById('metric-tsa-exit').textContent = fmtK(d.tsaExitSavings);
+    document.getElementById('metric-valuation').textContent = fmtK(d.valuationImpact);
+    document.getElementById('metric-valuation-sub').textContent = fmt(d.tsaExitSavings) + '/yr savings \u00d7 ' + d.ebitdaMultiple + 'x multiple';
+
+    // Timeline fit: estimate migration weeks based on enabled tools
+    var migWeeks = 4; // base foundation
+    var hasHighRisk = d.enabledTools.some(function(t) { return t.id === 'email' || t.id === 'erp'; });
+    var hasMedRisk = d.enabledTools.some(function(t) { return t.complexity === 'Medium' || t.complexity === 'High'; });
+    if (d.enabledTools.length > 0) migWeeks += 4; // low-risk phase
+    if (hasMedRisk) migWeeks += 6; // medium-risk phase
+    if (hasHighRisk) migWeeks += 8; // high-risk phase
+    migWeeks += 4; // stabilization
+    var migMonths = Math.ceil(migWeeks / 4.33);
+    var fits = migMonths <= d.tsaMonths;
+
+    var fitEl = document.getElementById('metric-timeline-fit');
+    fitEl.textContent = fits ? 'FITS' : 'AT RISK';
+    fitEl.style.color = fits ? '#22c55e' : '#ef4444';
+    document.getElementById('metric-timeline-sub').textContent = migMonths + ' months migration vs ' + d.tsaMonths + ' months TSA deadline';
+
+    // Timeline visualization
+    var tsaWeeks = Math.round(d.tsaMonths * 4.33);
+    var maxWeeks = Math.max(migWeeks, tsaWeeks, 30);
+    var phases = [];
+    var w = 0;
+    phases.push({ name: 'Foundation', start: w, end: w + 4, color: '#1e3a5f' }); w += 4;
+    if (d.enabledTools.length > 0) { phases.push({ name: 'Low-Risk Tools', start: w, end: w + 4, color: '#3b82f6' }); w += 4; }
+    if (hasMedRisk) { phases.push({ name: 'Medium-Risk', start: w, end: w + 6, color: '#f59e0b' }); w += 6; }
+    if (hasHighRisk) { phases.push({ name: 'Email & ERP', start: w, end: w + 8, color: '#ef4444' }); w += 8; }
+    phases.push({ name: 'Stabilization', start: w, end: w + 4, color: '#22c55e' }); w += 4;
+
+    var tHTML = '<div style="position:relative;height:' + (phases.length * 44 + 40) + 'px">';
+    phases.forEach(function(p, i) {
+      var left = (p.start / maxWeeks * 100).toFixed(1);
+      var width = ((p.end - p.start) / maxWeeks * 100).toFixed(1);
+      tHTML += '<div style="position:absolute;top:' + (i * 44) + 'px;left:' + left + '%;width:' + width + '%;height:34px;background:' + p.color + ';border-radius:6px;display:flex;align-items:center;padding:0 10px;color:white;font-size:12px;font-weight:600;white-space:nowrap">' +
+        p.name + ' <span style="margin-left:auto;opacity:0.8;font-weight:400">wk ' + p.start + '-' + p.end + '</span></div>';
+    });
+    // TSA deadline marker
+    var tsaLeft = (tsaWeeks / maxWeeks * 100).toFixed(1);
+    tHTML += '<div style="position:absolute;top:0;left:' + tsaLeft + '%;width:3px;height:' + (phases.length * 44 + 10) + 'px;background:#ef4444;border-radius:2px"></div>';
+    tHTML += '<div style="position:absolute;top:' + (phases.length * 44 + 12) + 'px;left:' + tsaLeft + '%;transform:translateX(-50%);font-size:12px;font-weight:700;color:#ef4444;white-space:nowrap">TSA Deadline (' + d.tsaMonths + ' mo)</div>';
+    tHTML += '</div>';
+    document.getElementById('timeline-visual').innerHTML = tHTML;
+
+    // Comparison table dynamic values
+    document.getElementById('compare-stacktic-cost').innerHTML = '<span style="color:#065f46;font-weight:700">' + fmt(d.year1Cost + d.stackticPS + d.itPlanningCost) + ' (automated + AI-accelerated)</span>';
+    document.getElementById('compare-stacktic-ongoing').innerHTML = '<span style="color:#065f46;font-weight:700">' + fmt(d.annualSelfHosted) + '/yr (fixed infrastructure)</span>';
+    document.getElementById('compare-si-ongoing').innerHTML = fmt(d.annualSaas) + '/yr at retail SaaS rates (higher per-user for small orgs)';
+  } else {
+    var crEl = document.getElementById('carveout-results');
+    if (crEl) crEl.style.display = 'none';
+  }
+
+  renderCharts(d);
+}
+
+// ============================================================
+// CHARTS
+// ============================================================
+function renderCharts(d) {
+  // Cost Breakdown Donut
+  if (charts.costBreakdown) charts.costBreakdown.destroy();
+  var ctx1 = document.getElementById('chart-cost-breakdown').getContext('2d');
+  charts.costBreakdown = new Chart(ctx1, {
+    type: 'doughnut',
+    data: {
+      labels: ['K8s Infrastructure', 'Stacktic License', 'Ops Overhead'],
+      datasets: [{
+        data: [d.annualInfra, d.stackticLicense, d.opsOverhead],
+        backgroundColor: ['#1e3a5f', '#667eea', '#764ba2'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom' },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              return ctx.label + ': $' + Math.round(ctx.parsed).toLocaleString();
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // Cumulative Savings
+  if (charts.cumulative) charts.cumulative.destroy();
+  var ctx2 = document.getElementById('chart-cumulative').getContext('2d');
+  var months = [];
+  var cumData = [];
+  var cum = -d.year1Cost;
+  var monthly1 = (d.year1SaasAvoided - d.annualSelfHosted) / 12;
+  var monthly2 = (d.year2SaasAvoided - d.annualSelfHosted) / 12;
+  var monthly3 = (d.year3SaasAvoided - d.annualSelfHosted) / 12;
+  for (var m = 0; m <= 36; m++) {
+    months.push(m === 0 ? 'Start' : 'M' + m);
+    if (m === 0) { cumData.push(cum); continue; }
+    if (m <= 12) cum += monthly1;
+    else if (m <= 24) cum += monthly2;
+    else cum += monthly3;
+    cumData.push(Math.round(cum));
+  }
+  charts.cumulative = new Chart(ctx2, {
+    type: 'line',
+    data: {
+      labels: months,
+      datasets: [{
+        label: 'Cumulative Net Savings',
+        data: cumData,
+        borderColor: '#22c55e',
+        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { ticks: { callback: function(v) { return '$' + (v / 1000).toFixed(0) + 'K'; } } },
+        x: { ticks: { maxTicksLimit: 12 } }
+      }
+    }
+  });
+
+  // Per-Tool Bar
+  if (charts.perTool) charts.perTool.destroy();
+  var ctx3 = document.getElementById('chart-per-tool').getContext('2d');
+  var toolLabels = d.enabledTools.map(function(t) { return t.category; });
+  var saasData = d.enabledTools.map(function(t) { return Math.round(t.currentPrice * d.employees * (t.adoption / 100) * 12); });
+  var totalSaas = saasData.reduce(function(s, v) { return s + v; }, 0);
+  var selfData = saasData.map(function(v) { return totalSaas > 0 ? Math.round((v / totalSaas) * d.annualSelfHosted) : 0; });
+  charts.perTool = new Chart(ctx3, {
+    type: 'bar',
+    data: {
+      labels: toolLabels,
+      datasets: [
+        { label: 'Current SaaS', data: saasData, backgroundColor: '#ef4444' },
+        { label: 'Self-Hosted (proportional)', data: selfData, backgroundColor: '#1e3a5f' }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'top' } },
+      scales: {
+        y: { ticks: { callback: function(v) { return '$' + (v / 1000).toFixed(0) + 'K'; } } },
+        x: { ticks: { maxRotation: 45 } }
+      }
+    }
+  });
+}
+
+// ============================================================
+// SCENARIO TOGGLE
+// ============================================================
+function toggleScenario() {
+  var scenario = document.getElementById('scenario').value;
+  var carveoutFields = document.getElementById('carveout-fields');
+  var carveoutResults = document.getElementById('carveout-results');
+  if (scenario === 'carveout') {
+    carveoutFields.style.display = 'block';
+    if (carveoutResults) carveoutResults.style.display = 'block';
+  } else {
+    carveoutFields.style.display = 'none';
+    if (carveoutResults) carveoutResults.style.display = 'none';
+  }
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function updateEmployeeDisplay() {
+  var val = document.getElementById('employees').value;
+  document.getElementById('employees-display').textContent = (+val).toLocaleString();
+  document.getElementById('employees-input').value = val;
+}
+
+function toggleExpand(header, bodyId) {
+  header.classList.toggle('open');
+  document.getElementById(bodyId).classList.toggle('open');
+}
+
+// ============================================================
+// LOCAL STORAGE
+// ============================================================
+function saveToLocalStorage() {
+  try {
+    var state = {
+      employees: document.getElementById('employees-input').value,
+      region: document.getElementById('region').value,
+      industry: document.getElementById('industry').value,
+      hourlyRate: document.getElementById('hourly-rate').value,
+      stackticPS: document.getElementById('stacktic-ps').value,
+      itPlanningHours: document.getElementById('it-planning-hours').value,
+      scenario: document.getElementById('scenario').value,
+      parentEmployees: document.getElementById('parent-employees').value,
+      tsaMonthly: document.getElementById('tsa-monthly').value,
+      tsaMonths: document.getElementById('tsa-months').value,
+      ebitdaMultiple: document.getElementById('ebitda-multiple').value,
+      tools: toolState.map(function(t) {
+        return {
+          id: t.id, enabled: t.enabled, currentVendor: t.currentVendor,
+          currentPrice: t.currentPrice, adoption: t.adoption, migration: t.migration
+        };
+      })
+    };
+    localStorage.setItem('sovereignty-roi', JSON.stringify(state));
+  } catch (e) { /* ignore */ }
+}
+
+function loadFromLocalStorage() {
+  try {
+    var raw = localStorage.getItem('sovereignty-roi');
+    if (!raw) return;
+    var state = JSON.parse(raw);
+    if (state.employees) {
+      document.getElementById('employees').value = Math.min(state.employees, 20000);
+      document.getElementById('employees-input').value = state.employees;
+      updateEmployeeDisplay();
+    }
+    if (state.region) document.getElementById('region').value = state.region;
+    if (state.industry) document.getElementById('industry').value = state.industry;
+    if (state.hourlyRate) document.getElementById('hourly-rate').value = state.hourlyRate;
+    if (state.stackticPS) document.getElementById('stacktic-ps').value = state.stackticPS;
+    if (state.itPlanningHours) document.getElementById('it-planning-hours').value = state.itPlanningHours;
+    if (state.scenario) { document.getElementById('scenario').value = state.scenario; toggleScenario(); }
+    if (state.parentEmployees) document.getElementById('parent-employees').value = state.parentEmployees;
+    if (state.tsaMonthly) document.getElementById('tsa-monthly').value = state.tsaMonthly;
+    if (state.tsaMonths) document.getElementById('tsa-months').value = state.tsaMonths;
+    if (state.ebitdaMultiple) document.getElementById('ebitda-multiple').value = state.ebitdaMultiple;
+    if (state.tools) {
+      state.tools.forEach(function(saved) {
+        var tool = toolState.find(function(t) { return t.id === saved.id; });
+        if (tool) {
+          tool.enabled = saved.enabled;
+          tool.currentVendor = saved.currentVendor;
+          tool.currentPrice = saved.currentPrice;
+          tool.adoption = saved.adoption;
+          tool.migration = saved.migration;
+        }
+      });
+    }
+  } catch (e) { /* ignore */ }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+loadFromLocalStorage();
+renderToolTable();
+calculate();
+</script>
+</body>
+</html>

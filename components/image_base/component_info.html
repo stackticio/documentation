@@ -199,6 +199,65 @@
             </div>
         </div>
 
+        <!-- ==================== ROUTING TABLE (Multi-Domain) ==================== -->
+        <div style="background-color: #eff6ff; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #3b82f6;">
+            <h2 style="color: #1e40af; margin-top: 0; margin-bottom: 15px;">Routing Table (Multi-Domain Multi-Protocol)</h2>
+            <p style="color: #1e3a8a; font-size: 12px; margin-bottom: 12px;">
+                Set <code>routing_table</code> on the <code>apisix-image_base</code> link to route multiple custom domains to different ports.
+                This replaces <code>subdomain</code> and <code>route_all</code> when present. Each domain gets its own TLS certificate.
+            </p>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 15px;">
+                <thead>
+                    <tr style="background-color: #bfdbfe;">
+                        <th style="padding: 8px; border: 1px solid #93c5fd; text-align: left;">Format</th>
+                        <th style="padding: 8px; border: 1px solid #93c5fd; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #93c5fd; text-align: left;">Behavior</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #93c5fd; font-family: monospace;">domain</td>
+                        <td style="padding: 6px 8px; border: 1px solid #93c5fd;"><code>mail.tenant2.ch</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #93c5fd;">Routes ALL ports (L7 HTTP + L4 stream SNI) for this domain</td>
+                    </tr>
+                    <tr style="background-color: #eff6ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #93c5fd; font-family: monospace;">domain:port1,port2</td>
+                        <td style="padding: 6px 8px; border: 1px solid #93c5fd;"><code>webmail.tenant2.ch:webmail</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #93c5fd;">Routes only named ports (names from <code>ports</code> attribute)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <details style="margin-bottom: 10px; border: 1px solid #bfdbfe; border-radius: 5px;">
+                <summary style="padding: 10px; background-color: #dbeafe; cursor: pointer; font-weight: bold; color: #1e40af; font-size: 12px;">
+                    Example: IceWarp multi-tenant setup
+                </summary>
+                <div style="padding: 10px; font-size: 12px;">
+                    <p><strong>Component ports:</strong></p>
+                    <div style="background-color: #f1f5f9; padding: 8px; border-radius: 4px; font-family: monospace; font-size: 11px; margin-bottom: 8px;">
+                        webmail:443:TCP<br>
+                        pop3:995:TCP:stream<br>
+                        imap:993:TCP:stream
+                    </div>
+                    <p><strong>Link routing_table (on apisix-image_base link):</strong></p>
+                    <div style="background-color: #f1f5f9; padding: 8px; border-radius: 4px; font-family: monospace; font-size: 11px; margin-bottom: 8px;">
+                        mail.tenant2.ch:webmail,pop3,imap<br>
+                        webmail.tenant2.ch:webmail
+                    </div>
+                    <p><strong>Result:</strong></p>
+                    <ul style="margin: 5px 0; padding-left: 20px;">
+                        <li><code>mail.tenant2.ch</code> → HTTPS (443) + POP3S SNI (995) + IMAPS SNI (993)</li>
+                        <li><code>webmail.tenant2.ch</code> → HTTPS (443) only</li>
+                        <li>Each domain gets its own ApisixTls + cert-manager Certificate</li>
+                        <li>Stream ports get <code>tls: true</code> in APISIX for SNI matching</li>
+                    </ul>
+                </div>
+            </details>
+            <div style="background-color: #fef3c7; padding: 10px; border-radius: 5px; border-left: 4px solid #f59e0b;">
+                <strong style="color: #92400e;">Note:</strong>
+                <span style="font-size: 12px; color: #78350f;"> Port names in routing_table must match names from the <code>ports</code> attribute. Domains that are subdomains of the stack domain use the wildcard cert; custom domains get dedicated cert-manager Certificates.</span>
+            </div>
+        </div>
+
         <!-- ==================== SECURITY FEATURES MATRIX ==================== -->
         <div style="background-color: #fef2f2; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
             <h2 style="color: #991b1b; margin-top: 0; margin-bottom: 15px;">Security Features Matrix</h2>
@@ -287,6 +346,11 @@
                         <td style="padding: 6px 8px; border: 1px solid #bae6fd;"><code>hpa: true</code></td>
                         <td style="padding: 6px 8px; border: 1px solid #bae6fd;">HorizontalPodAutoscaler</td>
                     </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd; font-family: monospace;">container.yaml</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;"><code>image_base_container</code> sub-components</td>
+                        <td style="padding: 6px 8px; border: 1px solid #bae6fd;">Deployment + Service + PVC per sub-component</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -373,6 +437,106 @@ startup_commands: |<br>
                         <td style="padding: 6px; border: 1px solid #e9d5ff;" colspan="2" style="text-align: center;">Same</td>
                     </tr>
                 </table>
+            </div>
+        </details>
+
+        <!-- ==================== SUB-COMPONENTS (image_base_container) ==================== -->
+        <div style="background-color: #faf5ff; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #a855f7;">
+            <h2 style="color: #6b21a8; margin-top: 0; margin-bottom: 15px;">Sub-Components (Multi-Image Deployment)</h2>
+            <p style="color: #7e22ce; font-size: 12px; margin-bottom: 12px;">
+                Add <code>image_base_container</code> sub-components to deploy multiple images in the same namespace under a single parent component.
+                Each sub-component generates its own <strong>Deployment + Service + optional PVC</strong>.
+            </p>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 15px;">
+                <thead>
+                    <tr style="background-color: #e9d5ff;">
+                        <th style="padding: 8px; border: 1px solid #d8b4fe; text-align: left;">Sub-Component Attribute</th>
+                        <th style="padding: 8px; border: 1px solid #d8b4fe; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #d8b4fe; text-align: left;">Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #d8b4fe;"><code>image_version</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #d8b4fe;"><code>ghcr.io/mailu/admin:2024.06</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #d8b4fe;">Container image for this sub-component</td>
+                    </tr>
+                    <tr style="background-color: #faf5ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #d8b4fe;"><code>ports</code> <span style="background-color: #f59e0b; color: #1e293b; padding: 1px 4px; border-radius: 2px; font-size: 9px;">REQ</span></td>
+                        <td style="padding: 6px 8px; border: 1px solid #d8b4fe;"><code>http:8080:TCP</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #d8b4fe;">Same format as parent: <code>name:port:protocol</code></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #d8b4fe;"><code>replicas</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #d8b4fe;"><code>1</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #d8b4fe;">Falls back to parent replicas if not set</td>
+                    </tr>
+                    <tr style="background-color: #faf5ff;">
+                        <td style="padding: 6px 8px; border: 1px solid #d8b4fe;"><code>pvc</code> / <code>mount_path</code> / <code>storage_size</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #d8b4fe;"><code>true</code> / <code>/data</code> / <code>5Gi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #d8b4fe;">Optional persistent storage per sub-component</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #d8b4fe;"><code>cpu/mem request/limit</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #d8b4fe;"><code>100m</code> / <code>128Mi</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #d8b4fe;">Falls back to parent resources if not set</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="color: #7e22ce; font-size: 12px;">
+                <strong>How it works:</strong> All sub-components share the parent's namespace, ServiceAccount, and <code>cloud.env</code> secret (envFrom).
+                Each gets a separate Deployment named <code>{parent}-{sub-component-name}</code> and matching Service.
+            </p>
+            <p style="color: #7e22ce; font-size: 12px;">
+                <strong>Generated file:</strong> <code>container.yaml</code> — only rendered when at least one <code>image_base_container</code> sub-component exists.
+            </p>
+        </div>
+
+        <!-- ==================== ENV MAPPING ==================== -->
+        <div style="background-color: #fff7ed; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #f97316;">
+            <h2 style="color: #9a3412; margin-top: 0; margin-bottom: 15px;">Env Mapping (Link Attribute)</h2>
+            <p style="color: #c2410c; font-size: 12px; margin-bottom: 12px;">
+                Add <code>env_mapping</code> on <strong>any link</strong> (to or from) to create env var aliases. Solves naming mismatches between linked services without duplicating values in cloud.env.
+            </p>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 10px;">
+                <thead>
+                    <tr style="background-color: #fed7aa;">
+                        <th style="padding: 8px; border: 1px solid #fdba74; text-align: left;">Format</th>
+                        <th style="padding: 8px; border: 1px solid #fdba74; text-align: left;">Example</th>
+                        <th style="padding: 8px; border: 1px solid #fdba74; text-align: left;">Generated K8s</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 6px 8px; border: 1px solid #fdba74; font-family: monospace;">NEW_VAR:EXISTING_VAR</td>
+                        <td style="padding: 6px 8px; border: 1px solid #fdba74;"><code>DB_HOST:MYSQL_HOST</code></td>
+                        <td style="padding: 6px 8px; border: 1px solid #fdba74; font-family: monospace; font-size: 11px;">- name: DB_HOST<br>&nbsp;&nbsp;value: "$(MYSQL_HOST)"</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="color: #c2410c; font-size: 12px;">
+                One mapping per line. Kubernetes resolves <code>$(EXISTING_VAR)</code> from the <code>envFrom</code> secret at pod startup. Applied to both parent and sub-component containers.
+            </p>
+        </div>
+
+        <!-- ==================== DNS RESOLVER (Rare) ==================== -->
+        <details style="margin-bottom: 15px; border: 1px solid #e2e8f0; border-radius: 8px;">
+            <summary style="padding: 15px; background-color: #f1f5f9; cursor: pointer; font-weight: bold; color: #475569;">
+                Custom DNS Resolver (Rare Use Case) - Click to expand
+            </summary>
+            <div style="padding: 15px; font-size: 12px;">
+                <p>For apps requiring custom DNS (e.g., DNSSEC validation). Set on sub-component or parent component.</p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin: 10px 0;">
+                    <tr>
+                        <td style="padding: 6px; border: 1px solid #e2e8f0; width: 30%;"><strong><code>dns_resolver</code></strong></td>
+                        <td style="padding: 6px; border: 1px solid #e2e8f0;">Custom nameserver IP (e.g., unbound ClusterIP). Set on sub-component or parent.</td>
+                    </tr>
+                    <tr style="background-color: #f8fafc;">
+                        <td style="padding: 6px; border: 1px solid #e2e8f0;"><strong><code>cluster_dns</code></strong></td>
+                        <td style="padding: 6px; border: 1px solid #e2e8f0;">Cluster DNS IP as fallback nameserver. Set on <strong>parent component</strong> only.</td>
+                    </tr>
+                </table>
+                <p>When <code>dns_resolver</code> is set: <code>dnsPolicy: "None"</code> + custom nameservers + cluster search domains. When empty: no effect.</p>
             </div>
         </details>
 

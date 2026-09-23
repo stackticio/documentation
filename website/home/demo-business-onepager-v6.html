@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stacktic | One-Pager</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --indigo: #4f46e5;
+            --indigo-light: #818cf8;
+            --purple: #7c3aed;
+            --cyan: #0891b2;
+            --green: #059669;
+            --green-light: #34d399;
+            --amber: #fbbf24;
+            --red: #dc2626;
+            --red-light: #f87171;
+            --dark: #0b0f1e;
+            --dark-2: #1a1a2e;
+            --slate-700: #334155;
+            --slate-600: #475569;
+            --slate-500: #64748b;
+            --slate-400: #94a3b8;
+            --slate-300: #cbd5e1;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+            --slate-50: #f8fafc;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; min-width: 0; }
+        html, body { width: 100%; }
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f1f5f9;
+            color: var(--dark-2);
+            line-height: 1.4;
+            font-size: 11px;
+        }
+        .serif { font-family: 'DM Serif Display', Georgia, serif; }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 16px auto;
+            padding: 11mm 12mm;
+            background: #fff;
+            box-shadow: 0 8px 32px rgba(11,15,30,0.12);
+        }
+        .page > * + * { margin-top: 9px; }
+
+        /* ===== BRAND ===== */
+        .brand {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--slate-200);
+        }
+        .brand .logo {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 26px;
+            line-height: 0.9;
+            color: var(--indigo);
+            letter-spacing: -1px;
+        }
+        .brand .tagline { font-size: 8px; color: var(--slate-500); margin-top: 3px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+        .brand .contact { text-align: right; font-size: 9px; line-height: 1.4; }
+        .brand .contact .url { color: var(--dark-2); font-weight: 800; }
+        .brand .contact .email { color: var(--slate-500); }
+
+        /* ===== STORY MARKERS ===== */
+        .marker {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+        .marker .n { font-family: 'DM Serif Display', Georgia, serif; font-size: 11px; color: var(--indigo); opacity: 0.6; }
+        .marker .l { font-size: 8.5px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; color: var(--slate-500); }
+        .marker.on-dark .n { color: var(--indigo-light); }
+        .marker.on-dark .l { color: rgba(255,255,255,0.55); }
+        .marker.on-purple .n { color: rgba(255,255,255,0.9); }
+        .marker.on-purple .l { color: rgba(255,255,255,0.7); }
+
+        /* ===== 01. HERO ===== */
+        .hero-title {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 26px;
+            line-height: 1.05;
+            letter-spacing: -1.2px;
+            color: var(--dark-2);
+            margin-bottom: 6px;
+        }
+        .hero-title .accent { color: var(--indigo); }
+        .hero-sub {
+            font-size: 12px;
+            color: var(--slate-600);
+            line-height: 1.45;
+            margin-bottom: 10px;
+        }
+        .hero-sub strong { color: var(--dark-2); font-weight: 700; }
+
+        /* THE PROMISE — big pull-quote, the centerpiece */
+        .hero-promise {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-style: italic;
+            font-size: 20px;
+            line-height: 1.25;
+            color: var(--dark-2);
+            padding: 14px 18px;
+            background: linear-gradient(135deg, rgba(79,70,229,0.05), rgba(124,58,237,0.03));
+            border-left: 3px solid var(--indigo);
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 10px;
+            letter-spacing: -0.4px;
+            position: relative;
+        }
+        .hero-promise strong { font-style: normal; color: var(--indigo); font-weight: 700; }
+        .hero-promise::before {
+            content: "“";
+            font-family: 'DM Serif Display', Georgia, serif;
+            position: absolute;
+            top: -8px;
+            left: 8px;
+            font-size: 36px;
+            color: var(--indigo);
+            opacity: 0.25;
+            line-height: 1;
+        }
+
+        .pillars {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 6px;
+        }
+        .pillar {
+            background: var(--slate-50);
+            border: 1px solid var(--slate-200);
+            border-radius: 7px;
+            padding: 8px 6px;
+            text-align: center;
+        }
+        .pillar .v {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 22px;
+            line-height: 1;
+            font-weight: 900;
+            letter-spacing: -1px;
+            color: var(--indigo);
+        }
+        .pillar .l {
+            font-size: 8px;
+            color: var(--slate-500);
+            margin-top: 4px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .pillar.p2 .v { color: var(--purple); }
+        .pillar.p3 .v { color: var(--cyan); }
+        .pillar.p4 .v { color: var(--green); }
+
+        /* ===== CARDS ===== */
+        .card {
+            border-radius: 10px;
+            padding: 12px 14px;
+        }
+        .card.dark { background: var(--dark); color: #fff; }
+        .card.feat { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: #fff; }
+        .card.light { background: linear-gradient(135deg, var(--slate-50), var(--slate-100)); border: 1px solid var(--slate-200); }
+        .card.green { background: linear-gradient(135deg, #ecfdf5, #d1fae5); border: 1px solid #a7f3d0; }
+
+        .card-title {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 16px;
+            line-height: 1.15;
+            letter-spacing: -0.4px;
+            margin-bottom: 4px;
+        }
+        .card-title.on-dark { color: #fff; }
+        .card-title .red { color: var(--red-light); }
+        .card-title .indigo { color: var(--indigo); }
+        .card-title .amber { color: var(--amber); }
+        .card-lede {
+            font-size: 10.5px;
+            line-height: 1.45;
+            color: var(--slate-600);
+            margin-bottom: 8px;
+        }
+        .card-lede.on-dark { color: var(--slate-300); }
+
+        /* ===== 02. PROBLEM ===== */
+        .pain-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 3px 14px;
+        }
+        .pain {
+            display: flex;
+            gap: 7px;
+            padding: 3px 0;
+        }
+        .pain .ic {
+            flex-shrink: 0;
+            width: 18px;
+            height: 18px;
+            border-radius: 5px;
+            background: rgba(248,113,113,0.10);
+            border: 1px solid rgba(248,113,113,0.28);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--red-light);
+            font-weight: 800;
+            font-size: 9.5px;
+        }
+        .pain .ic.tight { font-size: 7.5px; }
+        .pain .t {
+            font-size: 9.5px;
+            color: var(--slate-400);
+            line-height: 1.3;
+            flex: 1;
+            min-width: 0;
+        }
+        .pain .t b {
+            display: block;
+            color: #fff;
+            font-weight: 800;
+            font-size: 10.5px;
+            margin-bottom: 1px;
+            letter-spacing: -0.1px;
+        }
+        .close-dark {
+            margin-top: 8px;
+            padding-top: 6px;
+            border-top: 1px solid rgba(255,255,255,0.10);
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 12px;
+            line-height: 1.2;
+            color: var(--red-light);
+            text-align: center;
+        }
+
+        /* ===== BRIDGE: WHY NOW ===== */
+        .shifts {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+        }
+        .shift {
+            background: #fff;
+            border: 1px solid var(--slate-200);
+            border-radius: 8px;
+            padding: 9px 11px;
+            border-top: 3px solid var(--indigo);
+        }
+        .shift.s2 { border-top-color: var(--amber); }
+        .shift.s3 { border-top-color: var(--red); }
+        .shift .h {
+            font-size: 10.5px;
+            font-weight: 800;
+            color: var(--dark-2);
+            margin-bottom: 3px;
+            letter-spacing: -0.2px;
+        }
+        .shift .p {
+            font-size: 9.5px;
+            color: var(--slate-600);
+            line-height: 1.35;
+        }
+        .shift .p strong { color: var(--dark-2); }
+        .shift-close {
+            margin-top: 8px;
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 12px;
+            color: var(--dark-2);
+            text-align: center;
+            line-height: 1.2;
+        }
+        .shift-close .red { color: var(--red); }
+
+        /* ===== 03. SOLUTION ===== */
+        .meet-statement {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 18px;
+            line-height: 1.15;
+            color: #fff;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        .meet-kicker {
+            font-size: 8.5px;
+            font-weight: 800;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.75);
+            margin-bottom: 2px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 6px;
+        }
+        .feat-row {
+            background: rgba(255,255,255,0.10);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 7px;
+            padding: 7px 10px;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+        .feat-row .ck {
+            flex-shrink: 0;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #fff;
+            color: var(--indigo);
+            font-size: 9px;
+            font-weight: 900;
+            line-height: 14px;
+            text-align: center;
+            margin-top: 1px;
+        }
+        .feat-row .h {
+            font-size: 10.5px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.1px;
+            margin-bottom: 1px;
+        }
+        .feat-row .p {
+            font-size: 9px;
+            color: rgba(255,255,255,0.78);
+            line-height: 1.35;
+        }
+
+        .universal-strip {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 5px;
+            margin-top: 8px;
+        }
+        .u-tag {
+            background: rgba(255,255,255,0.10);
+            border-radius: 5px;
+            padding: 5px 7px;
+            border-top: 2px solid;
+            font-size: 8px;
+            line-height: 1.3;
+            color: rgba(255,255,255,0.82);
+        }
+        .u-tag b { display: block; color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 2px; }
+        .u-tag.u1 { border-top-color: #34d399; }
+        .u-tag.u2 { border-top-color: #fbbf24; }
+        .u-tag.u3 { border-top-color: var(--indigo-light); }
+        .u-tag.u4 { border-top-color: #c4b5fd; }
+
+        /* ===== 04. VALUE / PROOF (smaller) ===== */
+        .proof-scenario {
+            font-size: 9.5px;
+            color: var(--slate-400);
+        }
+        .proof-scenario strong { color: #fff; }
+
+        .proof-headline {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 14px;
+            padding: 6px 0;
+            border-top: 1px solid rgba(255,255,255,0.10);
+            border-bottom: 1px solid rgba(255,255,255,0.10);
+            margin: 6px 0 8px;
+        }
+        .proof-headline .big {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 34px;
+            line-height: 0.9;
+            font-weight: 900;
+            color: var(--green-light);
+            letter-spacing: -2px;
+        }
+        .proof-headline .label {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-style: italic;
+            font-size: 11px;
+            color: var(--slate-300);
+            line-height: 1.3;
+        }
+        .proof-headline .label small {
+            display: block;
+            font-style: normal;
+            font-size: 7.5px;
+            color: var(--slate-500);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 800;
+            margin-top: 2px;
+        }
+
+        .proof-cols {
+            display: grid;
+            grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+            gap: 12px;
+        }
+        .chart-svg { width: 100%; height: auto; display: block; }
+        .chart-foot {
+            text-align: center;
+            margin-top: 4px;
+            font-size: 8px;
+            color: var(--slate-400);
+            line-height: 1.35;
+        }
+        .chart-foot strong { color: var(--amber); }
+
+        .savings { display: flex; flex-direction: column; }
+        .save {
+            display: flex;
+            gap: 8px;
+            padding: 3px 0;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            align-items: baseline;
+        }
+        .save:first-child { border-top: none; padding-top: 0; }
+        .save .pct {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 16px;
+            line-height: 1;
+            font-weight: 900;
+            color: var(--green-light);
+            flex-shrink: 0;
+            min-width: 48px;
+            letter-spacing: -0.7px;
+        }
+        .save.r5 .pct { color: var(--indigo-light); }
+        .save .t {
+            font-size: 9.5px;
+            color: var(--slate-300);
+            line-height: 1.35;
+        }
+        .save .t b { color: #fff; font-weight: 800; }
+
+        .payback {
+            text-align: center;
+            background: rgba(251,191,36,0.10);
+            border: 1px solid rgba(251,191,36,0.22);
+            border-radius: 6px;
+            padding: 6px;
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 12px;
+            color: var(--amber);
+            margin-top: 8px;
+        }
+        .payback strong { color: #fff; font-weight: normal; }
+
+        /* ===== CTA ===== */
+        .cta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: #fff;
+        }
+        .cta-line {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 14px;
+            line-height: 1.25;
+        }
+        .cta-line span { opacity: 0.85; }
+        .cta-btn {
+            display: inline-block;
+            background: #fff;
+            color: var(--indigo);
+            font-weight: 800;
+            font-size: 10px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        /* ===== PRINT ===== */
+        @page { size: A4; margin: 0; }
+        @media print {
+            body { background: #fff; }
+            .page { margin: 0; box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page">
+
+    <!-- BRAND -->
+    <div class="brand">
+        <div>
+            <div class="logo">Stacktic</div>
+            <div class="tagline">The App Factory</div>
+        </div>
+        <div class="contact">
+            <div class="url">stacktic.io</div>
+            <div class="email">info@stacktic.io</div>
+        </div>
+    </div>
+
+    <!-- 01. WHAT IS STACKTIC -->
+    <div>
+        <div class="marker"><span class="n">01</span><span class="l">What is Stacktic</span></div>
+        <h1 class="hero-title">
+            Stacktic builds, secures and operates your entire software stack, <span class="accent">automatically.</span>
+        </h1>
+        <div class="hero-sub">
+            One definition. Any cloud. Every regulation. <strong>Built once. Runs everywhere. Compliant forever.</strong>
+        </div>
+        <div class="hero-promise">
+            Stacktic transforms AI-driven automation into <strong>deterministic, compliant and version-controlled</strong> operational systems.
+        </div>
+        <div class="pillars">
+            <div class="pillar"><div class="v">−80%</div><div class="l">Ops Cost</div></div>
+            <div class="pillar p2"><div class="v">−40%</div><div class="l">Infra &amp; Licensing</div></div>
+            <div class="pillar p3"><div class="v">+10×</div><div class="l">Faster Delivery</div></div>
+            <div class="pillar p4"><div class="v">0</div><div class="l">Vendor Lock-in</div></div>
+        </div>
+    </div>
+
+    <!-- 02. THE PROBLEM -->
+    <div class="card dark">
+        <div class="marker on-dark"><span class="n">02</span><span class="l">The Problem</span></div>
+        <h2 class="card-title on-dark">AI rewrote the rules. <span class="red">Your apps haven't adjusted.</span></h2>
+        <div class="card-lede on-dark">Apps must now run at machine speed, adapt continuously, automate every operation and prove compliance in real time.</div>
+
+        <div class="pain-grid">
+            <div class="pain"><div class="ic">$</div><div class="t"><b>Engineering in survival mode</b>70% of engineer-days just keep the stack alive.</div></div>
+            <div class="pain"><div class="ic">↗</div><div class="t"><b>Licensing &amp; cloud erode margins</b>SaaS renewals rise. One bill becomes three.</div></div>
+            <div class="pain"><div class="ic">⏱</div><div class="t"><b>Compliance: millions and months</b>PCI / HIPAA / SOC 2 / DORA. 8 mo &amp; $400K each.</div></div>
+            <div class="pain"><div class="ic">🔒</div><div class="t"><b>Vendor lock-in dictates strategy</b>Switching becomes impossible. Strategy serves the vendor.</div></div>
+            <div class="pain"><div class="ic">≠</div><div class="t"><b>No two stacks look alike</b>Standards drift. Audit gaps surface that no one knew existed.</div></div>
+            <div class="pain"><div class="ic tight">P</div><div class="t"><b>Private data is leaving the building</b>Customer and IP data flows into clouds and AI you don't control.</div></div>
+            <div class="pain"><div class="ic tight">AI</div><div class="t"><b>AI is running with the keys</b>Agents act on your data. No audit trail. No kill switch.</div></div>
+            <div class="pain"><div class="ic">!</div><div class="t"><b>Politics owns the roadmap</b>Past decisions and silos shape the stack, not the business.</div></div>
+        </div>
+
+        <div class="close-dark">Those who fail to automate and adapt will be left behind.</div>
+    </div>
+
+    <!-- WHY NOW — bridge -->
+    <div class="card light">
+        <div class="marker"><span class="n">·</span><span class="l">Why It Can't Wait</span></div>
+        <div class="shifts">
+            <div class="shift s1">
+                <div class="h">The stack is exploding.</div>
+                <div class="p">Open source <strong>+25%/yr</strong>. AI tooling faster. OSS downloads <strong>+67% YoY in 2025</strong>.</div>
+            </div>
+            <div class="shift s2">
+                <div class="h">Dependency is dangerous.</div>
+                <div class="p">Sovereignty, cloud costs, geopolitics. <strong>Portability is now a strategy</strong>.</div>
+            </div>
+            <div class="shift s3">
+                <div class="h">AI attacks at machine speed.</div>
+                <div class="p">Attackers automate. Breach windows shrink from days to minutes.</div>
+            </div>
+        </div>
+        <div class="shift-close">Complexity grows faster than engineering. <span class="red">You cannot hire your way out.</span></div>
+    </div>
+
+    <!-- 03. WHAT IT SOLVES -->
+    <div class="card feat">
+        <div class="marker on-purple"><span class="n">03</span><span class="l">What It Solves</span></div>
+        <div class="meet-kicker">The Answer</div>
+        <div class="meet-statement">Four guarantees, every stack.</div>
+
+        <div class="features">
+            <div class="feat-row">
+                <div class="ck">✓</div>
+                <div>
+                    <div class="h">Compliance built in</div>
+                    <div class="p">PCI, HIPAA, SOC 2, DORA ship with the stack. Not bolted on.</div>
+                </div>
+            </div>
+            <div class="feat-row">
+                <div class="ck">✓</div>
+                <div>
+                    <div class="h">Ships ready now</div>
+                    <div class="p">No platform projects. Stacks ship hardened by default.</div>
+                </div>
+            </div>
+            <div class="feat-row">
+                <div class="ck">✓</div>
+                <div>
+                    <div class="h">Runs anywhere</div>
+                    <div class="p">Any cloud, on-prem, air-gapped or edge. One definition.</div>
+                </div>
+            </div>
+            <div class="feat-row">
+                <div class="ck">✓</div>
+                <div>
+                    <div class="h">AI-native, AI-governed</div>
+                    <div class="p">Any model. Any MCP server. Agents gated &amp; audited.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="universal-strip">
+            <div class="u-tag u1"><b>Clouds &amp; Infra</b>AWS · Azure · GCP · On-Prem · Air-Gapped · Edge</div>
+            <div class="u-tag u2"><b>Compliance</b>PCI · HIPAA · SOC 2 · DORA</div>
+            <div class="u-tag u3"><b>Operations</b>DataOps · SecOps · SRE · NetOps · DevOps</div>
+            <div class="u-tag u4"><b>AI Governance</b>Any LLM · MCP · RAG · Agents</div>
+        </div>
+    </div>
+
+    <!-- 04. THE VALUE -->
+    <div class="card dark">
+        <div class="marker on-dark"><span class="n">04</span><span class="l">The Value · Real Scenario</span></div>
+        <div class="proof-scenario"><strong>Scenario:</strong> 20 engineers · 10 production stacks · $4M+ annual stack budget</div>
+
+        <div class="proof-headline">
+            <div class="big">$5M+</div>
+            <div class="label">Recovered. Year one.<small>Payback under 12 months</small></div>
+        </div>
+
+        <div class="proof-cols">
+            <!-- Chart -->
+            <div>
+                <svg class="chart-svg" viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="stkGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#34d399"/>
+                            <stop offset="100%" stop-color="#059669"/>
+                        </linearGradient>
+                    </defs>
+                    <line x1="20" y1="135" x2="180" y2="135" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+
+                    <g>
+                        <rect x="40" y="45" width="40" height="90" fill="#475569"/>
+                        <text x="60" y="95" text-anchor="middle" font-family="DM Sans" font-size="6.5" font-weight="800" fill="#fff">$3.0M</text>
+                        <text x="60" y="105" text-anchor="middle" font-family="DM Sans" font-size="6" fill="rgba(255,255,255,0.7)">Ops</text>
+
+                        <rect x="40" y="22" width="40" height="23" fill="#fbbf24"/>
+                        <text x="60" y="37" text-anchor="middle" font-family="DM Sans" font-size="6.5" font-weight="800" fill="#7c2d12">$1.2M</text>
+
+                        <rect x="40" y="10" width="40" height="12" fill="#f87171" rx="2 2 0 0"/>
+                        <text x="60" y="19" text-anchor="middle" font-family="DM Sans" font-size="6" font-weight="800" fill="#7f1d1d">$400K</text>
+
+                        <text x="60" y="6" text-anchor="middle" font-family="DM Serif Display" font-size="12" font-weight="900" fill="#fff" letter-spacing="-0.5">$4.6M</text>
+                        <text x="60" y="152" text-anchor="middle" font-family="DM Sans" font-size="6.5" font-weight="800" letter-spacing="2" fill="rgba(255,255,255,0.55)">TODAY</text>
+                    </g>
+
+                    <g>
+                        <line x1="92" y1="80" x2="108" y2="80" stroke="#34d399" stroke-width="1.5" stroke-dasharray="2 2"/>
+                        <path d="M 108 80 L 102 77 L 102 83 Z" fill="#34d399"/>
+                        <text x="100" y="73" text-anchor="middle" font-family="DM Serif Display" font-size="11" font-weight="900" fill="#34d399" letter-spacing="-0.5">−71%</text>
+                    </g>
+
+                    <g>
+                        <rect x="120" y="105" width="40" height="30" fill="url(#stkGrad)" rx="2 2 0 0"/>
+                        <text x="140" y="99" text-anchor="middle" font-family="DM Serif Display" font-size="11" font-weight="900" fill="#34d399" letter-spacing="-0.5">$1.35M</text>
+                        <text x="140" y="123" text-anchor="middle" font-family="DM Sans" font-size="6" font-weight="800" fill="#053820">$900K+$450K</text>
+                        <text x="140" y="152" text-anchor="middle" font-family="DM Sans" font-size="6.5" font-weight="800" letter-spacing="2" fill="#34d399">STACKTIC</text>
+                    </g>
+                </svg>
+                <div class="chart-foot">Plus <strong>$4M compliance</strong> avoided year one.</div>
+            </div>
+
+            <!-- Savings -->
+            <div class="savings">
+                <div class="save"><div class="pct">−80%</div><div class="t"><b>Specialized ops teams.</b> DataOps, SecOps, DevOps, SRE, NetOps — automated.</div></div>
+                <div class="save"><div class="pct">−70%</div><div class="t"><b>Operations cost.</b> $3M → $900K. $2.1M back annually.</div></div>
+                <div class="save"><div class="pct">−63%</div><div class="t"><b>Licensing &amp; infra.</b> $1.2M → $450K. OSS replaces SaaS.</div></div>
+                <div class="save"><div class="pct">−100%</div><div class="t"><b>Compliance project.</b> 8 mo + $400K per app → built in.</div></div>
+                <div class="save r5"><div class="pct">+10×</div><div class="t"><b>Faster to production.</b> 6–9 months → 1–2.</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta">
+        <div class="cta-line">The bill grows. The pace accelerates.<br><span>Your next stack ships in weeks.</span></div>
+        <a class="cta-btn" href="https://stacktic.io">stacktic.io →</a>
+    </div>
+
+</div>
+
+</body>
+</html>

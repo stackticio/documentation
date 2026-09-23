@@ -1,0 +1,138 @@
+---
+id: blueprints-ml
+slug: /blueprints/ml
+title: Machine learning
+sidebar_label: Machine learning
+sidebar_position: 2
+description: You do not configure training infrastructure. You draw it — and two moments stay deliberately human.
+---
+
+<Hero eyebrow="Blueprint" title="Draw the loop, not the plumbing">
+An experiment is where runs are logged. A registered model is where trained versions live.
+A job trains or applies one. Buckets hold data, labels and weights. The links between them
+generate every address, name, credential, GPU placement and network rule.
+</Hero>
+
+## The shape
+
+<Figure caption="Everything below the dotted line is generated. The two human moments are starting a run and promoting a version.">
+<svg viewBox="0 0 880 340" role="img" aria-label="Machine learning blueprint">
+  <defs>
+    <marker id="stkA4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--stk-steel)" />
+    </marker>
+  </defs>
+  <g fontFamily="Instrument Sans, sans-serif">
+    <rect x="20" y="24" width="190" height="72" rx="12" fill="var(--stk-panel)" stroke="var(--stk-blue)" strokeWidth="1.2"/>
+    <text x="115" y="50" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">buckets</text>
+    <text x="115" y="69" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">curated data · weights</text>
+    <text x="115" y="85" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">feedback</text>
+
+    <rect x="330" y="24" width="190" height="72" rx="12" fill="var(--stk-panel)" stroke="var(--stk-blue)" strokeWidth="1.2"/>
+    <text x="425" y="50" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">your trainer image</text>
+    <text x="425" y="69" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">built from your repository</text>
+    <text x="425" y="85" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">by the platform</text>
+
+    <rect x="640" y="24" width="210" height="72" rx="12" fill="var(--stk-panel)" stroke="var(--stk-mint)" strokeWidth="1.3"/>
+    <text x="745" y="50" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">experiment</text>
+    <text x="745" y="69" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">every run lands here</text>
+    <text x="745" y="85" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">tracking · artifacts</text>
+
+    <rect x="20" y="150" width="190" height="72" rx="12" fill="var(--stk-panel)" stroke="var(--stk-blue)" strokeWidth="1.2"/>
+    <text x="115" y="176" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">training job</text>
+    <text x="115" y="195" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">GPU · time limit</text>
+    <text x="115" y="211" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">run parameters</text>
+
+    <rect x="330" y="150" width="190" height="72" rx="12" fill="var(--stk-panel)" stroke="var(--stk-amber)" strokeWidth="1.4"/>
+    <text x="425" y="176" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">decision</text>
+    <text x="425" y="195" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">a person signs</text>
+    <text x="425" y="211" textAnchor="middle" fontSize="10" fill="var(--stk-amber)">HUMAN</text>
+
+    <rect x="640" y="150" width="210" height="72" rx="12" fill="var(--stk-panel)" stroke="var(--stk-mint)" strokeWidth="1.3"/>
+    <text x="745" y="176" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">registered model</text>
+    <text x="745" y="195" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">v1 · v2 · v3 …</text>
+    <text x="745" y="211" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">alias: champion</text>
+
+    <rect x="640" y="264" width="210" height="60" rx="12" fill="var(--stk-panel)" stroke="var(--stk-blue)" strokeWidth="1.2"/>
+    <text x="745" y="290" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">apply job or serving</text>
+    <text x="745" y="308" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">loads the current alias</text>
+
+    <line x1="326" y1="60" x2="216" y2="60" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#stkA4)"/>
+    <text x="271" y="50" textAnchor="middle" fontSize="9.5" fill="var(--stk-steel)">reads</text>
+    <line x1="524" y1="60" x2="634" y2="60" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#stkA4)"/>
+    <text x="579" y="50" textAnchor="middle" fontSize="9.5" fill="var(--stk-steel)">logs</text>
+    <line x1="115" y1="146" x2="115" y2="102" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#stkA4)"/>
+    <line x1="216" y1="186" x2="326" y2="186" stroke="var(--stk-amber)" strokeWidth="1.2" markerEnd="url(#stkA4)"/>
+    <line x1="524" y1="186" x2="634" y2="186" stroke="var(--stk-amber)" strokeWidth="1.2" markerEnd="url(#stkA4)"/>
+    <line x1="745" y1="102" x2="745" y2="146" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#stkA4)"/>
+    <line x1="745" y1="228" x2="745" y2="260" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#stkA4)"/>
+  </g>
+</svg>
+</Figure>
+
+## What each piece is
+
+| Piece | Role |
+|---|---|
+| **Experiment tracking and model registry** | Every run, every metric, every artifact, every version |
+| **A relational database** | The registry's backend store, and pipeline metadata |
+| **Object storage buckets** | Artifacts, curated data, labels, weights, run logs |
+| **An orchestrator** | Runs training and apply jobs on demand, on GPU when asked |
+| **Your trainer image** | Your own code, built by the platform from your repository |
+| **A gateway** | The tracking interface's address, and a login in front of it when you want one |
+| **Metrics** | Scrapes the tracking server's own health — not the metrics your runs log |
+| **A decision record** | The signature a job reads before it starts, and that a promotion follows |
+
+Without a database and a bucket, the registry falls back to local storage. That fallback is
+for development only, and the platform says so rather than letting you discover it.
+
+## The two sub-components that carry the loop
+
+| Sub-component | Side | Who links to it | What the link generates |
+|---|---|---|---|
+| **Experiment** | Write | Trainers — a job, an asset, or your own code component | The tracking address and the experiment name, so the run lands in the right place |
+| **Registered model** | Read | Consumers — an apply job or a serving component | The model address, its name and its alias |
+
+A sub-component-to-sub-component link binds them: *runs logged here become versions there*.
+A trainer linked only to the experiment still learns which model to register to, because
+the binding is read from the experiment's own record.
+
+Both are created for you when the registry deploys, idempotently, with their tags and
+descriptions.
+
+## Promotion is moving one alias
+
+Consumers load the model by **alias**, not by version number. Promotion is a person moving
+the alias to another version.
+
+No rebuild. No redeploy. The next run loads the new champion, and rolling back is moving
+the alias back.
+
+## Two deliberate human moments
+
+<Cards cols={2}>
+  <Card kicker="Before" title="Starting a run">
+    A training run can cost real money. A job can be made to refuse to start until a
+    decision record carries a signature.
+  </Card>
+  <Card kicker="After" title="Promoting a version">
+    A promotion changes what your users get. It can be made to follow a signed decision
+    rather than a chat message.
+  </Card>
+</Cards>
+
+Everything between those two moments is automatic. Both signatures are records, and an AI
+may propose them but never sign them.
+
+→ [Reviews and approvals](/docs/compliance/reviews)
+
+## GPU, queueing and cost
+
+GPU placement comes from the job's attributes — the node selection, the sharing mode, the
+memory fraction per model. Heavy periodic work can be admitted through a queue rather than
+competing with production workloads, with priority expressed as an attribute.
+
+Because all of it is on the graph, the expensive parts of an ML platform are visible in a
+diff and roll back with everything else.
+
+→ [Lifecycle and scale](/docs/day2/lifecycle)

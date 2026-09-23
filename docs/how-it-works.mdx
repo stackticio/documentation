@@ -1,0 +1,156 @@
+---
+id: how-it-works
+title: How it works
+sidebar_label: How it works
+sidebar_position: 2
+description: The four layers of Stacktic — declare the graph, generate the system, validate it, and operate it as a versioned unit.
+---
+
+<Hero eyebrow="The model" title="One graph, four layers">
+Everything Stacktic does is a consequence of one decision: the relationships between the
+parts of a system are declared, not implied.
+</Hero>
+
+## 1 · Declare
+
+A stack is a directed graph held by the platform. Three kinds of node, one kind of edge:
+
+| Element | What it is | Examples |
+|---|---|---|
+| **Component** | A technology instance in the stack | your application, a PostgreSQL cluster, a gateway, an identity provider, a vector store |
+| **Sub-component** | A resource that a component owns | a database, a bucket, a Kafka topic, a RabbitMQ queue, an OIDC client, a served model |
+| **Link** | A typed edge between two nodes | `fastapi-cnpg`, `apisix-langflow`, `prometheus-mongodb` |
+| **Attribute** | A value on a component, a sub-component or a link | namespace, version, replica count, retention, whether OIDC is on |
+
+A link type is always `sourceType-targetType`. That string is the contract: it selects
+which generation logic runs, which files appear, and which values are carried across.
+
+Attributes live in exactly three places — on the component, on the sub-component, or on
+the link. Nothing else carries configuration, which is why the graph alone is enough to
+regenerate the whole system.
+
+## 2 · Generate
+
+A build renders one template per component and aggregates the results into a single
+GitOps repository.
+
+<Steps>
+  <Step title="Parse the graph">
+    The diagram becomes a typed object model: components, sub-components, links indexed by
+    source and by target.
+  </Step>
+  <Step title="Resolve relationships">
+    Before a component renders, its inbound and outbound links are resolved. A template
+    asks "is there a link of type X into me?" and generates accordingly — the consumer's
+    environment variables, the producer's credentials, the route, the policy.
+  </Step>
+  <Step title="Render every component">
+    Components render in parallel, each into its own tree. Helm charts are rendered to
+    plain YAML so the output is readable and diffable rather than a chart you must trust.
+  </Step>
+  <Step title="Aggregate">
+    Per-component output is merged into one repository layout — <code>k8s/build</code>,
+    <code>k8s/deploy</code>, overlays per environment, docs, scripts — and the stack's own
+    metadata is written alongside it.
+  </Step>
+  <Step title="Commit">
+    The result is committed to your stack repository. Your own edits to marked files are
+    merged rather than overwritten; a conflict stops the push instead of committing
+    markers.
+  </Step>
+</Steps>
+
+### Incremental builds
+
+A full build regenerates everything. A **push** does not: it diffs the graph against the
+last pushed state, resolves which files each changed attribute can possibly affect through
+a per-template impact map, and re-renders only those files. The build log ends with the
+exact `kubectl apply` lines for what changed.
+
+<Figure caption="A link is not documentation. It is the instruction that produces configuration on both sides of the edge.">
+<svg viewBox="0 0 900 230" role="img" aria-label="One link generating configuration on both sides">
+  <g fontFamily="Instrument Sans, sans-serif">
+    <rect x="40" y="70" width="170" height="76" rx="13" fill="var(--stk-panel)" stroke="var(--stk-blue)" strokeWidth="1.2"/>
+    <text x="125" y="100" textAnchor="middle" fontSize="13" fontWeight="600" fill="var(--ifm-heading-color)">your application</text>
+    <text x="125" y="122" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">component</text>
+
+    <rect x="690" y="70" width="170" height="76" rx="13" fill="var(--stk-panel)" stroke="var(--stk-blue)" strokeWidth="1.2"/>
+    <text x="775" y="100" textAnchor="middle" fontSize="13" fontWeight="600" fill="var(--ifm-heading-color)">PostgreSQL</text>
+    <text x="775" y="122" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">component + db sub-component</text>
+
+    <line x1="212" y1="108" x2="686" y2="108" stroke="var(--stk-blue)" strokeWidth="1.6"/>
+    <rect x="392" y="90" width="116" height="34" rx="9" fill="var(--stk-navy-2)" stroke="var(--stk-blue)" strokeWidth="1"/>
+    <text x="450" y="112" textAnchor="middle" fontSize="12" fontFamily="Fira Code, monospace" fill="var(--stk-blue-soft)">one link</text>
+
+    <text x="450" y="34" textAnchor="middle" fontSize="11" fontFamily="Fira Code, monospace" fill="var(--stk-steel)">WHAT THE EDGE PRODUCES</text>
+
+    <g fontSize="11" fill="var(--stk-steel)">
+      <text x="125" y="175" textAnchor="middle">connection env vars</text>
+      <text x="125" y="193" textAnchor="middle">mounted secret</text>
+      <text x="125" y="211" textAnchor="middle">egress network policy</text>
+
+      <text x="450" y="175" textAnchor="middle">credential generated once</text>
+      <text x="450" y="193" textAnchor="middle">scrape target · dashboard</text>
+      <text x="450" y="211" textAnchor="middle">backup subject</text>
+
+      <text x="775" y="175" textAnchor="middle">database + user created</text>
+      <text x="775" y="193" textAnchor="middle">ingress network policy</text>
+      <text x="775" y="211" textAnchor="middle">RBAC for cross-namespace</text>
+    </g>
+  </g>
+</svg>
+</Figure>
+
+## 3 · Validate
+
+Generation says what should exist. Validation proves what does.
+
+The **stack agent** is deployed into the stack and reads the same `stack-metadata.yaml`
+the build produced. Every declared relationship is proven layer by layer — was it rendered
+into the consumer, did the credential arrive, is the port reachable, does the role permit
+it, does the target actually answer with that credential — and the verdict names the layer
+that failed rather than a generic red cross.
+
+The same engine runs scored security and compliance scans, and stores every run as a
+hash-chained record with the metadata commit it was measured against.
+
+→ [Day 2 — operate and prove](/docs/day2/) · [Evidence and attestation](/docs/day2/evidence)
+
+## 4 · Operate
+
+The stack is the unit of version. Not a manifest, not a chart — the whole graph plus every
+attribute on it.
+
+| Operation | What it means |
+|---|---|
+| **Snapshot** | The full topology and configuration at a point in time |
+| **Duplicate** | The same system as a second environment, with its own values |
+| **Roll back** | The entire stack returns to a previous state, relations included |
+| **Compare** | A diff between two versions of the system, not of a file |
+| **Migrate** | A component version moves, and everything that depends on it moves with it |
+
+Because a change is expressed on the graph, its consequences are computable before it is
+applied. Asking "what does this attribute touch" returns the files, the components
+downstream, and the dependents that will need attention — which is what makes it safe to
+let an AI propose the change.
+
+## What this buys you
+
+<Cards cols={2}>
+  <Card kicker="Day 0–1" title="Nothing is guessed">
+    The model designs against a catalog of real components, real link types and real
+    attributes. Anything it cannot express is reported as a gap, not improvised.
+  </Card>
+  <Card kicker="Day 0–1" title="The posture is generated">
+    Network policies, RBAC, secret encryption, admission policy and TLS are produced from
+    the topology — not added afterwards by whoever remembers.
+  </Card>
+  <Card kicker="Day 2" title="Change re-applies the rules">
+    Modify the system and the security rules regenerate with it. There is no window in
+    which the policy describes last month's topology.
+  </Card>
+  <Card kicker="Day 2" title="Claims are checkable">
+    Every validation run carries the hash of the state it judged, so a report names the
+    system it was true of.
+  </Card>
+</Cards>

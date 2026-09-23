@@ -1,0 +1,75 @@
+---
+id: platform-collaboration
+slug: /platform/collaboration
+title: Collaboration
+sidebar_label: Collaboration
+sidebar_position: 6
+description: Roles, temporary access with a full audit trail, and systems that share cells with each other.
+---
+
+<Hero eyebrow="People" title="Who may change what, and the record of who could">
+Access to a system is a role per person per system — including roles that expire by
+themselves, and a history that keeps every grant, change, expiry and revocation.
+</Hero>
+
+## Roles
+
+| Role | Typically |
+|---|---|
+| **Admin** | Owns the system: collaborators, configuration, everything below |
+| **Maintain** | Change the design, build, push, configuration |
+| **Write** | Change the design, build, push |
+| **Security auditor** | Read the system and its configuration, without changing the design |
+| **Read** | See the system |
+
+A system you are admin on is *yours*; everything else is *shared with you*.
+
+## Temporary access
+
+A grant can carry a time limit and the role to return to when it ends. It reverts by
+itself.
+
+This is the mechanism behind "give the contractor write access for the duration of the
+migration" without anyone needing to remember to take it away — and without the alternative
+people actually choose, which is permanent access nobody ever reviews.
+
+## The access history
+
+Every grant, every change of role, every expiry and every revocation writes a history row.
+Revoking a collaborator keeps the row as an expired collaborator rather than erasing that
+they ever had access; deleting it again removes it for good.
+
+Two different questions, both answerable: *who can change this system today*, and *who
+could change it in March*.
+
+## Systems that share cells
+
+Large environments are not one diagram. A shared platform stack, several product stacks and
+an observability stack are separate systems that nonetheless need to reference each other.
+
+A system can be published to other designs. Then:
+
+| Direction | Behaviour |
+|---|---|
+| **A copy is added elsewhere** | The origin records that another system holds a copy |
+| **The origin changes** | Name, type, group, attributes, added sub-components and links are propagated into every copy |
+| **The origin loses something** | The copies lose it too, along with the links that depended on it |
+| **A copy is removed** | The origin stops listing that system |
+
+At build time, a system can pull in the neighbourhood around the cells it references, so
+that generation knows about the components on the other side of the boundary — which is
+what makes cross-stack links, and the network rules and routes they imply, generate
+correctly.
+
+:::caution Renaming a system that others reference
+Cross-system references are resolved by the system's title. Renaming a system that other
+designs reference breaks those references silently. Decide the name before you publish it.
+:::
+
+## Multi-stack in practice
+
+The result is a federation: separate systems, each with its own graph, lifecycle, history
+and validation surface, that can still express dependencies on each other and generate the
+configuration those dependencies require.
+
+→ [Core concepts](/docs/concepts)

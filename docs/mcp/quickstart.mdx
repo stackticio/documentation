@@ -1,0 +1,170 @@
+---
+id: mcp-quickstart
+slug: /mcp/quickstart
+title: Start with the MCP initiator stack
+sidebar_label: Quickstart — initiator stack
+sidebar_position: 2
+description: The smallest Stacktic stack that gives an AI client a live, authenticated interface to the platform — and the one it then uses to build everything else.
+---
+
+<Hero eyebrow="Quickstart" title="Build the stack that builds the stacks">
+Six components. Once they are running, your AI client has an authenticated interface to
+the platform, the live graph and the cluster — and every later stack can be designed,
+generated, deployed and proven through it.
+</Hero>
+
+## Why this is the first thing you build
+
+You could design a full application stack by hand and connect the AI afterwards. It is the
+wrong order. The initiator stack is small, it is generic, and it hands the model the three
+things it needs before it can be useful: the **catalog** (what can exist), the **graph**
+(what does exist) and the **runtime** (what is actually true).
+
+Everything after this is a conversation.
+
+## What it contains
+
+| Component | Role in the initiator stack | Required |
+|---|---|---|
+| **Certificate manager** | TLS for the gateway, issued and renewed automatically | Yes |
+| **API gateway** | The public entry point; publishes the MCP endpoint on a subdomain | Yes |
+| **Identity provider** | The OIDC client your AI client authenticates against | Yes |
+| **MCP server** | The AI interface itself | Yes |
+| **Stack agent** | Topology queries, validation, scans — the MCP's runtime hands | Yes |
+| **Cache** | Persistent OAuth state, so the connector survives a pod restart | Strongly recommended |
+
+<Figure caption="The initiator stack. Every arrow is a typed link; each one generates the configuration that makes the next box reachable.">
+<svg viewBox="0 0 900 300" role="img" aria-label="MCP initiator stack topology">
+  <defs>
+    <marker id="stkA2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--stk-steel)" />
+    </marker>
+  </defs>
+  <g fontFamily="Instrument Sans, sans-serif">
+    <rect x="28" y="120" width="132" height="60" rx="12" fill="var(--stk-panel)" stroke="var(--stk-violet)" strokeWidth="1.3"/>
+    <text x="94" y="146" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">AI client</text>
+    <text x="94" y="164" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">outside the cluster</text>
+
+    <rect x="224" y="120" width="132" height="60" rx="12" fill="var(--stk-panel)" stroke="var(--stk-amber)" strokeWidth="1.3"/>
+    <text x="290" y="146" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">gateway</text>
+    <text x="290" y="164" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">TLS · route · rate limit</text>
+
+    <rect x="224" y="24" width="132" height="58" rx="12" fill="var(--stk-panel)" stroke="var(--stk-hair)" strokeWidth="1.2"/>
+    <text x="290" y="49" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">certificates</text>
+    <text x="290" y="67" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">issued and renewed</text>
+
+    <rect x="420" y="120" width="132" height="60" rx="12" fill="var(--stk-panel)" stroke="var(--stk-blue)" strokeWidth="1.5"/>
+    <text x="486" y="146" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">MCP server</text>
+    <text x="486" y="164" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">tools · knowledge</text>
+
+    <rect x="420" y="24" width="132" height="58" rx="12" fill="var(--stk-panel)" stroke="var(--stk-hair)" strokeWidth="1.2"/>
+    <text x="486" y="49" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">identity</text>
+    <text x="486" y="67" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">OIDC client</text>
+
+    <rect x="420" y="222" width="132" height="58" rx="12" fill="var(--stk-panel)" stroke="var(--stk-hair)" strokeWidth="1.2"/>
+    <text x="486" y="247" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">cache</text>
+    <text x="486" y="265" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">OAuth state persists</text>
+
+    <rect x="616" y="120" width="140" height="60" rx="12" fill="var(--stk-panel)" stroke="var(--stk-mint)" strokeWidth="1.5"/>
+    <text x="686" y="146" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">stack agent</text>
+    <text x="686" y="164" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">graph · tests · scans</text>
+
+    <rect x="790" y="120" width="84" height="60" rx="12" fill="var(--stk-panel-2)" stroke="var(--stk-hair)" strokeWidth="1.2"/>
+    <text x="832" y="146" textAnchor="middle" fontSize="11" fontWeight="600" fill="var(--ifm-heading-color)">cluster</text>
+    <text x="832" y="164" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">live state</text>
+
+    <line x1="162" y1="150" x2="218" y2="150" stroke="var(--stk-steel)" strokeWidth="1.3" markerEnd="url(#stkA2)"/>
+    <line x1="358" y1="150" x2="414" y2="150" stroke="var(--stk-steel)" strokeWidth="1.3" markerEnd="url(#stkA2)"/>
+    <line x1="554" y1="150" x2="610" y2="150" stroke="var(--stk-steel)" strokeWidth="1.3" markerEnd="url(#stkA2)"/>
+    <line x1="758" y1="150" x2="786" y2="150" stroke="var(--stk-steel)" strokeWidth="1.3" markerEnd="url(#stkA2)"/>
+    <line x1="290" y1="84" x2="290" y2="116" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#stkA2)"/>
+    <line x1="486" y1="84" x2="486" y2="116" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#stkA2)"/>
+    <line x1="486" y1="184" x2="486" y2="218" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#stkA2)"/>
+
+    <text x="190" y="140" textAnchor="middle" fontSize="9.5" fontFamily="Fira Code, monospace" fill="var(--stk-steel)">https</text>
+    <text x="386" y="140" textAnchor="middle" fontSize="9.5" fontFamily="Fira Code, monospace" fill="var(--stk-steel)">route</text>
+    <text x="582" y="140" textAnchor="middle" fontSize="9.5" fontFamily="Fira Code, monospace" fill="var(--stk-steel)">link</text>
+  </g>
+</svg>
+</Figure>
+
+## The links that make it work
+
+Four typed links turn six separate components into a working interface. Draw them and the
+configuration is generated; leave one out and the corresponding capability is simply
+absent.
+
+| Link | What it produces |
+|---|---|
+| gateway → MCP server | The public HTTPS route, TLS, and the host the connector talks to |
+| MCP server → stack agent | The runtime hands: topology queries, tests, scans, evidence |
+| MCP server → identity client | OIDC login for the connector, with redirect URIs already correct |
+| MCP server → cache | Persistent OAuth state across restarts |
+
+## Bring it up
+
+<Steps>
+  <Step title="Draw the six components and the four links">
+    Set a namespace and a subdomain for the gateway, and a domain for the stack. Everything
+    else can stay on catalog defaults for a first run.
+  </Step>
+  <Step title="Build">
+    The platform renders every component, resolves the links, and commits the result to
+    your stack repository — manifests, overlays, build pipelines, policies and the
+    <code>stack-metadata.yaml</code> that describes the graph.
+  </Step>
+  <Step title="Build the images in the cluster">
+    Container images are built in-cluster from the generated build manifests. No local
+    Docker daemon is involved.
+
+```bash
+kubectl apply -k k8s/build/base/<component>/
+```
+  </Step>
+  <Step title="Deploy">
+    Apply the generated deploy tree. The same command is safe to repeat — re-applying is
+    the normal way to move the cluster to a new stack version.
+
+```bash
+kubectl apply -k k8s/deploy/base/<component> --server-side=true --force-conflicts=true
+```
+  </Step>
+  <Step title="Connect your AI client">
+    Point it at the MCP endpoint published by the gateway and complete the OAuth login.
+    See <a href="/docs/mcp/connect">Connect a client</a>.
+  </Step>
+  <Step title="Ask it to orient itself">
+    A good first message is simply: <em>&ldquo;Describe this stack and tell me what it can
+    do.&rdquo;</em> The model will read the topology, list its own available tools, and tell
+    you which capabilities are present and which links would add more.
+  </Step>
+</Steps>
+
+## What you can do the moment it is up
+
+<Cards>
+  <Card kicker="Design" title="Paste a specification">
+    Hand the model your data or product spec. It asks the smallest set of questions that
+    change the drawing, then proposes a complete stack from the real catalog.
+  </Card>
+  <Card kicker="Operate" title="Ask what is wrong">
+    Scans, link proofs and graph traversal answer &ldquo;is my stack healthy&rdquo; with
+    evidence rather than an opinion.
+  </Card>
+  <Card kicker="Harden" title="Ask what to tighten">
+    The model enumerates the exact attributes that change the posture and what stays
+    running when they flip.
+  </Card>
+  <Card kicker="Prove" title="Ask for the compliance position">
+    Framework coverage, gaps, and the evidence behind each control, straight from the
+    cluster.
+  </Card>
+</Cards>
+
+## Growing from here
+
+Adding your application is one more component plus its links. The model proposes them; you
+approve; the build regenerates everything the change touches — including the network
+policies, the route, the secrets and the monitoring that the new edges imply.
+
+→ [Design and generate](/docs/day0/) · [Working with the model](/docs/mcp/workflows)

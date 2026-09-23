@@ -1,0 +1,62 @@
+---
+id: day2-scanners
+slug: /day2/scanners
+title: Scanners
+sidebar_label: Scanners
+sidebar_position: 3
+description: Scored security and posture scans that reason about your topology, not about a generic cluster.
+---
+
+<Hero eyebrow="Measure" title="Scans that know what your system is supposed to be">
+A generic scanner reports what it finds. These scanners compare what they find against the
+graph — so a missing network policy is reported against the link that should have produced
+it, and a finding comes with the attribute that fixes it.
+</Hero>
+
+Every scanner has a **light** mode for fast, frequent checks and a **full** mode that
+actively probes. Every run is scored, stored and hash-chained.
+
+## The scanners
+
+| Scanner | Light | Full |
+|---|---|---|
+| **Network policy** | Do the policies that the links imply exist, in both directions? Missing and extra policies are named | Adds real connection probes across every declared link, plus negative tests that a path which should be closed actually is |
+| **Admission policy** | Policy engine health, the constraint inventory, live violations per constraint, namespace coverage, score | Adds a dry-run admission test per constraint with a valid and an invalid resource, classifying each as enforcing, not enforcing, over-enforcing or broken |
+| **Kubernetes hardening** | Per-namespace compliance scores against recognised hardening frameworks | Per-control findings with the affected resources, and the platform attribute that remediates each one |
+| **RBAC** | Role bindings, cluster-admin holders, wildcard roles, score | Deeper analysis and per-finding evidence |
+| **Secrets** | Whether every secret a workload references exists and, where applicable, is synced from its store | Per-finding evidence — the query that produced it and what it returned, never the secret value |
+| **Configuration posture** | The declared attribute surface evaluated against declarative rules — insecure defaults, missing hardening toggles, values that contradict each other | — |
+| **Vulnerabilities** | Exposed routes, default credentials, obvious misconfiguration | Technology-specific checks per component type; dedicated network and TLS modes |
+| **Application security** | Source-code scanning across your application components | Severity-filtered findings |
+| **Backup** | The structural resources that protection depends on | The only mode that can prove data actually exists — see [Backup and recovery](/docs/day2/backup) |
+| **Compliance frameworks** | Control validation with real cluster evidence | Adds hardening scans, admission dry-runs and deep analysis; a report mode renders a full audit document — see [Compliance](/docs/compliance/) |
+
+## Findings are actionable, not descriptive
+
+A finding from a generic tool tells you a property of a Kubernetes object. A finding here
+tells you which part of *your declared system* is not holding, and what changes it.
+
+The remediation is expressed as **the attribute to change on the graph** — not a patch to
+hand-apply, because a hand-applied patch is drift that the next build will remove.
+
+## Over-enforcement is a finding too
+
+The admission policy scan does not only ask whether a policy blocks what it should. It
+also asks whether it blocks things it should not.
+
+A constraint that rejects legitimate workloads is a production incident waiting for the
+next deploy, and it is invisible to any check that only counts violations. Classifying a
+constraint as over-enforcing is the difference between a policy baseline you can actually
+turn on and one that stays in audit mode forever.
+
+## Running them
+
+| Through | How |
+|---|---|
+| **Your AI client** | `scan(scanner=..., mode=...)` — present the score, the summary, the findings by severity, and the fixes |
+| **The dashboard** | Run any scan, watch it progress, export the evidence, print an audit-friendly report |
+| **The API** | One endpoint per scan, with a mode parameter |
+| **On a schedule** | Inside the agent, per scan type — see [Evidence and drift](/docs/day2/evidence) |
+
+Scans run as background tasks and survive navigation, so a long full scan is not tied to a
+browser tab or a conversation staying open.

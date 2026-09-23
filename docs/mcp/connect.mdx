@@ -1,0 +1,82 @@
+---
+id: mcp-connect
+slug: /mcp/connect
+title: Connect a client
+sidebar_label: Connect a client
+sidebar_position: 3
+description: Endpoint, OAuth login, and the toggle that decides whether your connector survives a pod restart.
+---
+
+<Hero eyebrow="Setup" title="One endpoint, one login">
+The MCP server is published by your gateway on its own subdomain and authenticates against
+your stack's identity provider. Any MCP-capable client can connect.
+</Hero>
+
+## The endpoint
+
+The `gateway → MCP server` link creates the public route. The MCP endpoint is the `/mcp`
+path on that host:
+
+```
+https://<mcp-subdomain>.<your-domain>/mcp
+```
+
+The subdomain comes from the link's attributes and the domain from the stack
+configuration, so the exact URL is a property of your stack. Ask the model, read it from
+the generated route, or take it from the component documentation the build writes into
+your stack repository.
+
+The transport is streamable HTTP. There is no separate SSE endpoint to configure.
+
+## Authentication
+
+The server fronts your stack's identity provider with an OAuth proxy. Connecting a client
+is a standard authorization-code login: the client opens the login page, you sign in as a
+user of the stack, and the client receives a session token.
+
+Two details matter, and both are handled by the generated configuration rather than by you:
+
+- The authorization response carries the `iss` parameter, which strict OAuth 2.1 clients
+  require. Without it a client rejects an otherwise valid callback and the login fails
+  silently after the code is issued.
+- The token signing key is derived deterministically from the OIDC client secret rather
+  than generated per process, so tokens stay valid across restarts.
+
+:::caution Turn on persistent OAuth state before you rely on the connector
+OAuth session state is held **in memory** unless you give the MCP server a cache. Without
+it, every pod restart — a node drain, a new image, a config change — invalidates every
+connected client, and each one has to be removed and added again. The fix is one link and
+one toggle: link the MCP server to a cache component and set its `client_storage`
+attribute on that link. The state is encrypted at rest with a key derived from the OIDC
+client secret.
+:::
+
+## Who the model is, and who you are
+
+There are two identities in play. Confusing them is the most common support question.
+
+| Identity | What it is | Where it is proven |
+|---|---|---|
+| **The connector session** | The OAuth login between your AI client and the MCP server | Your stack's identity provider |
+| **The platform account** | The account the write tools use to change the graph and trigger builds | The platform's own identity |
+
+A permission error from a write tool is about the **platform account**, not about the
+connector. The server resolves its platform credentials itself, in order, and only asks a
+human as a last resort.
+
+## Troubleshooting
+
+| Symptom | Most likely cause | What to do |
+|---|---|---|
+| Client disconnects after every restart | OAuth state is in memory | Add the cache link and enable `client_storage` |
+| Login completes but the client never finishes connecting | Client rejected a callback without `iss` | Confirm the deployed image includes the OAuth proxy fix; re-add the connector |
+| Tools list is missing a technology you have | The corresponding link is not drawn | Add the link, build, deploy — the tools register on the next start |
+| A write tool returns 401, reads work | Platform account, not the connector | Re-check the platform credentials; a read succeeding proves the connector is fine |
+| A configuration change had no effect | The pod is still running the previous configuration | Roll the workload so it picks up the new values |
+
+## Health
+
+The server exposes a plain HTTP health endpoint used by Kubernetes probes. It answers
+whether the process is up — it does not assert that every tool registered, so a healthy
+pod with a missing link still reports healthy. The authoritative answer to "which tools do
+I have" is the client's own tool list.

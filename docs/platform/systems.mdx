@@ -1,0 +1,99 @@
+---
+id: platform-systems
+slug: /platform/systems
+title: Systems and builds
+sidebar_label: Systems and builds
+sidebar_position: 2
+description: The lifecycle of a system — save, validate, build, push — and what happens at each step.
+---
+
+<Hero eyebrow="Work" title="From a drawing to a repository">
+A system moves through a small, explicit lifecycle. Every transition is recorded, and
+every recorded transition carries the diagram it was made from.
+</Hero>
+
+## The lifecycle
+
+| State | Meaning |
+|---|---|
+| **Created** | The system exists, with a default configuration and one environment |
+| **Saved** | The current diagram is stored. Each save is its own version |
+| **Building** | A build is running; logs stream while it does |
+| **Generated** | The build finished and the repository was written |
+| **Failed** | The build stopped; the logs say where |
+
+## The actions
+
+| Action | What it does |
+|---|---|
+| **Save** | Stores the diagram as a new version. Optionally evaluates the catalog's suggestions against it |
+| **Build** | Renders every component, aggregates the repository, runs the post-generation chain and commits |
+| **Save & push** | Saves, then regenerates only what the changed attributes can affect |
+| **Push** | The same incremental path, using work the platform already pre-rendered in the background after your last save |
+| **Cancel** | Stops a running build between steps, and between components |
+| **History** | Every version, with a cell-by-cell diff between any two |
+| **Rollback** | Loads an earlier version's diagram back onto the canvas |
+
+:::tip Pre-rendering makes pushes fast
+After an effective save, the platform quietly renders the system's components in the
+background. When you then push, most of the work is already done. A newer save supersedes
+a running pre-render at a component boundary, so the result always matches what you last
+saved.
+:::
+
+## Validation
+
+Before a programmatic build, save-push or attribute change is accepted, the whole diagram
+is checked against the catalog:
+
+<Pills>
+  <Pill>unique component and sub-component names</Pill>
+  <Pill>name format</Pill>
+  <Pill>catalog entry exists</Pill>
+  <Pill>type matches the catalog</Pill>
+  <Pill>version matches the catalog</Pill>
+  <Pill>group matches</Pill>
+  <Pill>exactly the catalog's attributes — none missing, none extra</Pill>
+  <Pill>allowed values for select lists and toggles</Pill>
+  <Pill>free text matches the catalog pattern</Pill>
+  <Pill>a sub-component's parent can own it</Pill>
+  <Pill>every link is one the catalog permits</Pill>
+</Pills>
+
+That is what makes "the AI cannot invent a component type" a property of the system rather
+than a promise.
+
+## Environments
+
+A system's configuration lists its environments. The base output is shared; each
+environment gets an overlay with only its differences. Adding an environment is a
+configuration change, not a new design.
+
+## The divergence list
+
+The generated repository is yours to extend, so the platform has to know what to do when
+your copy of a file differs from what it would generate.
+
+| Choice | Behaviour |
+|---|---|
+| **Merge** | The default for any file without a stored choice: a three-way merge |
+| **Overwrite** | The file is brought back to what the platform generates |
+| **Ignore** | The platform never touches this file again |
+
+Only *ignore* is remembered — an overwrite makes the file match, and a merge is the
+default anyway, so neither needs to be stored. On a push, a conflict stops the operation
+instead of committing conflict markers.
+
+## Build logs
+
+Logs stream while the build runs, and each step reports its own timing, so a slow build can
+be attributed from the log alone. The build log ends with the exact apply commands for what
+changed.
+
+## Folders and visibility
+
+Systems live in nested folders, personal or shared. A system can additionally be marked as
+**externally visible**, which is what allows other users to pull its cells into their own
+designs.
+
+→ [Collaboration](/docs/platform/collaboration)

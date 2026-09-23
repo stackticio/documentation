@@ -1,0 +1,69 @@
+---
+id: platform-liveview
+slug: /platform/liveview
+title: LiveView
+sidebar_label: LiveView
+sidebar_position: 4
+description: The same diagram you designed, coloured by what is actually happening in the cluster.
+---
+
+<Hero eyebrow="Watch" title="The design, with the truth painted onto it">
+LiveView takes the diagram you drew and runs the stack's real tests against it on a cycle,
+colouring each component, sub-component and link by what the cluster says right now.
+</Hero>
+
+## What it is
+
+A second, read-only canvas that mirrors your design. It needs a **stack agent** in the
+system — that is where the tests actually execute — and it will tell you plainly if there
+isn't one rather than showing a pretty diagram with no data behind it.
+
+Because it is the same graph, you are not reading a dashboard and mentally mapping it onto
+your architecture. The architecture *is* the dashboard.
+
+## What it shows
+
+| Element | What its colour means |
+|---|---|
+| **Component** | The result of that component's own tests |
+| **Sub-component** | The result for that specific database, bucket, topic or queue |
+| **Link** | Whether that declared relationship is currently proven |
+
+Everything starts neutral and is coloured as results arrive, so a cell with no result yet is
+visibly different from a cell that passed.
+
+## What you can do in it
+
+<Cards cols={2}>
+  <Card kicker="Cycle" title="Run continuously">
+    Tests run on a cycle, so the picture keeps up with the cluster instead of being a
+    snapshot you took once.
+  </Card>
+  <Card kicker="Scope" title="Run for one cell">
+    Right-click a component to run just its tests, or to open its last results.
+  </Card>
+  <Card kicker="Inspect" title="Read the results">
+    Open the result behind any colour: which test, what ran, what came back.
+  </Card>
+  <Card kicker="Share" title="Export the view">
+    Export the live diagram as an image for a status update, a review or an incident
+    record.
+  </Card>
+</Cards>
+
+## Why it is the natural incident view
+
+When something breaks, the question is rarely "is this pod up". It is *which relationship
+stopped working*. A red link between two green components is an answer; two red components
+with no link information is a search.
+
+For the detail behind a red link — which of wiring, secret, network, access or protocol
+failed — the same engine's link validation gives the layer by name.
+
+→ [Validation](/docs/day2/validation)
+
+## The design view and the live view are the same drawing
+
+That is the whole point, and it is only possible because the topology is declared rather
+than inferred. Nothing has to be mapped, tagged or kept in sync between a design tool and a
+monitoring tool, because there is one graph.

@@ -1,0 +1,116 @@
+---
+id: day2-index
+slug: /day2/
+title: Day 2 — operate and prove
+sidebar_label: Overview
+sidebar_position: 1
+description: The stack agent — the operations surface that measures the running system against the graph that declared it.
+---
+
+<Hero eyebrow="Day 2" title="AI cannot run operations by improvising. It can run them inside a framework.">
+The stack agent is deployed into your stack, reads the same metadata the build produced,
+and turns every declaration into something measurable. It is the interface between an AI
+and your runtime — and the reason an AI is allowed near it.
+</Hero>
+
+## What it is
+
+One component, one API, scoped to one stack. It carries the tooling to reach every
+technology in the stack, and it knows the topology because it reads the graph rather than
+discovering it.
+
+<Cards>
+  <Card to="/docs/day2/validation" kicker="Prove" title="Validation">
+    Every declared relationship proven layer by layer, plus a query language that turns the
+    graph into executable tests.
+  </Card>
+  <Card to="/docs/day2/scanners" kicker="Measure" title="Scanners">
+    Scored scans for network policy, admission policy, Kubernetes hardening, RBAC, secrets,
+    configuration posture and vulnerabilities.
+  </Card>
+  <Card to="/docs/day2/evidence" kicker="Attest" title="Evidence and drift">
+    Hash-chained runs, explained deltas, finding memory, and a git-mirrored audit trail.
+  </Card>
+  <Card to="/docs/day2/backup" kicker="Recover" title="Backup and recovery">
+    What is protected, what can be proven to hold data, which restore points are usable,
+    and guarded restore.
+  </Card>
+  <Card to="/docs/day2/lifecycle" kicker="Change" title="Lifecycle and scale">
+    Upgrades and migrations from declarative recipes, autoscaling from real signals,
+    restart-on-change, and workload queueing.
+  </Card>
+  <Card to="/docs/compliance/" kicker="Certify" title="Compliance automation">
+    Framework controls measured from the cluster, with a signed human position on every gap.
+  </Card>
+</Cards>
+
+## Why a separate agent
+
+Because a claim made by the thing that generated the system is not evidence.
+
+The build says what should exist. The agent runs inside the cluster, with its own view, and
+answers what does. When the two disagree, the disagreement is the finding — and it is
+attributed: to a declared change you made, to an environment change, or to drift nobody
+asked for.
+
+<Figure caption="The agent measures the running cluster against the metadata commit the build produced. The difference between the two is the product.">
+<svg viewBox="0 0 880 210" role="img" aria-label="Stack agent measuring cluster against declared metadata">
+  <defs>
+    <marker id="stkA3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--stk-steel)" />
+    </marker>
+  </defs>
+  <g fontFamily="Instrument Sans, sans-serif">
+    <rect x="30" y="30" width="200" height="62" rx="12" fill="var(--stk-panel)" stroke="var(--stk-amber)" strokeWidth="1.3"/>
+    <text x="130" y="56" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">stack-metadata.yaml</text>
+    <text x="130" y="75" textAnchor="middle" fontSize="10.5" fill="var(--stk-steel)">the declared system</text>
+
+    <rect x="30" y="120" width="200" height="62" rx="12" fill="var(--stk-panel)" stroke="var(--stk-blue)" strokeWidth="1.3"/>
+    <text x="130" y="146" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">the cluster</text>
+    <text x="130" y="165" textAnchor="middle" fontSize="10.5" fill="var(--stk-steel)">the observed system</text>
+
+    <rect x="330" y="72" width="190" height="68" rx="13" fill="var(--stk-panel)" stroke="var(--stk-mint)" strokeWidth="1.5"/>
+    <text x="425" y="100" textAnchor="middle" fontSize="13" fontWeight="600" fill="var(--ifm-heading-color)">stack agent</text>
+    <text x="425" y="120" textAnchor="middle" fontSize="10.5" fill="var(--stk-steel)">prove · scan · attest</text>
+
+    <line x1="234" y1="61" x2="324" y2="94" stroke="var(--stk-steel)" strokeWidth="1.3" markerEnd="url(#stkA3)"/>
+    <line x1="234" y1="151" x2="324" y2="120" stroke="var(--stk-steel)" strokeWidth="1.3" markerEnd="url(#stkA3)"/>
+
+    <rect x="620" y="18" width="230" height="52" rx="11" fill="var(--stk-panel-2)" stroke="var(--stk-hair)"/>
+    <text x="735" y="40" textAnchor="middle" fontSize="11" fontWeight="600" fill="var(--ifm-heading-color)">proven</text>
+    <text x="735" y="58" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">the declaration holds</text>
+
+    <rect x="620" y="80" width="230" height="52" rx="11" fill="var(--stk-panel-2)" stroke="var(--stk-hair)"/>
+    <text x="735" y="102" textAnchor="middle" fontSize="11" fontWeight="600" fill="var(--ifm-heading-color)">explained change</text>
+    <text x="735" y="120" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">you declared it; it moved</text>
+
+    <rect x="620" y="142" width="230" height="52" rx="11" fill="var(--stk-panel-2)" stroke="rgba(255,107,129,.45)"/>
+    <text x="735" y="164" textAnchor="middle" fontSize="11" fontWeight="600" fill="var(--ifm-heading-color)">unexplained drift</text>
+    <text x="735" y="182" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">nothing declared it; re-run confirms</text>
+
+    <line x1="524" y1="96" x2="614" y2="52" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#stkA3)"/>
+    <line x1="524" y1="106" x2="614" y2="106" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#stkA3)"/>
+    <line x1="524" y1="118" x2="614" y2="164" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#stkA3)"/>
+  </g>
+</svg>
+</Figure>
+
+## How you reach it
+
+Three ways, same engine:
+
+| Through | For |
+|---|---|
+| **Your AI client, over MCP** | The normal way. Ask a question, get an answer with evidence |
+| **The dashboard** | A visual surface for scans, scores, timelines, evidence export and audit-friendly printing |
+| **The HTTP API** | Automation and CI. Every scan, query and report is an endpoint |
+
+All three are optional surfaces over the same measurements, so a number shown in the
+dashboard, quoted by the model and exported for an auditor is the same number.
+
+## What it is deliberately not
+
+It is not a GitOps drift detector comparing a manifest to a live object. It compares the
+**outcomes of executed checks** over time, and explains each change. A control that passed
+last week and fails today is a finding with a first-seen date, an age, a reopen count and
+a classification — not a red line in a diff.

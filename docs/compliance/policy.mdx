@@ -1,0 +1,72 @@
+---
+id: compliance-policy
+slug: /compliance/policy
+title: Admission policy from your topology
+sidebar_label: Admission policy
+sidebar_position: 3
+description: A policy baseline planned against your actual stack, with the carve-outs that stack needs — and a scan that catches over-enforcement.
+---
+
+<Hero eyebrow="Policy" title="The reason policy baselines stay in audit mode forever">
+Someone turns on a recommended baseline, it blocks a controller that legitimately needs
+what it blocks, a deploy fails at the worst moment, and the whole thing goes back to
+warn-only. The baseline was right; it just did not know what was in the cluster.
+</Hero>
+
+## Policies are planned, not pasted
+
+Admission policy in Stacktic is expressed as sub-components of a policy component —
+resource constraints, pod-level security, image provenance, image signing, label
+restrictions, enforcement of network policy and RBAC.
+
+A plan is generated for **your** topology: which policies to enable at which profile, and
+which namespaces each policy must exclude. The exclusions are not guesswork — they come
+from the knowledge layer, keyed by component type, and are resolved against the components
+your stack actually has.
+
+<Steps>
+  <Step title="Read the stack">
+    Components, types and namespaces from the graph.
+  </Step>
+  <Step title="Choose the policy set">
+    A named profile decides which policies are in scope.
+  </Step>
+  <Step title="Resolve carve-outs per policy">
+    Operator-managed namespaces, components whose workloads cannot satisfy a given control,
+    and anything you have declared as an exception.
+  </Step>
+  <Step title="Emit it as graph changes">
+    The plan becomes sub-components and attributes. It is reviewed, applied and versioned
+    like anything else — not applied directly to the cluster.
+  </Step>
+</Steps>
+
+## The scan that makes it safe to enforce
+
+Counting violations tells you whether a policy is doing something. It does not tell you
+whether it is doing the *right* thing.
+
+The deep admission scan performs a dry-run admission test per constraint, with a resource
+that should be admitted and one that should not, and classifies the result:
+
+| Classification | Meaning |
+|---|---|
+| **Enforcing** | Admits what it should, rejects what it should not |
+| **Not enforcing** | Present, but permitting what it is supposed to block |
+| **Over-enforcing** | Rejecting things it should admit — a future outage |
+| **Broken** | The constraint does not evaluate at all |
+
+Over-enforcement is the finding nobody else reports, and it is the one that decides whether
+you can move a baseline from audit to enforce.
+
+## Coverage is part of the score
+
+The scan also reports namespace coverage: which namespaces a constraint actually applies
+to, and which ones fall outside every policy. A cluster where the policies are excellent
+and the important namespace is excluded scores accordingly.
+
+## Live state
+
+Beyond planning and testing, the constraint inventory, the templates behind them, the live
+violations per constraint and an overall compliance summary are all readable — by a person,
+by the dashboard, or by an AI client answering "are we enforcing what we think we are".

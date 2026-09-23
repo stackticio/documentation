@@ -1,0 +1,87 @@
+---
+id: mcp-index
+slug: /mcp/
+title: MCP — the AI interface
+sidebar_label: Overview
+sidebar_position: 1
+description: The Stacktic MCP server is how an AI client designs, changes, validates and operates a stack.
+---
+
+<Hero eyebrow="Model Context Protocol" title="Your AI client is the primary interface">
+Stacktic ships an MCP server inside your stack. Connect a client to it and the model can
+read the graph, propose changes, write them through the platform, build, deploy, scan and
+prove the result — grounded in the real catalog, never in guesses.
+</Hero>
+
+## What the MCP gives a model
+
+A generic coding assistant knows how to write Kubernetes YAML. It does not know *your*
+system: which components exist, what a link of a given type actually generates, which
+attribute is safe to move, what is running right now, and what the last compliance run
+found.
+
+The MCP closes exactly that gap, in four layers.
+
+<Cards cols={2}>
+  <Card kicker="Layer 1" title="Knowledge — what the platform can express">
+    The catalog of component types, link types, sub-components and attributes, plus what
+    each one generates and the patterns real stacks use. The model designs against reality
+    and reports anything the catalog cannot express as a gap instead of improvising.
+  </Card>
+  <Card kicker="Layer 2" title="Graph — what your system is">
+    The live topology: components, links, sub-components, fields. Traversal tools answer
+    blast radius, dependency path, data flow and service contract questions before a
+    change is made.
+  </Card>
+  <Card kicker="Layer 3" title="Runtime — what is actually happening">
+    Scans, tests, link proofs, logs, metrics and per-technology tools that register only
+    when the matching link exists.
+  </Card>
+  <Card kicker="Layer 4" title="Write — change the declared system">
+    Attributes, links, components, users and builds go through the platform API, so a
+    change lands in the graph and regenerates everything that depends on it.
+  </Card>
+</Cards>
+
+## The rules the server enforces on the model
+
+The server ships instructions that every connected client loads. They are not style
+advice — they are what keeps an autonomous agent safe on a production system.
+
+| Rule | Why |
+|---|---|
+| Ground every claim in a tool result | No invented component types, link types, versions or attributes |
+| Design from the application outward | The application is the centre; everything else exists to serve it |
+| A missing capability is a feature request | Never substitute an unrelated component or silently drop a requirement |
+| Every instance gets its own credentials | A second database or bucket sharing the first one's secret is rejected at generation |
+| Propose, then ask | Enumerate the real options from a tool result before changing anything |
+| Blast radius before change | Show what a change touches and who depends on it, then ask |
+| Never build without explicit confirmation | A build rewrites the stack repository |
+| Declared state goes through the platform | Creating users or routes directly in an application is drift |
+
+## What it is bound to
+
+One MCP server belongs to one stack. It is generated as a component of that stack, it
+reads that stack's metadata, and its tools operate on that stack. There is no system name
+to guess and no cross-tenant surface.
+
+Per-technology tools register **only when the matching link exists**. A stack without a
+message broker has no broker tools; adding the link adds them on the next build. The tool
+list is therefore a description of your architecture.
+
+<Cards>
+  <Card to="/docs/mcp/quickstart" kicker="Start" title="The MCP initiator stack">
+    The smallest stack that gives your AI a live interface — and the one it uses to build
+    everything else.
+  </Card>
+  <Card to="/docs/mcp/connect" kicker="Setup" title="Connect a client">
+    Endpoint, OAuth, and the one toggle that decides whether the connector survives a
+    restart.
+  </Card>
+  <Card to="/docs/mcp/tools" kicker="Reference" title="Tool surface">
+    Every dispatcher, what it does, and which link switches it on.
+  </Card>
+  <Card to="/docs/mcp/workflows" kicker="Practice" title="Working with the model">
+    Design a stack from a spec, change one safely, investigate an incident, harden.
+  </Card>
+</Cards>

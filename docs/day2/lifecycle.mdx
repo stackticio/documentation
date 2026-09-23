@@ -1,0 +1,98 @@
+---
+id: day2-lifecycle
+slug: /day2/lifecycle
+title: Lifecycle and scale
+sidebar_label: Lifecycle and scale
+sidebar_position: 6
+description: Upgrades and migrations from declarative recipes, autoscaling from real signals, restart-on-change, and workload queueing.
+---
+
+<Hero eyebrow="Change" title="The hard part of Day 2 is doing it in the right order">
+Upgrading a component is rarely hard. Knowing what depends on it, what has to move first,
+what proves it worked and how to get back is the hard part — and that is exactly what a
+graph can answer.
+</Hero>
+
+## Upgrades and migrations
+
+Each component's upgrade procedure is a **recipe**: declarative data, not code. Adding
+coverage for a component means adding an entry, never writing new logic.
+
+| Part of a recipe | What it holds |
+|---|---|
+| **Version fields** | Which attributes actually carry the version |
+| **Preflight** | Probes that must pass before anything is touched, each with the risk of proceeding anyway — starting with "is this component healthy right now", because upgrading something already broken hides the cause |
+| **Migrations** | Conditional steps that apply only between specific versions, each with its reverse |
+| **Apply** | Change the attribute on the graph, then build — never a hand-patched cluster |
+| **Verify** | The component's own tests, run after |
+| **Rollback** | Revert the manifests, rebuild |
+| **Known gaps** | What the template does not yet handle, stated rather than discovered |
+
+The lifecycle tool reports status and produces a plan: the current versions, the
+dependents that will be affected, the preflight results, and the ordered steps. The AI
+proposes it; you approve it; the platform performs it as an ordinary graph change.
+
+## Database migrations
+
+Schema migration is expressed as a **sub-component** of the database, so it is part of the
+declared system and moves with it. Migrations run as an init container against the
+component's own image, the workload surges by zero so two versions never run against one
+schema, and a failed migration fails closed rather than starting an application against a
+half-migrated database.
+
+Backups stay with whatever already owns them — a migration step does not invent its own
+backup mechanism next to the one that is already proven.
+
+## Autoscaling from real signals
+
+Autoscaling is driven by what the system actually reports, not only by CPU. Scale targets
+are declared as sub-components of the autoscaler, each bound to a signal:
+
+<Pills>
+  <Pill>a metrics query</Pill>
+  <Pill>a log query</Pill>
+  <Pill>inference load on a served model</Pill>
+  <Pill>queue depth</Pill>
+</Pills>
+
+Because the autoscaler is a component and its triggers are sub-components, scaling
+behaviour is versioned with the stack and visible in a diff — not a cluster-side object
+someone edited once.
+
+## Restart on change
+
+A generated secret or configuration value that changes must actually reach the running
+pod. Two complementary mechanisms exist, and both are part of the graph:
+
+<Cards cols={2}>
+  <Card kicker="Generation-time" title="Content checksums">
+    The build adds a checksum of exactly the secrets and configuration a workload
+    references to its pod template. Change the value, regenerate, apply — the pod template
+    changed, so the workload rolls. Nothing else does.
+  </Card>
+  <Card kicker="Runtime" title="A reload controller">
+    A controller watches labelled secrets and configuration and restarts the workloads that
+    consume them. Scoped by label, so it acts on what you opted in.
+  </Card>
+</Cards>
+
+Without one of these, a changed secret sits correctly in the API server while the running
+pod keeps the old value — which is the class of bug that produces "it works after I restart
+it by hand".
+
+## Queueing and priority
+
+Batch and training workloads can be admitted through a queue rather than competing for
+whatever the cluster has left. Jobs are labelled into a queue automatically, and priority is
+expressed as an attribute on the workload that needs it.
+
+This is what makes a shared cluster usable for both a production application and heavy
+periodic work, without either one starving the other.
+
+## Everything here is a graph change
+
+The common thread: none of these are cluster-side operations you perform and then have to
+remember. Each one is an attribute or a sub-component on the graph. It is versioned,
+diffable, duplicable into another environment, rollback-able with the rest of the system,
+and computable — which is why an AI can plan it safely and why a human can approve it in
+one look.

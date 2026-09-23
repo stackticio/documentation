@@ -1,0 +1,110 @@
+---
+id: day0-graph-to-code
+slug: /day0/graph-to-code
+title: From graph to repository
+sidebar_label: From graph to repository
+sidebar_position: 2
+description: What a Stacktic build actually produces, and how a link becomes configuration on both sides of the edge.
+---
+
+<Hero eyebrow="Generation" title="One build, one repository">
+A build renders every component, resolves every link, and aggregates the result into a
+single GitOps repository that describes the whole system — including the parts nobody
+enjoys writing.
+</Hero>
+
+## What you get
+
+```
+your-stack-repository/
+├─ k8s/
+│  ├─ build/
+│  │  ├─ base/<component>/        in-cluster image build manifests
+│  │  └─ overlays/<environment>/
+│  └─ deploy/
+│     ├─ base/<component>/        workloads, services, policies, secrets, routes
+│     └─ overlays/<environment>/  per-environment values
+├─ doc/                           generated documentation, per component and for the system
+├─ scripts/                       decrypt, validate, operate
+├─ stack-metadata.yaml            the graph, as data
+└─ README.md                      the architecture, rendered as a diagram
+```
+
+Every component contributes its own subtree; the aggregation step merges them and
+preserves every environment any component defines.
+
+## How a link becomes configuration
+
+A template does not ask "what is in this stack". It asks "is there a link of type X into
+me, or out of me" — and generates from the answer. The link type is literally
+`sourceType-targetType`, which is what makes the behaviour predictable.
+
+| The link | On the source | On the target | Elsewhere |
+|---|---|---|---|
+| application → relational database | connection variables, mounted secret, egress policy | the database and its user, ingress policy, cross-namespace RBAC | a backup subject; a scrape target |
+| gateway → application | the route, TLS, path rules, auth mode | nothing it has to know about | a certificate request; an identity redirect URI |
+| application → object storage | endpoint and credentials | the bucket and its access key | lifecycle and replication settings |
+| metrics → anything | scrape configuration and alert rules | the metrics endpoint exposed | dashboards provisioned |
+| database → bucket | — | — | backup schedule and retention, as link attributes |
+
+The consequence: **you never write the second half of an integration.** Drawing the edge
+produces the consumer's configuration, the producer's resource, the isolation rules
+between them and the operational wiring around them, in one pass.
+
+## The post-generation chain
+
+After every component has rendered, a fixed chain runs across the whole tree. This is
+where the cross-cutting concerns are produced — the things no single component can know.
+
+<Steps>
+  <Step title="Stack metadata">
+    The graph is written to <code>stack-metadata.yaml</code>: every component, link,
+    sub-component and attribute, as data. This file is what the stack agent later reads,
+    and what every validation run is measured against.
+  </Step>
+  <Step title="Network policies from the links">
+    Namespace-level microsegmentation generated directly from the graph — including
+    sub-component to component edges, component to sub-component edges, and cross-stack
+    links. Nothing that was not declared is permitted, and nothing has to be maintained by
+    hand.
+  </Step>
+  <Step title="Regulated-scope network policies">
+    An additional, stricter policy set for the components that sit inside a regulated
+    boundary.
+  </Step>
+  <Step title="Configuration checksums (optional)">
+    Adds content checksums to the workload pod template, so that changing a secret or a
+    configuration value actually rolls the pod instead of sitting unread in the API server.
+  </Step>
+  <Step title="Image inventory and air-gap rewrite">
+    Every image the stack uses is inventoried; a migration script and a set of image
+    rewrites are produced so the same stack can be installed from a private registry with
+    no internet access.
+  </Step>
+</Steps>
+
+:::note Network policies are never written by a component
+A component template never ships a network policy file. Policies are generated from the
+graph after all components have rendered, because only then is the full set of edges
+known. That is why adding a link automatically opens exactly the path it needs — and
+removing it closes it again.
+:::
+
+## Incremental change
+
+A full build regenerates everything. A **push** does not.
+
+The platform diffs the new graph against the last pushed state, determines which
+attributes changed, and resolves — through a per-component impact map — exactly which
+generated files each of those attributes can affect. Only those files are re-rendered.
+
+The result is that changing one attribute produces a small, reviewable diff and a short
+list of things to apply, instead of a repository-wide churn you have to read.
+
+The build log ends with the exact apply commands for what changed.
+
+## Your edits are not steamrolled
+
+Files you have marked are merged rather than replaced, and a merge conflict stops the push
+instead of committing conflict markers into your repository. The generated tree stays
+yours to extend.

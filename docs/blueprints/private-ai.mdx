@@ -1,0 +1,89 @@
+---
+id: blueprints-private-ai
+slug: /blueprints/private-ai
+title: Private AI
+sidebar_label: Private AI
+sidebar_position: 3
+description: Self-hosted inference, a chat interface behind single sign-on, retrieval over your own documents, and a gateway in front of all of it.
+---
+
+<Hero eyebrow="Blueprint" title="Your models, your documents, your network">
+Everything an AI assistant needs, running on infrastructure you control — with the same
+segmentation, identity, policy and evidence as any other workload in the stack.
+</Hero>
+
+## The shape
+
+| Component | Role |
+|---|---|
+| **Inference server** | Serves your models. Each served model is a sub-component with its own memory fraction, context length and role — chat or embedding |
+| **Chat interface** | The interface people use, behind single sign-on |
+| **Vector store** | Retrieval over your own documents; each collection is a sub-component, with the vector size matched to the embedding model |
+| **Workflow builder** | Retrieval and agent workflows, when you want them designed visually |
+| **Relational database + object storage** | The chat interface's own state and uploads |
+| **Cache** | Session state |
+| **Identity provider** | Single sign-on, as an OIDC client sub-component |
+| **Gateway** | Publication, TLS, websockets, and AI-specific routing |
+| **MCP server** | The same stack's AI interface, so the assistant can also operate the platform |
+
+## The links are the design
+
+<Steps>
+  <Step title="Chat interface → served model">
+    One link per model. A chat model and an embedding model are two links, not one
+    configuration file.
+  </Step>
+  <Step title="Chat interface → vector collection">
+    Retrieval is a link. The collection's vector size has to match the embedding model's
+    dimensions — which is exactly the kind of constraint the model checks for you before
+    building.
+  </Step>
+  <Step title="Chat interface → identity client">
+    Single sign-on, with the redirect URIs generated rather than pasted.
+  </Step>
+  <Step title="Gateway → chat interface">
+    The public address, TLS, and websocket support for streaming.
+  </Step>
+  <Step title="Database, storage and cache links">
+    State, uploads and sessions, each with its own generated credential.
+  </Step>
+</Steps>
+
+## The AI gateway
+
+The gateway component has an AI-specific sub-component type. That is where model routing,
+request shaping and the controls you want in front of an inference endpoint live — as part
+of the graph, so they are versioned and validated like everything else.
+
+## Tool calling
+
+Chat models that support tool calling need the right parser for their family. The platform
+maps model family to parser automatically and emits nothing when it does not recognise a
+family, rather than guessing — with an explicit override available when you know better
+than the map.
+
+## GPU
+
+Served models are placed by node selection attributes, and several models can share one
+card where the hardware supports it. Because the placement is an attribute, moving from
+shared to dedicated is a value change and a rebuild, not a new design.
+
+## What this gets you that a hosted assistant does not
+
+<Cards cols={2}>
+  <Card kicker="Boundary" title="Nothing leaves">
+    The models, the documents, the embeddings and the conversations are inside your
+    network, under your network policies.
+  </Card>
+  <Card kicker="Identity" title="One login">
+    The same identity as the rest of your systems, with group membership declared in the
+    graph.
+  </Card>
+  <Card kicker="Proof" title="The same evidence surface">
+    Segmentation, access, policy and vulnerability posture are measured here exactly as
+    they are for a database.
+  </Card>
+  <Card kicker="Portability" title="Nothing proprietary">
+    Open-source components on Kubernetes. The stack is the graph, and the graph is yours.
+  </Card>
+</Cards>

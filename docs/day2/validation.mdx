@@ -1,0 +1,101 @@
+---
+id: day2-validation
+slug: /day2/validation
+title: Validation
+sidebar_label: Validation
+sidebar_position: 2
+description: Proving every declared relationship layer by layer, and turning the graph into executable tests.
+---
+
+<Hero eyebrow="Proof" title="A relationship is not validated until every layer of it is">
+&ldquo;The connection failed&rdquo; is not a finding. Which layer failed is. Link validation
+walks a declared edge from the rendered configuration all the way to the application
+answering with the credential it was actually given, and stops at the first layer that
+cannot be proven.
+</Hero>
+
+## Link validation
+
+The unit is the **link**, not the component. Every edge in the graph is taken in turn and
+proven layer by layer.
+
+| Layer | What is proven | How |
+|---|---|---|
+| **Wiring** | The link was rendered into the consumer | The target's host, credential and resource name are found *by value* in the consumer's runtime configuration — its workload environment, its referenced secrets and config |
+| **Secret** | The credential reached the consumer | The referenced secrets exist and, where they come from a store, are synced. Everything downstream uses the credential found *here*, never the one written in the metadata |
+| **Network** | The consumer can reach the target | A real connection to the resolved host and port |
+| **Access** | The source is permitted | An access review for the source's service account in the target's namespace: the verbs its level needs are allowed, and more than its level is denied |
+| **Protocol** | The target authenticates and answers | The target technology's own probe, run with the credential the consumer really uses |
+
+The verdict names the layer. A link that fails at *secret* is a different problem from one
+that fails at *network*, and both are different from one that connects and is rejected.
+
+<Pills>
+  <Pill tone="proven">pass — every applicable layer proven</Pill>
+  <Pill>partial — proven as far as a probe exists</Pill>
+  <Pill tone="gap">fail — with the failed layer named</Pill>
+  <Pill>unknown — a layer could not be determined</Pill>
+  <Pill>not probeable — external or virtual target</Pill>
+  <Pill>not deployed — no workload on the cluster yet</Pill>
+  <Pill tone="declared">design stage — declared as not live yet</Pill>
+</Pills>
+
+### Adding a technology never changes the agent
+
+Probe files ship with each technology and are collected into the agent at generation time.
+A target type without a probe gets a generic protocol check: any answer on the resolved
+port proves something is serving, a healthy answer on a common health path proves more.
+Types without a probe are counted as untested in the coverage number rather than silently
+passing.
+
+### Intent is declared, never guessed
+
+Two mechanisms keep validation honest about things that are *supposed* to be incomplete:
+
+- **Design stage.** Components you have declared but not yet brought up are listed as such,
+  with a reason. Their links are accepted rather than failed, and do not count against the
+  score. A reviewer can reject that acceptance, which turns it back into a gap of record.
+- **Reviews on links.** Any link row can carry a signed human position — confirmed gap,
+  compensating control, not applicable, or accepted risk with an expiry date. A positioned
+  link stops counting as a regression; a rejected pass becomes a finding.
+
+### Running it
+
+Link validation runs on demand, and once automatically after a new stack version — that
+is, when the metadata commit it measures against has changed. It can be scoped to one
+component, one namespace or one link type, runs in the background with live progress, can
+be stopped gracefully, and honours a time budget. Write probes are off unless you turn
+them on.
+
+## The metadata query API
+
+The same graph that generates the system can be queried — and every row of the result can
+carry a command.
+
+This is what makes a test topology-aware instead of hard-coded. You do not write "check
+the three databases". You write "for every database sub-component of every PostgreSQL
+component, run this check", and the test stays correct when a fourth database is added.
+
+| Part of a query | What it does |
+|---|---|
+| **Source** | Which components — by name, by type, by namespace, by group, or all of them |
+| **Target** | What to iterate — the component, its sub-components, its inbound or outbound links, or its sub-component links |
+| **Select / where** | Choose fields and filter, with exact, negated, contains, prefix, regex, exists, in-list and comparison operators |
+| **Command** | A command run per result, with the row's own values substituted into it |
+| **On success / on failure** | A follow-up check, or a diagnostic collected automatically when something fails |
+| **Severity, description, timeout** | How the result is labelled and bounded |
+| **Dry run** | Render every command without executing any of them |
+
+A query returns a pass rate and a per-result breakdown with the steps that ran. Discovery
+endpoints list the components, types, namespaces and available fields, so the model can
+build a correct query without guessing field names.
+
+## Predefined tests
+
+Each technology ships its own health tests alongside its template, and they are collected
+into the agent automatically. Adding a component to your stack adds its tests. There is no
+central test suite to maintain and nothing to keep in sync.
+
+There are also cross-cutting tests that only make sense at the system level: data flow
+across components, network reachability, secret propagation, cross-stack connectivity and
+Kubernetes-level compliance.

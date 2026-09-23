@@ -1,0 +1,71 @@
+---
+id: platform-history
+slug: /platform/history
+title: History and rollback
+sidebar_label: History and rollback
+sidebar_position: 3
+description: Every save and every build is a version of the whole system. Diff any two, and return to any of them.
+---
+
+<Hero eyebrow="Time" title="Roll back the system, not the file">
+Git rolls back a file. Stacktic rolls back a graph — every component, every link, every
+sub-component and every attribute, as one move.
+</Hero>
+
+## Every transition is a version
+
+Each save and each build inserts a version record carrying the diagram it was made from,
+and the build states carry their logs as well. Nothing has to be tagged, remembered or
+exported for this to happen — it is how the system records itself.
+
+That gives you a timeline of the architecture, not of the YAML.
+
+## Diff any two versions
+
+Two versions can be compared cell by cell: components added and removed, links added and
+removed, attributes whose values moved, sub-components that appeared. The comparison is
+ordered deterministically, so the same two versions always produce the same diff.
+
+This answers a question a file diff cannot: *what changed about the system* — as opposed
+to which 400 lines of generated YAML moved as a consequence.
+
+## Rollback
+
+Rolling back loads an earlier version's diagram back onto the canvas.
+
+:::note Rollback is deliberately not automatic
+Loading an old version does **not** silently become your current system. It is placed in
+front of you, and you save it if that is what you meant. An undo that commits itself is
+not an undo — it is a second uncontrolled change.
+:::
+
+Once saved, it is the current diagram like any other, and building from it regenerates the
+whole system at that state: the components, the links, the network policies the links
+imply, the routes, the credentials, the monitoring and the backups.
+
+## What rollback actually restores
+
+| Restored | Because |
+|---|---|
+| Component set and versions | They are nodes in the graph |
+| Every link | They are edges in the graph |
+| Every sub-component | They are nodes too |
+| Every attribute on all three | Configuration lives nowhere else |
+| The generated isolation, access, routes, secrets and monitoring | All of it is derived from the above at build time |
+
+What a rollback does **not** do is reach into your application's data. Declared state
+returns; runtime data is not the platform's to move.
+
+→ [Declared state and runtime data](/docs/concepts)
+
+## Using history with an AI
+
+The same timeline is what makes an AI-proposed change reversible in one step. A model can
+be allowed to change the graph precisely because the state before the change is a version,
+and returning to it is one action rather than an archaeology exercise across a repository.
+
+The practical loop is: read the current value → state the blast radius → change → build →
+validate → and if the validation says no, return to the previous version and try the other
+option.
+
+→ [Working with the model](/docs/mcp/workflows)

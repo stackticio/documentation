@@ -1,0 +1,81 @@
+---
+id: compliance-controls-from-graph
+slug: /compliance/controls-from-graph
+title: Controls the graph produces
+sidebar_label: Controls from the graph
+sidebar_position: 4
+description: Segmentation, access, encryption and audit are generated from the declared relationships — and regenerated every time those relationships change.
+---
+
+<Hero eyebrow="Generated" title="The control exists because of how the system was built">
+The most reliable control is the one nobody has to remember. When segmentation is derived
+from the links, there is no window in which the policy describes last month's topology.
+</Hero>
+
+## Segmentation
+
+Network policies are generated **after** every component has rendered, from the full set of
+edges — because only then is the complete graph known.
+
+| Handled | How |
+|---|---|
+| Component to component | From the declared link, in both directions |
+| Sub-component edges | A topic to a database, a bucket to a consumer — at the level the relationship exists |
+| Cross-stack links | Components in another stack are recognised as external and handled explicitly |
+| Exceptions | Keyed by component **type**, so they survive a namespace being renamed |
+| Regulated scope | An additional, stricter policy set for components inside a regulated boundary |
+
+The default is that nothing which was not declared is permitted. Adding a link opens
+exactly the path it needs; removing the link closes it again. Neither is a manual step.
+
+:::note This is why a component template never ships a network policy
+A component cannot know the graph it will end up in. Policies belong to the system, so
+they are produced at the system level. That single decision is what keeps segmentation
+correct through every change.
+:::
+
+## Access
+
+Cross-namespace access is generated per link and scoped to what that link actually
+requires. Link validation later proves it both ways: the verbs the relationship needs are
+permitted, and more than it needs is denied.
+
+## Credentials
+
+Every instance gets its own credential, generated at build time, and the build refuses to
+produce two instances that share one. Credentials are encrypted at rest in the repository,
+or sourced from a secret store where you prefer that — per component, not all-or-nothing.
+
+Validation never trusts the metadata for a credential: it reads the secret the consumer
+actually received and uses that to prove the connection. A stack where the declared
+password and the delivered password differ is a stack that fails validation, which is
+exactly what you want.
+
+## Transport
+
+Certificates are issued and renewed automatically, and the gateway routes that publish a
+component carry TLS as part of the link that publishes them. Certificate health, expiry
+and issuer state are collected as evidence.
+
+## Provenance
+
+Image policy and image signature verification are policy sub-components. The stack also
+produces a full inventory of every image it uses — which is what makes an air-gapped
+installation possible, and what a supply-chain question can be answered from.
+
+## Audit
+
+The system produces its own audit surface: scan runs with attestations, a hash chain per
+scan type, an optional git mirror on a dedicated branch, a write audit trail for every
+privileged operation the agent performs including the refusals, and a signed human position
+on every gap.
+
+## The property that matters
+
+All of it regenerates. A change to the system is a change to the graph, and every control
+above is derived from the graph — so the posture moves with the architecture instead of
+lagging behind it.
+
+This is the answer to the question underneath the whole product: *if I let an AI change my
+system, what stops the security model from silently falling behind?* Nothing has to stop
+it, because the security model is not a separate artefact.

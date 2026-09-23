@@ -1,0 +1,113 @@
+---
+id: day2-evidence
+slug: /day2/evidence
+title: Evidence and drift
+sidebar_label: Evidence and drift
+sidebar_position: 4
+description: Hash-chained scan runs, explained deltas, finding memory, and an audit trail an auditor can check without trusting the agent.
+---
+
+<Hero eyebrow="Attest" title="A report that names the system it was true of">
+Any tool can print a score. The question an auditor actually asks is: what exactly was
+measured, when, against which version of the system — and can I tell whether this record
+was edited?
+</Hero>
+
+## Every run is attested
+
+A saved run carries an attestation alongside its result. The parts that matter are the
+parts you can check yourself.
+
+| Field | What it fixes in place |
+|---|---|
+| **Result hash** | A hash of the canonical scan result. An edited record no longer matches |
+| **Metadata hash and commit** | The exact declared system the scan was measured against |
+| **Relation map hash** | The relationship semantics the scanners reasoned with |
+| **Cluster identity and version** | Which cluster was observed, and its API version |
+| **Agent image** | The build of the agent that produced the run |
+| **Previous run hash** | Runs of the same type form a chain |
+| **Run hash** | Over the run identity, its content, its predecessor and its context |
+| **Evidence coverage** | How many findings carry an actual command, its output and its result |
+
+Human labels, derived scores and summaries sit **outside** the hash, so labelling a run as
+a baseline later does not invalidate its attestation.
+
+Chain verification recomputes every stored hash and walks every chain. A failure lists, by
+run, which record was edited, deleted or reordered.
+
+## Per-finding evidence
+
+A finding is not a sentence. It carries the query that produced it and what that query
+returned — names, timestamps, rules, conditions. A "not found" finding shows the listing
+that was searched and what it did contain, so absence is evidenced rather than asserted.
+
+Secret values never appear. Compliance controls carry evidence per control.
+
+## Deltas: what changed, and whether anyone asked for it
+
+Every saved run is compared to the previous run of the same type and mode, and the change
+is **classified**.
+
+| Classification | Meaning |
+|---|---|
+| `explained-by-declared-change` | You changed the stack. The findings moved because the system moved |
+| `environment-change` | The cluster or the agent changed |
+| `unexplained-drift` | The findings changed while the declared system, the cluster and the agent all stayed the same |
+| `improvement-only` | Things were resolved, nothing regressed |
+| `no-change` · `mode-change` · `first-run` | Self-explanatory |
+
+After an unexplained drift, the scheduler re-runs the scan once. Findings still present are
+**confirmed**; the rest are **transient**. Only confirmed regressions are sent to a
+webhook — which is what makes an alert from this system worth waking someone for.
+
+## Finding memory
+
+Findings have identity. A fingerprint is computed over stable fields — control id,
+credential, role, pod, namespace — never over message text, ages or timestamps. A reworded
+issue is the same finding; a moved one is new.
+
+That gives every open finding a first-seen date, an age, and a reopen count. Findings that
+flip state repeatedly are reported as flapping and excluded from regressions, so noise
+does not drown the signal.
+
+## Baselines and versions
+
+Labelling a run means accepting it as the baseline. From then on, **drift** is the
+difference from that labelled run, while **change** stays the difference from the previous
+run. Both are shown, and both are useful for different questions.
+
+## The timeline
+
+Every scan surface ends with a posture timeline: one marker per run with its score and its
+change class, the trend with version markers, a history table you can click into, drift
+against any labelled version, the open findings with their age and reopen count, and a
+compare-any-two-runs view.
+
+## The audit trail
+
+Two levels, both optional and both explicit:
+
+- **Push on demand** — write a scan result into your repository as a timestamped record.
+- **Continuous mirror** — every saved run is committed automatically to a dedicated,
+  orphan branch of your stack repository, alongside the chain file for its type. Evidence
+  history never mixes with the platform's own commits, and the credential used is never
+  written into a URL, a git config or a log.
+
+Records mirrored to git are readable by anyone who can read the repository. They contain
+resource names, timestamps and command output — not secret values.
+
+## Continuous scanning
+
+A schedule attribute turns on scanning inside the agent, per scan type, with an interval
+and a mode:
+
+```
+rbac: 30m
+secrets: 1h
+pci: 24h full
+all: 12h
+```
+
+Due time is the last run of that type from *any* trigger plus the interval, so a restart
+never causes a burst and a manual run counts. One scan runs at a time, most overdue first,
+with jitter.

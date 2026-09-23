@@ -1,0 +1,76 @@
+---
+id: mcp-knowledge
+slug: /mcp/knowledge
+title: The knowledge layer
+sidebar_label: Knowledge layer
+sidebar_position: 5
+description: What the model reads to design correctly — and why it updates without a redeploy.
+---
+
+<Hero eyebrow="Grounding" title="Hands, and a brain to move them">
+The MCP tools are the hands: they operate components, the platform API and the cluster.
+The knowledge layer is what they read — what can exist, what each relationship really
+generates, and how working stacks are configured.
+</Hero>
+
+## Why it is separate
+
+Knowledge embedded in a tool is knowledge you can only change by rebuilding and
+redeploying that tool. Stacktic keeps it outside: the MCP server loads the knowledge layer
+at startup and re-pulls it on demand, so corrections and new patterns reach every
+connected stack **without a rebuild, a redeploy or a restart**.
+
+A model that answers from a stale catalog is worse than a model that says it does not
+know. This is the mechanism that prevents it.
+
+## What it contains
+
+| Layer | What the model gets from it |
+|---|---|
+| **Catalog knowledge** | Every component type: its attributes, what its generation logic does, which environment variables it produces, which files it writes |
+| **Link semantics** | For each link type: its kind, direction, which side plays which role, and how critical it is |
+| **Component semantics** | The *why* digest — a short, human-written explanation of what a component and each of its links is for, used when the model is choosing between options |
+| **Patterns** | Attribute values extracted from real working stacks, so a recommendation is grounded in something that runs |
+| **Curated patterns** | Hand-written why / gotcha / suggestion notes for composite patterns that span several components |
+| **Lifecycle recipes** | Per-component upgrade and migration procedures, with preflight checks and ordering |
+| **Policy schema and carve-outs** | The authoritative admission-policy attribute schema, and which namespaces a given policy must exclude for a given topology |
+| **Playbooks** | Deep guides for the awkward parts: the identity model, where application code should live, media connectivity, secret-store token rotation, connector operability |
+
+## What this changes in practice
+
+<Split>
+  <Side tone="problem" head="Without a knowledge layer">
+    <ul>
+      <li>The model invents a component type that sounds plausible.</li>
+      <li>It picks a version that is not a catalog option, and generation rejects it.</li>
+      <li>It proposes an attribute value copied from a blog post.</li>
+      <li>It cannot tell you what a link will actually produce, so it describes it in general terms.</li>
+    </ul>
+  </Side>
+  <Side tone="answer" head="With it">
+    <ul>
+      <li>Every option offered came from a tool result.</li>
+      <li>Versions come from the catalog, and the current default is used unless you say otherwise.</li>
+      <li>Values come from stacks that are running.</li>
+      <li>&ldquo;What does this link generate&rdquo; is answered with the files and variables, not a paraphrase.</li>
+    </ul>
+  </Side>
+</Split>
+
+## Version currency
+
+Catalog entries are version-pinned, and each component has a current default. Older
+entries are kept so that existing stacks still generate, but they carry a reduced
+attribute and link surface.
+
+The rule the model follows: **use the current default**, never offer legacy tags as a
+menu, and when a version is under discussion, also check the upstream project's latest
+release. If the catalog lags upstream it says so explicitly and offers both paths —
+proceed with the newest catalog option, or have the platform team add the newer version
+first. It never silently picks something outdated, and it never invents a version string.
+
+## Keeping it fresh
+
+`knowledge(action='refresh')` re-pulls the knowledge layer into a running MCP server.
+Several of the files hot-reload on change without even that. Nothing about updating
+platform knowledge requires touching your stack.

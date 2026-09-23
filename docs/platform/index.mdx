@@ -1,0 +1,63 @@
+---
+id: platform-index
+slug: /platform/
+title: The platform
+sidebar_label: Overview
+sidebar_position: 1
+description: The design surface where a system is drawn, versioned, built, watched live and rolled back.
+---
+
+<Hero eyebrow="The platform" title="Where the graph lives">
+The MCP server is how an AI works with a stack. The platform is where the stack exists —
+the canvas, the catalog, the versions, the collaborators, the live view and the history
+you can return to.
+</Hero>
+
+## What it is
+
+A system is drawn on a canvas: components, sub-components and links, each carrying
+attributes from a version-pinned catalog. That drawing is the graph. Everything else in
+Stacktic reads it, generates from it, measures against it or returns to an earlier version
+of it.
+
+<Cards>
+  <Card to="/docs/platform/systems" kicker="Work" title="Systems and builds">
+    Create, save, validate, build, push. Folders, visibility, environments and the file
+    divergence list.
+  </Card>
+  <Card to="/docs/platform/history" kicker="Time" title="History and rollback">
+    Every save and every build is a version. Diff any two, and return to any of them.
+  </Card>
+  <Card to="/docs/platform/liveview" kicker="Watch" title="LiveView">
+    The same diagram, coloured by what is actually happening in the cluster right now.
+  </Card>
+  <Card to="/docs/platform/sections" kicker="Guide" title="Catalog, sections and suggestions">
+    System-wide settings, and the platform telling you what your drawing is missing.
+  </Card>
+  <Card to="/docs/platform/collaboration" kicker="People" title="Collaboration">
+    Roles, temporary access with an audit trail, and systems that share cells.
+  </Card>
+  <Card to="/docs/reference/api" kicker="Automate" title="Programmatic access">
+    The same operations, over the API — which is what the MCP write tools use.
+  </Card>
+</Cards>
+
+## The three things it guarantees
+
+<Steps>
+  <Step title="The drawing is always valid against the catalog">
+    Names are unique and well-formed, every component exists in the catalog at the version
+    it claims, every attribute is one the catalog defines with a value the catalog allows,
+    every sub-component sits under a parent that can own it, and every link is one the
+    catalog permits between those two types. A drawing that violates any of this cannot be
+    built through the API.
+  </Step>
+  <Step title="Every state is recoverable">
+    Each save and each build is stored with its diagram. Nothing is lost by changing your
+    mind.
+  </Step>
+  <Step title="Your edits to the generated repository survive">
+    Files you asked the platform to leave alone stay yours, and a conflict stops a push
+    rather than committing over your work.
+  </Step>
+</Steps>

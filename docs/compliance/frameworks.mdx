@@ -1,0 +1,82 @@
+---
+id: compliance-frameworks
+slug: /compliance/frameworks
+title: PCI DSS and ISO 27001
+sidebar_label: Frameworks
+sidebar_position: 2
+description: How the compliance position is computed from the topology and the cluster, and what the generated audit report contains.
+---
+
+<Hero eyebrow="Frameworks" title="From topology to position">
+The framework scanners start from what your stack actually contains, decide which controls
+are even applicable, then go and measure them.
+</Hero>
+
+## Capability first, then controls
+
+Before evaluating anything, the scanner builds a **capability picture** from the graph:
+does this stack have a policy engine, a certificate authority, a secret store, a SIEM, a
+backup mechanism, an identity provider, a gateway, runtime detection.
+
+That picture decides which controls apply and how they can possibly be satisfied. A
+requirement about centralised log retention is evaluated differently in a stack that has a
+log pipeline than in one that does not — and in the second case the answer is a named gap,
+not a silent pass.
+
+## The three modes
+
+| Mode | What it does |
+|---|---|
+| **Fast** | Collects cluster evidence quickly: workloads, resource types, health, counts |
+| **Deep** | Adds hardening scans, admission dry-runs and deeper analysis |
+| **Report** | Everything in deep, plus a rendered audit document |
+
+## What the report contains
+
+The generated report is a document an auditor can read without a walkthrough:
+
+<Steps>
+  <Step title="An attestation table">
+    The result hash, the hash and commit of the declared system it judged, the cluster
+    identity and the agent build. The report names the state it was true of.
+  </Step>
+  <Step title="An executive summary">
+    Counts by status, coverage per requirement, and the review coverage.
+  </Step>
+  <Step title="Per-control findings">
+    The automated status, the finding, and the evidence — command, output, result.
+  </Step>
+  <Step title="The human position">
+    Under each control, the recorded review: who signed it, why, and when it expires.
+  </Step>
+</Steps>
+
+The machine finding and the human position are always shown **side by side**. The automated
+status is never replaced by a sign-off.
+
+## From a gap to a plan
+
+A gap is only useful if it says what to do. The framework tools answer three questions in
+sequence:
+
+| Question | What comes back |
+|---|---|
+| Where do I stand? | Overview: counts by status, per-requirement coverage, and what the stack is capable of |
+| What is missing? | Gaps with the evidence behind each one |
+| What fixes it? | The change to the graph — usually an attribute, sometimes a component or a link |
+| What would this component change? | Per-component impact: which controls a given technology moves if you add, remove or reconfigure it |
+
+Because the remediation is a graph change, "we fixed it" is verifiable by re-running the
+same scan and comparing the two runs — and the comparison is classified as an improvement
+explained by a declared change, not as unexplained movement.
+
+## Continuous, not annual
+
+A compliance position computed once a year describes a system that no longer exists.
+
+Framework scans participate in the same schedule, delta and attestation machinery as every
+other scan: they can run continuously, every run is chained to the previous one, a
+regression is confirmed by a re-run before anyone is alerted, and a labelled run becomes
+the baseline that drift is measured against.
+
+→ [Evidence and drift](/docs/day2/evidence)

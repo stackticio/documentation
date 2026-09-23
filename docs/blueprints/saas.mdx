@@ -1,0 +1,74 @@
+---
+id: blueprints-saas
+slug: /blueprints/saas
+title: Multi-environment SaaS
+sidebar_label: Multi-environment SaaS
+sidebar_position: 5
+description: One application, several environments, real autoscaling, and a compliance position you can hand to a customer.
+---
+
+<Hero eyebrow="Blueprint" title="One design, three environments, one compliance story">
+The most common shape: your application, the data services it needs, a gateway in front of
+it, and the operational surface that lets you answer a customer's security questionnaire
+without a project.
+</Hero>
+
+## The shape
+
+| Layer | Components |
+|---|---|
+| **Application** | Your code, built by the platform from your repository — one component per service |
+| **Data** | Relational database with a dedicated database per service, cache, object storage, message broker |
+| **Edge** | Gateway with routes, TLS, rate limiting and authentication mode per route |
+| **Identity** | Identity provider with a client per application that needs a login |
+| **Observability** | Metrics, dashboards, alerts, logs and tracing, wired from the links |
+| **Scale** | Autoscaling driven by queue depth, a metrics query or a log query |
+| **Recovery** | Backup from the database to object storage, with schedule and retention on the link |
+| **Assurance** | Stack agent, admission policy, and the compliance frameworks you are asked about |
+
+## Environments are values, not branches
+
+The base design is rendered once. Each environment is an overlay carrying only what
+differs — replica counts, resource sizes, the domain, and which optional components exist
+at all.
+
+That has three consequences worth stating plainly:
+
+<Cards>
+  <Card kicker="1" title="Staging is really staging">
+    It is the same graph, so a problem that only appears in production is a *value*
+    difference you can name, not an unexplained environment difference.
+  </Card>
+  <Card kicker="2" title="Promotion is a value change">
+    Not a merge between diverging trees.
+  </Card>
+  <Card kicker="3" title="A new environment is cheap">
+    Duplicating the stack gives you a complete second system, relations included.
+  </Card>
+</Cards>
+
+## Several applications, one repository
+
+Application components do not each need their own repository. Several can live in one
+repository, each in its own folder with its own container build, named after the
+component. That is the cheaper default and needs no new credentials.
+
+The alternative — a repository per application — is equally supported. The model will ask
+you which, rather than assuming.
+
+## The security questionnaire
+
+This is where the operational surface pays for itself. The questions a customer asks are
+the questions the stack agent already answers with evidence:
+
+| They ask | You run |
+|---|---|
+| Is traffic between services restricted? | Network policy scan — every declared link, both directions, with real probes |
+| Who has administrative access? | RBAC scan — bindings, privileged holders, wildcards |
+| Are secrets encrypted? | Secrets scan, plus the repository encryption model |
+| Do you enforce workload security policy? | Admission policy scan, including over-enforcement |
+| Are backups tested? | Backup scan — and the verdict distinguishes "completed" from "actually holds data" |
+| Are you PCI or ISO aligned? | The framework scan, with per-control evidence and the signed position on every gap |
+| How do you know this is still true? | The attestation chain, the delta classification and the scan schedule |
+
+→ [Compliance automation](/docs/compliance/) · [Evidence and drift](/docs/day2/evidence)

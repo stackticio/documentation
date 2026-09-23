@@ -1,0 +1,83 @@
+---
+id: blueprints-sovereignty
+slug: /blueprints/sovereignty
+title: Digital sovereignty
+sidebar_label: Digital sovereignty
+sidebar_position: 4
+description: Collaboration, mail, documents, video, wiki and business applications on infrastructure you control, with one identity across all of it.
+---
+
+<Hero eyebrow="Blueprint" title="The working environment, on your own terms">
+File sharing, mail, document editing, video, knowledge base and business applications —
+open source, on Kubernetes, behind one login, with the same segmentation and evidence as
+any other stack.
+</Hero>
+
+## The shape
+
+| Layer | What it provides |
+|---|---|
+| **Identity** | One provider, one user list, single sign-on across every application |
+| **Gateway** | Every application on its own subdomain with TLS, plus the raw mail protocol ports |
+| **Collaboration** | File sync and sharing, with document editing and video conferencing attached as links |
+| **Mail** | A full mail service, integrated with the file platform and using the same declared users |
+| **Knowledge** | A wiki, with single sign-on |
+| **Business applications** | ERP and related applications, on the same identity |
+| **Data and storage** | Databases, object storage and cache, one per consumer, with generated credentials |
+| **Secrets** | Encrypted in the repository, or from a secret store |
+| **Operations** | Backup, monitoring, policy, validation and compliance — the standard Day 2 surface |
+
+## One user list
+
+This is the part that makes it a system rather than a collection of applications.
+
+Users are declared **once**, as lines on the identity provider's client sub-component.
+Groups are declared on the provider. On the next build, synchronisation jobs create the
+accounts, and single sign-on carries the identity into every application that has an
+identity link.
+
+Onboarding is adding a line. Offboarding is removing one. Both are graph changes, so both
+are versioned, reviewable and reversible.
+
+:::danger Never create the account in the application
+An account created directly in a mail admin panel or a file-sharing admin interface is
+invisible to the graph and skipped by the synchronisation jobs. It works until the next
+build and then diverges silently.
+:::
+
+## Integrations are links
+
+The applications in this blueprint are integrated with each other, and every integration is
+an edge:
+
+<Pills>
+  <Pill>file platform → document editing</Pill>
+  <Pill>file platform → video conferencing</Pill>
+  <Pill>file platform → mail</Pill>
+  <Pill>file platform → cache</Pill>
+  <Pill>file platform → database</Pill>
+  <Pill>file platform → object storage</Pill>
+  <Pill>every application → identity client</Pill>
+  <Pill>gateway → every application</Pill>
+</Pills>
+
+Drawing the edge generates the configuration on both sides. Removing it removes the
+integration *and* the network path that supported it.
+
+## Why it is a sovereignty story
+
+| Property | How it is achieved |
+|---|---|
+| **Your data stays where you put it** | Self-hosted components on infrastructure you choose |
+| **No vendor dependency in the design** | The stack is a graph over open-source components; nothing about it is tied to a provider |
+| **Reproducible anywhere** | The same graph installs on a different cluster, including with no internet access |
+| **Auditable** | The same compliance, evidence and attestation surface as any other Stacktic stack |
+| **Exit is possible** | You hold the repository, the data and the graph |
+
+## Portability in practice
+
+Provider-specific values are attribute values, not template behaviour. That is what makes
+the same design install on a different cloud, on your own hardware, or into an air-gapped
+environment — without becoming a different design.
+
+→ [Build and deploy](/docs/day0/build-deploy)

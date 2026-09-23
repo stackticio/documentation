@@ -1,0 +1,61 @@
+---
+id: reference-api
+slug: /reference/api
+title: Platform API
+sidebar_label: Platform API
+sidebar_position: 3
+description: What the programmatic surface does, and how access is provided.
+---
+
+<Hero eyebrow="Reference" title="Everything the interface does, the API does">
+The platform exposes a REST surface over the same operations the web interface performs.
+It is what the MCP write tools call, and it is what your own automation would call.
+</Hero>
+
+:::info Access is provided to customers
+The API reference — endpoints, payload shapes, semantics and credentials — is provided
+directly to customers under their agreement, not published here. This page describes what
+the surface does so you can plan around it.
+:::
+
+## What it covers
+
+| Area | What you can do |
+|---|---|
+| **Systems** | Read a system's current graph, change it, and trigger a build or a push |
+| **Attributes** | Read and update component, sub-component and link attributes, individually or in batches |
+| **Topology** | Add and remove components and links |
+| **Catalog** | Define attributes, and bind them to component types with their options and defaults |
+| **Tests** | Define validation tests against a system, scoped by component or by topology |
+| **Identity** | Manage the platform's own users and access tokens |
+
+## The shape of a safe write
+
+The same discipline the MCP enforces applies to any client:
+
+<Steps>
+  <Step title="Read the current state">
+    Never write against an assumed value.
+  </Step>
+  <Step title="Change exactly what you mean to">
+    Some write operations merge and others replace wholesale. Knowing which is which is the
+    difference between adding a sub-component and silently removing the others.
+  </Step>
+  <Step title="Verify by identity, not by success">
+    A write that returns success is not a write that did what you meant. Read it back.
+  </Step>
+  <Step title="Build only when you intend to">
+    A build regenerates the stack repository.
+  </Step>
+</Steps>
+
+## Why most people never call it directly
+
+Because the MCP tools already do — with the current value read first, the blast radius
+computed, the options enumerated from the catalog, and a confirmation step before anything
+is written or built.
+
+Direct API use makes sense for integrating Stacktic into an existing internal workflow. For
+everything else, the conversation is the interface.
+
+→ [MCP tool surface](/docs/mcp/tools)

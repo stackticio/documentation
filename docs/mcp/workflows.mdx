@@ -1,0 +1,114 @@
+---
+id: mcp-workflows
+slug: /mcp/workflows
+title: Working with the model
+sidebar_label: Working with the model
+sidebar_position: 6
+description: The four conversations that cover almost everything — design, change, diagnose, prove.
+---
+
+<Hero eyebrow="Practice" title="Four conversations">
+Once the MCP is connected, almost everything you do with Stacktic is one of four
+exchanges. Each one has a shape the server enforces, so the outcome does not depend on how
+well you prompted.
+</Hero>
+
+## 1 · Design a stack from a specification
+
+Paste your product or data specification into a client connected to the MCP. The model
+does not start drawing immediately — it works outward from your application, in a fixed
+order, and asks the smallest set of questions that change the result.
+
+<Steps>
+  <Step title="The application">
+    What it does, what port it listens on, which language and framework. This decides the
+    environment-variable convention the application will be handed.
+  </Step>
+  <Step title="What it needs">
+    Database, object storage, cache, queue, search, scheduled jobs — one component per
+    need, never two that do the same job.
+  </Step>
+  <Step title="Who reaches it">
+    A public URL, a login, or internal only. This is what adds a gateway, an identity
+    client, and the routes and redirect URIs that go with them.
+  </Step>
+  <Step title="How it runs">
+    Environments, replicas or autoscaling, GPU, resource sizes.
+  </Step>
+  <Step title="What proves it works">
+    Metrics, dashboards, logs, backups — last, and only the ones you will actually look at.
+  </Step>
+</Steps>
+
+Every question arrives in one message with a sensible default, so "defaults are fine" is a
+complete answer. Anything the catalog cannot express is reported as a **gap** — named
+precisely, with the smallest change that would unblock it — rather than substituted with
+something that merely compiles.
+
+:::tip Your code needs a home
+An application component does nothing without a repository. The model will ask which of
+exactly two options you want: a new repository, or a subfolder in a repository the stack
+already uses. The second is the cheaper default and needs no new credentials — each
+application gets its own folder and its own container build, named after the component.
+:::
+
+## 2 · Change something safely
+
+The dangerous part of an autonomous agent is not that it makes changes. It is that it
+makes changes whose consequences nobody computed.
+
+<Steps>
+  <Step title="Read the current value">
+    Never a change proposed against an assumed state.
+  </Step>
+  <Step title="Show it to you">
+    The value as it is now, from a tool result.
+  </Step>
+  <Step title="State the blast radius">
+    What this attribute touches, which components depend on it, and in what order things
+    should move.
+  </Step>
+  <Step title="Ask">
+    Options enumerated from the real catalog — never free text.
+  </Step>
+  <Step title="Write, build, deploy, verify">
+    The change lands in the graph; the build regenerates everything that depends on it; the
+    runtime is checked afterwards, not before.
+  </Step>
+</Steps>
+
+## 3 · Diagnose
+
+A symptom is a starting point in a graph, not a search term.
+
+The model traverses from the symptom outward: which component, which links into and out of
+it, which of those links are proven and which are failing, what the logs and metrics on
+either side say, and what the generated configuration actually contains. Container-level
+inspection is the last resort, not the first move.
+
+The result names the failing layer — the credential never arrived, the port is not
+reachable, the role does not permit it, the target answers but rejects the credential —
+rather than reporting that something is red.
+
+## 4 · Prove
+
+"Is my stack fine?" has an answer with evidence behind it.
+
+| Question | What the model runs |
+|---|---|
+| Is it healthy? | Health map across the graph, then link validation for anything suspicious |
+| Is it secure? | Scored scans: admission policy, network policy, Kubernetes hardening, vulnerabilities |
+| Is it compliant? | Framework position, per-requirement detail, and the gaps with their evidence |
+| Can I restore it? | What is protected, what can be proven to hold data, and which restore points are usable |
+| What changed? | Deltas since the previous run, classified as explained by a declared change or as drift |
+
+→ [Day 2 — operate and prove](/docs/day2/) · [Compliance automation](/docs/compliance/)
+
+## Letting it run unattended
+
+The same conversations can run on a schedule. An **agent** sub-component defines the
+worker — model, allowed tool categories, budget. An **AI task** sub-component gives it a
+prompt, a cron schedule, a notification target and, optionally, the next task in a chain.
+
+Because both are sub-components of the MCP server, they are part of the graph: versioned
+with the stack, duplicated into staging with it, and rolled back with it.

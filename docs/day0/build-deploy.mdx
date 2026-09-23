@@ -1,0 +1,106 @@
+---
+id: day0-build-deploy
+slug: /day0/build-deploy
+title: Build and deploy
+sidebar_label: Build and deploy
+sidebar_position: 3
+description: In-cluster image builds, environment overlays, the apply contract, and air-gapped installation.
+---
+
+<Hero eyebrow="Delivery" title="Two commands, repeatable forever">
+Images are built inside the cluster. Manifests are applied with kustomize. Both steps are
+designed to be run again at any time without special handling.
+</Hero>
+
+## Build images in the cluster
+
+Container images are built by an in-cluster builder from the generated build manifests.
+There is no local container daemon in the loop, no image pushed from a laptop, and no
+credential that has to leave the cluster.
+
+```bash
+kubectl apply -k k8s/build/base/<component>/
+```
+
+For every environment at once, apply the build overlay instead:
+
+```bash
+kubectl apply -k k8s/build/overlays/<environment>/ --server-side=true --force-conflicts=true
+```
+
+The loop for an application change is therefore: edit the code in your application
+repository → build → deploy. The stack itself only changes when the graph changes.
+
+## Deploy
+
+```bash
+kubectl apply -k k8s/deploy/base/<component> --server-side=true --force-conflicts=true
+```
+
+Or the whole environment:
+
+```bash
+kubectl apply -k k8s/deploy/overlays/<environment>/ --server-side=true --force-conflicts=true
+```
+
+:::tip The apply contract
+`kubectl apply -k` must always succeed, and must always be safe to repeat. That is a design
+rule for everything the platform generates, not an aspiration — it is what makes moving a
+cluster to a new stack version a single idempotent command rather than a runbook.
+
+The one exception is a Kubernetes Job, whose spec is immutable once created: those are
+deleted before being re-applied.
+:::
+
+If you see `no matches for kind ... in version ...` on a first install, apply again. It
+means a custom resource was applied in the same pass that installed its definition.
+
+## Environments
+
+The base tree is shared; each environment is an overlay carrying only what differs —
+replica counts, resource sizes, domains, which optional components exist.
+
+An environment is not a branch and not a copy of the design. It is the same graph rendered
+again with different values, which is why promoting a change between environments is a
+value change rather than a merge.
+
+## Secrets in the repository
+
+Secrets are encrypted in the repository. Decryption is a local, offline step that runs
+before kustomize, using a key you hold:
+
+```bash
+export SOPS_AGE_KEY_FILE=<your key file>
+scripts/stacktic/decrypt-secrets.sh
+```
+
+Nothing contacts a key service, and nothing decrypts inside CI unless you put the key
+there deliberately.
+
+→ [Identity and secrets](/docs/day0/identity-secrets)
+
+## Validate the result
+
+```bash
+scripts/stacktic/validate-all.sh
+```
+
+The generated repository also carries per-component documentation and a rendered
+architecture diagram for the whole system, so the repository explains itself without a
+separate wiki.
+
+## Air-gapped installation
+
+The same stack installs with no internet access. The post-generation chain inventories
+every image the stack references, generates a migration script that copies them into your
+own registry, and rewrites the kustomizations to pull from there.
+
+The stack does not become a different stack in the process — the graph, the policies and
+the validation surface are identical. Only the registry changes.
+
+## Rolling behaviour
+
+Workloads whose storage can only be attached to one node at a time roll with a surge of
+zero rather than being torn down first. The pod is replaced in place, the volume is never
+contended, and the deployment is still a rolling update — so a failed new version does not
+leave you with nothing running.

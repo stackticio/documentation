@@ -1,0 +1,139 @@
+---
+id: reference-components
+slug: /reference/components
+title: Component catalog
+sidebar_label: Component catalog
+sidebar_position: 1
+description: What the platform can express today — grouped by purpose.
+---
+
+<Hero eyebrow="Reference" title="The catalog is the vocabulary">
+A component type is not a suggestion. It is the set of things the platform knows how to
+generate, wire, secure, validate and operate. Anything outside it is a gap to be named,
+never something to improvise around.
+</Hero>
+
+<Stats>
+  <Stat value="75" label="component templates available" />
+  <Stat value="441" label="typed link types" />
+  <Stat value="63" label="sub-component types" />
+</Stats>
+
+:::note Where these numbers come from
+The component count is the set of non-deprecated, selectable templates in the platform's
+template repository. The link and sub-component counts come from the platform's own
+generated inventory of those templates. Both move as the catalog grows.
+:::
+
+:::note The authoritative list is the catalog itself
+Entries are version-pinned, and the catalog states which version is current for each
+component. Ask your AI client (`knowledge`) or the platform for the live list rather than
+treating any document as the source of truth — including this one.
+:::
+
+## Your applications
+
+| Component | What it is for |
+|---|---|
+| **External source code** | Your own code, built in-cluster from your repository. The centre of most stacks |
+| **Image base** | A pre-built container image you already have |
+| **FastAPI** | A scaffolded Python API, when you want the platform to write the starting point |
+
+## AI and machine learning
+
+| Component | What it is for |
+|---|---|
+| **vLLM** · **Llama** | Self-hosted model inference; each served model is a sub-component |
+| **KServe** | Model serving as inference services |
+| **MLflow** | Experiment tracking and the model registry |
+| **Open WebUI** | A chat interface for served models |
+| **Langflow** · **Flowise** | Visual retrieval and agent workflow builders |
+| **Qdrant** | Vector store; collections are sub-components |
+| **Langfuse** | LLM observability |
+| **OpenAI** | An external model provider, expressed as a component so links behave the same |
+| **JupyterHub** | Notebooks |
+| **Dagster** · **Airflow** · **Argo Workflows** | Orchestration for training, apply and data jobs |
+| **Spark** | Distributed processing |
+
+## Data
+
+| Component | What it is for |
+|---|---|
+| **CloudNativePG** | PostgreSQL; databases, migrations and point-in-time-recovery clusters are sub-components |
+| **MongoDB** · **MariaDB** · **Cassandra** · **Neo4j** | Document, relational, wide-column and graph databases |
+| **ClickHouse** | Analytics |
+| **OpenSearch** · **Elasticsearch** | Search, analytics and SIEM |
+| **Valkey** | Cache |
+| **RabbitMQ** | Messaging; exchanges, queues and bindings are sub-components |
+| **Kafka** | Event streaming; topics and bridges are sub-components |
+| **Apicurio Schema Registry** | Schema governance for streaming |
+| **SeaweedFS** | S3-compatible object storage; buckets are sub-components |
+| **immudb** | Immutable, verifiable storage |
+| **RDS · DocumentDB · DynamoDB · S3 · IAM** | Cloud-managed resources, provisioned through Crossplane |
+
+## Gateway, identity and networking
+
+| Component | What it is for |
+|---|---|
+| **APISIX** | The gateway: routes, TLS, rate limiting, authentication, and an AI gateway sub-component |
+| **Istio** | Service mesh |
+| **Keycloak Operator** | Identity; OIDC clients, groups and LDAP federation are sub-components |
+| **LDAP** | Directory services |
+| **cert-manager** | Certificate issuance and renewal |
+| **External DNS** | DNS records from cluster state |
+
+## Security and policy
+
+| Component | What it is for |
+|---|---|
+| **OPA / Gatekeeper** | Admission policy; each policy family is a sub-component |
+| **OpenBao** | Secret storage |
+| **External Secrets** | Sourcing secrets from a store at runtime |
+| **Falco** | Runtime threat detection |
+| **Trivy** | Vulnerability scanning |
+| **Sigstore** | Image signature verification |
+| **SonarQube** | Code quality and security analysis |
+| **Vaultwarden** | Credential management for people |
+
+## Observability
+
+| Component | What it is for |
+|---|---|
+| **Prometheus** | Metrics and alerting; alerts are sub-components |
+| **Grafana** | Dashboards |
+| **Loki** | Logs |
+| **OpenTelemetry** · **Alloy** | Tracing and telemetry collection |
+| **Kubecost** | Cost visibility |
+
+## Platform and operations
+
+| Component | What it is for |
+|---|---|
+| **Stack agent** | Validation, scanning, evidence, backup control — see [Day 2](/docs/day2/) |
+| **MCP server** | The AI interface — see [MCP](/docs/mcp/) |
+| **Velero** | Cluster backup and restore |
+| **KEDA** | Event-driven autoscaling |
+| **Kueue** | Workload queueing and priority |
+| **Reloader** | Restart workloads when their configuration changes |
+| **Argo CD** | GitOps delivery |
+| **Crossplane** | Cloud resource provisioning |
+| **Backstage** | Developer portal |
+| **k6** | Load testing |
+| **Kanso** | Work and issue tracking |
+
+## Business applications
+
+| Component | What it is for |
+|---|---|
+| **Nextcloud** | File sync, sharing and applications |
+| **Collabora** | Document editing |
+| **Mailu** | Mail |
+| **Jitsi** | Video conferencing |
+| **XWiki** | Knowledge base |
+| **ERPNext** | ERP and business processes |
+
+## Deprecated entries
+
+Some catalog entries exist only so that stacks built on them still generate. They carry a
+reduced attribute and link surface and are never offered as a choice for a new design. If
+you find yourself looking at one, the answer is the current default for that component.

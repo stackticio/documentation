@@ -1,0 +1,45 @@
+---
+id: reference-glossary
+slug: /reference/glossary
+title: Glossary
+sidebar_label: Glossary
+sidebar_position: 4
+description: The terms this documentation uses, defined once.
+---
+
+<Hero eyebrow="Reference" title="Terms, defined once">
+Most confusion about Stacktic is vocabulary. These are the words that carry a specific
+meaning here.
+</Hero>
+
+| Term | Meaning |
+|---|---|
+| **Stack** | One system, as a graph. The unit of version, duplication and rollback |
+| **Component** | One technology instance in a stack. Its type selects the generation logic |
+| **Sub-component** | A resource a component owns — a database, bucket, topic, queue, client, model. A node in its own right |
+| **Link** | A typed, directed edge. Named `sourceType-targetType`. Generates real configuration on both sides |
+| **Attribute** | A value on a component, a sub-component or a link. The only place configuration lives |
+| **Graph** | Components, sub-components, links and attributes together — the complete description of a system |
+| **Stack metadata** | The graph written as data into your stack repository; what the agent measures against |
+| **Build** | Regenerate the whole stack repository from the graph |
+| **Push** | Regenerate only the files the changed attributes can affect |
+| **Impact map** | Per-component mapping from an attribute to the generated files it can affect. What makes a push small |
+| **Overlay** | An environment's differences from the shared base |
+| **Declared state** | Anything in the graph — components, links, attributes, system users, routes, policies |
+| **Runtime data** | Anything an application wrote — a ticket, a file, a row. Not in the graph, and should not be |
+| **Drift** | Runtime state that no declaration accounts for |
+| **Stack agent** | The component that measures the running system against the graph |
+| **Link validation** | Proving a declared edge layer by layer: wiring, secret, network, access, protocol |
+| **Probe file** | A technology's own protocol check, shipped with its template and collected into the agent |
+| **Scan** | A scored measurement of one dimension of the running system |
+| **Finding** | One issue from a scan, with a stable identity, a first-seen date and evidence |
+| **Delta** | The classified difference between a run and the previous run of the same type |
+| **Attestation** | The hashes and context that fix what a run measured, and against which state |
+| **Baseline** | A labelled run. Drift is measured from a baseline; change is measured from the previous run |
+| **Review** | A named person's recorded position on a control or a link the automation could not pass |
+| **Gate** | A record of human approval that something else waits on before it runs |
+| **MCP** | Model Context Protocol — how an AI client talks to the platform |
+| **Dispatcher** | An MCP tool taking an action enum, with a built-in help action |
+| **Knowledge layer** | What the MCP reads to answer correctly — catalog, semantics, patterns, recipes, playbooks |
+| **Recipe** | A declarative upgrade or migration procedure for a component |
+| **Blueprint** | A recognisable arrangement of components and links. Not a special mode |

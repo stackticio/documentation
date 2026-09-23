@@ -1,0 +1,159 @@
+---
+id: concepts
+title: Core concepts
+sidebar_label: Core concepts
+sidebar_position: 3
+description: Components, sub-components, links, attributes, environments and the stack as a version unit.
+---
+
+<Hero eyebrow="Vocabulary" title="Six words that explain the whole platform">
+Everything in Stacktic — the UI, the API, the MCP tools, the generated repository and the
+runtime agent — is expressed with the same small vocabulary.
+</Hero>
+
+## Component
+
+A component is one technology instance in your stack: your application, a database, a
+gateway, an identity provider, a metrics server. Its **type** selects the generation logic;
+its **name** is what everything else refers to.
+
+Two components of the same type are ordinary — three PostgreSQL clusters, two gateways,
+five applications. Each carries its own namespace, version and configuration.
+
+Your own code enters the stack as an application component that points at a Git
+repository. That component is the centre of the design: everything else exists to serve
+it.
+
+## Sub-component
+
+A sub-component is a resource a component owns and creates. It is a node in its own right,
+so it can carry attributes and be linked to directly.
+
+| Owner | Sub-components it can own |
+|---|---|
+| PostgreSQL | `db`, `migration`, point-in-time-recovery cluster |
+| MongoDB | `mongo_db`, `shard` |
+| Object storage | `swbucket`, `remote_bucket` |
+| Kafka | `topic` |
+| RabbitMQ | `exchange`, `queue`, `binding` |
+| Identity provider | `client`, `group`, LDAP federation |
+| Model serving | `model`, `registered_model`, `experiment` |
+| Admission policy | `resource_policy`, `pod_level_security`, `image_policy`, `image_signing` |
+
+Sub-components are why "one database per application" is expressible without deploying a
+second database: the cluster is the component, each logical database is a sub-component
+with its own credentials.
+
+:::tip Every instance needs its own identity
+The moment a component owns a second sub-component of the same kind — two buckets, three
+databases, four OIDC clients — each one needs its own name, user and secret. Shared
+credentials across instances are rejected at generation time rather than discovered in
+production.
+:::
+
+## Link
+
+A link is a typed, directed edge. Its type is always `sourceType-targetType`, and that
+string is what selects the generation logic on both sides.
+
+A link is not a diagram annotation. Drawing one produces, depending on its type:
+connection environment variables, a generated credential, a Kubernetes Secret, ingress and
+egress network policies, cross-namespace RBAC, a gateway route with TLS, a scrape target
+and alert rules, a backup subject, an OIDC client and the redirect URIs that go with it.
+
+Sub-components link too — a Kafka topic to a database, a bucket to a backup target — so a
+relationship can be expressed at the level it actually exists.
+
+→ [Link type reference](/docs/reference/links)
+
+## Attribute
+
+Attributes are the only place configuration lives, and they live in exactly three places:
+
+<Cards>
+  <Card kicker="1" title="On the component">
+    Namespace, version, replicas, resources, storage size, which optional features are on.
+  </Card>
+  <Card kicker="2" title="On the sub-component">
+    The database name, the bucket name, the topic partitions, the client's redirect URIs.
+  </Card>
+  <Card kicker="3" title="On the link">
+    Values that belong to the relationship rather than to either end — the backup schedule
+    and retention on a database-to-bucket link, the route path and auth mode on a
+    gateway-to-application link.
+  </Card>
+</Cards>
+
+Because there is no fourth place, the graph is a complete description. Regenerating from
+it produces the same system.
+
+## Environment
+
+One stack can generate several environments. The base output is shared, and each
+environment gets an overlay carrying the values that differ — replica counts, resource
+sizes, domains, which optional components are present.
+
+An environment is not a copy of the design. It is the same design, rendered again.
+
+## Version
+
+The unit of version is the **stack**, not the file.
+
+A version captures every component, every link, every sub-component and every attribute at
+once. That is what makes a duplicate into a real second environment, a rollback into a
+return of the whole system, and a comparison into an answer about the architecture rather
+than about YAML.
+
+<Figure caption="A stack version is a snapshot of the graph. Environments are renders of it; a rollback returns every relation, not only the file that changed.">
+<svg viewBox="0 0 880 200" role="img" aria-label="Stack versions and environments">
+  <g fontFamily="Instrument Sans, sans-serif">
+    <g>
+      <rect x="30" y="52" width="150" height="62" rx="12" fill="var(--stk-panel)" stroke="var(--stk-steel)" strokeWidth="1"/>
+      <text x="105" y="78" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">v1</text>
+      <text x="105" y="97" textAnchor="middle" fontSize="10.5" fill="var(--stk-steel)">app + database</text>
+    </g>
+    <g>
+      <rect x="230" y="52" width="150" height="62" rx="12" fill="var(--stk-panel)" stroke="var(--stk-steel)" strokeWidth="1"/>
+      <text x="305" y="78" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">v2</text>
+      <text x="305" y="97" textAnchor="middle" fontSize="10.5" fill="var(--stk-steel)">+ queue + gateway</text>
+    </g>
+    <g>
+      <rect x="430" y="52" width="150" height="62" rx="12" fill="var(--stk-panel)" stroke="var(--stk-mint)" strokeWidth="1.4"/>
+      <text x="505" y="78" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">v3</text>
+      <text x="505" y="97" textAnchor="middle" fontSize="10.5" fill="var(--stk-steel)">database major upgrade</text>
+    </g>
+
+    <line x1="182" y1="83" x2="226" y2="83" stroke="var(--stk-steel)" strokeWidth="1.2"/>
+    <line x1="382" y1="83" x2="426" y2="83" stroke="var(--stk-steel)" strokeWidth="1.2"/>
+
+    <path d="M 505 122 L 505 150 L 305 150 L 305 122" fill="none" stroke="var(--stk-red)" strokeWidth="1.2" strokeDasharray="4 4"/>
+    <text x="405" y="168" textAnchor="middle" fontSize="10.5" fill="var(--stk-red)">roll back the system, not the file</text>
+
+    <g>
+      <rect x="640" y="26" width="210" height="40" rx="10" fill="var(--stk-panel-2)" stroke="var(--stk-hair)" strokeWidth="1"/>
+      <text x="745" y="51" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">development overlay</text>
+      <rect x="640" y="74" width="210" height="40" rx="10" fill="var(--stk-panel-2)" stroke="var(--stk-hair)" strokeWidth="1"/>
+      <text x="745" y="99" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">staging overlay</text>
+      <rect x="640" y="122" width="210" height="40" rx="10" fill="var(--stk-panel-2)" stroke="var(--stk-hair)" strokeWidth="1"/>
+      <text x="745" y="147" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">production overlay</text>
+    </g>
+    <line x1="584" y1="83" x2="634" y2="83" stroke="var(--stk-steel)" strokeWidth="1.2"/>
+  </g>
+</svg>
+</Figure>
+
+## Declared state and runtime data
+
+The single most useful distinction when an AI is operating your stack.
+
+| | Declared state | Runtime data |
+|---|---|---|
+| **What** | Components, links, attributes, system users, groups, routes, policies | A ticket, an invoice, an uploaded file, a chat message, a row your application wrote |
+| **Where it lives** | The graph, and the generated repository | The application's own storage |
+| **How it changes** | Through the platform, then a build and a deploy | Through the application's own interface or API |
+| **If you change it the other way** | Drift: invisible to the graph, skipped by the sync jobs, silently divergent | Nothing — that is where it belongs |
+
+Creating a system user directly in the identity provider is the classic mistake. It works
+for a day and disappears on the next build, because the graph never knew about it.
+
+→ [Identity and secrets](/docs/day0/identity-secrets)

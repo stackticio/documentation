@@ -1,0 +1,75 @@
+---
+id: compliance-reviews
+slug: /compliance/reviews
+title: The human position of record
+sidebar_label: Reviews and approvals
+sidebar_position: 5
+description: Where a machine cannot decide, a named person records a position — and an AI may propose but never approve.
+---
+
+<Hero eyebrow="Sign-off" title="An approval signed by a model is worthless to the auditor who reads it">
+Automation decides what the cluster proves. An audit also needs a human position on
+everything the script cannot pass. Both are kept, and they are never confused with each
+other.
+</Hero>
+
+## Reviews on controls
+
+Controls found **in place** are approved by the script by default. Controls found **not in
+place** stay open until a person records one of the following:
+
+| State | Meaning | Effect |
+|---|---|---|
+| `gap_confirmed` | Acknowledged gap, with an owner and a plan | Still a gap, but owned |
+| `compensating_control` | Another control covers the risk | Audit-defensible position |
+| `not_applicable` | With justification | Audit-defensible position |
+| `risk_accepted` | **Requires an expiry date** | Audit-defensible until that date |
+| `proposed` | A suggestion — the only state an AI may write | No effect on counts |
+| `annotated` | On an in-place control: approval stands, context added | None |
+| `rejected` | On an in-place control: the customer overrules the script | Counted as a gap of record |
+
+The customer keeps the last word in both directions. A control the script passed can be
+rejected; a control it failed can be positioned.
+
+## A review is bound to what it was signed against
+
+Every review stores the run, the run hash, the automated status at the time, and a hash of
+the evidence. That is what makes a sign-off meaningful a year later.
+
+It **reopens** when it expires, or when the control's automated status changes. When only
+the evidence text changed, it is flagged rather than reopened — so a reworded finding does
+not invalidate a year of positions, and a real change does.
+
+Owner and reason are mandatory. Writes are gated by an explicit attribute and refused
+without durable storage, so a decision cannot be recorded somewhere it will be lost.
+
+## The same model on links
+
+Link validation uses the identical mechanism. A failing or partial link can be positioned
+exactly like a control; a proven link can be annotated or rejected. A positioned link stops
+counting as a regression in the timeline; a rejected pass becomes a finding.
+
+This matters because a validation surface that cannot express "we know, and here is why it
+is acceptable" gets turned off.
+
+## Approval gates
+
+Reviews answer a question the system asked. A **gate** is the opposite direction:
+something is waiting on a human answer and will not start without it.
+
+A database migration, a deploy, a restore over live data, a job that costs real money — all
+the same record. The gate stores the answer, never how the answer was reached. It
+deliberately knows nothing about what it is about, because the moment it grows conditional
+rules it becomes a policy language nobody understands a year later.
+
+:::danger An AI may propose, and nothing else
+This is enforced at the door, not by convention. A model can record a proposal on a control
+or a gate. It cannot approve one. The signature on an audit-defensible position is a
+person's.
+:::
+
+## The journal
+
+Every decision — recorded, changed, expired, revoked — is appended to a journal. Combined
+with the attestation chain on the runs themselves, that gives you the two halves an audit
+actually asks for: what the system was, and who said it was acceptable.

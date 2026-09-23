@@ -1,0 +1,160 @@
+---
+id: mcp-tools
+slug: /mcp/tools
+title: Tool surface
+sidebar_label: Tool surface
+sidebar_position: 4
+description: Every capability the Stacktic MCP server exposes to an AI client, and the link that switches each one on.
+---
+
+<Hero eyebrow="Reference" title="What the model can actually do">
+Most tools are dispatchers: one tool, an action enum, and a built-in help action that
+returns the full usage guide for every capability it covers. Nothing here has to be
+memorised — the model asks for help instead of guessing parameters.
+</Hero>
+
+:::note The tool list is a description of your architecture
+Per-technology tools register **only when the matching link exists**. A stack without a
+vector store has no vector-store tools. Draw the link, build, deploy — the capability
+appears.
+:::
+
+## Knowledge — what the platform can express
+
+| Tool | What it answers |
+|---|---|
+| `knowledge` | Component and link deep knowledge, search, recipes, recommendations, curated patterns from working stacks, and ad-hoc access to the knowledge files |
+| `get_attribute_impact` | Which generated files and downstream components a given attribute touches |
+| `validate_component_knowledge` | Whether a component in the stack is configured the way its template actually expects |
+| `refresh_knowledge` | Pull the latest platform knowledge without redeploying anything |
+
+→ [The knowledge layer](/docs/mcp/knowledge)
+
+## Graph — what your system is
+
+| Tool | What it answers |
+|---|---|
+| `topology_info` | Structure, components, links, available fields — the first call in most conversations |
+| `query_topology` | A filtered query over the graph with field selection |
+| `graph` | Blast radius, dependency path, search by context, health map, data flow, service contract |
+| `investigate` | Multi-hop diagnosis across knowledge and runtime for a symptom or a question |
+| `stack_repo` | Browse, read and search the generated manifests — the ground truth of what was produced |
+
+`blast_radius` is the one to insist on. Before any change, it returns what depends on the
+target, how badly, and what the recommended order of operations is.
+
+## Runtime — what is actually true
+
+| Tool | What it does |
+|---|---|
+| `stack_test` | Runs real end-to-end validation against the live topology: connections, credentials, certificates, routes |
+| `scan` | Scored security scans — admission policy, network policy, Kubernetes hardening, vulnerability scanning |
+| `evidence` | The attestation trail: versioned runs, hash chains, deltas, finding memory |
+| `backup` | What is protected, what can be proven, restore points, and guarded day-2 operations |
+| `cve` | Vulnerability posture and recorded decisions |
+| `lifecycle` | Upgrade and migration status and plans per component, from declarative recipes |
+| `kubectl` | Last resort only — pod status, events, restarts. Never used for discovery or scanning |
+
+## Compliance
+
+| Tool | What it does |
+|---|---|
+| `pci` | Pre-formatted PCI position: overview, per-requirement detail, gaps, per-component impact |
+| `opa_setup` | Plans and applies an admission-policy baseline that fits this topology, with the namespace carve-outs the stack actually needs |
+| `opa_*` | Constraint templates, constraints, live violations, compliance summary |
+| `scan(config)` | Configuration posture over the declared attribute surface, from declarative rules |
+
+→ [Compliance automation](/docs/compliance/)
+
+## Write — change the declared system
+
+These are the tools that make the model an operator rather than an advisor. Every one of
+them writes to the graph, never to the cluster directly.
+
+| Tool | What it changes |
+|---|---|
+| `stacktic_login` | Session for the platform account |
+| `stacktic_get` | Current state of a system, component, link or attribute |
+| `stacktic_attr` | One attribute, several attributes, or a link attribute |
+| `stacktic_system` | Topology changes — add or remove a component, add or remove a link — and the build |
+| `user_lifecycle` | System users and groups, as declared identity attributes, with a report of exactly what propagates where on the next build |
+
+The workflow the server enforces is always the same: **get the current value, show it,
+state the blast radius, ask, then change.** A build never runs without explicit
+confirmation.
+
+## Application development
+
+| Tool | What it does |
+|---|---|
+| `source_code` | Reads and works with the code of your application components — the ground truth for behaviour |
+| `spec_kit` | Spec-driven development for application components, with a constitution generated from the actual stack |
+
+Before recommending application work, the model checks what specifications and tasks are
+already in flight, so two sessions do not design the same feature twice. Shared project
+state lives in your repositories, not in a client's private memory.
+
+## Per-technology tools
+
+These appear when the corresponding link exists. They operate the component — they do not
+reconfigure it, because configuration belongs to the graph.
+
+<Pills>
+  <Pill>relational databases</Pill>
+  <Pill>document databases</Pill>
+  <Pill>analytics databases</Pill>
+  <Pill>object storage</Pill>
+  <Pill>message brokers</Pill>
+  <Pill>event streaming</Pill>
+  <Pill>cache</Pill>
+  <Pill>vector store</Pill>
+  <Pill>search and SIEM</Pill>
+  <Pill>logs</Pill>
+  <Pill>metrics</Pill>
+  <Pill>dashboards</Pill>
+  <Pill>GitOps delivery</Pill>
+  <Pill>AI workflow builder</Pill>
+  <Pill>application APIs</Pill>
+</Pills>
+
+## Guided prompts
+
+The server also ships prompts — starting points a client can offer directly to a person
+who does not want to think in tools.
+
+<Cards>
+  <Card kicker="Orientation" title="start_here · explain_stack">
+    What this stack is, what it runs, and what the model can do with it.
+  </Card>
+  <Card kicker="Build" title="deploy_my_app · add_to_my_app">
+    Take an application from a repository or a description to a running, wired stack.
+  </Card>
+  <Card kicker="Assure" title="is_my_stack_ok · validate_my_stack · run_validation">
+    Health, end-to-end validation, and a scoped validation run.
+  </Card>
+  <Card kicker="Secure" title="harden_my_stack · security_audit">
+    The exact attributes that change the posture, and a full audit with evidence.
+  </Card>
+  <Card kicker="Diagnose" title="incident_response · diagnose_component · check_logs">
+    From a symptom to a cause, using the graph rather than a guess.
+  </Card>
+  <Card kicker="Design" title="recommend_architecture · trace_data_flow">
+    A grounded architecture proposal, and where data actually goes.
+  </Card>
+</Cards>
+
+## Scheduled autonomous work
+
+The MCP server can also run **unattended**. Two sub-component types on the MCP server turn
+a conversation into a standing job:
+
+| Sub-component | What it is |
+|---|---|
+| `agent` | A configured AI worker: which model, which tool categories it may use, its budget |
+| `ai_task` | A task with a schedule, a prompt, a notification target, and optional chaining to another task |
+
+Tasks run on a cron expression inside the stack, call the same MCP tools a human
+conversation would, track token usage and cost per task, and report by webhook or email.
+Chained tasks pass their result to the next one. This is how a nightly compliance run, a
+weekly dependency review or a continuous drift watch is expressed — as part of the stack,
+versioned with it.

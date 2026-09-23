@@ -1,0 +1,113 @@
+---
+id: day2-backup
+slug: /day2/backup
+title: Backup and recovery
+sidebar_label: Backup and recovery
+sidebar_position: 5
+description: What is protected, what can be proven to hold data, which restore points are usable, and a restore that cannot be triggered by accident.
+---
+
+<Hero eyebrow="Recover" title="A backup that reports success and holds nothing">
+That is the failure this exists to catch. Backup tooling routinely reaches a completed
+state whether it copied gigabytes or nothing at all — and nobody finds out until the day it
+matters.
+</Hero>
+
+## Discovered from the graph
+
+Protection is not configured twice. A link drawn between a database and a storage target is
+an **intent**; the agent reports whether the cluster actually honours it. Because the
+mechanisms are discovered from the metadata structure, this works on any stack without
+per-stack configuration.
+
+## The verdict that matters
+
+| Verdict | Meaning |
+|---|---|
+| `PROTECTED` | Bytes were captured and verified |
+| `COMPLETED_NO_DATA` | **The dangerous one.** The backup reports success and holds zero volume data |
+| `NEVER_RAN` | Configured, never executed |
+| `NOT_PROTECTED` | The mechanism is missing or misconfigured |
+| `INCONCLUSIVE` | Could not be verified — a permission denial or an absent resource type. **Not** the same as unprotected |
+
+Only the deep scan mode can prove that data exists; the fast mode reports structure. A
+score of `null` means the stack has no backup wiring at all — which is "nothing is
+configured", not zero percent.
+
+## Drift, both directions
+
+| | What it is |
+|---|---|
+| `ORPHAN` | A resource on the cluster that nothing in the graph asks for. Kustomize does not prune, so these accumulate |
+| `VOID` | A link that generates nothing — the diagram showing protection that does not exist |
+
+## Restore points are a catalogue, not a list
+
+A restore should be chosen *from* something. The agent produces a dated catalogue of every
+point you could restore from, grouped by day, each one carrying what it costs to pick it:
+when it was taken, how many bytes it actually holds, when it expires, whether a human has
+certified it, and — when it cannot be used — the reason.
+
+A point is **not selectable** when it partially failed, when it captured zero bytes, when
+it has expired, or when its mechanism cannot target a specific artefact. The same rule the
+scan enforces is applied at the moment of choosing: a backup that cannot be proven is never
+offered as a restore source.
+
+Where a mechanism has a limitation, it is stated on the point rather than hidden. Artefacts
+are listed so you can see what exists, marked unusable with the reason.
+
+## Recovery horizon is an attribute of the relationship
+
+Schedule and retention live on the link between the data and its storage target, not in a
+separate backup configuration. The cadence and the recovery horizon are therefore part of
+the graph: versioned with it, duplicated into staging with it, visible in a diff.
+
+Where a horizon was never set explicitly, the scan says so, so an inherited default is
+visible as an inherited default.
+
+## Day-2 control is opt-in and layered
+
+Reading and rendering manifests always works. **Applying** anything requires every one of
+the following:
+
+<Steps>
+  <Step title="API authentication">
+    The agent's key, when one is set.
+  </Step>
+  <Step title="An explicit attribute on the component">
+    Write operations are off by default. In-place restore needs a second attribute on top.
+  </Step>
+  <Step title="A rendered manifest">
+    The exact YAML is produced and server-side dry-run first. A confirmation token embeds
+    the resolved target, so the manifest step cannot be skipped.
+  </Step>
+  <Step title="An exact confirmation token">
+    Naming the subject and, for a restore, where the data lands.
+  </Step>
+  <Step title="A typed human phrase — for restores only">
+    Case-sensitive and exact. Enforced by the API, not only by the interface, so it cannot
+    be pre-filled by a caller acting on someone's behalf. Taking a backup needs no phrase.
+  </Step>
+  <Step title="An admitted dry run">
+    Before anything is applied for real.
+  </Step>
+</Steps>
+
+Restores default to a **scratch namespace**; the live namespace is untouched unless you
+have explicitly enabled in-place restore. Every attempt — including every refusal — is
+recorded in the agent's own write audit trail.
+
+## Certification and pinning
+
+A restore point can be **certified** by a named person, and that certification is part of
+its history. A point can also be **pinned**: a new backup taken with a long retention and a
+label, which is the only honest way to keep a checkpoint when retention is time-based and
+existing artefacts cannot be exempted from it.
+
+## Continuously replicating mechanisms
+
+Some mechanisms do not have runs — off-site replication, write-ahead archiving. They have
+no schedule, no retention window and no per-run byte count; they are healthy when their
+workload is ready. The interface reads this from the mechanism's own declared capabilities,
+so these are shown correctly without a special case, and a new mechanism needs no interface
+change.

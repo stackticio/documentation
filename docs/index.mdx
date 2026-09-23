@@ -1,0 +1,153 @@
+---
+id: index
+slug: /
+title: What Stacktic is
+sidebar_label: What Stacktic is
+sidebar_position: 1
+description: Stacktic turns every layer of a complex application into a connected, machine-readable graph, so AI can architect, secure, deploy, operate and validate the whole system.
+---
+
+<Hero eyebrow="Automation platform" title={<>Graph the system.<br/>Automate everything.</>}>
+Stacktic turns every layer of a complex application into a connected, machine-readable
+graph — giving AI the context to architect, secure, deploy, operate and validate the
+entire system autonomously.
+</Hero>
+
+Your AI writes the application. Stacktic automates everything under it: the topology, the
+operations, the security and the compliance — and keeps all of it correct with every
+change.
+
+## The gap AI cannot close on its own
+
+An application is not the code. It is the code plus the database it talks to, the secret
+that carries the password, the route that exposes it, the policy that constrains it, the
+network rule that lets the two namespaces speak, the backup that can prove the data
+survived, and the evidence an auditor will ask for.
+
+<Split>
+  <Side tone="problem" head="Vibe coding as it is today">
+    <ul>
+      <li>The model edits the code it was pointed at.</li>
+      <li>The relations around that code — data, access, policy, evidence — are never in its context.</li>
+      <li>Compliance cannot be improvised, and security is not tuned by a prompt.</li>
+      <li>Nothing verifies the result. Production finds the gaps for you — in an outage, an audit, or a bill.</li>
+    </ul>
+  </Side>
+  <Side tone="answer" head="Vibe coding inside a framework">
+    <ul>
+      <li>Every relation is declared, so nothing is guessed.</li>
+      <li>Security and compliance defaults are generated, not remembered.</li>
+      <li>The whole stack is produced as production-grade, autoscaled Kubernetes.</li>
+      <li>The result is validated, attested and hash-chained before anyone trusts it.</li>
+    </ul>
+  </Side>
+</Split>
+
+## What the graph contains
+
+A stack is a directed graph. Components are the nodes, links are the edges, and
+sub-components are the resources a component owns — a database, a bucket, a topic, a
+queue, an OIDC client, a model. Every edge generates real configuration: environment
+variables, secrets, gateway routes, network policies, RBAC, scrape targets, backup jobs.
+
+<Stats>
+  <Stat value="75" label="component templates in the catalog" />
+  <Stat value="441" label="typed link types between them" />
+  <Stat value="63" label="sub-component types" />
+  <Stat value="1" label="unit of version: the whole stack" />
+</Stats>
+
+<Figure caption="One drawing produces the repository, the cluster state and the proof — and the agent measures the running system back against the same graph.">
+<svg viewBox="0 0 900 250" role="img" aria-label="Graph to generation to cluster to evidence">
+  <defs>
+    <marker id="stkArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--stk-steel)" />
+    </marker>
+  </defs>
+
+  <g fontFamily="Instrument Sans, sans-serif">
+    <rect x="8" y="55" width="180" height="108" rx="14" fill="var(--stk-panel)" stroke="var(--stk-blue)" strokeWidth="1.2" opacity="0.95" />
+    <text x="98" y="84" textAnchor="middle" fontSize="13" fontWeight="600" fill="var(--ifm-heading-color)">The graph</text>
+    <text x="98" y="106" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">components · links</text>
+    <text x="98" y="122" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">sub-components</text>
+    <text x="98" y="138" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">attributes</text>
+
+    <rect x="240" y="55" width="180" height="108" rx="14" fill="var(--stk-panel)" stroke="var(--stk-blue)" strokeWidth="1.2" />
+    <text x="330" y="84" textAnchor="middle" fontSize="13" fontWeight="600" fill="var(--ifm-heading-color)">Generation</text>
+    <text x="330" y="106" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">one render per component</text>
+    <text x="330" y="122" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">links become real config</text>
+    <text x="330" y="138" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">GitOps repository</text>
+
+    <rect x="472" y="55" width="180" height="108" rx="14" fill="var(--stk-panel)" stroke="var(--stk-mint)" strokeWidth="1.2" />
+    <text x="562" y="84" textAnchor="middle" fontSize="13" fontWeight="600" fill="var(--ifm-heading-color)">Running stack</text>
+    <text x="562" y="106" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">Kubernetes workloads</text>
+    <text x="562" y="122" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">policies · routes · secrets</text>
+    <text x="562" y="138" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">backups · autoscaling</text>
+
+    <rect x="704" y="55" width="188" height="108" rx="14" fill="var(--stk-panel)" stroke="var(--stk-amber)" strokeWidth="1.2" />
+    <text x="798" y="84" textAnchor="middle" fontSize="13" fontWeight="600" fill="var(--ifm-heading-color)">Evidence</text>
+    <text x="798" y="106" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">scans · link proofs</text>
+    <text x="798" y="122" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">hash-chained runs</text>
+    <text x="798" y="138" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">signed human position</text>
+
+    <line x1="192" y1="109" x2="234" y2="109" stroke="var(--stk-steel)" strokeWidth="1.4" markerEnd="url(#stkArrow)" />
+    <line x1="424" y1="109" x2="466" y2="109" stroke="var(--stk-steel)" strokeWidth="1.4" markerEnd="url(#stkArrow)" />
+    <line x1="656" y1="109" x2="698" y2="109" stroke="var(--stk-steel)" strokeWidth="1.4" markerEnd="url(#stkArrow)" />
+
+    <path d="M 798 175 L 798 205 L 98 205 L 98 175" fill="none" stroke="var(--stk-blue)" strokeWidth="1.2" strokeDasharray="4 4" markerEnd="url(#stkArrow)" />
+    <text x="448" y="225" textAnchor="middle" fontSize="11" fill="var(--stk-blue)">measured back against the graph that declared it</text>
+
+    <text x="98" y="38" textAnchor="middle" fontSize="10.5" fontFamily="Fira Code, monospace" fill="var(--stk-steel)">DECLARED</text>
+    <text x="330" y="38" textAnchor="middle" fontSize="10.5" fontFamily="Fira Code, monospace" fill="var(--stk-steel)">GENERATED</text>
+    <text x="562" y="38" textAnchor="middle" fontSize="10.5" fontFamily="Fira Code, monospace" fill="var(--stk-steel)">OBSERVED</text>
+    <text x="798" y="38" textAnchor="middle" fontSize="10.5" fontFamily="Fira Code, monospace" fill="var(--stk-steel)">PROVEN</text>
+  </g>
+</svg>
+</Figure>
+
+## Where to go next
+
+<Cards>
+  <Card to="/docs/mcp/quickstart" kicker="Start here" title="Start with MCP">
+    Bring up the smallest stack that gives your AI client a live interface to the platform,
+    then let it build everything else.
+  </Card>
+  <Card to="/docs/how-it-works" kicker="Model" title="How it works">
+    Graph, generation, validation, operation — and what each layer actually produces.
+  </Card>
+  <Card to="/docs/concepts" kicker="Model" title="Core concepts">
+    Components, sub-components, links, attributes, versions, environments.
+  </Card>
+  <Card to="/docs/platform/" kicker="Platform" title="The design surface">
+    The canvas, the catalog, LiveView, and a history you can roll the whole system back to.
+  </Card>
+  <Card to="/docs/day0/" kicker="Day 0–1" title="Design and generate">
+    From a written spec to a production-grade repository, with the security posture
+    already applied.
+  </Card>
+  <Card to="/docs/day2/" kicker="Day 2" title="Operate and prove">
+    The stack agent: validation, scanning, evidence, backup, lifecycle.
+  </Card>
+  <Card to="/docs/compliance/" kicker="Compliance" title="Compliance automation">
+    Controls generated from the graph, measured from the cluster, and signed off as a
+    record of position.
+  </Card>
+  <Card to="/docs/blueprints/" kicker="Blueprints" title="Reference stacks">
+    Machine learning, private AI, sovereignty, multi-environment SaaS.
+  </Card>
+  <Card to="/docs/reference/components" kicker="Reference" title="Catalog">
+    Every component, link type and sub-component the platform can express.
+  </Card>
+</Cards>
+
+## The two repositories you own
+
+Everything you work with lives in two places, and both are yours.
+
+| Repository | What it holds | Who writes it |
+|---|---|---|
+| **Your application repository** | Your source code, one folder or one repo per application component | You and your AI |
+| **Your stack repository** | The generated GitOps tree: manifests, overlays, policies, build pipelines, docs, and the `stack-metadata.yaml` that describes the graph | Stacktic, on every build |
+
+The templates that do the generating are part of the platform. You consume their output;
+you never have to read them.

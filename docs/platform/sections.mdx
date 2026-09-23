@@ -1,0 +1,79 @@
+---
+id: platform-sections
+slug: /platform/sections
+title: Catalog, sections and suggestions
+sidebar_label: Catalog and sections
+sidebar_position: 5
+description: Where component types come from, how system-wide settings are expressed, and how the platform tells you what your drawing is missing.
+---
+
+<Hero eyebrow="Guide" title="The catalog is the contract">
+Every component type, every attribute, every allowed value and every permitted link comes
+from the catalog. It is what a drawing is validated against, and what an AI is allowed to
+propose from.
+</Hero>
+
+## The catalog
+
+A catalog entry defines a component type: the attributes it carries, the values each
+attribute may take, the sub-components it can own, and the links it may participate in.
+
+Entries are **version-pinned**. Each has a current default, and older entries are kept so
+that systems built on them still generate — with a reduced attribute and link surface, which
+is why they are never offered as a choice for a new design.
+
+| The catalog defines | Which means |
+|---|---|
+| Attributes and their types | A free text field, a select list, a toggle — each validated on save |
+| Allowed values and patterns | A value outside them is refused, not silently accepted |
+| Sub-components and their parents | A sub-component cannot be attached to a component that cannot own it |
+| Permitted links | A link type that is not in the catalog cannot be drawn |
+| Default versions | What a new design gets unless you deliberately choose otherwise |
+
+## Sections: settings that belong to the whole system
+
+Some values are not properties of any one component — they describe the system. Those live
+in **sections**: groups of system-level attributes defined by the catalog, seeded with
+their defaults the first time you open a design, edited per system, and handed to every
+build.
+
+Everything generated can read them, which is how a single decision reaches every component
+that should honour it.
+
+## Suggestions: the platform reading your drawing
+
+Suggestions are catalog-defined rules evaluated against your diagram. A rule can require
+that a component is present, that a link exists in a given direction, or that an attribute
+holds a particular value — and when it matches, the platform surfaces a suggestion on the
+component concerned.
+
+This is the platform's own "you have drawn a database with no backup target" — expressed as
+catalog data rather than as hard-coded advice, so it grows with the catalog.
+
+An AI client gets the same signal, plus richer recommendations from the knowledge layer.
+
+→ [The knowledge layer](/docs/mcp/knowledge)
+
+## Notifications and synchronisation
+
+The catalog moves: new attributes appear, defaults change, a link type is added. Systems
+drawn against the previous shape are notified.
+
+| Kind | Behaviour |
+|---|---|
+| **Volatile** | Recomputed as you work — guidance about the diagram in front of you |
+| **Non-volatile** | A standing "please synchronise": the catalog changed under this design |
+
+A standing synchronisation notice **blocks programmatic mutation** of the system until it
+is acknowledged. That is deliberate: an automated caller changing a system whose catalog
+definition has moved underneath it is exactly how a silently wrong build happens.
+
+## Tests in the catalog
+
+Validation tests are catalog objects too. They are defined against a component type or a
+topology pattern, and they are what LiveView runs and what the stack agent executes.
+
+Because they are attached to types rather than to your particular system, adding a
+component to your stack brings its tests with it.
+
+→ [Validation](/docs/day2/validation)

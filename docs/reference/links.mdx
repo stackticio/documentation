@@ -1,0 +1,83 @@
+---
+id: reference-links
+slug: /reference/links
+title: Link types
+sidebar_label: Link types
+sidebar_position: 2
+description: How a typed edge is named, what each family of links generates, and how sub-component links work.
+---
+
+<Hero eyebrow="Reference" title="441 typed edges, one naming rule">
+A link type is always <code>sourceType-targetType</code>. That string selects the
+generation logic on both sides — which is why the behaviour of a new link is predictable
+before you draw it.
+</Hero>
+
+## The naming rule
+
+```
+apisix-langflow       gateway publishes an AI workflow builder
+fastapi-cnpg          an application uses PostgreSQL
+prometheus-mongodb    metrics scrape a document database
+fastmcp-stack_agent   the MCP server uses the stack agent
+cnpg-swbucket         a database backs up to an object storage bucket
+```
+
+The source and target can each be a component **or** a sub-component, which is how a
+relationship gets expressed at the level it actually exists — a Kafka topic to a database,
+a bucket to a backup target, an experiment to a registered model.
+
+## What a link family generates
+
+| Family | On the consumer | On the provider | Elsewhere |
+|---|---|---|---|
+| **Application → data** | Connection variables, mounted secret, egress policy | The database, bucket, topic or queue, its user and credential, ingress policy | Backup subject, scrape target, cross-namespace access |
+| **Gateway → anything** | — | — | Route, TLS certificate, path and method rules, rate limiting, authentication mode, websocket support |
+| **Anything → identity client** | Client id, secret, issuer and callback configuration | The OIDC client and its redirect URIs | Group and role mapping |
+| **Metrics → anything** | Scrape configuration, alert rules | The metrics endpoint | Dashboards |
+| **Logs and tracing → anything** | Collection configuration | Export configuration | Retention |
+| **Data → storage** | — | — | Backup schedule and retention as link attributes; the restore surface |
+| **Autoscaler → workload** | — | — | The scaling rule and its signal |
+| **Mesh → anything** | — | Sidecar injection | Mesh policy |
+| **Application → application** | Service address and credentials | Ingress policy | The declared dependency, used by blast radius and ordering |
+
+## Link attributes
+
+Some configuration belongs to neither end of an edge. It belongs to the edge.
+
+| Example | Why it lives on the link |
+|---|---|
+| Backup schedule and retention | They describe *this* database's protection in *this* bucket, not the database in general |
+| Route path, authentication mode, body size limit | They describe how *this* gateway publishes *this* application |
+| Access level | The permission this relationship needs, which validation later proves both ways |
+| Feature toggles on an integration | Whether this particular consumer uses a capability of the provider |
+
+## Sub-component links
+
+A sub-component is a node, so it can be an endpoint of a link. Three shapes exist:
+
+| Shape | Example |
+|---|---|
+| Component → sub-component | An application to one specific database of a cluster |
+| Sub-component → component | A topic to a destination system |
+| Sub-component → sub-component | An experiment binding to a registered model |
+
+This is what allows a shared technology to serve many consumers without either sharing
+credentials or being deployed several times.
+
+## What a link does not do
+
+A link is not a network rule, and it is not documentation. It is a declaration of
+relationship, from which the network rule, the credential, the route, the monitoring and
+the backup are all derived — after the whole graph is known.
+
+Which is why removing a link removes all of them, and why the security posture cannot
+drift away from the architecture.
+
+## Finding out what a specific link generates
+
+Do not guess, and do not read this page as a substitute. Ask:
+
+- Through an AI client: `knowledge` for the link type, or `get_attribute_impact` for the
+  files a given attribute touches.
+- In the generated repository: read the files. The output is plain YAML, on purpose.

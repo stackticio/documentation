@@ -1,0 +1,100 @@
+---
+id: compliance-index
+slug: /compliance/
+title: Compliance automation
+sidebar_label: Overview
+sidebar_position: 1
+description: Controls generated from the graph, measured from the running cluster, attested run by run, and signed off by a named human where a machine cannot decide.
+---
+
+<Hero eyebrow="Compliance" title="Compliance is not a document. It is a measurement with a signature on it.">
+Most of what a framework asks for is already a property of how the system was built. The
+rest is a position a person has to take. Stacktic automates the first, records the second,
+and makes both checkable.
+</Hero>
+
+## Three layers, and none of them is a spreadsheet
+
+<Cards>
+  <Card kicker="1 · Generated" title="The control is built in">
+    Segmentation, least-privilege access, encrypted credentials, TLS everywhere, admission
+    policy, audit logging and backup are produced from the graph — so the control exists
+    because of how the system was generated, not because someone configured it afterwards.
+  </Card>
+  <Card kicker="2 · Measured" title="The control is proven">
+    Every control is validated against the running cluster with real command evidence:
+    what was queried, what came back, and what that means. Not a checkbox, and not a
+    metadata inference.
+  </Card>
+  <Card kicker="3 · Positioned" title="The gap is owned">
+    Where a control cannot be met automatically, a named person records a position —
+    confirmed gap, compensating control, not applicable, or accepted risk with an expiry
+    date. That position is the audit-defensible artefact.
+  </Card>
+</Cards>
+
+## Coverage
+
+| Framework | Controls evaluated | Modes |
+|---|---|---|
+| **PCI DSS v4.0** | 250 controls | fast, deep, full report |
+| **ISO/IEC 27001:2022** | 93 controls | fast, deep, full report |
+| **Kubernetes hardening** | Recognised hardening frameworks, per namespace and per control | fast, deep |
+| **Admission policy** | Every constraint in the cluster, including over-enforcement | fast, deep |
+| **Network policy** | Every declared link, in both directions | fast, deep |
+| **RBAC** | Bindings, privileged holders, wildcards | fast, deep |
+| **Secrets** | Existence and synchronisation of every referenced secret | fast |
+| **Vulnerabilities** | Images and routes, with recorded decisions | fast, deep |
+
+## What "evidence" means here
+
+Every control returns the command that ran, its output, and the result derived from it.
+
+```json
+{
+  "id": "A.5.2",
+  "title": "Information security roles and responsibilities",
+  "runtime_status": "In Place",
+  "finding": "RBAC verified: 23 role bindings, compliance score 85%",
+  "evidence": [{
+    "command": "kubectl get rolebindings --all-namespaces + declared vs actual",
+    "output": "Expected: 30 RBAC resources, Found: 23, Missing: 7 ...",
+    "result": "RBAC score=85% expected=30 found=23 missing=7"
+  }]
+}
+```
+
+An auditor can re-run the command. That is the point.
+
+## What gets verified from the cluster
+
+| Area | Evidence collected |
+|---|---|
+| Admission policy | Engine health, constraint templates, constraints, live violations, dry-run admission tests |
+| Network policy | Policy count, default-deny per namespace, real connection probes |
+| Access control | Role bindings, privileged holders, wildcard roles, score |
+| Transport security | Certificate authority health, certificates ready and expiring, issuers |
+| Secrets | Store seal state, synchronisation status of every external secret |
+| Monitoring | Metrics health and targets, alert rules, dashboards, log pipeline, tracing, SIEM |
+| Runtime security | Vulnerability reports, critical findings, runtime detection, signature policy |
+| Delivery | Application count, sync status, drift |
+| Recovery | Schedules, recent successful runs, and whether they hold data |
+| Identity and gateway | Provider and gateway health, published route inventory |
+
+## Where to go next
+
+<Cards>
+  <Card to="/docs/compliance/frameworks" kicker="Frameworks" title="PCI DSS and ISO 27001">
+    How the position is computed, what the report contains, and how a gap becomes a plan.
+  </Card>
+  <Card to="/docs/compliance/policy" kicker="Policy" title="Admission policy from your topology">
+    A policy baseline planned against your actual stack, including the carve-outs it needs
+    to not break on day one.
+  </Card>
+  <Card to="/docs/compliance/controls-from-graph" kicker="Generated" title="Controls the graph produces">
+    Segmentation, access, encryption and audit — and why they stay correct after a change.
+  </Card>
+  <Card to="/docs/compliance/reviews" kicker="Sign-off" title="The human position of record">
+    Reviews, approval gates, and the rule that an AI may propose but never approve.
+  </Card>
+</Cards>

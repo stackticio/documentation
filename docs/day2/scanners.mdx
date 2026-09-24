@@ -16,6 +16,51 @@ it, and a finding comes with the attribute that fixes it.
 Every scanner has a **light** mode for fast, frequent checks and a **full** mode that
 actively probes. Every run is scored, stored and hash-chained.
 
+<Figure caption="A finding knows its fix. The scanner compares what the link implies with what the cluster has; the fix is an attribute on the graph, so the next build regenerates the missing piece.">
+<svg viewBox="0 0 900 330" role="img" aria-label="A scanner compares what the links imply with what the cluster has. A finding names the link it belongs to and carries its evidence, and the fix is an attribute on the graph — so the next build regenerates the missing piece instead of someone patching the cluster.">
+  <defs>
+    <marker id="scanAAmber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-amber)" /></marker>
+    <marker id="scanABlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-blue)" /></marker>
+    <marker id="scanARed" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-red)" /></marker>
+  </defs>
+  <path d="M224 82 C259 82 259 132 294 132" fill="none" stroke="var(--stk-amber)" strokeWidth="1.4" markerEnd="url(#scanAAmber)" />
+  <path d="M224 214 C259 214 259 164 294 164" fill="none" stroke="var(--stk-blue)" strokeWidth="1.4" markerEnd="url(#scanABlue)" />
+  <path d="M510 148 C549 148 549 78 588 78" fill="none" stroke="var(--stk-red)" strokeWidth="1.4" markerEnd="url(#scanARed)" />
+  <path d="M733 126 L733 158" fill="none" stroke="var(--stk-amber)" strokeWidth="1.4" markerEnd="url(#scanAAmber)" />
+  <path d="M733 236 C733 312 124 312 124 254" fill="none" stroke="var(--stk-amber)" strokeWidth="1.4" strokeDasharray="4 4" markerEnd="url(#scanAAmber)" />
+  <rect x="24" y="44" width="200" height="76" rx="12" fill="var(--stk-panel)" />
+  <rect x="24" y="44" width="200" height="76" rx="12" fill="var(--stk-amber)" fillOpacity="0.045" stroke="var(--stk-amber)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="24" y="176" width="200" height="76" rx="12" fill="var(--stk-panel)" />
+  <rect x="24" y="176" width="200" height="76" rx="12" fill="var(--stk-blue)" fillOpacity="0.045" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="296" y="96" width="214" height="104" rx="12" fill="var(--stk-panel)" />
+  <rect x="296" y="96" width="214" height="104" rx="12" fill="var(--stk-mint)" fillOpacity="0.11" stroke="var(--stk-mint)" strokeOpacity="1" strokeWidth="1.6" />
+  <rect x="590" y="30" width="286" height="96" rx="12" fill="var(--stk-panel)" />
+  <rect x="590" y="30" width="286" height="96" rx="12" fill="var(--stk-red)" fillOpacity="0.045" stroke="var(--stk-red)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="590" y="160" width="286" height="76" rx="12" fill="var(--stk-panel)" />
+  <rect x="590" y="160" width="286" height="76" rx="12" fill="var(--stk-amber)" fillOpacity="0.11" stroke="var(--stk-amber)" strokeOpacity="1" strokeWidth="1.6" />
+  <text x="38" y="64" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">DECLARED</text>
+  <text x="38" y="81" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">the link implies</text>
+  <text x="38" y="98" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">ingress + egress policy</text>
+  <text x="38" y="196" fontSize="9.7" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">OBSERVED</text>
+  <text x="38" y="213" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">the cluster has</text>
+  <text x="38" y="230" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">egress only</text>
+  <text x="310" y="116" fontSize="9.7" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">SCANNER · NETWORK</text>
+  <text x="310" y="133" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">expected vs found</text>
+  <text x="310" y="150" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">light: does it exist</text>
+  <text x="310" y="164.5" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">full: probe the path</text>
+  <text x="604" y="50" fontSize="9.7" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">FINDING</text>
+  <text x="604" y="67" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">ingress policy missing</text>
+  <text x="604" y="84" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">link: your app → orders</text>
+  <text x="604" y="98.5" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">evidence: query + output</text>
+  <text x="604" y="180" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">THE FIX</text>
+  <text x="604" y="197" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">an attribute on the graph</text>
+  <text x="604" y="214" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">never a hand-made patch</text>
+  <rect x="334.26" y="290.9" width="191.48" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="334.26" y="290.9" width="191.48" height="18.2" rx="9.1" fill="var(--stk-amber)" fillOpacity="0.14" stroke="var(--stk-amber)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="430" y="303.672" fontSize="10.2" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">the next build regenerates it</text>
+</svg>
+</Figure>
+
 ## The scanners
 
 | Scanner | Light | Full |

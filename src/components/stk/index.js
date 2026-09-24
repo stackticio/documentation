@@ -65,11 +65,41 @@ export function Pill({tone, children}) {
 }
 
 export function Figure({caption, children}) {
+  const [open, setOpen] = React.useState(false);
+  React.useEffect(() => {
+    if (!open) return undefined;
+    const onKey = (e) => { if (e.key === 'Escape') setOpen(false); };
+    window.addEventListener('keydown', onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
   return (
-    <figure className="stk-figure">
-      {children}
-      {caption && <figcaption>{caption}</figcaption>}
-    </figure>
+    <>
+      <figure
+        className="stk-figure"
+        role="button"
+        tabIndex={0}
+        aria-label="Enlarge diagram"
+        onClick={() => setOpen(true)}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(true); } }}>
+        {children}
+        {caption && <figcaption>{caption}</figcaption>}
+        <span className="stk-figure-zoom" aria-hidden="true">click to enlarge</span>
+      </figure>
+      {open && (
+        <div className="stk-lightbox" role="dialog" aria-modal="true" onClick={() => setOpen(false)}>
+          <div className="stk-lightbox-inner">
+            {children}
+            {caption && <p>{caption}</p>}
+          </div>
+          <span className="stk-lightbox-close" aria-hidden="true">esc · click anywhere to close</span>
+        </div>
+      )}
+    </>
   );
 }
 

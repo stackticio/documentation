@@ -77,6 +77,58 @@ makes changes whose consequences nobody computed.
   </Step>
 </Steps>
 
+<Figure caption="Every change follows the same path: read, show, compute the blast radius, ask — then write, build, deploy and prove it. If the proof fails, the previous version is one step away.">
+<svg viewBox="0 0 900 300" role="img" aria-label="How the model changes a live system: read the current value, show it, compute the blast radius, ask, and only then write, build, deploy and verify — returning to the previous version if verification fails.">
+  <defs>
+    <marker id="safeChangeABlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-blue)" /></marker>
+    <marker id="safeChangeAAmber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-amber)" /></marker>
+    <marker id="safeChangeAGit" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-git)" /></marker>
+    <marker id="safeChangeARed" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-red)" /></marker>
+  </defs>
+  <path d="M74 120 L157 120" fill="none" stroke="var(--stk-blue)" strokeWidth="1.4" markerEnd="url(#safeChangeABlue)" />
+  <path d="M185 120 L268 120" fill="none" stroke="var(--stk-blue)" strokeWidth="1.4" markerEnd="url(#safeChangeABlue)" />
+  <path d="M296 120 L379 120" fill="none" stroke="var(--stk-blue)" strokeWidth="1.4" markerEnd="url(#safeChangeABlue)" />
+  <path d="M407 120 L490 120" fill="none" stroke="var(--stk-amber)" strokeWidth="1.4" markerEnd="url(#safeChangeAAmber)" />
+  <path d="M518 120 L601 120" fill="none" stroke="var(--stk-amber)" strokeWidth="1.4" markerEnd="url(#safeChangeAAmber)" />
+  <path d="M629 120 L712 120" fill="none" stroke="var(--stk-git)" strokeWidth="1.4" markerEnd="url(#safeChangeAGit)" />
+  <path d="M740 120 L823 120" fill="none" stroke="var(--stk-git)" strokeWidth="1.4" markerEnd="url(#safeChangeAGit)" />
+  <path d="M837 168 C837 262 504 262 504 172" fill="none" stroke="var(--stk-red)" strokeWidth="1.4" strokeDasharray="4 4" markerEnd="url(#safeChangeARed)" />
+  <circle cx="60" cy="120" r="9" fill="var(--stk-blue)" />
+  <circle cx="171" cy="120" r="9" fill="var(--stk-blue)" />
+  <circle cx="282" cy="120" r="9" fill="var(--stk-blue)" />
+  <circle cx="393" cy="120" r="18" fill="var(--stk-amber)" fillOpacity="0.16" />
+  <circle cx="393" cy="120" r="12" fill="var(--stk-amber)" />
+  <circle cx="504" cy="120" r="9" fill="var(--stk-amber)" />
+  <circle cx="615" cy="120" r="9" fill="var(--stk-git)" />
+  <circle cx="726" cy="120" r="9" fill="var(--stk-git)" />
+  <circle cx="837" cy="120" r="15" fill="var(--stk-mint)" fillOpacity="0.16" />
+  <circle cx="837" cy="120" r="9" fill="var(--stk-mint)" />
+  <text x="60" y="144" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">read</text>
+  <text x="60" y="157" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">CURRENT VALUE</text>
+  <text x="171" y="144" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">show</text>
+  <text x="171" y="157" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">TO YOU</text>
+  <text x="282" y="144" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">blast radius</text>
+  <text x="282" y="157" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">WHO DEPENDS</text>
+  <text x="393" y="147" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">you approve</text>
+  <text x="393" y="160" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">THE ONE GATE</text>
+  <text x="504" y="144" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">write</text>
+  <text x="504" y="157" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">TO THE GRAPH</text>
+  <text x="615" y="144" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">build</text>
+  <text x="615" y="157" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">REGENERATE</text>
+  <text x="726" y="144" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">deploy</text>
+  <text x="726" y="157" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">APPLY -K</text>
+  <text x="837" y="144" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">verify</text>
+  <text x="837" y="157" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">REAL TESTS</text>
+  <text x="171" y="70" fontSize="9.7" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600" letterSpacing="1.1">PROPOSE</text>
+  <text x="393" y="70" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600" letterSpacing="1.1">DECIDE</text>
+  <text x="615" y="70" fontSize="9.7" fill="var(--stk-git)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600" letterSpacing="1.1">ACT</text>
+  <text x="837" y="70" fontSize="9.7" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600" letterSpacing="1.1">PROVE</text>
+  <rect x="546.72" y="240.9" width="246.56" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="546.72" y="240.9" width="246.56" height="18.2" rx="9.1" fill="var(--stk-red)" fillOpacity="0.14" stroke="var(--stk-red)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="670" y="253.672" fontSize="10.2" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">fails → return to the previous version</text>
+</svg>
+</Figure>
+
 ## 3 · Diagnose
 
 A symptom is a starting point in a graph, not a search term.

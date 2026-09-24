@@ -12,6 +12,66 @@ Images are built inside the cluster. Manifests are applied with kustomize. Both 
 designed to be run again at any time without special handling.
 </Hero>
 
+<Figure caption="Two lanes into the cluster. Your code becomes an image built inside the cluster; your stack repository is decrypted offline with your key and applied with kustomize, one overlay per environment.">
+<svg viewBox="0 0 900 330" role="img" aria-label="Two lanes reach the cluster. Your code becomes an image built inside the cluster; the stack repository is decrypted offline with your key and applied with kustomize, one overlay per environment.">
+  <defs>
+    <marker id="deliverAGit" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-git)" /></marker>
+    <marker id="deliverABlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-blue)" /></marker>
+    <marker id="deliverAAmber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-amber)" /></marker>
+  </defs>
+  <path d="M226 82 L340 82" fill="none" stroke="var(--stk-git)" strokeWidth="1.4" markerEnd="url(#deliverAGit)" />
+  <path d="M364 82 L510 82" fill="none" stroke="var(--stk-blue)" strokeWidth="1.4" markerEnd="url(#deliverABlue)" />
+  <path d="M226 248 L340 248" fill="none" stroke="var(--stk-git)" strokeWidth="1.4" markerEnd="url(#deliverAGit)" />
+  <path d="M364 248 L510 248" fill="none" stroke="var(--stk-amber)" strokeWidth="1.4" markerEnd="url(#deliverAAmber)" />
+  <rect x="640" y="30" width="240" height="284" rx="16" fill="var(--stk-blue)" fillOpacity="0.035" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <path d="M530 248 C596 248 596 104 662 104" fill="none" stroke="var(--stk-blue)" strokeWidth="1.2" strokeOpacity="0.85" markerEnd="url(#deliverABlue)" />
+  <path d="M530 248 C596 248 596 180 662 180" fill="none" stroke="var(--stk-blue)" strokeWidth="1.2" strokeOpacity="0.85" markerEnd="url(#deliverABlue)" />
+  <path d="M530 248 C596 248 596 256 662 256" fill="none" stroke="var(--stk-blue)" strokeWidth="1.2" strokeOpacity="0.85" markerEnd="url(#deliverABlue)" />
+  <path d="M530 82 C596 82 596 104 662 104" fill="none" stroke="var(--stk-blue)" strokeWidth="1.2" strokeOpacity="0.8" strokeDasharray="4 4" markerEnd="url(#deliverABlue)" />
+  <rect x="24" y="50" width="200" height="64" rx="12" fill="var(--stk-panel)" />
+  <rect x="24" y="50" width="200" height="64" rx="12" fill="var(--stk-git)" fillOpacity="0.045" stroke="var(--stk-git)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="24" y="200" width="200" height="96" rx="12" fill="var(--stk-panel)" />
+  <rect x="24" y="200" width="200" height="96" rx="12" fill="var(--stk-git)" fillOpacity="0.045" stroke="var(--stk-git)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="664" y="76" width="192" height="56" rx="12" fill="var(--stk-panel)" />
+  <rect x="664" y="76" width="192" height="56" rx="12" fill="var(--stk-blue)" fillOpacity="0.045" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="664" y="152" width="192" height="56" rx="12" fill="var(--stk-panel)" />
+  <rect x="664" y="152" width="192" height="56" rx="12" fill="var(--stk-blue)" fillOpacity="0.045" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="664" y="228" width="192" height="56" rx="12" fill="var(--stk-panel)" />
+  <rect x="664" y="228" width="192" height="56" rx="12" fill="var(--stk-blue)" fillOpacity="0.045" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <circle cx="352" cy="82" r="9" fill="var(--stk-blue)" />
+  <circle cx="520" cy="82" r="8" fill="var(--stk-blue)" />
+  <circle cx="352" cy="248" r="9" fill="var(--stk-amber)" />
+  <circle cx="520" cy="248" r="8" fill="var(--stk-blue)" />
+  <text x="24" y="36" fontSize="9.7" fill="var(--stk-git)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">IMAGES</text>
+  <text x="38" y="70" fontSize="9.7" fill="var(--stk-git)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">GIT</text>
+  <text x="38" y="87" fontSize="12.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">your app repository</text>
+  <text x="352" y="106" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">in-cluster build</text>
+  <text x="352" y="119" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">NO LOCAL DOCKER</text>
+  <rect x="256.64" y="56.9" width="50.72" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="282" y="69.672" fontSize="10.2" fill="var(--stk-git)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">source</text>
+  <text x="520" y="105" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">image</text>
+  <text x="520" y="118" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">YOUR REGISTRY</text>
+  <text x="24" y="186" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">MANIFESTS</text>
+  <text x="38" y="220" fontSize="9.7" fill="var(--stk-git)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">GIT</text>
+  <text x="38" y="237" fontSize="12.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">your stack repository</text>
+  <text x="38" y="254" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">base · overlays</text>
+  <text x="38" y="268.5" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">encrypted secrets</text>
+  <text x="352" y="272" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">decrypt</text>
+  <text x="352" y="285" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">OFFLINE · YOUR KEY</text>
+  <text x="520" y="271" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">apply -k</text>
+  <text x="520" y="284" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">SAFE TO REPEAT</text>
+  <text x="656" y="51" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">CLUSTER</text>
+  <text x="676" y="96" fontSize="12.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">development</text>
+  <text x="676" y="111" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">same base · own overlay</text>
+  <text x="676" y="172" fontSize="12.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">staging</text>
+  <text x="676" y="187" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">same base · own overlay</text>
+  <text x="676" y="248" fontSize="12.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">production</text>
+  <text x="676" y="263" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">same base · own overlay</text>
+  <rect x="570.64" y="60.9" width="50.72" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="596" y="73.672" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">pulled</text>
+</svg>
+</Figure>
+
 ## Build images in the cluster
 
 Container images are built by an in-cluster builder from the generated build manifests.

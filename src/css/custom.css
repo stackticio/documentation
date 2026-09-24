@@ -9,14 +9,19 @@
 :root {
   --stk-navy:      #081A31;
   --stk-navy-2:    #0C2340;
-  --stk-blue:      #4D96FF;
-  --stk-blue-soft: #BAD4FB;
-  --stk-blue-deep: #2F6FE0;
-  --stk-mint:      #6EE7B7;
-  --stk-amber:     #F9C22B;
-  --stk-steel:     #8FA3BF;
-  --stk-red:       #FF6B81;
-  --stk-violet:    #A78BFA;
+
+  /* Accent inks. Light theme uses the deck's dark inks (readable as text on white);
+     the dark theme below swaps in the bright pair, as the deck does with --mint/--mint2. */
+  --stk-blue:      #2F6FE0;
+  --stk-blue-soft: #6E9CF7;
+  --stk-blue-deep: #1D4FB8;
+  --stk-mint:      #0F9D76;
+  --stk-amber:     #B8790A;
+  --stk-steel:     #64748B;
+  --stk-red:       #DC3A57;
+  --stk-violet:    #7C4DEB;
+  --stk-git:       #E8492A;
+  --stk-ink:       #0B1B2E;
 
   --ifm-font-family-base: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, sans-serif;
   --ifm-font-family-monospace: 'Fira Code', ui-monospace, 'SF Mono', Menlo, monospace;
@@ -63,6 +68,17 @@
   --stk-panel: #0C2340;
   --stk-panel-2: #0a1d37;
   --stk-muted: #8FA3BF;
+
+  --stk-blue:      #4D96FF;
+  --stk-blue-soft: #BAD4FB;
+  --stk-blue-deep: #2F6FE0;
+  --stk-mint:      #6EE7B7;
+  --stk-amber:     #F9C22B;
+  --stk-steel:     #8FA3BF;
+  --stk-red:       #FF6B81;
+  --stk-violet:    #A78BFA;
+  --stk-git:       #F05032;
+  --stk-ink:       #FFFFFF;
 }
 
 html { scroll-behavior: smooth; }
@@ -323,11 +339,45 @@ div[class^='codeBlockContainer'] {
 
 /* Figure -------------------------------------------------------------------- */
 .stk-figure {
+  position: relative;
   margin: 1.8rem 0 2rem;
-  padding: 1.4rem 1.2rem 1rem;
+  padding: 1rem .55rem .85rem;
   border: 1px solid var(--stk-hair);
   border-radius: 16px;
   background: var(--stk-panel-2);
+  cursor: zoom-in;
+  transition: border-color .18s ease;
+}
+.stk-figure:hover, .stk-figure:focus-visible { border-color: rgba(77,150,255,.45); outline: none; }
+.stk-figure-zoom {
+  position: absolute; top: .55rem; right: .8rem;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: .64rem; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--stk-muted); opacity: 0; transition: opacity .18s ease;
+}
+.stk-figure:hover .stk-figure-zoom, .stk-figure:focus-visible .stk-figure-zoom { opacity: .85; }
+.stk-lightbox {
+  position: fixed; inset: 0; z-index: 1000;
+  display: grid; place-items: center;
+  padding: 2.2rem 1.2rem;
+  background: rgba(4, 12, 26, .86);
+  backdrop-filter: blur(4px);
+  cursor: zoom-out;
+}
+.stk-lightbox-inner {
+  width: min(96vw, 1480px);
+  max-height: 90vh; overflow: auto;
+  padding: 1.4rem 1.2rem 1.1rem;
+  border-radius: 16px;
+  border: 1px solid var(--stk-hair);
+  background: var(--stk-panel-2);
+}
+.stk-lightbox-inner svg { display: block; width: 100%; height: auto; }
+.stk-lightbox-inner p { max-width: 80ch; margin: .9rem auto 0; text-align: center; font-size: .92rem; color: var(--stk-muted); }
+.stk-lightbox-close {
+  position: fixed; top: .9rem; right: 1.2rem;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; color: #c9d6ea;
 }
 .stk-figure svg { display: block; width: 100%; height: auto; }
 .stk-figure figcaption {

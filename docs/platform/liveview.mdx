@@ -21,6 +21,64 @@ isn't one rather than showing a pretty diagram with no data behind it.
 Because it is the same graph, you are not reading a dashboard and mentally mapping it onto
 your architecture. The architecture *is* the dashboard.
 
+<Figure caption="The same drawing, twice. LiveView colours your design with the results of real tests the stack agent runs every cycle, so a broken relationship shows up as a red link between healthy components.">
+<svg viewBox="0 0 900 346" role="img" aria-label="LiveView is the same graph as the design, read-only, coloured by the results of real tests the stack agent runs on a cycle — so a failing relationship shows up as a red link between healthy components.">
+  <defs>
+    <marker id="liveviewASteel" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-steel)" /></marker>
+    <marker id="liveviewAMint" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-mint)" /></marker>
+  </defs>
+  <rect x="24" y="24" width="380" height="250" rx="16" fill="var(--stk-blue)" fillOpacity="0.035" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <rect x="496" y="24" width="380" height="250" rx="16" fill="var(--stk-mint)" fillOpacity="0.035" stroke="var(--stk-mint)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <path d="M406 150 L494 150" fill="none" stroke="var(--stk-steel)" strokeWidth="1.4" markerEnd="url(#liveviewASteel)" />
+  <path d="M686 308 L686 276" fill="none" stroke="var(--stk-mint)" strokeWidth="1.4" markerEnd="url(#liveviewAMint)" />
+  <path d="M110 110 L210 158" fill="none" stroke="var(--stk-steel)" strokeWidth="1.4" strokeOpacity="0.6" />
+  <path d="M210 158 L150 226" fill="none" stroke="var(--stk-steel)" strokeWidth="1.4" strokeOpacity="0.6" />
+  <path d="M210 158 L330 116" fill="none" stroke="var(--stk-steel)" strokeWidth="1.4" strokeOpacity="0.6" />
+  <path d="M210 158 L340 220" fill="none" stroke="var(--stk-steel)" strokeWidth="1.4" strokeOpacity="0.6" />
+  <path d="M582 110 L682 158" fill="none" stroke="var(--stk-mint)" strokeWidth="1.4" />
+  <path d="M682 158 L622 226" fill="none" stroke="var(--stk-mint)" strokeWidth="1.4" />
+  <path d="M682 158 L802 116" fill="none" stroke="var(--stk-mint)" strokeWidth="1.4" />
+  <path d="M682 158 L812 220" fill="none" stroke="var(--stk-red)" strokeWidth="2" />
+  <circle cx="110" cy="110" r="7" fill="var(--stk-blue)" />
+  <circle cx="210" cy="158" r="7" fill="var(--stk-blue)" />
+  <circle cx="150" cy="226" r="7" fill="var(--stk-blue)" />
+  <circle cx="330" cy="116" r="7" fill="var(--stk-blue)" />
+  <circle cx="340" cy="220" r="7" fill="var(--stk-blue)" />
+  <circle cx="582" cy="110" r="7" fill="var(--stk-mint)" />
+  <circle cx="682" cy="158" r="13" fill="var(--stk-mint)" fillOpacity="0.16" />
+  <circle cx="682" cy="158" r="7" fill="var(--stk-mint)" />
+  <circle cx="622" cy="226" r="7" fill="var(--stk-mint)" />
+  <circle cx="802" cy="116" r="7" fill="var(--stk-steel)" />
+  <circle cx="812" cy="220" r="7" fill="var(--stk-mint)" />
+  <circle cx="686" cy="320" r="15" fill="var(--stk-mint)" fillOpacity="0.16" />
+  <circle cx="686" cy="320" r="9" fill="var(--stk-mint)" />
+  <circle cx="48" cy="312" r="5" fill="var(--stk-mint)" />
+  <circle cx="158" cy="312" r="5" fill="var(--stk-red)" />
+  <circle cx="268" cy="312" r="5" fill="var(--stk-steel)" />
+  <text x="40" y="45" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">DESIGN VIEW</text>
+  <text x="110" y="132" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">gw</text>
+  <text x="210" y="180" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">your app</text>
+  <text x="150" y="248" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">db</text>
+  <text x="330" y="138" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">cache</text>
+  <text x="340" y="242" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">queue</text>
+  <text x="512" y="45" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">LIVEVIEW · READ-ONLY</text>
+  <text x="582" y="132" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">gw</text>
+  <text x="682" y="180" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">your app</text>
+  <text x="622" y="248" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">db</text>
+  <text x="802" y="138" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">cache</text>
+  <text x="812" y="242" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">queue</text>
+  <rect x="412.4" y="124.9" width="75.2" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="450" y="137.672" fontSize="10.2" fill="var(--stk-steel)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">same graph</text>
+  <rect x="732.28" y="174.9" width="87.44" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="732.28" y="174.9" width="87.44" height="18.2" rx="9.1" fill="var(--stk-red)" fillOpacity="0.14" stroke="var(--stk-red)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="776" y="187.672" fontSize="10.2" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">link failing</text>
+  <text x="704" y="324" fontSize="11.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">stack agent · tests every cycle</text>
+  <text x="58" y="316" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">passed</text>
+  <text x="168" y="316" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">failed</text>
+  <text x="278" y="316" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">no result yet</text>
+</svg>
+</Figure>
+
 ## What it shows
 
 | Element | What its colour means |

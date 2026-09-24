@@ -22,6 +22,58 @@ found.
 
 The MCP closes exactly that gap, in four layers.
 
+<Figure caption="One MCP server per stack. It reads three layers — what can exist, what your system is, what is true right now — and writes to one, only after reading the current value, stating the blast radius and asking you.">
+<svg viewBox="0 0 900 420" role="img" aria-label="An AI client talks to one MCP server bound to one stack. The server reads three layers — platform knowledge, the live graph and the runtime — and writes to one: the declared system, only after reading the current value, stating the blast radius and asking.">
+  <defs>
+    <marker id="mcpHubAViolet" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-violet)" /></marker>
+    <marker id="mcpHubASteel" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-steel)" /></marker>
+    <marker id="mcpHubAAmber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-amber)" /></marker>
+  </defs>
+  <path d="M94 210 L234 210" fill="none" stroke="var(--stk-violet)" strokeWidth="1.6" markerEnd="url(#mcpHubAViolet)" markerStart="url(#mcpHubAViolet)" />
+  <path d="M448 210 C525 210 525 64 602 64" fill="none" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#mcpHubASteel)" />
+  <path d="M448 210 C525 210 525 162 602 162" fill="none" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#mcpHubASteel)" />
+  <path d="M448 210 C525 210 525 260 602 260" fill="none" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#mcpHubASteel)" />
+  <path d="M448 210 C525 210 525 358 602 358" fill="none" stroke="var(--stk-amber)" strokeWidth="1.5" markerEnd="url(#mcpHubAAmber)" />
+  <rect x="236" y="160" width="210" height="100" rx="12" fill="var(--stk-panel)" />
+  <rect x="236" y="160" width="210" height="100" rx="12" fill="var(--stk-violet)" fillOpacity="0.11" stroke="var(--stk-violet)" strokeOpacity="1" strokeWidth="1.6" />
+  <rect x="604" y="26" width="272" height="76" rx="12" fill="var(--stk-panel)" />
+  <rect x="604" y="26" width="272" height="76" rx="12" fill="var(--stk-blue)" fillOpacity="0.045" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="604" y="124" width="272" height="76" rx="12" fill="var(--stk-panel)" />
+  <rect x="604" y="124" width="272" height="76" rx="12" fill="var(--stk-blue)" fillOpacity="0.045" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="604" y="222" width="272" height="76" rx="12" fill="var(--stk-panel)" />
+  <rect x="604" y="222" width="272" height="76" rx="12" fill="var(--stk-mint)" fillOpacity="0.045" stroke="var(--stk-mint)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="604" y="320" width="272" height="76" rx="12" fill="var(--stk-panel)" />
+  <rect x="604" y="320" width="272" height="76" rx="12" fill="var(--stk-amber)" fillOpacity="0.11" stroke="var(--stk-amber)" strokeOpacity="1" strokeWidth="1.6" />
+  <circle cx="74" cy="210" r="19" fill="var(--stk-violet)" fillOpacity="0.16" />
+  <circle cx="74" cy="210" r="13" fill="var(--stk-violet)" />
+  <text x="74" y="238" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">AI client</text>
+  <text x="74" y="251" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">ANY MCP CLIENT</text>
+  <text x="250" y="180" fontSize="9.7" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">MCP SERVER</text>
+  <text x="250" y="197" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">one per stack</text>
+  <text x="250" y="214" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">bound to this graph</text>
+  <text x="250" y="228.5" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">tools · prompts</text>
+  <rect x="141.7" y="184.9" width="44.6" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="164" y="197.672" fontSize="10.2" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">tools</text>
+  <text x="618" y="46" fontSize="9.7" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">1 · KNOWLEDGE</text>
+  <text x="618" y="63" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">what can exist</text>
+  <text x="618" y="80" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">catalog · link semantics</text>
+  <text x="618" y="144" fontSize="9.7" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">2 · GRAPH</text>
+  <text x="618" y="161" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">what your system is</text>
+  <text x="618" y="178" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">components · links · fields</text>
+  <text x="618" y="242" fontSize="9.7" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">3 · RUNTIME</text>
+  <text x="618" y="259" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">what is true now</text>
+  <text x="618" y="276" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">tests · scans · logs</text>
+  <text x="618" y="340" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">4 · WRITE</text>
+  <text x="618" y="357" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">change the declared system</text>
+  <text x="618" y="374" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">attributes · links · build</text>
+  <rect x="501.7" y="118.9" width="44.6" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="524" y="131.672" fontSize="10.2" fill="var(--stk-steel)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">reads</text>
+  <rect x="440.5" y="322.9" width="167" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="440.5" y="322.9" width="167" height="18.2" rx="9.1" fill="var(--stk-amber)" fillOpacity="0.14" stroke="var(--stk-amber)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="524" y="335.672" fontSize="10.2" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">read · blast radius · ask</text>
+</svg>
+</Figure>
+
 <Cards cols={2}>
   <Card kicker="Layer 1" title="Knowledge — what the platform can express">
     The catalog of component types, link types, sub-components and attributes, plus what

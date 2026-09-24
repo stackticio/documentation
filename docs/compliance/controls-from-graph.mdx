@@ -17,6 +17,54 @@ from the links, there is no window in which the policy describes last month's to
 Network policies are generated **after** every component has rendered, from the full set of
 edges — because only then is the complete graph known.
 
+<Figure caption="Segmentation follows the links. Only declared paths are open; remove a link and its path closes on the next build.">
+<svg viewBox="0 0 900 344" role="img" aria-label="Network segmentation is generated from the links. Only declared paths are open; removing a link closes its path on the next build, with nothing to maintain by hand.">
+  <defs>
+    <marker id="segmentationAMint" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-mint)" /></marker>
+    <marker id="segmentationARed" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-red)" /></marker>
+  </defs>
+  <rect x="30" y="128" width="130" height="60" rx="16" fill="var(--stk-blue)" fillOpacity="0.035" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <rect x="280" y="44" width="130" height="56" rx="16" fill="var(--stk-blue)" fillOpacity="0.035" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <rect x="280" y="130" width="130" height="56" rx="16" fill="var(--stk-blue)" fillOpacity="0.035" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <rect x="280" y="232" width="130" height="56" rx="16" fill="var(--stk-steel)" fillOpacity="0.035" stroke="var(--stk-steel)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <path d="M162 158 L278 158" fill="none" stroke="var(--stk-mint)" strokeWidth="1.8" markerEnd="url(#segmentationAMint)" />
+  <path d="M162 140 C220 140 220 72 278 72" fill="none" stroke="var(--stk-mint)" strokeWidth="1.8" markerEnd="url(#segmentationAMint)" />
+  <path d="M345 230 L345 190" fill="none" stroke="var(--stk-red)" strokeWidth="1.3" strokeOpacity="0.8" strokeDasharray="4 4" markerEnd="url(#segmentationARed)" />
+  <rect x="480" y="128" width="130" height="60" rx="16" fill="var(--stk-blue)" fillOpacity="0.035" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <rect x="730" y="44" width="130" height="56" rx="16" fill="var(--stk-blue)" fillOpacity="0.035" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <rect x="730" y="130" width="130" height="56" rx="16" fill="var(--stk-blue)" fillOpacity="0.035" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <rect x="730" y="232" width="130" height="56" rx="16" fill="var(--stk-steel)" fillOpacity="0.035" stroke="var(--stk-steel)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <path d="M612 158 L728 158" fill="none" stroke="var(--stk-mint)" strokeWidth="1.8" markerEnd="url(#segmentationAMint)" />
+  <path d="M612 140 C670 140 670 72 728 72" fill="none" stroke="var(--stk-red)" strokeWidth="1.5" strokeDasharray="4 4" markerEnd="url(#segmentationARed)" />
+  <path d="M795 230 L795 190" fill="none" stroke="var(--stk-red)" strokeWidth="1.3" strokeOpacity="0.8" strokeDasharray="4 4" markerEnd="url(#segmentationARed)" />
+  <text x="30" y="36" fontSize="9.7" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">LINKS DRAWN</text>
+  <text x="95" y="162" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">your app</text>
+  <text x="345" y="76" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">cache</text>
+  <text x="345" y="162" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">database</text>
+  <text x="345" y="264" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">anything else</text>
+  <rect x="200.76" y="134.9" width="38.48" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="220" y="147.672" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">link</text>
+  <rect x="194.76" y="86.9" width="38.48" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="214" y="99.672" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">link</text>
+  <text x="364" y="215" fontSize="11" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="700">✗ no link</text>
+  <text x="480" y="36" fontSize="9.7" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">ONE LINK REMOVED</text>
+  <text x="545" y="162" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">your app</text>
+  <text x="795" y="76" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">cache</text>
+  <text x="795" y="162" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">database</text>
+  <text x="795" y="264" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">anything else</text>
+  <rect x="650.76" y="134.9" width="38.48" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="670" y="147.672" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">link</text>
+  <text x="670" y="102" fontSize="15" fill="var(--stk-red)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="700">✗</text>
+  <text x="814" y="215" fontSize="11" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="700">✗ no link</text>
+  <rect x="132.32" y="312.9" width="185.36" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="132.32" y="312.9" width="185.36" height="18.2" rx="9.1" fill="var(--stk-mint)" fillOpacity="0.14" stroke="var(--stk-mint)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="225" y="325.672" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">only declared paths are open</text>
+  <rect x="536.42" y="312.9" width="277.16" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="536.42" y="312.9" width="277.16" height="18.2" rx="9.1" fill="var(--stk-red)" fillOpacity="0.14" stroke="var(--stk-red)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="675" y="325.672" fontSize="10.2" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">no link → the path closes on the next build</text>
+</svg>
+</Figure>
+
 | Handled | How |
 |---|---|
 | Component to component | From the declared link, in both directions |

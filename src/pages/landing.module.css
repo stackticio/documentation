@@ -41,8 +41,8 @@
   font-weight: 600; font-size: .94rem; text-decoration: none !important;
   transition: transform .16s ease, background .16s ease, border-color .16s ease;
 }
-.primary { background: var(--stk-blue); color: #04101f; }
-.primary:hover { background: var(--stk-blue-soft); transform: translateY(-1px); color: #04101f; }
+.primary { background: var(--stk-blue-deep); color: #fff; }
+.primary:hover { background: var(--stk-blue); transform: translateY(-1px); color: #fff; }
 .secondary { border: 1px solid var(--stk-hair); color: var(--ifm-font-color-base); }
 .secondary:hover { border-color: var(--stk-blue); color: var(--stk-blue); transform: translateY(-1px); }
 

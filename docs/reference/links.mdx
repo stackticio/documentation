@@ -13,6 +13,52 @@ generation logic on both sides — which is why the behaviour of a new link is p
 before you draw it.
 </Hero>
 
+<Figure caption="A link type is sourceType-targetType. The string selects the generation logic on both sides, and either end can be a component or a sub-component.">
+<svg viewBox="0 0 900 336" role="img" aria-label="A link type is the source type and the target type joined by a hyphen, and that string selects the generation logic on both sides. Either end can be a component or a sub-component.">
+  <defs>
+    <marker id="linkTypeAAmber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-amber)" /></marker>
+  </defs>
+  <path d="M270.6 90 L270.6 98 L582.6 98 L582.6 90" fill="none" stroke="var(--stk-blue)" strokeWidth="1.3" />
+  <path d="M598.2 90 L598.2 98 L629.4 98 L629.4 90" fill="none" stroke="var(--stk-mint)" strokeWidth="1.3" />
+  <path d="M116 250 L184 250" fill="none" stroke="var(--stk-amber)" strokeWidth="1.6" markerEnd="url(#linkTypeAAmber)" />
+  <path d="M416 250 L484 250" fill="none" stroke="var(--stk-amber)" strokeWidth="1.6" markerEnd="url(#linkTypeAAmber)" />
+  <path d="M716 250 L784 250" fill="none" stroke="var(--stk-amber)" strokeWidth="1.6" markerEnd="url(#linkTypeAAmber)" />
+  <rect x="188" y="230" width="52" height="40" rx="9" fill="none" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="3 3" />
+  <rect x="360" y="230" width="52" height="40" rx="9" fill="none" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="3 3" />
+  <rect x="660" y="230" width="52" height="40" rx="9" fill="none" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="3 3" />
+  <rect x="788" y="230" width="52" height="40" rx="9" fill="none" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="3 3" />
+  <circle cx="86" cy="250" r="15" fill="var(--stk-blue)" fillOpacity="0.16" />
+  <circle cx="86" cy="250" r="9" fill="var(--stk-blue)" />
+  <circle cx="214" cy="250" r="5" fill="var(--stk-mint)" />
+  <circle cx="386" cy="250" r="5" fill="var(--stk-mint)" />
+  <circle cx="514" cy="250" r="15" fill="var(--stk-blue)" fillOpacity="0.16" />
+  <circle cx="514" cy="250" r="9" fill="var(--stk-blue)" />
+  <circle cx="686" cy="250" r="5" fill="var(--stk-mint)" />
+  <circle cx="814" cy="250" r="5" fill="var(--stk-mint)" />
+  <circle cx="24" cy="324" r="5" fill="var(--stk-mint)" />
+  <circle cx="290" cy="324" r="6" fill="var(--stk-blue)" />
+  <text x="270.6" y="76" fontSize="26" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600">external_source_code</text>
+  <text x="582.6" y="76" fontSize="26" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600">-</text>
+  <text x="598.2" y="76" fontSize="26" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600">db</text>
+  <text x="426.6" y="118" fontSize="9.7" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600" letterSpacing="1.1">SOURCE TYPE</text>
+  <text x="613.8" y="118" fontSize="9.7" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600" letterSpacing="1.1">TARGET TYPE</text>
+  <rect x="276.05" y="142.75" width="347.9" height="18.5" rx="9.25" fill="var(--stk-panel-2)" />
+  <rect x="276.05" y="142.75" width="347.9" height="18.5" rx="9.25" fill="var(--stk-steel)" fillOpacity="0.14" stroke="var(--stk-steel)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="450" y="155.78" fontSize="10.5" fill="var(--stk-steel)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">the string selects the generation logic on both sides</text>
+  <text x="150" y="200" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600" letterSpacing="1.1">COMPONENT → SUB-COMPONENT</text>
+  <rect x="76.07" y="287.15" width="147.86" height="17.7" rx="4" fill="var(--stk-panel-2)" />
+  <text x="150" y="299.492" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">external_source_code-db</text>
+  <text x="450" y="200" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600" letterSpacing="1.1">SUB-COMPONENT → COMPONENT</text>
+  <rect x="396.44" y="287.15" width="107.12" height="17.7" rx="4" fill="var(--stk-panel-2)" />
+  <text x="450" y="299.492" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">topic-opensearch</text>
+  <text x="750" y="200" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600" letterSpacing="1.1">SUB-COMPONENT → SUB-COMPONENT</text>
+  <rect x="664.43" y="287.15" width="171.14" height="17.7" rx="4" fill="var(--stk-panel-2)" />
+  <text x="750" y="299.492" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">experiment-registered_model</text>
+  <text x="34" y="328" fontSize="10.2" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">sub-component, inside its parent</text>
+  <text x="302" y="328" fontSize="10.2" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">component</text>
+</svg>
+</Figure>
+
 ## The naming rule
 
 ```

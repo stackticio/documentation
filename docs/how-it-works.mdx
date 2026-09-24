@@ -16,6 +16,119 @@ parts of a system are declared, not implied.
   two components actually generates.
 </Explainer>
 
+<Figure caption="The whole loop. Your AI client changes the graph through the MCP server; the platform generates your stack repository; it is applied to the cluster — by you, by CI, or by the agent's opt-in deploy arm; the stack agent measures what runs against what was declared and hands the evidence back to the model.">
+<svg viewBox="0 0 900 472" role="img" aria-label="The whole loop: the AI client changes the graph through the MCP server, the platform generates a Git repository, the repository is applied to the cluster, and the stack agent measures what runs against what was declared and returns the evidence to the model.">
+  <defs>
+    <marker id="loopAViolet" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-violet)" /></marker>
+    <marker id="loopAAmber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-amber)" /></marker>
+    <marker id="loopAGit" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-git)" /></marker>
+    <marker id="loopABlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-blue)" /></marker>
+    <marker id="loopAMint" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-mint)" /></marker>
+  </defs>
+  <rect x="176" y="228" width="708" height="226" rx="16" fill="var(--stk-blue)" fillOpacity="0.035" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <path d="M80 122 C80 270 118 326 200 326" fill="none" stroke="var(--stk-violet)" strokeWidth="1.5" markerEnd="url(#loopAViolet)" markerStart="url(#loopAViolet)" />
+  <path d="M275 284 L275 172" fill="none" stroke="var(--stk-amber)" strokeWidth="1.5" markerEnd="url(#loopAAmber)" />
+  <path d="M434 105 L518 105" fill="none" stroke="var(--stk-amber)" strokeWidth="1.5" markerEnd="url(#loopAAmber)" />
+  <path d="M646 172 C646 231 706 231 706 290" fill="none" stroke="var(--stk-git)" strokeWidth="1.5" markerEnd="url(#loopAGit)" />
+  <path d="M800 172 C800 248 766 248 766 324" fill="none" stroke="var(--stk-git)" strokeWidth="1.3" strokeOpacity="0.85" markerEnd="url(#loopAGit)" />
+  <path d="M548 172 C548 227 516 227 516 282" fill="none" stroke="var(--stk-amber)" strokeWidth="1.3" markerEnd="url(#loopAAmber)" />
+  <path d="M692 322 L602 322" fill="none" stroke="var(--stk-blue)" strokeWidth="1.3" markerEnd="url(#loopABlue)" />
+  <path d="M430 326 L352 326" fill="none" stroke="var(--stk-mint)" strokeWidth="1.6" markerEnd="url(#loopAMint)" />
+  <rect x="190" y="40" width="244" height="130" rx="12" fill="var(--stk-panel)" />
+  <rect x="190" y="40" width="244" height="130" rx="12" fill="var(--stk-amber)" fillOpacity="0.11" stroke="var(--stk-amber)" strokeOpacity="1" strokeWidth="1.6" />
+  <path d="M350 82 L400 74" stroke="var(--stk-amber)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M400 74 L416 114" stroke="var(--stk-amber)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M416 114 L378 146" stroke="var(--stk-amber)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M378 146 L344 118" stroke="var(--stk-amber)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M344 118 L350 82" stroke="var(--stk-amber)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M350 82 L416 114" stroke="var(--stk-amber)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M400 74 L378 146" stroke="var(--stk-amber)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <rect x="520" y="40" width="172" height="130" rx="12" fill="var(--stk-panel)" />
+  <rect x="520" y="40" width="172" height="130" rx="12" fill="var(--stk-git)" fillOpacity="0.045" stroke="var(--stk-git)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="708" y="40" width="172" height="130" rx="12" fill="var(--stk-panel)" />
+  <rect x="708" y="40" width="172" height="130" rx="12" fill="var(--stk-git)" fillOpacity="0.045" stroke="var(--stk-git)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="200" y="284" width="150" height="84" rx="12" fill="var(--stk-panel)" />
+  <rect x="200" y="284" width="150" height="84" rx="12" fill="var(--stk-violet)" fillOpacity="0.045" stroke="var(--stk-violet)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="430" y="284" width="170" height="84" rx="12" fill="var(--stk-panel)" />
+  <rect x="430" y="284" width="170" height="84" rx="12" fill="var(--stk-mint)" fillOpacity="0.11" stroke="var(--stk-mint)" strokeOpacity="1" strokeWidth="1.6" />
+  <path d="M706 300 L764 336" fill="none" stroke="var(--stk-blue)" strokeWidth="1.2" strokeOpacity="0.6" />
+  <path d="M764 336 L720 404" fill="none" stroke="var(--stk-blue)" strokeWidth="1.2" strokeOpacity="0.6" />
+  <path d="M764 336 L832 300" fill="none" stroke="var(--stk-blue)" strokeWidth="1.2" strokeOpacity="0.6" />
+  <path d="M764 336 L836 404" fill="none" stroke="var(--stk-blue)" strokeWidth="1.2" strokeOpacity="0.6" />
+  <circle cx="80" cy="102" r="19" fill="var(--stk-violet)" fillOpacity="0.16" />
+  <circle cx="80" cy="102" r="13" fill="var(--stk-violet)" />
+  <circle cx="350" cy="82" r="4" fill="var(--stk-amber)" />
+  <circle cx="400" cy="74" r="4" fill="var(--stk-amber)" />
+  <circle cx="416" cy="114" r="4" fill="var(--stk-amber)" />
+  <circle cx="378" cy="146" r="4" fill="var(--stk-amber)" />
+  <circle cx="344" cy="118" r="4" fill="var(--stk-amber)" />
+  <circle cx="706" cy="300" r="5" fill="var(--stk-blue)" />
+  <circle cx="764" cy="336" r="13" fill="var(--stk-blue)" fillOpacity="0.16" />
+  <circle cx="764" cy="336" r="7" fill="var(--stk-blue)" />
+  <circle cx="720" cy="404" r="5" fill="var(--stk-blue)" />
+  <circle cx="832" cy="300" r="5" fill="var(--stk-blue)" />
+  <circle cx="836" cy="404" r="5" fill="var(--stk-blue)" />
+  <text x="80" y="130" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">AI client</text>
+  <text x="80" y="143" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">ANY MCP CLIENT</text>
+  <text x="204" y="60" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">STACKTIC PLATFORM</text>
+  <text x="204" y="77" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">the graph</text>
+  <text x="204" y="94" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">components · links</text>
+  <text x="204" y="108.5" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">sub-components</text>
+  <text x="204" y="123" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">attributes · versions</text>
+  <text x="534" y="60" fontSize="9.7" fill="var(--stk-git)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">GIT</text>
+  <text x="534" y="77" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">stack repository</text>
+  <text x="534" y="94" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">manifests · overlays</text>
+  <text x="534" y="108.5" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">policies · secrets</text>
+  <text x="534" y="123" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">stack-metadata.yaml</text>
+  <text x="722" y="60" fontSize="9.7" fill="var(--stk-git)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">GIT</text>
+  <text x="722" y="77" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">your app repository</text>
+  <text x="722" y="94" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">your source code</text>
+  <text x="722" y="108.5" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">a folder per app</text>
+  <text x="192" y="249" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">KUBERNETES CLUSTER</text>
+  <text x="333.96" y="249" fontSize="10.2" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">your stack, running</text>
+  <text x="214" y="304" fontSize="9.7" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">MCP SERVER</text>
+  <text x="214" y="321" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">AI interface</text>
+  <text x="214" y="338" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">tools · knowledge</text>
+  <text x="444" y="304" fontSize="9.7" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">STACK AGENT</text>
+  <text x="444" y="321" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">measures, proves</text>
+  <text x="444" y="338" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">declared vs observed</text>
+  <text x="664" y="268" fontSize="9.7" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">YOUR WORKLOADS</text>
+  <text x="706" y="320" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">gateway</text>
+  <text x="764" y="358" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">your app</text>
+  <text x="720" y="424" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">database</text>
+  <text x="832" y="320" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">cache</text>
+  <text x="836" y="424" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">queue</text>
+  <circle cx="67.34" cy="236" r="9" fill="var(--stk-violet)" />
+  <text x="67.34" y="239.6" fontSize="11" fill="var(--stk-panel-2)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="700">1</text>
+  <rect x="80.34" y="226.9" width="81.32" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="121" y="239.672" fontSize="10.2" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">MCP · OAuth</text>
+  <circle cx="192.56" cy="204" r="9" fill="var(--stk-amber)" />
+  <text x="192.56" y="207.6" fontSize="11" fill="var(--stk-panel-2)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="700">2</text>
+  <rect x="205.56" y="194.9" width="160.88" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="286" y="207.672" fontSize="10.2" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">writes attributes, links</text>
+  <circle cx="442.52" cy="90" r="9" fill="var(--stk-amber)" />
+  <text x="442.52" y="93.6" fontSize="11" fill="var(--stk-panel-2)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="700">3</text>
+  <rect x="455.52" y="80.9" width="62.96" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="487" y="93.672" fontSize="10.2" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">generate</text>
+  <circle cx="582.04" cy="196" r="9" fill="var(--stk-git)" />
+  <text x="582.04" y="199.6" fontSize="11" fill="var(--stk-panel-2)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="700">4</text>
+  <rect x="595.04" y="186.9" width="111.92" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="651" y="199.672" fontSize="10.2" fill="var(--stk-git)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">kubectl apply -k</text>
+  <rect x="760.04" y="240.9" width="111.92" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="816" y="253.672" fontSize="10.2" fill="var(--stk-git)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">built in-cluster</text>
+  <rect x="490.86" y="244.9" width="130.28" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="556" y="257.672" fontSize="10.2" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">stack-metadata.yaml</text>
+  <circle cx="610.52" cy="342" r="9" fill="var(--stk-blue)" />
+  <text x="610.52" y="345.6" fontSize="11" fill="var(--stk-panel-2)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="700">5</text>
+  <rect x="623.52" y="332.9" width="62.96" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="655" y="345.672" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">observed</text>
+  <circle cx="357.52" cy="310" r="9" fill="var(--stk-mint)" />
+  <text x="357.52" y="313.6" fontSize="11" fill="var(--stk-panel-2)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="700">6</text>
+  <rect x="370.52" y="300.9" width="62.96" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="402" y="313.672" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">evidence</text>
+</svg>
+</Figure>
+
 ## 1 · Declare
 
 A stack is a directed graph held by the platform. Three kinds of node, one kind of edge:
@@ -72,37 +185,59 @@ last pushed state, resolves which files each changed attribute can possibly affe
 a per-template impact map, and re-renders only those files. The build log ends with the
 exact `kubectl apply` lines for what changed.
 
-<Figure caption="A link is not documentation. It is the instruction that produces configuration on both sides of the edge.">
-<svg viewBox="0 0 900 230" role="img" aria-label="One link generating configuration on both sides">
-  <g fontFamily="Instrument Sans, sans-serif">
-    <rect x="40" y="70" width="170" height="76" rx="13" fill="var(--stk-panel)" stroke="var(--stk-blue)" strokeWidth="1.2"/>
-    <text x="125" y="100" textAnchor="middle" fontSize="13" fontWeight="600" fill="var(--ifm-heading-color)">your application</text>
-    <text x="125" y="122" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">component</text>
-
-    <rect x="690" y="70" width="170" height="76" rx="13" fill="var(--stk-panel)" stroke="var(--stk-blue)" strokeWidth="1.2"/>
-    <text x="775" y="100" textAnchor="middle" fontSize="13" fontWeight="600" fill="var(--ifm-heading-color)">PostgreSQL</text>
-    <text x="775" y="122" textAnchor="middle" fontSize="11" fill="var(--stk-steel)">component + db sub-component</text>
-
-    <line x1="212" y1="108" x2="686" y2="108" stroke="var(--stk-blue)" strokeWidth="1.6"/>
-    <rect x="392" y="90" width="116" height="34" rx="9" fill="var(--stk-navy-2)" stroke="var(--stk-blue)" strokeWidth="1"/>
-    <text x="450" y="112" textAnchor="middle" fontSize="12" fontFamily="Fira Code, monospace" fill="var(--stk-blue-soft)">one link</text>
-
-    <text x="450" y="34" textAnchor="middle" fontSize="11" fontFamily="Fira Code, monospace" fill="var(--stk-steel)">WHAT THE EDGE PRODUCES</text>
-
-    <g fontSize="11" fill="var(--stk-steel)">
-      <text x="125" y="175" textAnchor="middle">connection env vars</text>
-      <text x="125" y="193" textAnchor="middle">mounted secret</text>
-      <text x="125" y="211" textAnchor="middle">egress network policy</text>
-
-      <text x="450" y="175" textAnchor="middle">credential generated once</text>
-      <text x="450" y="193" textAnchor="middle">scrape target · dashboard</text>
-      <text x="450" y="211" textAnchor="middle">backup subject</text>
-
-      <text x="775" y="175" textAnchor="middle">database + user created</text>
-      <text x="775" y="193" textAnchor="middle">ingress network policy</text>
-      <text x="775" y="211" textAnchor="middle">RBAC for cross-namespace</text>
-    </g>
-  </g>
+<Figure caption="Draw one edge and nine things are generated: three on your app, three on the database, a credential per instance on the edge itself, and monitoring and backup around it.">
+<svg viewBox="0 0 900 392" role="img" aria-label="One link between your app and a database generates nine things: three on the app side, three on the database side, a per-instance credential on the edge, and monitoring and backup around it.">
+  <path d="M274 196 L626 196" fill="none" stroke="var(--stk-amber)" strokeWidth="2.6" />
+  <path d="M173.14 96 C210.57 96 210.57 192 248 192" fill="none" stroke="var(--stk-blue)" strokeWidth="1" strokeOpacity="0.55" />
+  <path d="M185.38 166 C216.69 166 216.69 192 248 192" fill="none" stroke="var(--stk-blue)" strokeWidth="1" strokeOpacity="0.55" />
+  <path d="M176.2 236 C212.1 236 212.1 192 248 192" fill="none" stroke="var(--stk-blue)" strokeWidth="1" strokeOpacity="0.55" />
+  <path d="M720.74 96 C686.37 96 686.37 192 652 192" fill="none" stroke="var(--stk-blue)" strokeWidth="1" strokeOpacity="0.55" />
+  <path d="M723.8 166 C687.9 166 687.9 192 652 192" fill="none" stroke="var(--stk-blue)" strokeWidth="1" strokeOpacity="0.55" />
+  <path d="M748.28 236 C700.14 236 700.14 192 652 192" fill="none" stroke="var(--stk-blue)" strokeWidth="1" strokeOpacity="0.55" />
+  <path d="M450 110 L450 186" fill="none" stroke="var(--stk-amber)" strokeWidth="1" strokeOpacity="0.6" />
+  <path d="M360 302 L360 200" fill="none" stroke="var(--stk-mint)" strokeWidth="1" strokeOpacity="0.55" />
+  <path d="M560 302 L560 200" fill="none" stroke="var(--stk-mint)" strokeWidth="1" strokeOpacity="0.55" />
+  <circle cx="262" cy="196" r="16" fill="var(--stk-blue)" fillOpacity="0.16" />
+  <circle cx="262" cy="196" r="10" fill="var(--stk-blue)" />
+  <circle cx="638" cy="196" r="16" fill="var(--stk-blue)" fillOpacity="0.16" />
+  <circle cx="638" cy="196" r="10" fill="var(--stk-blue)" />
+  <text x="40" y="44" fontSize="9.7" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">ON YOUR APP</text>
+  <text x="860" y="44" fontSize="9.7" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="end" fontWeight="600" letterSpacing="1.1">ON THE DATABASE</text>
+  <text x="262" y="221" fontSize="12.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">your app</text>
+  <text x="262" y="234" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">EXTERNAL_SOURCE_CODE</text>
+  <text x="638" y="221" fontSize="12.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">orders</text>
+  <text x="638" y="234" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">POSTGRESQL · DB SUB-COMPONENT</text>
+  <rect x="370.55" y="186.75" width="158.9" height="18.5" rx="9.25" fill="var(--stk-panel-2)" />
+  <rect x="370.55" y="186.75" width="158.9" height="18.5" rx="9.25" fill="var(--stk-amber)" fillOpacity="0.14" stroke="var(--stk-amber)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="450" y="199.78" fontSize="10.5" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">external_source_code-db</text>
+  <rect x="42.86" y="86.9" width="130.28" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="42.86" y="86.9" width="130.28" height="18.2" rx="9.1" fill="var(--stk-blue)" fillOpacity="0.14" stroke="var(--stk-blue)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="108" y="99.672" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">connection env vars</text>
+  <rect x="30.62" y="156.9" width="154.76" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="30.62" y="156.9" width="154.76" height="18.2" rx="9.1" fill="var(--stk-blue)" fillOpacity="0.14" stroke="var(--stk-blue)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="108" y="169.672" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">Secret with credentials</text>
+  <rect x="39.8" y="226.9" width="136.4" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="39.8" y="226.9" width="136.4" height="18.2" rx="9.1" fill="var(--stk-blue)" fillOpacity="0.14" stroke="var(--stk-blue)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="108" y="239.672" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">egress NetworkPolicy</text>
+  <rect x="720.74" y="86.9" width="142.52" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="720.74" y="86.9" width="142.52" height="18.2" rx="9.1" fill="var(--stk-blue)" fillOpacity="0.14" stroke="var(--stk-blue)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="792" y="99.672" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">ingress NetworkPolicy</text>
+  <rect x="723.8" y="156.9" width="136.4" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="723.8" y="156.9" width="136.4" height="18.2" rx="9.1" fill="var(--stk-blue)" fillOpacity="0.14" stroke="var(--stk-blue)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="792" y="169.672" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">cross-namespace RBAC</text>
+  <rect x="748.28" y="226.9" width="87.44" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="748.28" y="226.9" width="87.44" height="18.2" rx="9.1" fill="var(--stk-blue)" fillOpacity="0.14" stroke="var(--stk-blue)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="792" y="239.672" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">health check</text>
+  <rect x="360.38" y="90.9" width="179.24" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="360.38" y="90.9" width="179.24" height="18.2" rx="9.1" fill="var(--stk-amber)" fillOpacity="0.14" stroke="var(--stk-amber)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="450" y="103.672" fontSize="10.2" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">one credential per instance</text>
+  <rect x="276.5" y="302.9" width="167" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="276.5" y="302.9" width="167" height="18.2" rx="9.1" fill="var(--stk-mint)" fillOpacity="0.14" stroke="var(--stk-mint)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="360" y="315.672" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">scrape target · dashboard</text>
+  <rect x="522.4" y="302.9" width="75.2" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="522.4" y="302.9" width="75.2" height="18.2" rx="9.1" fill="var(--stk-mint)" fillOpacity="0.14" stroke="var(--stk-mint)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="560" y="315.672" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">backup job</text>
+  <text x="450" y="356" fontSize="9.7" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600" letterSpacing="1.1">AROUND THE EDGE</text>
 </svg>
 </Figure>
 

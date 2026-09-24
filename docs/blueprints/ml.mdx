@@ -15,58 +15,59 @@ generate every address, name, credential, GPU placement and network rule.
 
 ## The shape
 
-<Figure caption="Everything below the dotted line is generated. The two human moments are starting a run and promoting a version.">
-<svg viewBox="0 0 880 340" role="img" aria-label="Machine learning blueprint">
+<Figure caption="The ML loop as a graph. A signed decision starts the training job; the trainer reads data and logs to an experiment; runs become versions of a registered model; serving loads whichever version holds the champion alias.">
+<svg viewBox="0 0 900 360" role="img" aria-label="The machine-learning loop as a graph: a signed decision lets a GPU training job start, the trainer reads data and logs its run to an experiment, runs become versions of a registered model, and serving loads whichever version holds the champion alias — moved by a person, with a record.">
   <defs>
-    <marker id="stkA4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--stk-steel)" />
-    </marker>
+    <marker id="mlLoopAAmber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-amber)" /></marker>
+    <marker id="mlLoopABlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-blue)" /></marker>
+    <marker id="mlLoopAMint" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-mint)" /></marker>
   </defs>
-  <g fontFamily="Instrument Sans, sans-serif">
-    <rect x="20" y="24" width="190" height="72" rx="12" fill="var(--stk-panel)" stroke="var(--stk-blue)" strokeWidth="1.2"/>
-    <text x="115" y="50" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">buckets</text>
-    <text x="115" y="69" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">curated data · weights</text>
-    <text x="115" y="85" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">feedback</text>
-
-    <rect x="330" y="24" width="190" height="72" rx="12" fill="var(--stk-panel)" stroke="var(--stk-blue)" strokeWidth="1.2"/>
-    <text x="425" y="50" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">your trainer image</text>
-    <text x="425" y="69" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">built from your repository</text>
-    <text x="425" y="85" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">by the platform</text>
-
-    <rect x="640" y="24" width="210" height="72" rx="12" fill="var(--stk-panel)" stroke="var(--stk-mint)" strokeWidth="1.3"/>
-    <text x="745" y="50" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">experiment</text>
-    <text x="745" y="69" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">every run lands here</text>
-    <text x="745" y="85" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">tracking · artifacts</text>
-
-    <rect x="20" y="150" width="190" height="72" rx="12" fill="var(--stk-panel)" stroke="var(--stk-blue)" strokeWidth="1.2"/>
-    <text x="115" y="176" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">training job</text>
-    <text x="115" y="195" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">GPU · time limit</text>
-    <text x="115" y="211" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">run parameters</text>
-
-    <rect x="330" y="150" width="190" height="72" rx="12" fill="var(--stk-panel)" stroke="var(--stk-amber)" strokeWidth="1.4"/>
-    <text x="425" y="176" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">decision</text>
-    <text x="425" y="195" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">a person signs</text>
-    <text x="425" y="211" textAnchor="middle" fontSize="10" fill="var(--stk-amber)">HUMAN</text>
-
-    <rect x="640" y="150" width="210" height="72" rx="12" fill="var(--stk-panel)" stroke="var(--stk-mint)" strokeWidth="1.3"/>
-    <text x="745" y="176" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">registered model</text>
-    <text x="745" y="195" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">v1 · v2 · v3 …</text>
-    <text x="745" y="211" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">alias: champion</text>
-
-    <rect x="640" y="264" width="210" height="60" rx="12" fill="var(--stk-panel)" stroke="var(--stk-blue)" strokeWidth="1.2"/>
-    <text x="745" y="290" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">apply job or serving</text>
-    <text x="745" y="308" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">loads the current alias</text>
-
-    <line x1="326" y1="60" x2="216" y2="60" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#stkA4)"/>
-    <text x="271" y="50" textAnchor="middle" fontSize="9.5" fill="var(--stk-steel)">reads</text>
-    <line x1="524" y1="60" x2="634" y2="60" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#stkA4)"/>
-    <text x="579" y="50" textAnchor="middle" fontSize="9.5" fill="var(--stk-steel)">logs</text>
-    <line x1="115" y1="146" x2="115" y2="102" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#stkA4)"/>
-    <line x1="216" y1="186" x2="326" y2="186" stroke="var(--stk-amber)" strokeWidth="1.2" markerEnd="url(#stkA4)"/>
-    <line x1="524" y1="186" x2="634" y2="186" stroke="var(--stk-amber)" strokeWidth="1.2" markerEnd="url(#stkA4)"/>
-    <line x1="745" y1="102" x2="745" y2="146" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#stkA4)"/>
-    <line x1="745" y1="228" x2="745" y2="260" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#stkA4)"/>
-  </g>
+  <path d="M88 262 L250 262" fill="none" stroke="var(--stk-amber)" strokeWidth="1.5" markerEnd="url(#mlLoopAAmber)" />
+  <path d="M262 250 L262 118" fill="none" stroke="var(--stk-blue)" strokeWidth="1.4" markerEnd="url(#mlLoopABlue)" />
+  <path d="M250 104 L102 104" fill="none" stroke="var(--stk-blue)" strokeWidth="1.4" markerEnd="url(#mlLoopABlue)" />
+  <path d="M274 104 L488 104" fill="none" stroke="var(--stk-mint)" strokeWidth="1.5" markerEnd="url(#mlLoopAMint)" />
+  <path d="M500 116 L500 248" fill="none" stroke="var(--stk-mint)" strokeWidth="1.5" markerEnd="url(#mlLoopAMint)" />
+  <path d="M514 262 L778 262" fill="none" stroke="var(--stk-blue)" strokeWidth="1.5" markerEnd="url(#mlLoopABlue)" />
+  <path d="M640 305 L640 272" fill="none" stroke="var(--stk-amber)" strokeWidth="1.3" markerEnd="url(#mlLoopAAmber)" />
+  <circle cx="90" cy="104" r="9" fill="var(--stk-blue)" />
+  <circle cx="262" cy="104" r="16" fill="var(--stk-blue)" fillOpacity="0.16" />
+  <circle cx="262" cy="104" r="10" fill="var(--stk-blue)" />
+  <circle cx="262" cy="262" r="10" fill="var(--stk-blue)" />
+  <path d="M72 248 L86 262 L72 276 L58 262 Z" fill="var(--stk-amber)" fillOpacity="0.2" stroke="var(--stk-amber)" strokeWidth="1.6" />
+  <circle cx="500" cy="104" r="10" fill="var(--stk-mint)" />
+  <circle cx="500" cy="262" r="18" fill="var(--stk-mint)" fillOpacity="0.16" />
+  <circle cx="500" cy="262" r="12" fill="var(--stk-mint)" />
+  <circle cx="790" cy="262" r="16" fill="var(--stk-blue)" fillOpacity="0.16" />
+  <circle cx="790" cy="262" r="10" fill="var(--stk-blue)" />
+  <path d="M640 306 L652 318 L640 330 L628 318 Z" fill="var(--stk-amber)" fillOpacity="0.2" stroke="var(--stk-amber)" strokeWidth="1.6" />
+  <text x="90" y="128" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">buckets</text>
+  <text x="90" y="141" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">DATA · LABELS · WEIGHTS</text>
+  <text x="262" y="72" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">BUILT FROM YOUR REPO</text>
+  <text x="262" y="85" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">your trainer</text>
+  <text x="262" y="287" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">training job</text>
+  <text x="262" y="300" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">GPU · TIME LIMIT</text>
+  <text x="72" y="294" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">decision</text>
+  <text x="72" y="307" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">A PERSON SIGNS</text>
+  <text x="500" y="72" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">EVERY RUN LANDS HERE</text>
+  <text x="500" y="85" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">experiment</text>
+  <text x="500" y="289" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">registered model</text>
+  <text x="500" y="302" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">V1 · V2 · V3</text>
+  <text x="790" y="287" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">serving · apply</text>
+  <text x="790" y="300" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">LOADS @CHAMPION</text>
+  <rect x="110.98" y="236.9" width="118.04" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="170" y="249.672" fontSize="10.2" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">starts only after</text>
+  <rect x="230.52" y="174.9" width="62.96" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="262" y="187.672" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">launches</text>
+  <rect x="153.7" y="78.9" width="44.6" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="176" y="91.672" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">reads</text>
+  <rect x="336.28" y="78.9" width="87.44" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="380" y="91.672" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">logs the run</text>
+  <rect x="474.43" y="161.15" width="171.14" height="17.7" rx="4" fill="var(--stk-panel-2)" />
+  <text x="560" y="173.492" fontSize="9.7" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">experiment-registered_model</text>
+  <text x="560" y="190" fontSize="10.2" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">runs become versions</text>
+  <rect x="562.62" y="236.9" width="154.76" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="640" y="249.672" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">models:/&lt;name&gt;@champion</text>
+  <text x="660" y="322" fontSize="11" fill="var(--stk-amber)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">promote = move the alias · a person signs</text>
 </svg>
 </Figure>
 

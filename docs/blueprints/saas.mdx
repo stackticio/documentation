@@ -28,6 +28,83 @@ without a project.
 
 ## Environments are values, not branches
 
+<Figure caption="One design, rendered once per environment. Each environment differs only in its values — sizes, replicas, domain.">
+<svg viewBox="0 0 900 296" role="img" aria-label="One graph renders into every environment. Each environment carries only the values that differ — sizes, replicas, domain — so staging and production are the same design with different values.">
+  <defs>
+    <marker id="envsAAmber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-amber)" /></marker>
+  </defs>
+  <path d="M122 88 C122 22 388 22 388 68" fill="none" stroke="var(--stk-amber)" strokeWidth="1.2" strokeOpacity="0.85" markerEnd="url(#envsAAmber)" />
+  <path d="M122 88 C122 22 584 22 584 68" fill="none" stroke="var(--stk-amber)" strokeWidth="1.2" strokeOpacity="0.85" markerEnd="url(#envsAAmber)" />
+  <path d="M122 88 C122 22 780 22 780 68" fill="none" stroke="var(--stk-amber)" strokeWidth="1.2" strokeOpacity="0.85" markerEnd="url(#envsAAmber)" />
+  <rect x="24" y="88" width="196" height="156" rx="12" fill="var(--stk-panel)" />
+  <rect x="24" y="88" width="196" height="156" rx="12" fill="var(--stk-amber)" fillOpacity="0.11" stroke="var(--stk-amber)" strokeOpacity="1" strokeWidth="1.6" />
+  <path d="M70 168 L116 142" stroke="var(--stk-amber)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M116 142 L156 174" stroke="var(--stk-amber)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M156 174 L128 212" stroke="var(--stk-amber)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M128 212 L82 216" stroke="var(--stk-amber)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M82 216 L70 168" stroke="var(--stk-amber)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M70 168 L156 174" stroke="var(--stk-amber)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <rect x="300" y="70" width="176" height="206" rx="12" fill="var(--stk-panel)" />
+  <rect x="300" y="70" width="176" height="206" rx="12" fill="var(--stk-blue)" fillOpacity="0.045" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <path d="M344 190 L390 164" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M390 164 L430 196" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M430 196 L402 234" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M402 234 L356 238" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M356 238 L344 190" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M344 190 L430 196" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <rect x="496" y="70" width="176" height="206" rx="12" fill="var(--stk-panel)" />
+  <rect x="496" y="70" width="176" height="206" rx="12" fill="var(--stk-blue)" fillOpacity="0.045" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <path d="M540 190 L586 164" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M586 164 L626 196" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M626 196 L598 234" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M598 234 L552 238" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M552 238 L540 190" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M540 190 L626 196" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <rect x="692" y="70" width="176" height="206" rx="12" fill="var(--stk-panel)" />
+  <rect x="692" y="70" width="176" height="206" rx="12" fill="var(--stk-blue)" fillOpacity="0.11" stroke="var(--stk-blue)" strokeOpacity="1" strokeWidth="1.6" />
+  <path d="M736 190 L782 164" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M782 164 L822 196" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M822 196 L794 234" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M794 234 L748 238" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M748 238 L736 190" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <path d="M736 190 L822 196" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
+  <circle cx="70" cy="168" r="4.5" fill="var(--stk-amber)" />
+  <circle cx="116" cy="142" r="4.5" fill="var(--stk-amber)" />
+  <circle cx="156" cy="174" r="4.5" fill="var(--stk-amber)" />
+  <circle cx="128" cy="212" r="4.5" fill="var(--stk-amber)" />
+  <circle cx="82" cy="216" r="4.5" fill="var(--stk-amber)" />
+  <circle cx="344" cy="190" r="3" fill="var(--stk-blue)" />
+  <circle cx="390" cy="164" r="3" fill="var(--stk-blue)" />
+  <circle cx="430" cy="196" r="3" fill="var(--stk-blue)" />
+  <circle cx="402" cy="234" r="3" fill="var(--stk-blue)" />
+  <circle cx="356" cy="238" r="3" fill="var(--stk-blue)" />
+  <circle cx="540" cy="190" r="4.5" fill="var(--stk-blue)" />
+  <circle cx="586" cy="164" r="4.5" fill="var(--stk-blue)" />
+  <circle cx="626" cy="196" r="4.5" fill="var(--stk-blue)" />
+  <circle cx="598" cy="234" r="4.5" fill="var(--stk-blue)" />
+  <circle cx="552" cy="238" r="4.5" fill="var(--stk-blue)" />
+  <circle cx="736" cy="190" r="6.5" fill="var(--stk-blue)" />
+  <circle cx="782" cy="164" r="6.5" fill="var(--stk-blue)" />
+  <circle cx="822" cy="196" r="6.5" fill="var(--stk-blue)" />
+  <circle cx="794" cy="234" r="6.5" fill="var(--stk-blue)" />
+  <circle cx="748" cy="238" r="6.5" fill="var(--stk-blue)" />
+  <text x="38" y="108" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">THE DESIGN</text>
+  <text x="38" y="125" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">one graph</text>
+  <text x="314" y="90" fontSize="9.7" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">DEVELOPMENT</text>
+  <text x="314" y="107" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">small</text>
+  <text x="314" y="121" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">own domain</text>
+  <text x="510" y="90" fontSize="9.7" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">STAGING</text>
+  <text x="510" y="107" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">like production</text>
+  <text x="510" y="121" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">own domain</text>
+  <text x="706" y="90" fontSize="9.7" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">PRODUCTION</text>
+  <text x="706" y="107" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">sized · scaled</text>
+  <text x="706" y="121" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">own domain</text>
+  <rect x="374.26" y="16.9" width="191.48" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="374.26" y="16.9" width="191.48" height="18.2" rx="9.1" fill="var(--stk-amber)" fillOpacity="0.14" stroke="var(--stk-amber)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="470" y="29.672" fontSize="10.2" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">rendered once per environment</text>
+</svg>
+</Figure>
+
 The base design is rendered once. Each environment is an overlay carrying only what
 differs — replica counts, resource sizes, the domain, and which optional components exist
 at all.

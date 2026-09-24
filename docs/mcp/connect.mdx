@@ -51,6 +51,72 @@ attribute on that link. The state is encrypted at rest with a key derived from t
 client secret.
 :::
 
+<Figure caption="The connection handshake. The MCP server fronts your identity provider, adds the iss parameter strict clients require, signs tokens with a key derived from the client secret, and keeps sessions in the cache so a restart disconnects nobody.">
+<svg viewBox="0 0 900 470" role="img" aria-label="How a client connects: the MCP server fronts the stack identity provider, adds the iss parameter strict clients require, signs tokens with a key derived from the client secret, and keeps session state in the cache so a restart does not disconnect anyone.">
+  <defs>
+    <marker id="oauthAViolet" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-violet)" /></marker>
+    <marker id="oauthASteel" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-steel)" /></marker>
+    <marker id="oauthABlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-blue)" /></marker>
+    <marker id="oauthAAmber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-amber)" /></marker>
+    <marker id="oauthAMint" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-mint)" /></marker>
+  </defs>
+  <path d="M90 70 L90 426" fill="none" stroke="var(--stk-violet)" strokeWidth="1" strokeOpacity="0.45" strokeDasharray="4 4" />
+  <path d="M270 70 L270 426" fill="none" stroke="var(--stk-blue)" strokeWidth="1" strokeOpacity="0.45" strokeDasharray="4 4" />
+  <path d="M460 70 L460 426" fill="none" stroke="var(--stk-violet)" strokeWidth="1" strokeOpacity="0.45" strokeDasharray="4 4" />
+  <path d="M650 70 L650 426" fill="none" stroke="var(--stk-blue)" strokeWidth="1" strokeOpacity="0.45" strokeDasharray="4 4" />
+  <path d="M820 70 L820 426" fill="none" stroke="var(--stk-mint)" strokeWidth="1" strokeOpacity="0.45" strokeDasharray="4 4" />
+  <path d="M96 124 L454 124" fill="none" stroke="var(--stk-violet)" strokeWidth="1.4" markerEnd="url(#oauthAViolet)" />
+  <path d="M454 164 L96 164" fill="none" stroke="var(--stk-steel)" strokeWidth="1.4" strokeDasharray="4 4" markerEnd="url(#oauthASteel)" />
+  <path d="M466 204 L644 204" fill="none" stroke="var(--stk-blue)" strokeWidth="1.4" markerEnd="url(#oauthABlue)" />
+  <path d="M644 244 L466 244" fill="none" stroke="var(--stk-blue)" strokeWidth="1.4" strokeDasharray="4 4" markerEnd="url(#oauthABlue)" />
+  <path d="M454 284 L96 284" fill="none" stroke="var(--stk-amber)" strokeWidth="1.4" strokeDasharray="4 4" markerEnd="url(#oauthAAmber)" />
+  <path d="M96 324 L454 324" fill="none" stroke="var(--stk-violet)" strokeWidth="1.4" markerEnd="url(#oauthAViolet)" />
+  <path d="M466 364 L814 364" fill="none" stroke="var(--stk-mint)" strokeWidth="1.4" markerEnd="url(#oauthAMint)" />
+  <path d="M454 404 L96 404" fill="none" stroke="var(--stk-violet)" strokeWidth="1.4" strokeDasharray="4 4" markerEnd="url(#oauthAViolet)" />
+  <circle cx="90" cy="52" r="14" fill="var(--stk-violet)" fillOpacity="0.16" />
+  <circle cx="90" cy="52" r="8" fill="var(--stk-violet)" />
+  <circle cx="270" cy="52" r="14" fill="var(--stk-blue)" fillOpacity="0.16" />
+  <circle cx="270" cy="52" r="8" fill="var(--stk-blue)" />
+  <circle cx="460" cy="52" r="14" fill="var(--stk-violet)" fillOpacity="0.16" />
+  <circle cx="460" cy="52" r="8" fill="var(--stk-violet)" />
+  <circle cx="650" cy="52" r="14" fill="var(--stk-blue)" fillOpacity="0.16" />
+  <circle cx="650" cy="52" r="8" fill="var(--stk-blue)" />
+  <circle cx="820" cy="52" r="14" fill="var(--stk-mint)" fillOpacity="0.16" />
+  <circle cx="820" cy="52" r="8" fill="var(--stk-mint)" />
+  <text x="90" y="30" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">AI client</text>
+  <text x="270" y="30" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">gateway</text>
+  <text x="460" y="30" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">MCP server</text>
+  <text x="650" y="30" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">identity provider</text>
+  <text x="820" y="30" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">cache</text>
+  <rect x="229.34" y="76.9" width="81.32" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="229.34" y="76.9" width="81.32" height="18.2" rx="9.1" fill="var(--stk-blue)" fillOpacity="0.14" stroke="var(--stk-blue)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="270" y="89.672" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">TLS · route</text>
+  <rect x="419.34" y="76.9" width="81.32" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="419.34" y="76.9" width="81.32" height="18.2" rx="9.1" fill="var(--stk-violet)" fillOpacity="0.14" stroke="var(--stk-violet)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="460" y="89.672" fontSize="10.2" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">OAuth proxy</text>
+  <rect x="222.1" y="102.9" width="105.8" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="275" y="115.672" fontSize="10.2" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">connect to /mcp</text>
+  <rect x="200.68" y="142.9" width="148.64" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="275" y="155.672" fontSize="10.2" fill="var(--stk-steel)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">401 · where to sign in</text>
+  <rect x="474.56" y="182.9" width="160.88" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="555" y="195.672" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">send the user to sign in</text>
+  <rect x="492.92" y="222.9" width="124.16" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="555" y="235.672" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">authorization code</text>
+  <rect x="237.4" y="262.9" width="75.2" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="275" y="275.672" fontSize="10.2" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">code + iss</text>
+  <rect x="197.62" y="302.9" width="154.76" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="275" y="315.672" fontSize="10.2" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">exchange code for token</text>
+  <rect x="559.56" y="342.9" width="160.88" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="640" y="355.672" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">session state, encrypted</text>
+  <rect x="163.96" y="382.9" width="222.08" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="275" y="395.672" fontSize="10.2" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">session token · stable signing key</text>
+  <text x="470" y="300" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace">strict OAuth 2.1 clients require iss</text>
+  <rect x="204.32" y="440.9" width="491.36" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="204.32" y="440.9" width="491.36" height="18.2" rx="9.1" fill="var(--stk-red)" fillOpacity="0.14" stroke="var(--stk-red)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="450" y="453.672" fontSize="10.2" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">without the cache: state lives in memory — every restart drops every connector</text>
+</svg>
+</Figure>
+
 ## Who the model is, and who you are
 
 There are two identities in play. Confusing them is the most common support question.

@@ -33,58 +33,63 @@ Everything after this is a conversation.
 | **Stack agent** | Topology queries, validation, scans — the MCP's runtime hands | Yes |
 | **Cache** | Persistent OAuth state, so the connector survives a pod restart | Strongly recommended |
 
-<Figure caption="The initiator stack. Every arrow is a typed link; each one generates the configuration that makes the next box reachable.">
-<svg viewBox="0 0 900 300" role="img" aria-label="MCP initiator stack topology">
+<Figure caption="Six components, four typed links. Each label is the real link type: drawing it is what produces the public route, the login, the persistent OAuth state and the runtime view.">
+<svg viewBox="0 0 900 392" role="img" aria-label="The MCP initiator stack: six components joined by four typed links. The gateway publishes the MCP server, the identity client logs the connector in, the cache keeps OAuth state across restarts, and the stack agent gives the server its view of the cluster.">
   <defs>
-    <marker id="stkA2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--stk-steel)" />
-    </marker>
+    <marker id="initiatorAViolet" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-violet)" /></marker>
+    <marker id="initiatorABlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-blue)" /></marker>
+    <marker id="initiatorAMint" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-mint)" /></marker>
+    <marker id="initiatorASteel" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-steel)" /></marker>
   </defs>
-  <g fontFamily="Instrument Sans, sans-serif">
-    <rect x="28" y="120" width="132" height="60" rx="12" fill="var(--stk-panel)" stroke="var(--stk-violet)" strokeWidth="1.3"/>
-    <text x="94" y="146" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">AI client</text>
-    <text x="94" y="164" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">outside the cluster</text>
-
-    <rect x="224" y="120" width="132" height="60" rx="12" fill="var(--stk-panel)" stroke="var(--stk-amber)" strokeWidth="1.3"/>
-    <text x="290" y="146" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">gateway</text>
-    <text x="290" y="164" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">TLS · route · rate limit</text>
-
-    <rect x="224" y="24" width="132" height="58" rx="12" fill="var(--stk-panel)" stroke="var(--stk-hair)" strokeWidth="1.2"/>
-    <text x="290" y="49" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">certificates</text>
-    <text x="290" y="67" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">issued and renewed</text>
-
-    <rect x="420" y="120" width="132" height="60" rx="12" fill="var(--stk-panel)" stroke="var(--stk-blue)" strokeWidth="1.5"/>
-    <text x="486" y="146" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">MCP server</text>
-    <text x="486" y="164" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">tools · knowledge</text>
-
-    <rect x="420" y="24" width="132" height="58" rx="12" fill="var(--stk-panel)" stroke="var(--stk-hair)" strokeWidth="1.2"/>
-    <text x="486" y="49" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">identity</text>
-    <text x="486" y="67" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">OIDC client</text>
-
-    <rect x="420" y="222" width="132" height="58" rx="12" fill="var(--stk-panel)" stroke="var(--stk-hair)" strokeWidth="1.2"/>
-    <text x="486" y="247" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">cache</text>
-    <text x="486" y="265" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">OAuth state persists</text>
-
-    <rect x="616" y="120" width="140" height="60" rx="12" fill="var(--stk-panel)" stroke="var(--stk-mint)" strokeWidth="1.5"/>
-    <text x="686" y="146" textAnchor="middle" fontSize="12" fontWeight="600" fill="var(--ifm-heading-color)">stack agent</text>
-    <text x="686" y="164" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">graph · tests · scans</text>
-
-    <rect x="790" y="120" width="84" height="60" rx="12" fill="var(--stk-panel-2)" stroke="var(--stk-hair)" strokeWidth="1.2"/>
-    <text x="832" y="146" textAnchor="middle" fontSize="11" fontWeight="600" fill="var(--ifm-heading-color)">cluster</text>
-    <text x="832" y="164" textAnchor="middle" fontSize="10" fill="var(--stk-steel)">live state</text>
-
-    <line x1="162" y1="150" x2="218" y2="150" stroke="var(--stk-steel)" strokeWidth="1.3" markerEnd="url(#stkA2)"/>
-    <line x1="358" y1="150" x2="414" y2="150" stroke="var(--stk-steel)" strokeWidth="1.3" markerEnd="url(#stkA2)"/>
-    <line x1="554" y1="150" x2="610" y2="150" stroke="var(--stk-steel)" strokeWidth="1.3" markerEnd="url(#stkA2)"/>
-    <line x1="758" y1="150" x2="786" y2="150" stroke="var(--stk-steel)" strokeWidth="1.3" markerEnd="url(#stkA2)"/>
-    <line x1="290" y1="84" x2="290" y2="116" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#stkA2)"/>
-    <line x1="486" y1="84" x2="486" y2="116" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#stkA2)"/>
-    <line x1="486" y1="184" x2="486" y2="218" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#stkA2)"/>
-
-    <text x="190" y="140" textAnchor="middle" fontSize="9.5" fontFamily="Fira Code, monospace" fill="var(--stk-steel)">https</text>
-    <text x="386" y="140" textAnchor="middle" fontSize="9.5" fontFamily="Fira Code, monospace" fill="var(--stk-steel)">route</text>
-    <text x="582" y="140" textAnchor="middle" fontSize="9.5" fontFamily="Fira Code, monospace" fill="var(--stk-steel)">link</text>
-  </g>
+  <rect x="150" y="24" width="730" height="350" rx="16" fill="var(--stk-blue)" fillOpacity="0.035" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <path d="M77 196 L247 196" fill="none" stroke="var(--stk-violet)" strokeWidth="1.5" markerEnd="url(#initiatorAViolet)" />
+  <path d="M277 196 L467 196" fill="none" stroke="var(--stk-blue)" strokeWidth="1.5" markerEnd="url(#initiatorABlue)" />
+  <path d="M482 182 L482 96" fill="none" stroke="var(--stk-blue)" strokeWidth="1.5" markerEnd="url(#initiatorABlue)" />
+  <path d="M482 210 L482 302" fill="none" stroke="var(--stk-blue)" strokeWidth="1.5" markerEnd="url(#initiatorABlue)" />
+  <path d="M497 196 L689 196" fill="none" stroke="var(--stk-mint)" strokeWidth="1.5" markerEnd="url(#initiatorAMint)" />
+  <path d="M262 96 L262 182" fill="none" stroke="var(--stk-steel)" strokeWidth="1.5" markerEnd="url(#initiatorASteel)" />
+  <path d="M718 196 L846 196" fill="none" stroke="var(--stk-mint)" strokeWidth="1.3" strokeDasharray="4 4" markerEnd="url(#initiatorAMint)" />
+  <circle cx="62" cy="196" r="18" fill="var(--stk-violet)" fillOpacity="0.16" />
+  <circle cx="62" cy="196" r="12" fill="var(--stk-violet)" />
+  <circle cx="262" cy="196" r="16" fill="var(--stk-blue)" fillOpacity="0.16" />
+  <circle cx="262" cy="196" r="10" fill="var(--stk-blue)" />
+  <circle cx="262" cy="82" r="8" fill="var(--stk-steel)" />
+  <circle cx="482" cy="196" r="18" fill="var(--stk-violet)" fillOpacity="0.16" />
+  <circle cx="482" cy="196" r="12" fill="var(--stk-violet)" />
+  <circle cx="482" cy="82" r="8" fill="var(--stk-blue)" />
+  <circle cx="482" cy="316" r="8" fill="var(--stk-blue)" />
+  <circle cx="704" cy="196" r="18" fill="var(--stk-mint)" fillOpacity="0.16" />
+  <circle cx="704" cy="196" r="12" fill="var(--stk-mint)" />
+  <text x="166" y="45" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">KUBERNETES CLUSTER</text>
+  <rect x="121.34" y="172.9" width="81.32" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="162" y="185.672" fontSize="10.2" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">https · MCP</text>
+  <rect x="322.16" y="172.9" width="99.68" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="372" y="185.672" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">apisix-fastmcp</text>
+  <rect x="495" y="129.9" width="99.68" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="544.84" y="142.672" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">fastmcp-client</text>
+  <rect x="495" y="246.9" width="99.68" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="544.84" y="259.672" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">fastmcp-valkey</text>
+  <rect x="527.86" y="172.9" width="130.28" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="593" y="185.672" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">fastmcp-stack_agent</text>
+  <rect x="275" y="129.9" width="130.28" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="340.14" y="142.672" fontSize="10.2" fill="var(--stk-steel)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">TLS for every route</text>
+  <text x="62" y="223" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">AI client</text>
+  <text x="62" y="236" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">OUTSIDE</text>
+  <text x="262" y="221" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">gateway</text>
+  <text x="262" y="234" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">APISIX</text>
+  <text x="278" y="86" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">certificates</text>
+  <text x="278" y="99" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">CERT-MANAGER</text>
+  <text x="482" y="223" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">MCP server</text>
+  <text x="482" y="236" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">FASTMCP</text>
+  <text x="498" y="86" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">identity client</text>
+  <text x="498" y="99" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">KEYCLOAK · CLIENT SUB</text>
+  <text x="498" y="320" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">cache</text>
+  <text x="498" y="333" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">VALKEY · CLIENT_STORAGE</text>
+  <text x="704" y="223" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">stack agent</text>
+  <text x="704" y="236" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">GRAPH · TESTS · SCANS</text>
+  <text x="852" y="200" fontSize="11.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">cluster</text>
+  <rect x="750.52" y="170.9" width="62.96" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="782" y="183.672" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">measures</text>
 </svg>
 </Figure>
 

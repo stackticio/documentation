@@ -12,6 +12,51 @@ The framework scanners start from what your stack actually contains, decide whic
 are even applicable, then go and measure them.
 </Hero>
 
+<Figure caption="From topology to report. What the stack can do decides which controls apply; each is measured in the cluster; the report puts the attestation, the evidence and the human position side by side.">
+<svg viewBox="0 0 900 300" role="img" aria-label="The framework scan starts from the graph: what the stack can do decides which controls apply and how they can be met; each control is measured in the cluster; the report carries the attestation, the evidence and the human position side by side.">
+  <defs>
+    <marker id="frameworksAAmber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-amber)" /></marker>
+    <marker id="frameworksABlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-blue)" /></marker>
+    <marker id="frameworksAViolet" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-violet)" /></marker>
+  </defs>
+  <path d="M60 150 L108 150" fill="none" stroke="var(--stk-amber)" strokeWidth="1.4" markerEnd="url(#frameworksAAmber)" />
+  <path d="M324 144 L376 144" fill="none" stroke="var(--stk-blue)" strokeWidth="1.4" markerEnd="url(#frameworksABlue)" />
+  <path d="M578 144 L638 144" fill="none" stroke="var(--stk-violet)" strokeWidth="1.4" markerEnd="url(#frameworksAViolet)" />
+  <rect x="110" y="62" width="214" height="170" rx="12" fill="var(--stk-panel)" />
+  <rect x="110" y="62" width="214" height="170" rx="12" fill="var(--stk-blue)" fillOpacity="0.045" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="378" y="86" width="200" height="116" rx="12" fill="var(--stk-panel)" />
+  <rect x="378" y="86" width="200" height="116" rx="12" fill="var(--stk-violet)" fillOpacity="0.045" stroke="var(--stk-violet)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="640" y="56" width="236" height="184" rx="12" fill="var(--stk-panel)" />
+  <rect x="640" y="56" width="236" height="184" rx="12" fill="var(--stk-mint)" fillOpacity="0.11" stroke="var(--stk-mint)" strokeOpacity="1" strokeWidth="1.6" />
+  <circle cx="46" cy="150" r="17" fill="var(--stk-amber)" fillOpacity="0.16" />
+  <circle cx="46" cy="150" r="11" fill="var(--stk-amber)" />
+  <text x="46" y="176" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">your graph</text>
+  <text x="124" y="82" fontSize="9.7" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">CAPABILITY PICTURE</text>
+  <text x="124" y="99" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">what this stack can do</text>
+  <text x="124" y="116" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">policy engine    ✓</text>
+  <text x="124" y="132" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">secret store     ✓</text>
+  <text x="124" y="148" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">certificates     ✓</text>
+  <text x="124" y="164" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">backup           ✓</text>
+  <text x="124" y="180" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">SIEM             ✗</text>
+  <text x="392" y="106" fontSize="9.7" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">APPLICABLE CONTROLS</text>
+  <text x="392" y="123" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">PCI DSS · ISO 27001</text>
+  <text x="392" y="140" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">PCI DSS v4.0 · 250</text>
+  <text x="392" y="155" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">ISO 27001:2022 · 93</text>
+  <text x="392" y="170" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">no SIEM = a named gap</text>
+  <rect x="321.58" y="118.9" width="56.84" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="350" y="131.672" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">decides</text>
+  <text x="654" y="76" fontSize="9.7" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">THE REPORT</text>
+  <text x="654" y="93" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">an audit document</text>
+  <text x="654" y="110" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">attestation: what was judged</text>
+  <text x="654" y="126" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">summary · coverage</text>
+  <text x="654" y="142" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">evidence for every control</text>
+  <text x="654" y="158" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">the human position,</text>
+  <text x="654" y="174" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">side by side</text>
+  <rect x="576.52" y="118.9" width="62.96" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="608" y="131.672" fontSize="10.2" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">measured</text>
+</svg>
+</Figure>
+
 ## Capability first, then controls
 
 Before evaluating anything, the scanner builds a **capability picture** from the graph:

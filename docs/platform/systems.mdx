@@ -22,6 +22,53 @@ every recorded transition carries the diagram it was made from.
 | **Generated** | The build finished and the repository was written |
 | **Failed** | The build stopped; the logs say where |
 
+<Figure caption="A build takes a saved system through building to generated or failed. Save and push skips the full build and regenerates only the files the change can affect; every save is its own version.">
+<svg viewBox="0 0 900 330" role="img" aria-label="A system moves from created to saved; a build takes it through building to generated or failed; save and push skips the full build and regenerates only the files the change can affect.">
+  <defs>
+    <marker id="lifecycleASteel" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-steel)" /></marker>
+    <marker id="lifecycleABlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-blue)" /></marker>
+    <marker id="lifecycleAMint" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-mint)" /></marker>
+    <marker id="lifecycleARed" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-red)" /></marker>
+    <marker id="lifecycleAGit" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-git)" /></marker>
+    <marker id="lifecycleAAmber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-amber)" /></marker>
+  </defs>
+  <path d="M88 186 C169 186 169 186 250 186" fill="none" stroke="var(--stk-steel)" strokeWidth="1.4" markerEnd="url(#lifecycleASteel)" />
+  <path d="M278 186 C372 186 372 186 466 186" fill="none" stroke="var(--stk-blue)" strokeWidth="1.4" markerEnd="url(#lifecycleABlue)" />
+  <path d="M494 186 C612 186 612 118 730 118" fill="none" stroke="var(--stk-mint)" strokeWidth="1.4" markerEnd="url(#lifecycleAMint)" />
+  <path d="M494 186 C612 186 612 262 730 262" fill="none" stroke="var(--stk-red)" strokeWidth="1.4" markerEnd="url(#lifecycleARed)" />
+  <path d="M304 186 C344 36 700 36 736 104" fill="none" stroke="var(--stk-git)" strokeWidth="1.5" markerEnd="url(#lifecycleAGit)" />
+  <path d="M254 198 C224 250 304 250 274 198" fill="none" stroke="var(--stk-amber)" strokeWidth="1.2" markerEnd="url(#lifecycleAAmber)" />
+  <circle cx="74" cy="186" r="10" fill="var(--stk-steel)" />
+  <circle cx="264" cy="186" r="16" fill="var(--stk-amber)" fillOpacity="0.16" />
+  <circle cx="264" cy="186" r="10" fill="var(--stk-amber)" />
+  <circle cx="480" cy="186" r="10" fill="var(--stk-blue)" />
+  <circle cx="744" cy="118" r="16" fill="var(--stk-mint)" fillOpacity="0.16" />
+  <circle cx="744" cy="118" r="10" fill="var(--stk-mint)" />
+  <circle cx="744" cy="262" r="10" fill="var(--stk-red)" />
+  <text x="74" y="211" fontSize="12.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">created</text>
+  <text x="264" y="167" fontSize="12.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">saved</text>
+  <text x="480" y="211" fontSize="12.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">building</text>
+  <text x="744" y="143" fontSize="12.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">generated</text>
+  <text x="744" y="287" fontSize="12.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">failed</text>
+  <rect x="123.22" y="162.9" width="93.56" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="170" y="175.672" fontSize="10.2" fill="var(--stk-steel)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">create · save</text>
+  <rect x="349.7" y="162.9" width="44.6" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="372" y="175.672" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">build</text>
+  <rect x="583.58" y="128.9" width="56.84" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="612" y="141.672" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">success</text>
+  <rect x="552.98" y="226.9" width="118.04" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="612" y="239.672" fontSize="10.2" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">error · cancelled</text>
+  <rect x="399.78" y="48.9" width="240.44" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="399.78" y="48.9" width="240.44" height="18.2" rx="9.1" fill="var(--stk-git)" fillOpacity="0.14" stroke="var(--stk-git)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="520" y="61.672" fontSize="10.2" fill="var(--stk-git)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">save &amp; push · only the affected files</text>
+  <rect x="183.56" y="252.9" width="160.88" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="264" y="265.672" fontSize="10.2" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">save again = new version</text>
+  <rect x="172.61" y="289.15" width="182.78" height="17.7" rx="8.85" fill="var(--stk-panel-2)" />
+  <rect x="172.61" y="289.15" width="182.78" height="17.7" rx="8.85" fill="var(--stk-mint)" fillOpacity="0.14" stroke="var(--stk-mint)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="264" y="301.492" fontSize="9.7" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">pre-renders in the background</text>
+</svg>
+</Figure>
+
 ## The actions
 
 | Action | What it does |

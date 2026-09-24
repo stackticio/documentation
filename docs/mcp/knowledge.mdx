@@ -23,6 +23,54 @@ connected stack **without a rebuild, a redeploy or a restart**.
 A model that answers from a stale catalog is worse than a model that says it does not
 know. This is the mechanism that prevents it.
 
+<Figure caption="Knowledge lives in its own repository. The MCP server reads it at start and on refresh, so a correction reaches every stack without touching any of them.">
+<svg viewBox="0 0 900 330" role="img" aria-label="The knowledge layer lives in its own repository. The MCP server clones it at start and pulls it on refresh, so corrections reach every stack without a rebuild, a redeploy or a restart.">
+  <defs>
+    <marker id="brainAGit" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-git)" /></marker>
+    <marker id="brainABlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-blue)" /></marker>
+  </defs>
+  <path d="M290 137 L358 137" fill="none" stroke="var(--stk-git)" strokeWidth="1.6" markerEnd="url(#brainAGit)" />
+  <path d="M556 137 C591 137 591 88 626 88" fill="none" stroke="var(--stk-blue)" strokeWidth="1.2" markerEnd="url(#brainABlue)" />
+  <path d="M556 137 C591 137 591 146 626 146" fill="none" stroke="var(--stk-blue)" strokeWidth="1.2" markerEnd="url(#brainABlue)" />
+  <path d="M556 137 C591 137 591 204 626 204" fill="none" stroke="var(--stk-blue)" strokeWidth="1.2" markerEnd="url(#brainABlue)" />
+  <rect x="28" y="54" width="262" height="166" rx="12" fill="var(--stk-panel)" />
+  <rect x="28" y="54" width="262" height="166" rx="12" fill="var(--stk-git)" fillOpacity="0.045" stroke="var(--stk-git)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="360" y="74" width="196" height="126" rx="12" fill="var(--stk-panel)" />
+  <rect x="360" y="74" width="196" height="126" rx="12" fill="var(--stk-violet)" fillOpacity="0.11" stroke="var(--stk-violet)" strokeOpacity="1" strokeWidth="1.6" />
+  <rect x="628" y="64" width="244" height="48" rx="12" fill="var(--stk-panel)" />
+  <rect x="628" y="64" width="244" height="48" rx="12" fill="var(--stk-blue)" fillOpacity="0.045" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="628" y="122" width="244" height="48" rx="12" fill="var(--stk-panel)" />
+  <rect x="628" y="122" width="244" height="48" rx="12" fill="var(--stk-blue)" fillOpacity="0.045" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="628" y="180" width="244" height="48" rx="12" fill="var(--stk-panel)" />
+  <rect x="628" y="180" width="244" height="48" rx="12" fill="var(--stk-blue)" fillOpacity="0.045" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <text x="42" y="74" fontSize="9.7" fill="var(--stk-git)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">GIT · PLATFORM KNOWLEDGE</text>
+  <text x="42" y="91" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">the brain</text>
+  <text x="42" y="108" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">catalog · attributes</text>
+  <text x="42" y="123" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">link semantics</text>
+  <text x="42" y="138" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">patterns from real stacks</text>
+  <text x="42" y="153" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">upgrade recipes</text>
+  <text x="42" y="168" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">policy schema · carve-outs</text>
+  <text x="42" y="183" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">playbooks</text>
+  <text x="374" y="94" fontSize="9.7" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">MCP SERVER</text>
+  <text x="374" y="111" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">reads it, answers</text>
+  <text x="374" y="128" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">clones at start</text>
+  <text x="374" y="142.5" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">pulls on refresh</text>
+  <text x="374" y="157" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">hot-reloads on change</text>
+  <rect x="304.76" y="111.9" width="38.48" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="324" y="124.672" fontSize="10.2" fill="var(--stk-git)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">pull</text>
+  <text x="628" y="44" fontSize="9.7" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">THE HANDS</text>
+  <text x="640" y="84" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">platform API</text>
+  <text x="640" y="99" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">change the graph</text>
+  <text x="640" y="142" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">stack agent</text>
+  <text x="640" y="157" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">test · scan · prove</text>
+  <text x="640" y="200" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">per-technology tools</text>
+  <text x="640" y="215" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">operate what is linked</text>
+  <rect x="254" y="276.75" width="392" height="18.5" rx="9.25" fill="var(--stk-panel-2)" />
+  <rect x="254" y="276.75" width="392" height="18.5" rx="9.25" fill="var(--stk-amber)" fillOpacity="0.14" stroke="var(--stk-amber)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="450" y="289.78" fontSize="10.5" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">update the knowledge → no rebuild · no redeploy · no restart</text>
+</svg>
+</Figure>
+
 ## What it contains
 
 | Layer | What the model gets from it |

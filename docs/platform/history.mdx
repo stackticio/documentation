@@ -17,6 +17,52 @@ sub-component and every attribute, as one move.
   rollback stops being a file operation and becomes an estate operation.
 </Explainer>
 
+<Figure caption="Every save and every build is a version. Diff any two, cell by cell. Rolling back loads an older version onto the canvas — it becomes current only when you save it.">
+<svg viewBox="0 0 900 310" role="img" aria-label="Every save and every build is a version of the whole graph. Any two can be diffed cell by cell, and rolling back loads an earlier version onto the canvas — it becomes current only when you save it.">
+  <defs>
+    <marker id="historyABlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-blue)" /></marker>
+    <marker id="historyAAmber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-amber)" /></marker>
+    <marker id="historyAMint" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-mint)" /></marker>
+  </defs>
+  <path d="M50 150 L600 150" fill="none" stroke="var(--stk-steel)" strokeWidth="1.4" strokeOpacity="0.55" />
+  <path d="M160 110 C200 62 380 62 420 110" fill="none" stroke="var(--stk-blue)" strokeWidth="1.3" markerEnd="url(#historyABlue)" markerStart="url(#historyABlue)" />
+  <path d="M160 190 C170 272 520 268 646 234" fill="none" stroke="var(--stk-amber)" strokeWidth="1.4" strokeDasharray="4 4" markerEnd="url(#historyAAmber)" />
+  <path d="M760 186 C760 150 640 150 604 150" fill="none" stroke="var(--stk-mint)" strokeWidth="1.5" markerEnd="url(#historyAMint)" />
+  <rect x="648" y="186" width="226" height="96" rx="12" fill="var(--stk-panel)" />
+  <rect x="648" y="186" width="226" height="96" rx="12" fill="var(--stk-amber)" fillOpacity="0.045" stroke="var(--stk-amber)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <circle cx="80" cy="150" r="5" fill="var(--stk-steel)" />
+  <circle cx="160" cy="150" r="8" fill="var(--stk-blue)" />
+  <circle cx="250" cy="150" r="5" fill="var(--stk-steel)" />
+  <circle cx="330" cy="150" r="5" fill="var(--stk-steel)" />
+  <circle cx="420" cy="150" r="8" fill="var(--stk-blue)" />
+  <circle cx="500" cy="150" r="5" fill="var(--stk-steel)" />
+  <circle cx="590" cy="150" r="16" fill="var(--stk-mint)" fillOpacity="0.16" />
+  <circle cx="590" cy="150" r="10" fill="var(--stk-mint)" />
+  <text x="50" y="40" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">EVERY SAVE AND BUILD, RECORDED</text>
+  <text x="80" y="176" fontSize="10.2" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">save</text>
+  <text x="160" y="176" fontSize="10.2" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">build</text>
+  <text x="250" y="176" fontSize="10.2" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">save</text>
+  <text x="330" y="176" fontSize="10.2" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">save</text>
+  <text x="420" y="176" fontSize="10.2" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">build</text>
+  <text x="500" y="176" fontSize="10.2" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">save</text>
+  <text x="160" y="126" fontSize="12.8" fill="var(--stk-ink)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="700">v1</text>
+  <text x="420" y="126" fontSize="12.8" fill="var(--stk-ink)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="700">v2</text>
+  <rect x="224.86" y="60.9" width="130.28" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="224.86" y="60.9" width="130.28" height="18.2" rx="9.1" fill="var(--stk-blue)" fillOpacity="0.14" stroke="var(--stk-blue)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="290" y="73.672" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">diff · cell by cell</text>
+  <text x="662" y="206" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">DESIGN CANVAS</text>
+  <text x="662" y="223" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">v1 loaded again</text>
+  <text x="662" y="240" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">nothing saved yet</text>
+  <rect x="325.46" y="248.9" width="69.08" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="325.46" y="248.9" width="69.08" height="18.2" rx="9.1" fill="var(--stk-amber)" fillOpacity="0.14" stroke="var(--stk-amber)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="360" y="261.672" fontSize="10.2" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">roll back</text>
+  <text x="590" y="126" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">current</text>
+  <rect x="684.52" y="120.9" width="62.96" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="684.52" y="120.9" width="62.96" height="18.2" rx="9.1" fill="var(--stk-mint)" fillOpacity="0.14" stroke="var(--stk-mint)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="716" y="133.672" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">you save</text>
+</svg>
+</Figure>
+
 ## Every transition is a version
 
 Each save and each build inserts a version record carrying the diagram it was made from,

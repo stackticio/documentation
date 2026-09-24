@@ -20,6 +20,66 @@ an **intent**; the agent reports whether the cluster actually honours it. Becaus
 mechanisms are discovered from the metadata structure, this works on any stack without
 per-stack configuration.
 
+<Figure caption="How a backup verdict is reached, starting from the link the diagram declares. The case that matters most is a run that reports success and holds no data.">
+<svg viewBox="0 0 900 350" role="img" aria-label="How a backup verdict is reached: from the link the diagram declares, the agent checks that a mechanism exists, that it has run, and that bytes were captured — and a run that completed with no data is reported as the dangerous case it is.">
+  <defs>
+    <marker id="backupTreeAAmber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-amber)" /></marker>
+    <marker id="backupTreeAMint" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-mint)" /></marker>
+    <marker id="backupTreeARed" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-red)" /></marker>
+  </defs>
+  <path d="M54 90 L166 90" fill="none" stroke="var(--stk-amber)" strokeWidth="2" />
+  <path d="M110 104 C110 190 200 190 274 190" fill="none" stroke="var(--stk-amber)" strokeWidth="1.4" markerEnd="url(#backupTreeAAmber)" />
+  <path d="M307 190 L463 190" fill="none" stroke="var(--stk-mint)" strokeWidth="1.4" markerEnd="url(#backupTreeAMint)" />
+  <path d="M497 190 L653 190" fill="none" stroke="var(--stk-mint)" strokeWidth="1.4" markerEnd="url(#backupTreeAMint)" />
+  <path d="M687 190 L776 190" fill="none" stroke="var(--stk-mint)" strokeWidth="1.5" markerEnd="url(#backupTreeAMint)" />
+  <path d="M290 207 L290 268" fill="none" stroke="var(--stk-red)" strokeWidth="1.3" markerEnd="url(#backupTreeARed)" />
+  <path d="M480 207 L480 268" fill="none" stroke="var(--stk-red)" strokeWidth="1.3" markerEnd="url(#backupTreeARed)" />
+  <path d="M670 207 L670 268" fill="none" stroke="var(--stk-red)" strokeWidth="1.5" markerEnd="url(#backupTreeARed)" />
+  <circle cx="44" cy="90" r="8" fill="var(--stk-blue)" />
+  <circle cx="176" cy="90" r="8" fill="var(--stk-blue)" />
+  <path d="M290 175 L305 190 L290 205 L275 190 Z" fill="var(--stk-panel)" stroke="var(--stk-steel)" strokeWidth="1.5" />
+  <path d="M480 175 L495 190 L480 205 L465 190 Z" fill="var(--stk-panel)" stroke="var(--stk-steel)" strokeWidth="1.5" />
+  <path d="M670 175 L685 190 L670 205 L655 190 Z" fill="var(--stk-panel)" stroke="var(--stk-steel)" strokeWidth="1.5" />
+  <text x="24" y="38" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">THE DIAGRAM'S INTENT</text>
+  <text x="44" y="113" fontSize="11.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">database</text>
+  <text x="176" y="113" fontSize="11.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">bucket</text>
+  <rect x="70.99" y="61.15" width="78.02" height="17.7" rx="8.85" fill="var(--stk-panel-2)" />
+  <rect x="70.99" y="61.15" width="78.02" height="17.7" rx="8.85" fill="var(--stk-amber)" fillOpacity="0.14" stroke="var(--stk-amber)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="110" y="73.492" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">backup link</text>
+  <text x="290" y="150" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">mechanism</text>
+  <text x="290" y="164" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">present?</text>
+  <rect x="368.82" y="166.9" width="32.36" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="385" y="179.672" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">yes</text>
+  <text x="480" y="150" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">has it</text>
+  <text x="480" y="164" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">run?</text>
+  <rect x="558.82" y="166.9" width="32.36" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="575" y="179.672" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">yes</text>
+  <text x="670" y="150" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">bytes captured</text>
+  <text x="670" y="164" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">and verified?</text>
+  <rect x="803.3" y="180.5" width="73.4" height="19" rx="9.5" fill="var(--stk-panel-2)" />
+  <rect x="803.3" y="180.5" width="73.4" height="19" rx="9.5" fill="var(--stk-mint)" fillOpacity="0.14" stroke="var(--stk-mint)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="840" y="193.96" fontSize="11" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">PROTECTED</text>
+  <rect x="302.88" y="226.9" width="26.24" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="316" y="239.672" fontSize="10.2" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">no</text>
+  <rect x="243.22" y="278.9" width="93.56" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="243.22" y="278.9" width="93.56" height="18.2" rx="9.1" fill="var(--stk-red)" fillOpacity="0.14" stroke="var(--stk-red)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="290" y="291.672" fontSize="10.2" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">NOT_PROTECTED</text>
+  <rect x="492.88" y="226.9" width="26.24" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="506" y="239.672" fontSize="10.2" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">no</text>
+  <rect x="445.46" y="278.9" width="69.08" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="445.46" y="278.9" width="69.08" height="18.2" rx="9.1" fill="var(--stk-red)" fillOpacity="0.14" stroke="var(--stk-red)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="480" y="291.672" fontSize="10.2" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">NEVER_RAN</text>
+  <rect x="677.58" y="226.9" width="56.84" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="706" y="239.672" fontSize="10.2" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">0 bytes</text>
+  <rect x="606.9" y="278.5" width="126.2" height="19" rx="9.5" fill="var(--stk-panel-2)" />
+  <rect x="606.9" y="278.5" width="126.2" height="19" rx="9.5" fill="var(--stk-red)" fillOpacity="0.14" stroke="var(--stk-red)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="670" y="291.96" fontSize="11" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">COMPLETED_NO_DATA</text>
+  <text x="670" y="320" fontSize="10.2" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">reports success · holds nothing</text>
+  <rect x="375.49" y="99.15" width="369.02" height="17.7" rx="4" fill="var(--stk-panel-2)" />
+  <text x="560" y="111.492" fontSize="9.7" fill="var(--stk-steel)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">could not verify → INCONCLUSIVE · not the same as unprotected</text>
+</svg>
+</Figure>
+
 ## The verdict that matters
 
 | Verdict | Meaning |

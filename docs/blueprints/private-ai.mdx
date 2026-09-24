@@ -14,6 +14,65 @@ segmentation, identity, policy and evidence as any other workload in the stack.
 
 ## The shape
 
+<Figure caption="Private AI inside your network. People sign in through the gateway, the chat interface calls self-hosted chat and embedding models on GPU, and retrieval runs against your own vector collection.">
+<svg viewBox="0 0 900 350" role="img" aria-label="A private AI stack: people reach a chat interface through the gateway with single sign-on; the interface calls self-hosted chat and embedding models on GPU and retrieves from a vector collection — all inside your network.">
+  <defs>
+    <marker id="privateAiAViolet" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-violet)" /></marker>
+    <marker id="privateAiABlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-blue)" /></marker>
+    <marker id="privateAiAAmber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-amber)" /></marker>
+    <marker id="privateAiAMint" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-mint)" /></marker>
+  </defs>
+  <rect x="150" y="24" width="730" height="300" rx="16" fill="var(--stk-mint)" fillOpacity="0.035" stroke="var(--stk-mint)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <rect x="540" y="60" width="170" height="236" rx="16" fill="var(--stk-amber)" fillOpacity="0.035" stroke="var(--stk-amber)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <path d="M76 176 L224 176" fill="none" stroke="var(--stk-violet)" strokeWidth="1.5" markerEnd="url(#privateAiAViolet)" />
+  <path d="M247 176 L384 176" fill="none" stroke="var(--stk-blue)" strokeWidth="1.5" markerEnd="url(#privateAiABlue)" />
+  <path d="M398 86 L398 162" fill="none" stroke="var(--stk-blue)" strokeWidth="1.3" markerEnd="url(#privateAiABlue)" />
+  <path d="M398 190 L398 270" fill="none" stroke="var(--stk-steel)" strokeWidth="1.2" />
+  <path d="M412 170 C512 170 512 124 612 124" fill="none" stroke="var(--stk-amber)" strokeWidth="1.4" markerEnd="url(#privateAiAAmber)" />
+  <path d="M412 182 C512 182 512 232 612 232" fill="none" stroke="var(--stk-amber)" strokeWidth="1.4" markerEnd="url(#privateAiAAmber)" />
+  <path d="M636 232 L800 232" fill="none" stroke="var(--stk-mint)" strokeWidth="1.4" markerEnd="url(#privateAiAMint)" />
+  <path d="M404 190 C470 318 760 318 806 244" fill="none" stroke="var(--stk-mint)" strokeWidth="1.3" strokeDasharray="4 4" markerEnd="url(#privateAiAMint)" />
+  <circle cx="62" cy="176" r="18" fill="var(--stk-violet)" fillOpacity="0.16" />
+  <circle cx="62" cy="176" r="12" fill="var(--stk-violet)" />
+  <circle cx="236" cy="176" r="9" fill="var(--stk-blue)" />
+  <circle cx="398" cy="176" r="18" fill="var(--stk-blue)" fillOpacity="0.16" />
+  <circle cx="398" cy="176" r="12" fill="var(--stk-blue)" />
+  <circle cx="398" cy="76" r="8" fill="var(--stk-blue)" />
+  <circle cx="398" cy="280" r="7" fill="var(--stk-steel)" />
+  <circle cx="624" cy="124" r="10" fill="var(--stk-amber)" />
+  <circle cx="624" cy="232" r="10" fill="var(--stk-amber)" />
+  <circle cx="812" cy="232" r="10" fill="var(--stk-mint)" />
+  <text x="166" y="45" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">YOUR NETWORK</text>
+  <text x="264.64" y="45" fontSize="10.2" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">nothing leaves</text>
+  <text x="62" y="203" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">people</text>
+  <text x="62" y="216" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">SIGNED IN</text>
+  <text x="236" y="200" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">gateway</text>
+  <text x="236" y="213" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">AI GATEWAY</text>
+  <text x="398" y="203" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">chat interface</text>
+  <text x="414" y="80" fontSize="11.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">identity client</text>
+  <text x="413" y="284" fontSize="11.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">db · files · cache</text>
+  <text x="556" y="81" fontSize="10.2" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">GPU</text>
+  <text x="624" y="149" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">chat model</text>
+  <text x="624" y="257" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">embedding model</text>
+  <text x="812" y="200" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">SIZE = EMBEDDING DIMS</text>
+  <text x="812" y="213" fontSize="11.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">vector collection</text>
+  <rect x="129.7" y="150.9" width="44.6" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="152" y="163.672" fontSize="10.2" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">https</text>
+  <rect x="293.7" y="150.9" width="44.6" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="316" y="163.672" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">route</text>
+  <rect x="409.58" y="114.9" width="56.84" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="438" y="127.672" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">sign-on</text>
+  <rect x="480.76" y="126.9" width="38.48" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="500" y="139.672" fontSize="10.2" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">chat</text>
+  <rect x="477.7" y="212.9" width="44.6" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="500" y="225.672" fontSize="10.2" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">embed</text>
+  <rect x="689.58" y="236.9" width="56.84" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="718" y="249.672" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">vectors</text>
+  <rect x="585.46" y="290.9" width="69.08" height="18.2" rx="4" fill="var(--stk-panel-2)" />
+  <text x="620" y="303.672" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">retrieval</text>
+</svg>
+</Figure>
+
 | Component | Role |
 |---|---|
 | **Inference server** | Serves your models. Each served model is a sub-component with its own memory fraction, context length and role — chat or embedding |

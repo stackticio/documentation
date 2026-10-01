@@ -121,4 +121,13 @@ The result is a federation: separate systems, each with its own graph, lifecycle
 and validation surface, that can still express dependencies on each other and generate the
 configuration those dependencies require.
 
+The common shapes are all links to a cell published by another stack:
+
+| Shape | On the graph | What it generates |
+|---|---|---|
+| **Central metrics** | Each application stack's metrics server links to the metrics server of a central stack; the central one is marked as the master | Every stack sends its metrics to the central one, each series labelled with the name of the stack it came from; the central server accepts samples up to an hour late |
+| **Central dashboards** | The central stack's dashboards link to its metrics server | One dashboard folder per stack whose metrics arrive |
+| **Central delivery** | Each stack's GitOps controller links to the central one | The central controller deploys every linked stack, cluster by cluster — see [Argo CD](/docs/day0/build-deploy#argo-cd) |
+| **Shared services** | A cell of another stack — a database, a gateway, an identity provider — is pulled into your design | Your links to it generate as if it were local; at build time its neighbourhood is pulled in too |
+
 → [Core concepts](/docs/concepts)

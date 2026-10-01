@@ -43,6 +43,20 @@ it is fixed. And everything the rest of this documentation describes — generat
 validation, scanning, evidence, compliance, backup, lifecycle — applies to all of them
 without qualification.
 
+## Recipes
+
+Smaller arrangements recur inside larger ones. Each is a few links, and each is something
+the AI client can propose by name:
+
+| Recipe | On the graph |
+|---|---|
+| **AI gateway in front of models** | The gateway's AI sub-component links to served models or to external AI providers. Each link can carry prompt-guard patterns for chat models, and the route adds single sign-on, API keys, rate limiting and the allowed methods |
+| **Streams into stores** | Event-streaming topics link to a database, an analytics store, a search index or a bucket, and the sink connectors are generated. A bridge sub-component adds HTTP access to the topics |
+| **Data and ML pipelines** | Each pipeline sub-component of the orchestrator becomes one DAG: `etl` extracts from every linked source and loads the linked destination, `ml` trains and evaluates a model, `airflow_job` is a scheduled unit of your own |
+| **Load testing** | The load-testing component links to a database, a topic, a queue, a bucket or a broker, and gets a test for that technology |
+| **Central logs** | A log store with a storage link keeps the logs, and a collector linked to it ships every pod's logs |
+| **Admission policy rollout** | Every policy sub-component carries its own enforcement action — start in dry run, move to warn, then deny |
+
 ## Starting from one
 
 The fastest path is to describe what you want to your AI client and let it propose the

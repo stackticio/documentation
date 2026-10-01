@@ -130,6 +130,15 @@ A permission error from a write tool is about the **platform account**, not abou
 connector. The server resolves its platform credentials itself, in order, and only asks a
 human as a last resort.
 
+## Clients differ
+
+Clients do not all see the same parts of the server. Some never show its prompts or
+resources, and some ignore its instructions; a client running on your own machine may also
+read local files the server never sends. So everything a model needs to work correctly also
+comes back in tool descriptions and tool results — `workflow`, `server_info` and
+`knowledge` — which every client passes to the model. If a client behaves differently from
+another, ask it to call `workflow` first.
+
 ## Troubleshooting
 
 | Symptom | Most likely cause | What to do |

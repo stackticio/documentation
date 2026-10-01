@@ -1,0 +1,356 @@
+---
+id: mcp-vibe-coding
+slug: /mcp/vibe-coding
+title: Vibe coding with Stacktic
+sidebar_label: Vibe coding with Stacktic
+sidebar_position: 4
+description: Connect an AI client to your stack's MCP server and know what to ask it, for a new application, an existing one, security and validation.
+---
+
+<Hero eyebrow="Build with AI" title="Vibe coding with Stacktic">
+You talk to an AI client, and the client works through the MCP server of your stack. This
+page covers connecting the client and what to say to it: for a new application, for an
+application you already have, and for security and validation.
+</Hero>
+
+## Before you start
+
+You need a stack that contains the MCP server. The smallest one is the
+[initiator stack](/docs/mcp/quickstart). Check these before you connect:
+
+| What | Why | Where it is set |
+|---|---|---|
+| Gateway → MCP server link | Publishes the MCP server's URL | The link's subdomain |
+| MCP server → identity client link | The login your AI client goes through | The identity client |
+| MCP server → cache link, with `client_storage` on | The connection survives a restart of the MCP server | The link |
+| MCP server → stack agent link | Scans, tests and evidence | The link |
+| A platform account | The MCP server changes the design and starts builds through the platform API with it | `stacktic_api_user` and `stacktic_api_key` on the MCP server |
+| The knowledge repository | What the MCP server knows about the catalog | Three lines in the MCP server's `configmap` attribute (see [MCP knowledge repository](/docs/mcp/knowledge)) |
+
+## Connect your AI client
+
+<Steps>
+  <Step title="Take the URL">
+    The address is <code>https://&lt;mcp-subdomain&gt;.&lt;your-domain&gt;/mcp</code>. The
+    subdomain is the one on the gateway → MCP server link.
+  </Step>
+  <Step title="Add it to your client">
+    <ul>
+      <li><b>Claude</b> on the web or desktop: add a custom connector with that URL.</li>
+      <li><b>Claude Code</b>: <code>claude mcp add --transport http stacktic https://&lt;mcp-subdomain&gt;.&lt;your-domain&gt;/mcp</code></li>
+      <li><b>Other clients</b>: add a remote MCP server with streamable HTTP transport.</li>
+    </ul>
+  </Step>
+  <Step title="Sign in">
+    Log in as a user of your stack's identity provider.
+  </Step>
+  <Step title="Ask where you are">
+    A good first message is: <em>"Check this MCP and tell me what is next."</em> The server
+    tests its own credentials and connections, then says which stage your stack is in.
+  </Step>
+</Steps>
+
+Details and troubleshooting are in [Connect a client](/docs/mcp/connect).
+
+## How a conversation goes
+
+The MCP server takes every stack through the same stages and tells you which one you are
+in. When you ask what to do next, it answers for that stage.
+
+| Stage | What happens | What it asks you |
+|---|---|---|
+| **Connect** | It checks its own credentials, the platform account, the stack agent and the persistent login | Nothing, unless something is missing |
+| **Design** | It draws your application and what it needs, from the real catalog | Where the code lives, public or internal, login or not, which environments |
+| **Build** | The platform generates your stack repository | It asks for confirmation before every build |
+| **Install** | Images are built in the cluster and the manifests applied | It gives the exact commands for your stack |
+| **Automate** | Argo CD and Reloader take over delivery | Which components Argo CD manages, automatic or manual sync |
+| **Secure** | Scans, fixes on the design, re-scans | It confirms each fix before applying it |
+| **Prove** | Scheduled scans and an audit trail | — |
+| **Operate** | Backups, upgrades, users, health | — |
+
+Some rules hold in every stage:
+
+- It never builds without your confirmation.
+- Every option it offers comes from the catalog.
+- It asks all its questions in one message, each with a default, so "defaults are fine" is
+  a complete answer.
+
+Clients that show MCP prompts also list the server's built-in ones, such as
+`start_here`, `deploy_my_app`, `add_to_my_app`, `is_my_stack_ok`, `security_audit`,
+`harden_my_stack` and `validate_my_stack`. Plain sentences work in every client.
+
+## How to phrase a request
+
+A request that works well has four parts. Leave out anything you do not know; the server
+asks for it, with a default.
+
+```text title="The shape of a good request"
+Goal:        <the outcome, in one sentence>
+Scope:       <the components or applications, by the names on the design page>
+Constraints: <plan only | apply after I confirm | do not build>
+Facts:       <port, framework, repository, environments: only what you know>
+```
+
+| Do | Example | Why |
+|---|---|---|
+| Say whether to act or only plan | "Show me the plan for adding a cache to `orders`. Don't change anything yet." | The server proposes before every change. Saying "plan only", or "apply after I confirm", saves a round trip |
+| Use the names on your design page | "Set `replicas` on `orders` to 3." | The server finds cells by their label. Names are lowercase letters, digits, dashes and underscores. A component is named after its type (`cnpg`, `keycloak-operator`, `stack-agent`) unless you name it |
+| Say who uses whom | "`orders` uses the invoices bucket." · "The gateway exposes `orders` publicly." | Links have a direction, and the catalog allows one direction for each pair of types |
+| Describe the need, or name the catalog's component | "a cache" or "Valkey" | Products are mapped to the catalog's equivalent: Redis to Valkey, PostgreSQL to CNPG, object storage to SeaweedFS. For something the catalog does not have, the server says so; it never invents a component |
+| Describe the effect when you do not know the attribute | "Make `orders` autoscale between 2 and 5 replicas." | The server reads the component's attributes, picks the right ones and shows you the current values first |
+| Give a whole design in one message, but changes one goal at a time | — | A design is drawn in one step. A change is easier to check and to roll back on its own |
+| Name the proof you want | "Run a penetration test on `orders`." · "Prove the link from `orders` to its database." | Each kind of check is a different tool. See [What confuses the MCP](#what-confuses-the-mcp) |
+
+"Defaults are fine" is always a complete answer to the server's questions.
+
+## A new application
+
+The best input is a **specification**. The next best is a clear description that answers
+five things:
+
+- what the application is;
+- what it needs (data, cache, queue, storage);
+- who reaches it;
+- which environments it runs in;
+- how you will know it works.
+
+These are the questions the server would otherwise ask.
+
+```text title="With a specification"
+Here is the specification of my application: <paste it>.
+Design a Stacktic stack for it. Use the catalog defaults where I did not say otherwise,
+show me the plan before you change anything, and do not build until I say so.
+```
+
+```text title="With a description"
+I am building a FastAPI service for order tracking that listens on port 8000. It needs a
+PostgreSQL database, a Redis cache and a bucket for invoices. It needs a public URL with a
+login. Environments: dev and staging. Design the stack and show me the plan first.
+```
+
+The server answers with a plan: the components, the links between them, and what each
+link generates (the variables your code will receive, the secret, the route, the network
+policy). After you confirm, it writes the design through the platform API. You see it on
+the design page.
+
+### Where the code lives
+
+It always asks this, with two options:
+
+| Option | When | What it sets on the application |
+|---|---|---|
+| **The stack's own repository, one folder per application** (the default) | Most cases. No new credential is needed | `git_owner`, `project` and `branch` from the stack's configuration, `git_folder` = `/apps/<name>`, and the stack's token. Each folder needs its own Dockerfile |
+| **A separate repository** | Another team, another release cadence, or code that will outlive the stack | `git_owner`, `project`, `branch` and `git_token`. Use the stack's token if it can read the repository, so there is one credential to rotate |
+
+With the default option, the server can write the application's first code itself. It
+writes under `apps/<name>` in the stack repository, Dockerfile included, and commits with
+the token the platform already holds. No extra link is needed. It can write only under
+`apps/`, because everything else in that repository is generated.
+
+It also sets two values that decide whether the application starts at all:
+
+- **`port`**: the port the application listens on.
+- **`framework_type`**: decides the names of the variables the application receives, for
+  example `DATABASE_URL` for Node.js and Python, or `SPRING_DATASOURCE_URL` for Spring.
+
+### Writing the code from the specification
+
+For spec-driven development of the application code (GitHub spec-kit), set the MCP
+server's `ai_workflow` attribute to `spec-kit`. Then ask:
+
+```text
+Set up spec-kit for my application.
+```
+
+The answer gives the exact install commands for each application. Later, ask *"Where is
+the development of the orders app?"*. It reads the features and tasks from the specs in
+the application's repository.
+
+## An existing application
+
+Start by choosing how the application enters the stack:
+
+| You have | Use | Note |
+|---|---|---|
+| Source code you will keep developing | An `external_source_code` component, built in the cluster from your repository | The repository needs a Dockerfile; set `dockerfile` if it is not at the folder's root |
+| A container image you already build elsewhere | An `image_base` component with the image as its `version` | Its links give the same variables as `external_source_code`; no source code is needed |
+
+<Steps>
+  <Step title="Describe the application and where its code is">
+    For example: <em>"I have an existing Node.js app in github.com/acme/shop, branch main,
+    listening on port 3000. Today it uses PostgreSQL and Redis. Add it to this stack, wire
+    it to a database and a cache, and give the MCP read access to its code."</em>
+  </Step>
+  <Step title="Choose where the code stays">
+    Keep it in its own repository: the server sets the repository and a token that can
+    clone it, the stack's token if it has access, otherwise the repository's own. Or move
+    the code into the stack's repository under <code>/apps/&lt;name&gt;</code>, with no new
+    token.
+  </Step>
+  <Step title="Give the MCP server the code">
+    If the code moved into the stack repository, the server already reaches it there. If
+    it stays in its own repository, draw an <b>MCP server → application</b> link
+    (<code>fastmcp-external_source_code</code>), one per application. The link's
+    <code>write_access</code> attribute decides whether the server may change the code;
+    without it the repository is read-only. Build, then deploy the MCP server again so it
+    picks up the repository.
+  </Step>
+  <Step title="Migrate the configuration">
+    The application must read its connections from the variables the stack gives it. Ask
+    for the change on a branch and review it before anything is pushed.
+  </Step>
+  <Step title="Build and install">
+    As for a new application.
+  </Step>
+</Steps>
+
+```text title="Migrating the configuration"
+Read my app's code and find every place it reads database, cache, queue or storage
+settings. Show me how each one maps to the variables this stack gives it, then make the
+change on a new branch and show me the diff before you push.
+```
+
+With the link in place, the server can:
+
+- clone the repository, show its structure, read and search files;
+- find its entry points and dependency files for its framework;
+- show what the application is connected to in the running stack;
+- when `write_access` is on: create a branch, write files, show the diff, and commit and
+  push.
+
+Until the link exists, the server knows the application only from what you tell it. A
+client that runs on your own machine, such as Claude Code inside the repository, can read
+the code directly.
+
+:::tip Production
+A production stack runs `image_base` with the exact image that staging built and scanned,
+not a build from source. Make it a separate system: ask the server to duplicate the
+staging design, then switch each application to `image_base`.
+:::
+
+## Designing and changing the stack
+
+The server changes the design through the platform API, so its changes appear on the
+design page. If the design page is open, reload it before you save there.
+
+| You say | What it does |
+|---|---|
+| "What does this stack contain?" | Lists the components and links of the design |
+| "Add a RabbitMQ queue to the orders app." | Finds the right component and link in the catalog, shows the plan and what the link generates, and writes it after you confirm |
+| "What does the link from my app to the database generate?" | Lists the variables, secrets and network rules that link produces |
+| "Lay out the diagram." | Arranges the drawing in zones. Only the layout changes |
+| "Validate the design." | Checks it against the rules the platform and the templates enforce |
+| "Build it." | Asks for confirmation, builds, and reads the build log |
+| "Why did the build fail?" | Explains the failure from the log and the platform's message |
+| "How do I install this?" | Gives the install route for this stack: Argo CD, the stack agent, or the exact commands |
+| "The catalog cannot do X." | Shows the gap and the closest thing the catalog can do, and prepares a request for the platform team |
+
+## Security: inspect it, then add it
+
+Security is a loop: measure, fix on the design, build, deploy, measure again. The server
+proposes each fix with what it affects, and applies it only after you confirm.
+
+| You say | What runs |
+|---|---|
+| "Is my stack secure?" or "Run a security audit." | The configuration check first, which names the attribute behind each finding. Then the cluster scans (admission policy, network, Kubernetes hardening, secrets, RBAC), the penetration test of the applications and the gateway, and the link proofs. The result is a score and the gaps by severity |
+| "Run a penetration test on the orders app." | A time-boxed test of that application's surface |
+| "Which images have critical vulnerabilities?" | The vulnerability overview. It needs a Trivy component in the stack |
+| "What is our PCI DSS position?" | The PCI DSS scan and overview. ISO 27001 works the same way |
+| "Harden my stack." | The same loop, ending with a re-scan that shows the score went up |
+
+The fixes it proposes are changes to the design:
+
+| Finding | Fix |
+|---|---|
+| Application pods run with weak settings | `security_features` on the application: `pod_security`, `read_only_fs`, `seccomp`, `no_privilege_escalation`, `no_host_access`, `no_automount`, `drop_capabilities` |
+| A route accepts too much | On the gateway → application link: `allowed_methods`, `response_headers`, `remove_response_headers`, `ssl_protocols`, `ssl_ciphers`, `cors` |
+| A weak login realm | On the identity provider: brute-force protection, password rules, email verification |
+| Secrets written into the repository | Add the External Secrets component with `external_secrets_enabled` on. Components that support it then take their credentials from the secret store instead of a secret file in the repository. `external_secret_sub` set to false keeps one component on the file |
+| No admission policies | A baseline or hardened policy plan for this topology, applied as design changes |
+| No image scanning, runtime detection or code scanning | A Trivy component, a Falco component, or SonarQube with a SonarQube → application link that has `scan_enabled` on |
+
+Network policies are not on this list because they are generated from the links on every
+build, unless the section value `microsegmentation_level` is `none`.
+
+## What to turn on in the stack agent
+
+The stack agent runs the scans, tests and evidence. These attributes are off by default,
+except where noted.
+
+| Attribute | Turn it on to |
+|---|---|
+| `ui_enabled` | Get the agent's dashboard at `/ui`. The platform's **Scans** menu opens it; it also needs a gateway → stack agent link |
+| `scan_schedule` | Run scans inside the agent on a schedule, one line per scan type, for example `rbac: 30m`, `pci: 24h full`, `all: 12h` |
+| `delta_webhook` | Send confirmed regressions, as JSON, to a URL you give |
+| `evidence_push` | Commit every scan run to your stack repository on an `evidence` branch. It uses the platform's Git credential |
+| `cve_decisions_enabled` | Let people record signed decisions about vulnerabilities, such as an accepted risk. Scanning itself is always on |
+| `nuclei` | Install the Nuclei scanner for sweeps of exposed services |
+| `deploy_access` | Let the agent deploy from the repository to the cluster. For staging and QA stacks, not production |
+| `backup_apply_access` | Let the agent run backups and restores. Reading the backup status is always available |
+| `backup_inplace_restore` | Allow a restore over live data. Needs `backup_apply_access` |
+| `design_stage_components` | List components that are drawn but not live yet. Their links count as accepted in link validation |
+| `agent_endpoint` | The agent's public address. The platform uses it to run the tests of a Test paper ([LiveView](/docs/platform/liveview)) |
+| `api_key` | The key the platform sends with those tests. Set it to the same value as `api_key` on the gateway → stack agent link, which is the key the agent checks |
+
+## What confuses the MCP
+
+### Words that mean more than one thing
+
+| Word | What it can mean in Stacktic | Say instead |
+|---|---|---|
+| deploy | Change the design, build the repository, or apply it to the cluster | "add … to the design", "build it", "install it on the cluster" |
+| push | Save & Push (regenerate the files an attribute change affects), commit application code, or mirror scan evidence to Git | "push the attribute changes", "commit the code" |
+| test | The tests of a Test paper, the predefined stack tests, link validation, a penetration test, or your application's own tests | "run the predefined tests", "prove the links", "run a penetration test" |
+| scan | The configuration check, a cluster scan, the penetration test, a sweep of exposed services (Nuclei), or image vulnerabilities | Name the scan. "Pen test" means the penetration test, not Nuclei |
+| version | The catalog version of a component type, the software version (an attribute, such as the PostgreSQL version), an image tag, or the Stacktic version of the stack-wide steps | "upgrade PostgreSQL to 17" changes the software version. Name a catalog version only if you mean one: older ones offer fewer attributes and links |
+| knowledge | The Knowledge paper of your design, or the MCP's knowledge repository | "Knowledge paper" or "knowledge repository" |
+| environment | An overlay of one design (dev, staging), or production as a separate system | "add a staging environment", "create the production system" |
+| external | A component copied from another system, the External Secrets component, or `external_source_code` (your own application) | Name the one you mean |
+| stack, system | The same thing; the platform calls it a system | Either |
+
+### Requests the server redirects
+
+| You ask | What it does instead | Why |
+|---|---|---|
+| "Create user alice in Nextcloud." | Adds alice to the identity client's `users` attribute, then builds and deploys | Users are declared in the design. An account created inside an application is drift the stack does not know about |
+| "Fix it with kubectl." or "Restart the pod." | Changes the design and rebuilds. It uses kubectl only to read pod status, events and logs, and only when kubectl access is enabled | The design is the source of truth; a change made on the cluster is overwritten by the next apply |
+| "Add X" when the catalog has no X | Shows the closest option (`image_base` runs any image, `external_source_code` runs any code, `configmap` lines carry extra settings) and sends a request to the platform team | It never invents a component, a version or a link |
+| "Add another database like the first one." | Gives the second its own name, user and password | Two instances of the same kind may not share credentials; the build rejects it |
+| "Build and deploy everything." | Asks for confirmation before the build | A build rewrites the stack repository |
+| "Remember this for next time." | Writes it into the repository, for example in the specs and task lists | Shared project state lives in the repositories, where every session and every tool can see it |
+| Anything about another stack | Works on its own stack, and on another system only when you name it exactly | Each MCP server belongs to one stack and never guesses a system name |
+
+### Situations that trip it up
+
+- **The design page is open while the server writes.** The page's next save overwrites
+  the server's change. Reload the page first.
+- **A catalog change is pending** (the yellow **Synchronize** on the design page). Builds
+  and design writes are refused until the design is synchronized. Ask the server to
+  synchronize it.
+- **Two cells share a label**, for example an application and its identity client with
+  the same name. The server cannot tell them apart; rename one.
+- **It cannot reach the code.** Without an application folder in the stack repository or
+  an MCP server → application link, it knows the application only from what you said.
+- **There is no stack agent link.** Scans, tests and evidence are not available, and the
+  server says so.
+- **Secrets in the chat.** Everything you type goes to the AI provider. The server takes
+  the stack repository's token from the platform and never needs it in the chat. Set any
+  other token yourself in the inspector's password fields, then tell the server it is set.
+- **Long operations.** A build, a penetration test and link validation take minutes. Ask
+  for progress instead of starting them again.
+- **A client that does not pass the server's instructions to the model.** Start with
+  "what is next?". The server answers through its journey tool, which carries the same
+  guidance.
+
+## The links that switch the MCP server's abilities on
+
+| Link | What it adds |
+|---|---|
+| MCP server → stack agent | Scans, tests, evidence, health, backups, lifecycle plans |
+| MCP server → application (`fastmcp-external_source_code`) | Reading the application's code; changing it when `write_access` is on |
+| MCP server → Argo CD | Seeing and syncing Argo CD applications (`write_access` for syncs) |
+| MCP server → cache | A connection that survives restarts (`client_storage`) |
+| MCP server → a database, broker or search engine | That technology's own tools |
+
+The full list is in [Tool surface](/docs/mcp/tools). How the server behaves in each kind
+of conversation is in [Working with the model](/docs/mcp/workflows).

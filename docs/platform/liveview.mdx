@@ -4,30 +4,27 @@ slug: /platform/liveview
 title: LiveView
 sidebar_label: LiveView
 sidebar_position: 4
-description: The same diagram you designed, coloured by what is actually happening in the cluster.
+description: The diagram you designed, with each component coloured by the result of its tests against the running cluster.
 ---
 
-<Hero eyebrow="Watch" title="The design, with the truth painted onto it">
-LiveView takes the diagram you drew and runs the stack's real tests against it on a cycle,
-colouring each component, sub-component and link by what the cluster says right now.
+<Hero eyebrow="Watch" title="The design, coloured by its test results">
+LiveView shows the diagram you drew with each component coloured by the result of its
+tests against the running cluster. The tests come from a Test paper in the catalog, and
+the stack agent in your system runs them.
 </Hero>
 
-## What it is
+## Opening it
 
-A second, read-only canvas that mirrors your design. It needs a **stack agent** in the
-system — that is where the tests actually execute — and it will tell you plainly if there
-isn't one rather than showing a pretty diagram with no data behind it.
+On the design page, click **Switch Paper** and choose a *Test* paper. A read-only copy of
+the drawing opens. **Switch Paper** again returns to the design.
 
-Open it from the design page with **Switch Paper**, then choose a *Test* paper. Each run
-executes that paper's catalog tests for every component, matched by component type and
-version; **Run Tests** starts a pass on demand. Results are coloured by the severity the
-tests report: critical, warning or info.
+LiveView needs a **stack agent** component in the design. The platform reaches the agent
+through two attributes of that component: `agent_endpoint` and `api_key`. Without a stack
+agent the page says so ("Stack Agent does not exist in your system!") instead of showing
+colours.
 
-Because it is the same graph, you are not reading a dashboard and mentally mapping it onto
-your architecture. The architecture *is* the dashboard.
-
-<Figure caption="The same drawing, twice. LiveView colours your design with the results of real tests the stack agent runs every cycle, so a broken relationship shows up as a red link between healthy components.">
-<svg viewBox="0 0 900 346" role="img" aria-label="LiveView is the same graph as the design, read-only, coloured by the results of real tests the stack agent runs on a cycle — so a failing relationship shows up as a red link between healthy components.">
+<Figure caption="The same drawing, twice. LiveView sends each component's tests to the stack agent and colours the component with the worst failure. Links stay grey; a failed test on a link counts towards its component's colour.">
+<svg viewBox="0 0 900 346" role="img" aria-label="LiveView is the same graph as the design, read-only. Each component is coloured by the results of the tests the stack agent ran for it: green with no failure, amber with a warning, red with a critical failure, grey with no tests. Links are not coloured.">
   <defs>
     <marker id="liveviewASteel" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-steel)" /></marker>
     <marker id="liveviewAMint" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-mint)" /></marker>
@@ -40,33 +37,35 @@ your architecture. The architecture *is* the dashboard.
   <path d="M210 158 L150 226" fill="none" stroke="var(--stk-steel)" strokeWidth="1.4" strokeOpacity="0.6" />
   <path d="M210 158 L330 116" fill="none" stroke="var(--stk-steel)" strokeWidth="1.4" strokeOpacity="0.6" />
   <path d="M210 158 L340 220" fill="none" stroke="var(--stk-steel)" strokeWidth="1.4" strokeOpacity="0.6" />
-  <path d="M582 110 L682 158" fill="none" stroke="var(--stk-mint)" strokeWidth="1.4" />
-  <path d="M682 158 L622 226" fill="none" stroke="var(--stk-mint)" strokeWidth="1.4" />
-  <path d="M682 158 L802 116" fill="none" stroke="var(--stk-mint)" strokeWidth="1.4" />
-  <path d="M682 158 L812 220" fill="none" stroke="var(--stk-red)" strokeWidth="2" />
+  <path d="M582 110 L682 158" fill="none" stroke="var(--stk-steel)" strokeWidth="1.4" strokeOpacity="0.6" />
+  <path d="M682 158 L622 226" fill="none" stroke="var(--stk-steel)" strokeWidth="1.4" strokeOpacity="0.6" />
+  <path d="M682 158 L802 116" fill="none" stroke="var(--stk-steel)" strokeWidth="1.4" strokeOpacity="0.6" />
+  <path d="M682 158 L812 220" fill="none" stroke="var(--stk-steel)" strokeWidth="1.4" strokeOpacity="0.6" />
   <circle cx="110" cy="110" r="7" fill="var(--stk-blue)" />
   <circle cx="210" cy="158" r="7" fill="var(--stk-blue)" />
   <circle cx="150" cy="226" r="7" fill="var(--stk-blue)" />
   <circle cx="330" cy="116" r="7" fill="var(--stk-blue)" />
   <circle cx="340" cy="220" r="7" fill="var(--stk-blue)" />
   <circle cx="582" cy="110" r="7" fill="var(--stk-mint)" />
-  <circle cx="682" cy="158" r="13" fill="var(--stk-mint)" fillOpacity="0.16" />
-  <circle cx="682" cy="158" r="7" fill="var(--stk-mint)" />
+  <circle cx="682" cy="158" r="13" fill="var(--stk-amber)" fillOpacity="0.16" />
+  <circle cx="682" cy="158" r="7" fill="var(--stk-amber)" />
   <circle cx="622" cy="226" r="7" fill="var(--stk-mint)" />
   <circle cx="802" cy="116" r="7" fill="var(--stk-steel)" />
-  <circle cx="812" cy="220" r="7" fill="var(--stk-mint)" />
+  <circle cx="812" cy="220" r="13" fill="var(--stk-red)" fillOpacity="0.16" />
+  <circle cx="812" cy="220" r="7" fill="var(--stk-red)" />
   <circle cx="686" cy="320" r="15" fill="var(--stk-mint)" fillOpacity="0.16" />
   <circle cx="686" cy="320" r="9" fill="var(--stk-mint)" />
   <circle cx="48" cy="312" r="5" fill="var(--stk-mint)" />
-  <circle cx="158" cy="312" r="5" fill="var(--stk-red)" />
-  <circle cx="268" cy="312" r="5" fill="var(--stk-steel)" />
+  <circle cx="138" cy="312" r="5" fill="var(--stk-amber)" />
+  <circle cx="228" cy="312" r="5" fill="var(--stk-red)" />
+  <circle cx="318" cy="312" r="5" fill="var(--stk-steel)" />
   <text x="40" y="45" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">DESIGN VIEW</text>
   <text x="110" y="132" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">gw</text>
   <text x="210" y="180" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">your app</text>
   <text x="150" y="248" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">db</text>
   <text x="330" y="138" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">cache</text>
   <text x="340" y="242" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">queue</text>
-  <text x="512" y="45" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">LIVEVIEW · READ-ONLY</text>
+  <text x="512" y="45" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">LIVEVIEW · TEST PAPER · READ-ONLY</text>
   <text x="582" y="132" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">gw</text>
   <text x="682" y="180" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">your app</text>
   <text x="622" y="248" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">db</text>
@@ -74,59 +73,74 @@ your architecture. The architecture *is* the dashboard.
   <text x="812" y="242" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">queue</text>
   <rect x="412.4" y="124.9" width="75.2" height="18.2" rx="4" fill="var(--stk-panel-2)" />
   <text x="450" y="137.672" fontSize="10.2" fill="var(--stk-steel)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">same graph</text>
-  <rect x="732.28" y="174.9" width="87.44" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
-  <rect x="732.28" y="174.9" width="87.44" height="18.2" rx="9.1" fill="var(--stk-red)" fillOpacity="0.14" stroke="var(--stk-red)" strokeOpacity="0.6" strokeWidth="1" />
-  <text x="776" y="187.672" fontSize="10.2" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">link failing</text>
-  <text x="704" y="324" fontSize="11.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">stack agent · tests every cycle</text>
-  <text x="58" y="316" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">passed</text>
-  <text x="168" y="316" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">failed</text>
-  <text x="278" y="316" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">no result yet</text>
+  <rect x="742.28" y="186.9" width="99.44" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="742.28" y="186.9" width="99.44" height="18.2" rx="9.1" fill="var(--stk-red)" fillOpacity="0.14" stroke="var(--stk-red)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="792" y="199.672" fontSize="10.2" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">critical failed</text>
+  <text x="704" y="324" fontSize="11.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">stack agent · runs the paper's tests</text>
+  <text x="58" y="316" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">no failure</text>
+  <text x="148" y="316" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">warning</text>
+  <text x="238" y="316" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">critical</text>
+  <text x="328" y="316" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">no tests</text>
 </svg>
 </Figure>
 
-## What it shows
+## How a run works
 
-| Element | What its colour means |
+<Steps>
+  <Step title="One request per component">
+    The page sends each component's type, version and the name of the Test paper to the
+    platform.
+  </Step>
+  <Step title="The catalog supplies the tests">
+    The platform looks up the tests the catalog defines for that component type and version
+    in that paper. A component with no tests there turns grey.
+  </Step>
+  <Step title="The stack agent runs them">
+    Each test (its command, target, filter and severity) is sent to the stack agent. The
+    agent runs it against the cluster, using the stack's metadata to find what the test
+    targets, and posts the result back to the platform.
+  </Step>
+  <Step title="Results colour the drawing">
+    Results reach the page over a live connection and colour the component as they arrive.
+  </Step>
+</Steps>
+
+The tests run once when the paper opens. **Run Tests** clears the colours and runs them all
+again. Right-click a component to run only its tests, or to read its last results. Nothing
+re-runs on its own.
+
+## What the colours mean
+
+| Colour | Meaning |
 |---|---|
-| **Component** | The result of that component's own tests |
-| **Sub-component** | The result for that specific database, bucket, topic or queue |
-| **Link** | Whether that declared relationship is currently proven |
+| Red | At least one test of the component failed with severity *critical* |
+| Amber | At least one failed with severity *warning*, and none with *critical* |
+| Green | No test failed. A failed test with severity *info* also leaves it green |
+| Grey | The paper has no tests for this component type and version, or no result has arrived |
 
-Everything starts neutral and is coloured as results arrive, so a cell with no result yet is
-visibly different from a cell that passed.
+A sub-component takes the colour of the component that owns it. Links are not coloured.
+A test that targets a component's links counts towards the component's colour.
 
-## What you can do in it
+## Reading the results
 
-<Cards cols={2}>
-  <Card kicker="Cycle" title="Run continuously">
-    Tests run on a cycle, so the picture keeps up with the cluster instead of being a
-    snapshot you took once.
-  </Card>
-  <Card kicker="Scope" title="Run for one cell">
-    Right-click a component to run just its tests, or to open its last results.
-  </Card>
-  <Card kicker="Inspect" title="Read the results">
-    Open the result behind any colour: which test, what ran, what came back.
-  </Card>
-  <Card kicker="Share" title="Export the view">
-    Export the live diagram as an image for a status update, a review or an incident
-    record.
-  </Card>
-</Cards>
+The results panel of a component has one tab per target: the component itself, its
+sub-components, its links to and from other components, its sub-components' links, and its
+attributes. Each tab shows how many results it holds and their worst severity. Each result
+shows passed, warning or failed, its target, its description and the steps it ran.
 
-## Why it is the natural incident view
+## Where the tests come from
 
-When something breaks, the question is rarely "is this pod up". It is *which relationship
-stopped working*. A red link between two green components is an answer; two red components
-with no link information is a search.
+Tests are catalog objects. Each belongs to one component type and version and to one Test
+paper, and is managed under **Catalog → Tests**. Because tests belong to types and not to
+your system, adding a component to a design brings its tests with it. A Test paper groups
+tests for one purpose, so the same drawing can be checked against different papers.
 
-For the detail behind a red link — which of wiring, secret, network, access or protocol
-failed — the same engine's link validation gives the layer by name.
+The stack agent also has its own validation, independent of papers. It proves every
+declared link layer by layer: wiring, secret, network, access and protocol. See
+[Validation](/docs/day2/validation).
 
-→ [Validation](/docs/day2/validation)
+## Why it is the same drawing
 
-## The design view and the live view are the same drawing
-
-That is the whole point, and it is only possible because the topology is declared rather
-than inferred. Nothing has to be mapped, tagged or kept in sync between a design tool and a
-monitoring tool, because there is one graph.
+The topology is declared rather than discovered. That is why the drawing you designed can
+show test results directly, with nothing to map, tag or keep in sync between a design tool
+and a monitoring tool.

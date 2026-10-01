@@ -1,129 +1,307 @@
 ---
 id: platform-index
 slug: /platform/
-title: The platform
-sidebar_label: Overview
+title: The platform, screen by screen
+sidebar_label: Screen by screen
 sidebar_position: 1
-description: The design surface where a system is drawn, versioned, built, watched live and rolled back.
+description: Every screen and button of the Stacktic web application, what each one does, and what it changes in your generated repository.
 ---
 
-<Hero eyebrow="The platform" title="Where the graph lives">
-The MCP server is how an AI works with a stack. The platform is where the stack exists —
-the canvas, the catalog, the versions, the collaborators, the live view and the history
-you can return to.
+<Hero eyebrow="The platform" title="The platform, screen by screen">
+The platform is the web application where you draw a system, configure it, build it into
+a Git repository and keep every version of it. This page walks through it in the order you
+meet it and says what each screen and button does.
 </Hero>
 
-## What it is
+## The menu
 
-A system is drawn on a canvas: components, sub-components and links, each carrying
-attributes from a version-pinned catalog. That drawing is the graph. Everything else in
-Stacktic reads it, generates from it, measures against it or returns to an earlier version
-of it.
+| Menu entry | What it is |
+|---|---|
+| **Systems** | Your systems and the ones shared with you, in folders |
+| **Design** | The canvas where the system is drawn. Most of this page is about it |
+| **Configuration** | The system's Git repository, image registry, domain, environments and secret encryption |
+| **Build** | Generates the repository from the drawing, in full or for selected components |
+| **History** | Every save and every build, with a diff between any two and rollback |
+| **Collaborators** | Who has which role on the system, including roles that expire |
+| **Scans** | Opens the stack agent's dashboard for this system |
+| **Components**, **Attributes**, **Suggestions**, **Sections**, **Papers**, **Tests** | The catalog: what systems are drawn from |
+| **Profile**, **Git access tokens**, **Registry** | Your account, credentials for your own template repositories, and your organisation's systems |
 
-<Cards>
-  <Card to="/docs/platform/systems" kicker="Work" title="Systems and builds">
-    Create, save, validate, build, push. Folders, visibility, environments and the file
-    divergence list.
-  </Card>
-  <Card to="/docs/platform/history" kicker="Time" title="History and rollback">
-    Every save and every build is a version. Diff any two, and return to any of them.
-  </Card>
-  <Card to="/docs/platform/liveview" kicker="Watch" title="LiveView">
-    The same diagram, coloured by what is actually happening in the cluster right now.
-  </Card>
-  <Card to="/docs/platform/sections" kicker="Guide" title="Catalog, sections and suggestions">
-    System-wide settings, and the platform telling you what your drawing is missing.
-  </Card>
-  <Card to="/docs/platform/collaboration" kicker="People" title="Collaboration">
-    Roles, temporary access with an audit trail, and systems that share cells.
-  </Card>
-  <Card to="/docs/reference/api" kicker="Automate" title="Programmatic access">
-    The same operations, over the API — which is what the MCP write tools use.
-  </Card>
-</Cards>
+Design, Configuration, Build, History, Collaborators and Scans appear once a system is
+open. The administration pages (licences, catalog distribution to other instances,
+organisations) are for whoever operates the platform instance and play no part in
+designing a stack.
 
-<Figure caption="Everything on the platform is organised around one graph: validated by the catalog, snapshotted by history, mirrored by LiveView, rendered by the build, shared by collaborators, and written by the API and MCP.">
-<svg viewBox="0 0 900 404" role="img" aria-label="The platform holds the graph at the centre. The catalog validates it, history snapshots it, LiveView mirrors it, the build renders it, collaborators share it, and the API and MCP write to it.">
-  <defs>
-    <marker id="platHubAViolet" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-violet)" /></marker>
-  </defs>
-  <path d="M240 64 C295 64 295 170 350 170" fill="none" stroke="var(--stk-blue)" strokeWidth="1.3" />
-  <path d="M660 64 C605 64 605 170 550 170" fill="none" stroke="var(--stk-steel)" strokeWidth="1.3" />
-  <path d="M700 202 C625 202 625 202 550 202" fill="none" stroke="var(--stk-mint)" strokeWidth="1.3" />
-  <path d="M660 340 C605 340 605 234 550 234" fill="none" stroke="var(--stk-git)" strokeWidth="1.3" />
-  <path d="M240 340 C295 340 295 234 350 234" fill="none" stroke="var(--stk-violet)" strokeWidth="1.3" />
-  <path d="M200 202 C275 202 275 202 350 202" fill="none" stroke="var(--stk-violet)" strokeWidth="1.3" markerEnd="url(#platHubAViolet)" />
-  <rect x="350" y="136" width="200" height="132" rx="12" fill="var(--stk-panel)" />
-  <rect x="350" y="136" width="200" height="132" rx="12" fill="var(--stk-amber)" fillOpacity="0.11" stroke="var(--stk-amber)" strokeOpacity="1" strokeWidth="1.6" />
-  <path d="M390 196 L448 166" stroke="var(--stk-amber)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
-  <path d="M448 166 L494 204" stroke="var(--stk-amber)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
-  <path d="M494 204 L460 248" stroke="var(--stk-amber)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
-  <path d="M460 248 L406 254" stroke="var(--stk-amber)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
-  <path d="M406 254 L390 196" stroke="var(--stk-amber)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
-  <path d="M390 196 L494 204" stroke="var(--stk-amber)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
-  <path d="M448 166 L460 248" stroke="var(--stk-amber)" strokeOpacity="0.55" strokeWidth="1.1" fill="none" />
-  <rect x="40" y="34" width="200" height="60" rx="12" fill="var(--stk-panel)" />
-  <rect x="40" y="34" width="200" height="60" rx="12" fill="var(--stk-blue)" fillOpacity="0.045" stroke="var(--stk-blue)" strokeOpacity="0.5" strokeWidth="1.1" />
-  <rect x="660" y="34" width="200" height="60" rx="12" fill="var(--stk-panel)" />
-  <rect x="660" y="34" width="200" height="60" rx="12" fill="var(--stk-steel)" fillOpacity="0.045" stroke="var(--stk-steel)" strokeOpacity="0.5" strokeWidth="1.1" />
-  <rect x="700" y="172" width="200" height="60" rx="12" fill="var(--stk-panel)" />
-  <rect x="700" y="172" width="200" height="60" rx="12" fill="var(--stk-mint)" fillOpacity="0.045" stroke="var(--stk-mint)" strokeOpacity="0.5" strokeWidth="1.1" />
-  <rect x="660" y="310" width="200" height="60" rx="12" fill="var(--stk-panel)" />
-  <rect x="660" y="310" width="200" height="60" rx="12" fill="var(--stk-git)" fillOpacity="0.045" stroke="var(--stk-git)" strokeOpacity="0.5" strokeWidth="1.1" />
-  <rect x="40" y="310" width="200" height="60" rx="12" fill="var(--stk-panel)" />
-  <rect x="40" y="310" width="200" height="60" rx="12" fill="var(--stk-violet)" fillOpacity="0.045" stroke="var(--stk-violet)" strokeOpacity="0.5" strokeWidth="1.1" />
-  <rect x="0" y="172" width="200" height="60" rx="12" fill="var(--stk-panel)" />
-  <rect x="0" y="172" width="200" height="60" rx="12" fill="var(--stk-violet)" fillOpacity="0.045" stroke="var(--stk-violet)" strokeOpacity="0.5" strokeWidth="1.1" />
-  <circle cx="390" cy="196" r="4" fill="var(--stk-amber)" />
-  <circle cx="448" cy="166" r="4" fill="var(--stk-amber)" />
-  <circle cx="494" cy="204" r="4" fill="var(--stk-amber)" />
-  <circle cx="460" cy="248" r="4" fill="var(--stk-amber)" />
-  <circle cx="406" cy="254" r="4" fill="var(--stk-amber)" />
-  <text x="364" y="156" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">YOUR SYSTEM</text>
-  <text x="364" y="173" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">the graph</text>
-  <text x="53" y="55" fontSize="12.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">catalog</text>
-  <text x="53" y="70" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">validates every cell</text>
-  <rect x="269.64" y="99.9" width="50.72" height="18.2" rx="4" fill="var(--stk-panel-2)" />
-  <text x="295" y="112.672" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">checks</text>
-  <text x="673" y="55" fontSize="12.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">history</text>
-  <text x="673" y="70" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">every save is a version</text>
-  <rect x="570.46" y="99.9" width="69.08" height="18.2" rx="4" fill="var(--stk-panel-2)" />
-  <text x="605" y="112.672" fontSize="10.2" fill="var(--stk-steel)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">snapshots</text>
-  <text x="713" y="193" fontSize="12.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">LiveView</text>
-  <text x="713" y="208" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">coloured by the cluster</text>
-  <rect x="596.58" y="200.9" width="56.84" height="18.2" rx="4" fill="var(--stk-panel-2)" />
-  <text x="625" y="213.672" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">mirrors</text>
-  <text x="673" y="331" fontSize="12.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">build · push</text>
-  <text x="673" y="346" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">generates the repository</text>
-  <rect x="576.58" y="285.9" width="56.84" height="18.2" rx="4" fill="var(--stk-panel-2)" />
-  <text x="605" y="298.672" fontSize="10.2" fill="var(--stk-git)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">renders</text>
-  <text x="53" y="331" fontSize="12.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">collaborators</text>
-  <text x="53" y="346" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">roles · temporary access</text>
-  <rect x="269.64" y="285.9" width="50.72" height="18.2" rx="4" fill="var(--stk-panel-2)" />
-  <text x="295" y="298.672" fontSize="10.2" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">shares</text>
-  <text x="13" y="193" fontSize="12.8" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">API · MCP</text>
-  <text x="13" y="208" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">programmatic changes</text>
-  <rect x="249.64" y="200.9" width="50.72" height="18.2" rx="4" fill="var(--stk-panel-2)" />
-  <text x="275" y="213.672" fontSize="10.2" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">writes</text>
-</svg>
-</Figure>
+## Systems
 
-## The three things it guarantees
+Each system is a card showing the picture of its last save, its status and the date of its
+last change. On your own systems the card has three icons:
 
-<Steps>
-  <Step title="The drawing is always valid against the catalog">
-    Names are unique and well-formed, every component exists in the catalog at the version
-    it claims, every attribute is one the catalog defines with a value the catalog allows,
-    every sub-component sits under a parent that can own it, and every link is one the
-    catalog permits between those two types. A drawing that violates any of this cannot be
-    built through the API.
-  </Step>
-  <Step title="Every state is recoverable">
-    Each save and each build is stored with its diagram. Nothing is lost by changing your
-    mind.
-  </Step>
-  <Step title="Your edits to the generated repository survive">
-    Files you asked the platform to leave alone stay yours, and a conflict stops a push
-    rather than committing over your work.
-  </Step>
-</Steps>
+| Icon | Does |
+|---|---|
+| Pencil | Renames the system |
+| Bin | Deletes it. Copies of its cells held by other systems are detached first |
+| Eye | Publishes the system's cells. While the eye is open, its components are offered under **External systems** on the design page of everyone who has a role on it |
+
+**Personal systems** are the ones you are admin on. **Shared systems** are the ones
+someone gave you a role on. Folders organise both. A new system needs a title that is
+unique among your systems. It starts with a default configuration (images built with
+Kaniko, one environment called `dev`) and you as its admin.
+
+A system's status is one of *Created*, *Saved*, *Building*, *Generated* or *Failed*.
+
+:::caution Rename before you publish
+Systems that hold copies of your cells find your system by its title. Renaming a
+published system silently breaks their link back to it.
+:::
+
+## Design
+
+The design page has four areas: the component panel on the left, the canvas in the middle,
+the toolbar above it, and the inspector on the right, which shows the selected cell.
+
+### The component panel
+
+The panel lists the catalog in groups such as Frontend, Backend, Data and Authentication.
+The groups and their order come from the catalog. The search box filters every group.
+Drag an entry onto the canvas to add that component.
+
+The **Draw** group holds plain shapes, like rectangles and ellipses, for zones and notes.
+Boxes such as *Platform ops* or *Security & policy* are drawn with them. They are for
+drawing only: generation reads components, sub-components and links, and ignores
+everything else on the canvas.
+
+The label at the top of the panel switches it to **External systems**. This lists the
+components of the published systems you have a role on. A system with a pending catalog
+change is left out until it is synchronized. When you drop one of these components:
+
+- a copy is added, named after its system: `<system title>_<component name>`;
+- its sub-components come with it;
+- its links to other copies already on your canvas are recreated.
+
+You link your own components to a copy like to any other. Two copies from the same system
+cannot be linked to each other, because their links belong to the system they come from.
+What a copy generates is covered in
+[Collaboration](/docs/platform/collaboration#systems-that-share-cells).
+
+### Drawing
+
+Select a component and handles appear around it:
+
+| Handle | Does |
+|---|---|
+| Link | Drag to another component to connect the two |
+| Connections | Lists the components on the canvas this one may link to; click one to create the link |
+| Add sub-component | Lists the sub-components the catalog lets this component own, such as a database, a bucket, a topic or a client |
+| Unlink | Removes every link of the component |
+| Remove | Deletes the component |
+| Rotate | Rotates it |
+
+You can only draw a link where the catalog defines one between those two component types,
+and only once in each direction. The new link is named after both types,
+`<source type>-<target type>` (for example `fastapi-db`). That name is what the templates
+read. The link takes its default attributes from the catalog. It also takes the catalog's
+colour for that link type, which is why links on the canvas have different colours.
+
+Right-click a component or a link for **Copy**, **Paste** and **Guide**. The guide is the
+catalog's documentation for that component type or link type, when it has one.
+
+The usual shortcuts work: `Ctrl+C`, `Ctrl+V`, `Ctrl+X`, `Delete`, `Ctrl+Z`, `Ctrl+Y`,
+`Ctrl+A`, `Ctrl+plus`, `Ctrl+minus`. `Ctrl+S` is **Save & Render**.
+
+### The inspector
+
+The inspector shows the selected component:
+
+- its name;
+- its catalog version;
+- the environments it is deployed to (`dev` by default);
+- its attributes, grouped as the catalog groups them: *Information*, *Configuration*,
+  *Deploy*, *Resources*, *Auto-Scaling*, *Security*, *Access Control*, *Keys & Access*,
+  *Tuning* and *Unique attributes*.
+
+Each field has the type the catalog gives it: text, long text, toggle, single or multiple
+choice, code editor or password. A choice field offers only the catalog's options. The
+*Design* group sets the component's colours and image.
+
+Two fields behave differently:
+
+- **Open Helm Editor** appears on components installed from a Helm chart. It renders the
+  component's Helm values from the canvas as it is now, unsaved changes included, and
+  marks the keys Stacktic sets from the design. You can add values. The editor refuses a
+  change to a marked key and a duplicate key.
+- **External systems** appears on a published component and lists the systems that hold
+  a copy of it.
+
+### The toolbar
+
+| Button | What it does |
+|---|---|
+| **Save & Render** | Stores the drawing as a new version (a row in History) and copies your changes into systems that hold copies of your cells. Then, in the background, it validates the drawing against the catalog and renders the components whose configuration changed. Moving cells without changing anything else renders nothing. If validation fails, the errors appear on that save's row in History and nothing is rendered |
+| **Save & Push** | Saves, then regenerates only the files whose templates read an attribute you changed since the last push, and commits them. The log lists the `kubectl apply` commands for exactly those files. It refuses when you added or removed a component, sub-component or link; run a Build for that. It commits nothing if the merge into your branch conflicts. A push leaves no row in History |
+| **Undo**, **Redo** | Undo and redo changes on the canvas |
+| **Clear Paper** (bin icon) | Empties the canvas. Nothing is stored until you save |
+| **SVG** | Opens the drawing as an SVG image |
+| **Export**, **Import** | Export downloads the drawing as `system.json`. Import replaces the canvas with one and drops any component that is not in the catalog |
+| **Send To Front**, **Send To Back** | Change which overlapping cell is on top |
+| **Sections** | System-wide values, and a set of attributes edited across every component at once. See [Catalog and sections](/docs/platform/sections) |
+| **Synchronize** | Appears, in yellow, only when the catalog changed a component type this design uses. Both save buttons stay disabled until you click it. It brings the attributes, links and sub-components of those cells up to the new catalog definition, and removes cells whose type was deleted |
+| **Zoom to fit**, zoom slider | Fit the drawing to the window; zoom in and out |
+| **Links Visibility** | Hides or shows the links of each component. It only changes the display, never what is generated |
+| **Show suggestions** | Makes components that match a catalog suggestion blink; click one to read the suggestion. Suggestions are evaluated each time you save with the box ticked |
+| **Switch Paper** | Opens the drawing as a Rationale paper or a Test paper, described next |
+
+Both save buttons check one rule in the browser before saving: two components may not
+share a namespace. Apart from that, catalog validation never blocks a save on this page.
+It runs in the background after Save & Render, is listed on the build page, and is
+enforced by the API.
+
+### Papers: more layers on the same drawing
+
+**Switch Paper** lists the papers you can use, yours and Stacktic's, grouped by category.
+A paper shows the same drawing with another layer on it. **Switch Paper** again returns to
+the design.
+
+| Paper | What you see | Where it comes from |
+|---|---|---|
+| **Rationale** | A *Rationale* field on every component, sub-component and link, for why it exists, what it carries and which rule of the application depends on it. *Show Rationale Graph* opens one cell with its links, its neighbours and their texts | Written by people or by an AI, stored in the drawing and saved with each version. Nothing generated reads it. See [Knowledge](/docs/platform/knowledge) |
+| **Test** | Each component coloured by the result of its tests against the running cluster: red for critical, amber for warning, green when nothing failed, grey when it has no tests | The tests the catalog attaches to each component type in that paper, run by the system's stack agent. See [LiveView](/docs/platform/liveview) |
+| **Data** | Listed, but opening one does nothing yet | — |
+
+## Configuration
+
+This page holds what the system needs to build and push. Every value on it reaches every
+template of the system. That is how one domain or one registry setting ends up in every
+manifest.
+
+| Field | Passed to templates as | Used for |
+|---|---|---|
+| Registry host, authentication URI, project, username, password, email | `registry_*` | Where images are pushed and pulled, and the pull secret |
+| Git host, project, Azure repository, owner, branch, username, email, password | `git_*` | The repository the build commits to. **Test Connection** checks it |
+| Build namespace, build branch | `build_namespace`, `build_branch` | Where the in-cluster image builds run, and the branch they read source from |
+| Image builder: Kaniko or BuildKit | `build_type` | Which builder the image-build manifests use |
+| Domain | `domain` | Every hostname the stack exposes is a subdomain of it |
+| Environments | the environment list | The environments each component can be placed in. Every environment a component is in gets its own overlay folder |
+| SOPS enabled, Age recipients, Age secret key | `sops_*` | Encrypting the secrets written to the repository |
+
+The system's title is passed as `system_name`. The configuration can be exported and
+imported. Admins, maintainers and security auditors can open this page.
+
+## Build
+
+The build page first lists the drawing's validation errors (component type, attribute,
+value and message), then offers four actions.
+
+| Action | What it does |
+|---|---|
+| **Build** | Renders every component from its template, runs the stack-wide generation steps and commits the result. If the system shares cells with other systems, you first choose which shared components are rendered into your repository (see [What a copy generates](/docs/platform/collaboration#what-a-copy-generates)). Then you choose the *Stacktic version* (the version of the stack-wide steps) and whether to merge into your branch |
+| **Fast Build** | Renders only the components you tick, with their sub-components, then runs the stack-wide steps and commits. Components you did not tick keep the output of the last build, even when they read something you changed. The page warns about this |
+| **Push** | Commits the whole system from what the last Save & Render already rendered, plus the stack-wide steps. It is a full build without waiting for rendering. It is refused until that background render has finished |
+| **Cancel Build** | Stops a running build between steps and between components |
+
+**Merging into your branch.** Stacktic commits to its own branch and merges it into
+yours. With merge on, the build lists every file in your repository that differs from
+what Stacktic would write. For each file you choose:
+
+- *merge*, the default;
+- *overwrite*, to take Stacktic's version;
+- *ignore*, to leave the file alone from now on.
+
+Ignore choices are remembered for later builds and pushes. A build that still conflicts
+commits the conflict markers and lists the files in its log. A push that conflicts commits
+nothing.
+
+The build log streams while the build runs and stays on the build's row in History.
+
+## History
+
+There is one row per save and per build. Each row shows the ID, message, status, whether
+it merged, the Stacktic version, who made it and when.
+
+- **Compare** shows the difference between two versions, cell by cell.
+- **Rollback** loads a version's drawing onto the canvas without saving it. It becomes the
+  current version when you save.
+
+Pushes are not recorded here. See [History and rollback](/docs/platform/history).
+
+## Collaborators
+
+| Role | Can |
+|---|---|
+| Admin | Everything, including managing collaborators |
+| Maintain | Design, build, push, configuration |
+| Write | Design, build, push |
+| Security auditor | Read the system and open its configuration |
+| Read | See the system |
+
+A role can be given until a date (UTC), with a reason. When that date passes, the person
+goes back to the role they had before. **Roles history** keeps every grant, change, expiry
+and revocation. See [Collaboration](/docs/platform/collaboration).
+
+## Scans
+
+**Scans** opens the stack agent's dashboard (scans, scores, evidence) in a new tab at
+`<subdomain>.<domain>/ui/`. The subdomain is the one set on the link from the API gateway
+(APISIX) to the stack agent. Until the design has that link, the menu entry says so instead
+of opening. See [The stack agent](/docs/day2/).
+
+## The catalog
+
+| Page | Holds |
+|---|---|
+| **Components** | One entry per component type and version, holding: <ul><li>its technical ID, which is the name of its template folder;</li><li>label, description, family (its group in the component panel) and logo;</li><li>its attributes, with defaults and allowed values;</li><li>the sub-components it can own;</li><li>the links it can have to and from other types, each with attributes, a colour and a guide;</li><li>its guides;</li><li>the Git repository and branch its template lives in.</li></ul>One version of each type is the default |
+| **Attributes** | Attribute definitions: technical ID (the name templates read), label, group, type, allowed options and a validation pattern |
+| **Suggestions** | Rules checked against a drawing: a required component, a link to or from a type, or an attribute value. A match puts a suggestion on the component |
+| **Sections** | System-wide attributes, plus a chosen set of component attributes to edit across a design from one tab |
+| **Papers** | Rationale, Test and Data papers, yours and Stacktic's |
+| **Tests** | For each component type and version, the tests in each Test paper. A test has a command, a target, a filter, a severity, messages and a recommendation (below) |
+
+**Test targets** are what a test checks:
+
+- the component itself;
+- its sub-components;
+- its links to other components;
+- its links from other components;
+- its sub-components' links;
+- its attributes.
+
+A test's severity is *info*, *warning* or *critical*. It has one message for success and
+one for failure, plus a recommendation.
+
+Changing a component type in the catalog notifies every system that uses it. Those
+designs show **Synchronize** until they take the change.
+
+A component type of your own can come with a template that Stacktic writes for you. With
+*auto source code* or *auto Helm* set, saving the type writes a starter template into its
+Git repository and pushes it. See [Your own components](/docs/platform/custom-components).
+
+## Your account
+
+- **Profile**: your name and email.
+- **Git access tokens**: username and password pairs for the Git repositories that hold
+  your own component templates. A catalog component points at one of them.
+- **Registry**: your organisation's systems, with their owner and who they are shared
+  with.
+
+## What happens when you build
+
+Each component is rendered from its template. The template receives:
+
+- the component and its attributes;
+- its links in both directions, with the component at the other end of each;
+- its sub-components;
+- every other component of the system;
+- the configuration values above.
+
+Then the stack-wide steps run, in this order:
+
+| Step | Runs when |
+|---|---|
+| Write `stack-metadata.yaml`, the machine-readable description of the whole graph | Always |
+| Generate network policies from the links | Unless the section value `microsegmentation_level` is `none`. The value `pci_dss_strict` generates the strict set |
+| Add content checksums, so that a changed secret or configuration restarts its pods | When `checksum_annotations` is `true` |
+| List every image and rewrite the manifests to pull from your registry | When `air_gapped` is `true` |
+
+The output of all components is then merged into one repository tree and committed. The
+tree has `k8s/build`, `k8s/deploy` (one overlay per environment), `doc` and `scripts`.
+See [From graph to repository](/docs/day0/graph-to-code).

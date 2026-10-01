@@ -12,23 +12,10 @@ module.exports = {
     },
     {
       type: 'category',
-      label: 'Build with AI',
+      label: 'The platform',
       collapsed: false,
       items: [
-        { type: 'doc', id: 'mcp/mcp-index', label: 'MCP — the AI interface' },
-        { type: 'doc', id: 'mcp/mcp-quickstart', label: 'Quickstart — initiator stack' },
-        { type: 'doc', id: 'mcp/mcp-connect', label: 'Connect a client' },
-        { type: 'doc', id: 'mcp/mcp-tools', label: 'Tool surface' },
-        { type: 'doc', id: 'mcp/mcp-knowledge', label: 'Knowledge layer' },
-        { type: 'doc', id: 'mcp/mcp-workflows', label: 'Working with the model' },
-      ],
-    },
-    {
-      type: 'category',
-      label: 'The platform',
-      collapsed: true,
-      items: [
-        { type: 'doc', id: 'platform/platform-index', label: 'Overview' },
+        { type: 'doc', id: 'platform/platform-index', label: 'Screen by screen' },
         { type: 'doc', id: 'platform/platform-systems', label: 'Systems and builds' },
         { type: 'doc', id: 'platform/platform-history', label: 'History and rollback' },
         { type: 'doc', id: 'platform/platform-liveview', label: 'LiveView' },
@@ -36,6 +23,20 @@ module.exports = {
         { type: 'doc', id: 'platform/platform-custom-components', label: 'Your own components' },
         { type: 'doc', id: 'platform/platform-collaboration', label: 'Collaboration' },
         { type: 'doc', id: 'platform/platform-knowledge', label: 'Knowledge' },
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Build with AI',
+      collapsed: false,
+      items: [
+        { type: 'doc', id: 'mcp/mcp-index', label: 'MCP — the AI interface' },
+        { type: 'doc', id: 'mcp/mcp-quickstart', label: 'Quickstart — initiator stack' },
+        { type: 'doc', id: 'mcp/mcp-connect', label: 'Connect a client' },
+        { type: 'doc', id: 'mcp/mcp-vibe-coding', label: 'Vibe coding with Stacktic' },
+        { type: 'doc', id: 'mcp/mcp-tools', label: 'Tool surface' },
+        { type: 'doc', id: 'mcp/mcp-knowledge', label: 'MCP knowledge repository' },
+        { type: 'doc', id: 'mcp/mcp-workflows', label: 'Working with the model' },
       ],
     },
     {

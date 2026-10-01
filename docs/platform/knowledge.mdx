@@ -4,14 +4,29 @@ slug: /platform/knowledge
 title: Knowledge
 sidebar_label: Knowledge
 sidebar_position: 7
-description: Writing the why behind every component and link into the graph itself, and reading it back as a page of the design.
+description: Papers are layers on top of the topology. A Rationale paper explains why each component and link exists; a Test paper checks each component against the running cluster.
 ---
 
-<Hero eyebrow="Guide" title="The graph knows what; Knowledge says why">
-A drawing says that a topic feeds a database. It does not say what the data is, why that
-sink was chosen, or which business rule depends on it. Knowledge is that text, written
-on the cell itself, kept with the design, and shown as its own page of the diagram.
+<Hero eyebrow="Guide" title="A layer of knowledge on top of the topology">
+The topology says what exists and how it is wired, and it is what Stacktic generates from.
+Papers add layers to the same drawing, cell by cell. A Rationale paper explains why each
+component and link is there: the logic of the application. A Test paper checks each
+component against the running cluster.
 </Hero>
+
+## Two layers on one drawing
+
+| Layer | Holds | Stored | Read by |
+|---|---|---|---|
+| **Topology** | Components, sub-components, links and their attributes | In the drawing | The build: every template, every stack-wide step |
+| **Rationale paper** | One text per component, sub-component and link: why it exists, what data it carries, which business rule depends on it, what breaks without it | In the drawing, next to each cell, saved with every version | People, AI clients through the MCP, and the Rationale Graph. Never the build |
+| **Test paper** | Tests per component type and version: a command, a target, a filter, a severity and what success or failure means | In the catalog, so a component brings its tests to every design | The stack agent, when the paper is opened in [LiveView](/docs/platform/liveview) |
+
+A third category, **Data**, can be created but nothing reads it yet.
+
+The two papers answer different questions about the same cell. The rationale says why the
+link from the order service to the payments database exists. The tests show whether that
+component and its links work in the cluster right now.
 
 <Figure caption="One cell, one paper, one text. The rationale is stored in the graph next to the cell, so the design page and the API read and write the same thing; the generated stack never sees it.">
 <svg viewBox="0 0 900 300" role="img" aria-label="A rationale written on the design page or through the API is stored on the cell inside the graph, under the paper's name, and read back by the Rationale Graph; the generated stack never reads it.">
@@ -54,67 +69,75 @@ on the cell itself, kept with the design, and shown as its own page of the diagr
 
 ## Papers
 
-A **paper** is a named sheet in the catalog. It has a category: **Rationale** papers hold
-knowledge, **Test** papers hold validation tests, **Data** papers are reserved. The Papers
-page under the catalog lists yours next to the ones Stacktic ships, and lets you create one.
-A paper named *Knowledge* is the usual place for the why of a stack; nothing stops you from
-keeping a second one, say *Security*, for a different audience. When you create one, choose
-**Rationale** — the dialog starts on *Data*, which nothing reads yet.
+A paper is a named sheet in the catalog with a category: *Rationale*, *Test* or *Data*.
+**Catalog → Papers** lists yours next to the ones Stacktic ships and creates new ones. The
+creation dialog starts on *Data*, so pick the category explicitly.
 
-## Writing knowledge on the design page
+A Rationale paper named *Knowledge* is the usual place for the why of a stack. You can keep
+more than one, for example a *Security* paper written for auditors. Each holds its own
+text on each cell.
+
+## Writing the rationale on the design page
 
 <Steps>
   <Step title="Switch paper">
-    On the design page, use <em>Switch Paper</em> and pick a Rationale paper. The diagram opens
-    as that paper: same cells, same links, a different layer of text.
+    On the design page, click <em>Switch Paper</em> and pick a Rationale paper. The drawing
+    opens with the same cells and links, showing that paper's texts.
   </Step>
   <Step title="Select a cell">
-    A component, a sub-component or a link. Its inspector gains a <em>Rationale</em> field.
+    A component, a sub-component or a link. The inspector shows a <em>Rationale</em> field.
   </Step>
   <Step title="Write and save">
-    The Rationale Editor holds the text for that cell and that paper. Save the design as usual:
-    the text is stored with the cell and travels with every version of the design.
+    The editor holds that cell's text for that paper. Saving stores it in the drawing, so it
+    is part of every version from then on.
   </Step>
 </Steps>
 
-With <em>Show Rationale Graph</em> on, clicking a cell opens the Rationale Graph: the cell's
-text in the middle, every inbound and outbound link with its own text, the neighbouring cells,
-and the sub-components a component contains. It is the quickest way to read a topology as a
-story rather than as a drawing.
+With *Show Rationale Graph* on, clicking a cell opens the Rationale Graph: the cell's text
+in the middle, every inbound and outbound link with its own text, the neighbouring cells,
+and the sub-components a component contains. It reads a topology as an explanation rather
+than a drawing.
 
-## Through the API and the MCP
+## Writing it through the API or an AI
 
-The same text can be written by automation: an agent that has read your repository can fill
-the Knowledge paper of a whole stack, cell by cell, and the design page shows it the next
-time it opens. The platform API lists the papers and attaches a rationale to one cell of a
-system without touching anything else in it; the MCP exposes it as one tool that lists,
-reads and writes. Writing knowledge never triggers a build, a validation or a re-render,
-and it needs the Admin, Maintain or Write role on the system.
+An AI client that has read your application can fill the Knowledge paper of a whole stack,
+cell by cell, through the MCP. The design page shows the texts the next time it opens.
+
+- The platform API attaches a rationale to one cell of a system without touching anything
+  else in it (`set system` with the `rationale` sub-resource).
+- The MCP exposes the same thing as one tool that lists papers, reads texts and writes them.
+
+Writing a rationale never triggers a build, a validation or a render. It needs the Admin,
+Maintain or Write role on the system.
 
 Three facts to know when you automate it:
 
-- **Cells are addressed by their label.** Two cells with the same label, for instance an
-  application and the identity client named after it, cannot both be reached; keep labels
+- **Cells are addressed by their label.** The MCP refuses to write when two cells share a
+  label, for example an application and the identity client named after it. Keep labels
   unique on a stack you plan to document this way.
-- **The text is shown as HTML.** Paragraph and line-break tags render; a bare newline does not.
-- **Keep credentials out of it.** Knowledge is read by people and by AI tools.
-
-## What it is not
-
-Knowledge is documentation, not configuration. No template reads it, no policy is derived from
-it, and no test runs from it. It is also stored in the graph rather than the catalog, so it
-belongs to one system: the same component type on another stack starts with an empty page.
-
-Nor is it the MCP's [knowledge layer](/docs/mcp/knowledge) — the platform knowledge an AI
-client reads to design correctly. This page holds the why of *your* design; that one holds
-what the platform can express.
+- **The text is shown as HTML.** Paragraph and line-break tags render; a bare newline does
+  not.
+- **Keep credentials out of it.** People and AI tools read it.
 
 :::caution
-A single-attribute update made through the API rewrites the graph through a typed model that
-does not carry rationales. Change attributes from the design page, or through the MCP, which
-detects a documented stack and writes through the full graph instead. A design page left open
-while automation writes knowledge will overwrite it on its next save; reload it first.
+A single-attribute `update` through the API rewrites the drawing through a model that does
+not carry rationales, and erases every one of them. Change attributes from the design page,
+or through the MCP, which detects a documented stack and writes through the full drawing
+instead. A design page left open while automation writes rationales overwrites them on its
+next save, so reload it first.
 :::
 
-→ [Catalog and sections](/docs/platform/sections) · [Platform API](/docs/reference/api) ·
-[Tool surface](/docs/mcp/tools)
+## What the rationale is not
+
+The rationale is documentation, not configuration. No template reads it, no policy comes
+from it, and it is not checked when the cell changes. When you change a component or a
+link, update its text yourself.
+
+It belongs to one system. The same component type on another stack starts with no text.
+
+It is also not the MCP's [knowledge repository](/docs/mcp/knowledge). That repository
+describes what the platform can express, for every stack. A Rationale paper describes why
+*your* stack is built the way it is.
+
+→ [LiveView](/docs/platform/liveview) · [Catalog and sections](/docs/platform/sections) ·
+[Platform API](/docs/reference/api) · [Tool surface](/docs/mcp/tools)

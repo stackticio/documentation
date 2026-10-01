@@ -88,12 +88,41 @@ is why they are never offered as a choice for a new design.
 ## Sections: settings that belong to the whole system
 
 Some values are not properties of any one component — they describe the system. Those live
-in **sections**: groups of system-level attributes defined by the catalog, seeded with
-their defaults the first time you open a design, edited per system, and handed to every
-build.
+in **sections**. A section is a catalog object with two halves:
 
-Everything generated can read them, which is how a single decision reaches every component
-that should honour it.
+| Half | What it holds | What you do with it |
+|---|---|---|
+| **System attributes** | Keys with a type — text, long text, password, select, toggle — and a default | Set one value per system |
+| **Component attributes** | A chosen set of component types, and for each one a chosen set of its attributes | Edit those attributes on every matching component of the design, from one place |
+
+On the design page, **Sections** opens one tab per section — Stacktic's and your own. Each
+tab shows the system attributes with their values, then every component on the canvas
+whose type the section covers, with the section's attributes editable in place, then the
+types it covers that are not drawn yet. A security section, for instance, can put the
+hardening attributes of every workload in one list instead of one inspector at a time.
+
+System attributes are seeded with their defaults the first time a design is opened, edited
+per system, and handed to every build as configuration values. Component attributes are
+ordinary attributes of the cells, saved with the design.
+
+### What the shipped sections switch on
+
+Several stack-wide behaviours are read from section values, not from any component:
+
+| Key | Effect |
+|---|---|
+| `air_gapped` | `"true"` produces the image inventory and rewrites every image to your registry — see [Air-gapped installation](/docs/day0/air-gapped) |
+| `microsegmentation_level` | `none` generates no network policies; `pci_dss_strict` generates the strict set; any other value, the standard set |
+| `checksum_annotations` | `"true"` adds content checksums so a changed secret or configuration rolls the pod |
+| `global_labels` | One `key: value` per line, added to the workloads of every component |
+| `ttl` | How long finished jobs are kept, in seconds; 600 when unset. With a policy engine in the stack, jobs created by charts, operators or applications get the same default |
+| `namespaces_exclude` | One namespace per line where that job default is never applied |
+
+:::caution Section keys are added after the system's own settings
+A section value is merged into the build configuration after the values of the
+configuration page. A section key named like one of those — `domain`, for instance —
+replaces it for every component. Name your own keys so they cannot collide.
+:::
 
 ## Suggestions: the platform reading your drawing
 
@@ -132,3 +161,11 @@ Because they are attached to types rather than to your particular system, adding
 component to your stack brings its tests with it.
 
 → [Validation](/docs/day2/validation)
+
+## Papers: tests and knowledge
+
+Tests are grouped in **papers**, and papers have a category. A *Test* paper is what the section
+above describes. A *Rationale* paper carries a different layer: the why of every cell of a design,
+written on the cell and shown as its own page of the diagram.
+
+→ [Knowledge](/docs/platform/knowledge)

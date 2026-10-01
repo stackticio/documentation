@@ -27,7 +27,13 @@ the surface does so you can plan around it.
 | **Topology** | Add and remove components and links |
 | **Catalog** | Define attributes, and bind them to component types with their options and defaults |
 | **Tests** | Define validation tests against a system, scoped by component or by topology |
-| **Identity** | Manage the platform's own users and access tokens |
+| **Knowledge** | List the rationale papers, and attach the why of a component, sub-component or link to a system without touching anything else in it |
+
+Every call is made as a **platform account** — the account you sign in to the web interface
+with — and carries that account's role on the system. A user of your stack's own identity
+provider is a different identity and is never accepted here. Writes are refused, with the
+reason, while the diagram is invalid against the catalog or while a catalog change is
+waiting to be synchronised.
 
 ## The shape of a safe write
 

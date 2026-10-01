@@ -73,10 +73,10 @@ every recorded transition carries the diagram it was made from.
 
 | Action | What it does |
 |---|---|
-| **Save** | Stores the diagram as a new version. Optionally evaluates the catalog's suggestions against it |
+| **Save & Render** | Stores the diagram as a new version, optionally evaluates the catalog's suggestions against it, and starts the background pre-render |
 | **Build** | Renders every component, aggregates the repository, runs the post-generation chain and commits |
-| **Save & push** | Saves, then regenerates only what the changed attributes can affect |
-| **Push** | The same incremental path, using work the platform already pre-rendered in the background after your last save |
+| **Save & Push** | Saves, then regenerates only the files the changed attributes can affect, and commits them |
+| **Full push** | From the build page: commits the whole system from the pre-rendered output, running the post-generation chain — a full build without the rendering wait. It is refused until the pre-render of your last save has finished |
 | **Cancel** | Stops a running build between steps, and between components |
 | **History** | Every version, with a cell-by-cell diff between any two |
 | **Rollback** | Loads an earlier version's diagram back onto the canvas |
@@ -88,7 +88,23 @@ a running pre-render at a component boundary, so the result always matches what 
 saved.
 :::
 
+## Building from the build page
+
+A build asks for a little more than a click:
+
+| Choice | What it decides |
+|---|---|
+| **External and referenced components** | Which cells pulled in from other systems take part, so cross-stack links generate |
+| **Message** | The commit message in your stack repository |
+| **Stacktic version** | The version of the platform's own generation logic — policies, metadata, the post-generation chain. The current default is preselected |
+| **Merge** | Whether the result is merged into your working branch, with the divergence list below |
+| **Fast build** | Render only the components you select, instead of every component |
+
 ## Validation
+
+A save from the design page is never blocked: validation runs with the pre-render, and its
+errors are listed on that save in the history — the pre-render is skipped, and a full push
+stays closed, until they are fixed.
 
 Before a programmatic build, save-push or attribute change is accepted, the whole diagram
 is checked against the catalog:
@@ -115,6 +131,34 @@ than a promise.
 A system's configuration lists its environments. The base output is shared; each
 environment gets an overlay with only its differences. Adding an environment is a
 configuration change, not a new design.
+
+## The configuration page
+
+Each system has a configuration page: where its repository goes, where its images go, and
+how its secrets are encrypted.
+
+| Group | Settings |
+|---|---|
+| **Registry** | Host, authentication URI, project, user name, password and email — where in-cluster builds push images, and where an air-gapped stack pulls them from |
+| **Git** | Host, project, owner, user name, email and password of your stack repository; the branch the generated output is committed to; and, for Azure DevOps, the repository name |
+| **Build** | The namespace in-cluster builds run in, the branch generated output is merged into, the image builder (Kaniko or BuildKit), the stack's domain, and its environments |
+| **SOPS** | Whether secrets are encrypted in the repository, the age recipients, and the age key |
+
+Test buttons check the git and registry credentials before a build depends on them, and a
+configuration can be exported to a file and imported into another system.
+
+## Helm values
+
+For a component deployed from a Helm chart, the inspector can open the chart's values file
+as the platform renders it for your design, unsaved edits included. Keys the platform
+computes from the graph are marked and must stay as they are; the YAML is checked when you
+save, and checked again when the system renders — a duplicate key fails that component with
+the file and the key named.
+
+:::caution An edited values file replaces the generated one
+Once saved, your file is used instead of the generated values file for that component.
+Changes the graph would have made to it later are not merged in.
+:::
 
 ## The divergence list
 

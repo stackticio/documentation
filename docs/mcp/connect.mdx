@@ -137,12 +137,23 @@ human as a last resort.
 | Client disconnects after every restart | OAuth state is in memory | Add the cache link and enable `client_storage` |
 | Login completes but the client never finishes connecting | Client rejected a callback without `iss` | Confirm the deployed image includes the OAuth proxy fix; re-add the connector |
 | Tools list is missing a technology you have | The corresponding link is not drawn | Add the link, build, deploy — the tools register on the next start |
-| A write tool returns 401, reads work | Platform account, not the connector | Re-check the platform credentials; a read succeeding proves the connector is fine |
+| A write tool returns 401, reads work | Platform account, not the connector | Set the MCP component's `stacktic_api_user` and `stacktic_api_key` to a real platform account — not the catalog placeholders, and not a user of your stack's identity provider — then build, apply and restart the pod. For this conversation only, `stacktic_login` signs in as that account without a redeploy |
 | A configuration change had no effect | The pod is still running the previous configuration | Roll the workload so it picks up the new values |
 
 ## Health
 
-The server exposes a plain HTTP health endpoint used by Kubernetes probes. It answers
-whether the process is up — it does not assert that every tool registered, so a healthy
-pod with a missing link still reports healthy. The authoritative answer to "which tools do
-I have" is the client's own tool list.
+The server exposes two endpoints, and they answer different questions on purpose.
+
+| Endpoint | What it answers |
+|---|---|
+| `/health` | Whether the process is up. Kubernetes probes use it, and it never fails for an external reason — a bad credential must not put the pod in a restart loop |
+| `/readyz` | Whether the server can actually work: platform credentials set and not the catalog placeholders, an OIDC base URL clients can discover, persistent client storage, a stack agent, and the knowledge repository. It always answers HTTP 200 — read `status` (`ok` or `degraded`) and the `degraded` list, not the status code |
+
+```bash
+curl https://<mcp-host>/readyz
+```
+
+Neither endpoint asserts that every tool registered, so a healthy pod with a missing link
+still reports healthy. The authoritative answer to "which tools do I have" is the client's
+own tool list. From inside a conversation, `server_info` reports the same capabilities and
+`self_check` tests every credential live and names the attribute that fixes a failure.

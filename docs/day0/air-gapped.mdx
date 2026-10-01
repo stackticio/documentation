@@ -1,0 +1,141 @@
+---
+id: day0-air-gapped
+slug: /day0/air-gapped
+title: Air-gapped installation
+sidebar_label: Air-gapped installation
+sidebar_position: 4
+description: Installing a stack where the cluster cannot reach the internet — one switch, an image inventory, one migration run, and every image rewritten to your registry.
+---
+
+<Hero eyebrow="Delivery" title="The same stack, from your own registry">
+A cluster with no internet access cannot pull a single public image. Switch the stack to
+air-gapped and the build inventories every image it uses, writes the script that copies
+them into your registry, and rewrites every manifest to pull from there.
+</Hero>
+
+<Figure caption="One switch, one copy, one apply. The build inventories the images and rewrites the manifests to your registry; you run the migration script once from a machine that can reach both sides; the cluster then pulls only from your registry.">
+<svg viewBox="0 0 900 320" role="img" aria-label="The build inventories every image and rewrites the manifests to the private registry. A migration script, run once from a machine that reaches both the public registries and the private one, copies the images across. The cluster pulls only from the private registry.">
+  <defs>
+    <marker id="airgapABlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-blue)" /></marker>
+    <marker id="airgapAMint" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-mint)" /></marker>
+    <marker id="airgapAAmber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-amber)" /></marker>
+  </defs>
+  <text x="40" y="38" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">BUILD · COPY ONCE · APPLY</text>
+  <rect x="40" y="70" width="210" height="96" rx="12" fill="var(--stk-panel)" />
+  <rect x="40" y="70" width="210" height="96" rx="12" fill="var(--stk-blue)" fillOpacity="0.06" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" />
+  <text x="145" y="98" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">build</text>
+  <text x="145" y="118" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">air_gapped = "true"</text>
+  <text x="145" y="134" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">inventory · rewrite</text>
+  <text x="145" y="150" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">migrate.sh</text>
+  <path d="M250 118 L338 118" fill="none" stroke="var(--stk-blue)" strokeWidth="1.4" markerEnd="url(#airgapABlue)" />
+  <rect x="340" y="70" width="220" height="96" rx="12" fill="var(--stk-panel)" />
+  <rect x="340" y="70" width="220" height="96" rx="12" fill="var(--stk-mint)" fillOpacity="0.06" stroke="var(--stk-mint)" strokeOpacity="0.6" strokeWidth="1.3" />
+  <text x="450" y="98" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">your stack repository</text>
+  <text x="450" y="118" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">images → your registry</text>
+  <text x="450" y="134" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">versioning/ · bom</text>
+  <text x="450" y="150" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">migration/migrate.sh</text>
+  <rect x="40" y="214" width="210" height="76" rx="12" fill="var(--stk-panel)" />
+  <rect x="40" y="214" width="210" height="76" rx="12" fill="var(--stk-steel)" fillOpacity="0.05" stroke="var(--stk-steel)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <text x="145" y="242" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">public registries</text>
+  <text x="145" y="262" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">where the images</text>
+  <text x="145" y="276" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">come from</text>
+  <rect x="340" y="214" width="220" height="76" rx="12" fill="var(--stk-panel)" />
+  <rect x="340" y="214" width="220" height="76" rx="12" fill="var(--stk-amber)" fillOpacity="0.06" stroke="var(--stk-amber)" strokeOpacity="0.6" strokeWidth="1.1" />
+  <text x="450" y="242" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">migrate.sh, run once</text>
+  <text x="450" y="262" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">from a machine that</text>
+  <text x="450" y="276" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">reaches both sides</text>
+  <path d="M250 252 L338 252" fill="none" stroke="var(--stk-steel)" strokeWidth="1.4" strokeOpacity="0.7" />
+  <path d="M450 166 L450 212" fill="none" stroke="var(--stk-mint)" strokeWidth="1.2" strokeDasharray="4 4" />
+  <path d="M560 252 L648 252" fill="none" stroke="var(--stk-amber)" strokeWidth="1.4" markerEnd="url(#airgapAAmber)" />
+  <rect x="650" y="40" width="220" height="266" rx="16" fill="var(--stk-blue)" fillOpacity="0.035" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <text x="664" y="62" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">NO INTERNET</text>
+  <rect x="670" y="214" width="180" height="76" rx="12" fill="var(--stk-panel)" />
+  <rect x="670" y="214" width="180" height="76" rx="12" fill="var(--stk-amber)" fillOpacity="0.06" stroke="var(--stk-amber)" strokeOpacity="0.6" strokeWidth="1.1" />
+  <text x="760" y="242" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">your registry</text>
+  <text x="760" y="262" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">host / project /</text>
+  <text x="760" y="276" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">image : same tag</text>
+  <rect x="670" y="86" width="180" height="80" rx="12" fill="var(--stk-panel)" />
+  <rect x="670" y="86" width="180" height="80" rx="12" fill="var(--stk-blue)" fillOpacity="0.06" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" />
+  <text x="760" y="114" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">cluster</text>
+  <text x="760" y="134" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">apply -k</text>
+  <text x="760" y="150" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">pulls only from here</text>
+  <path d="M560 118 L668 118" fill="none" stroke="var(--stk-blue)" strokeWidth="1.4" markerEnd="url(#airgapABlue)" />
+  <path d="M760 212 L760 168" fill="none" stroke="var(--stk-mint)" strokeWidth="1.4" markerEnd="url(#airgapAMint)" />
+</svg>
+</Figure>
+
+## Turn it on
+
+Air-gapped mode is a [section value](/docs/platform/sections), not a different design:
+
+<Steps>
+  <Step title="Point the system at your registry">
+    On the system's configuration page, set the registry host and project. That registry
+    is where every image will be pulled from — the same one in-cluster builds push to.
+  </Step>
+  <Step title="Set air_gapped to true">
+    In <strong>Sections</strong>, set the system attribute <code>air_gapped</code> to
+    <code>true</code>.
+  </Step>
+  <Step title="Build">
+    The build runs three extra steps after the other components have rendered: inventory,
+    migration script, rewrite.
+  </Step>
+</Steps>
+
+The graph does not change. The same components, links, policies and validation surface
+generate; only where images are pulled from moves.
+
+## What the build produces
+
+| Output | What it is |
+|---|---|
+| `versioning/versions.json` · `versions.md` | Every image the stack references, and every file that references it |
+| `versioning/bom.json` · `bom.xml` | A bill of materials for the stack's images |
+| `versioning/migration/migrate.sh` | The script that copies every image into your registry |
+| Rewritten kustomizations | Every component's deploy **and** build kustomization pulls from your registry — `<host>/<project>/<image>`, keeping the original tag or digest |
+| `airgap-images-config.yaml` | For images held in a custom resource field — a monitoring server's image, a database cluster's image — the field is rewritten too |
+| `airgap-patch-*.yaml` | For images an operator reads from its environment or arguments, a patch on that operator's workload |
+
+The rewrite is idempotent: building again after a registry change updates the entries in
+place.
+
+## Copy the images, once
+
+`migrate.sh` copies registry to registry, keeping every architecture of a multi-platform
+image. Run it once, before the first apply, from a machine that can reach **both** the
+public registries and yours — not from inside the isolated network:
+
+```bash
+export REGISTRY_PASSWORD=<your registry password>   # or type it when prompted
+versioning/migration/migrate.sh
+```
+
+It needs Docker with Buildx, logs in to your registry, and reports how many images
+succeeded and failed. It is safe to run again: a second run retries what failed. It also
+warns when two source images would land on the same target name.
+
+Then apply the stack as usual: every image the rewrite covered is pulled from your
+registry.
+
+→ [Build and deploy](/docs/day0/build-deploy)
+
+## Before you rely on it
+
+:::caution Allow your registry in the admission policy
+An image policy in the stack admits only the registries listed on it, and air-gapped mode
+does not change that list. Add your registry to the policy's allowed registries, or the
+rewritten workloads are refused at admission.
+:::
+
+Some images cannot be rewritten automatically, and the build log names each one it meets:
+
+- image fields shaped as a mapping of registry and name rather than one string;
+- images embedded deeper inside custom resources, with no generic patch;
+- short image names inside an operator's environment or arguments;
+- images compiled into an operator itself.
+
+Handle those on the component, and check the log after the first air-gapped build.
+
+The AI interface needs its knowledge repository inside the network too: mirror it and
+point the MCP server at the mirror — see [The knowledge layer](/docs/mcp/knowledge).

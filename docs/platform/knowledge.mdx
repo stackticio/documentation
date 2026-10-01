@@ -1,0 +1,120 @@
+---
+id: platform-knowledge
+slug: /platform/knowledge
+title: Knowledge
+sidebar_label: Knowledge
+sidebar_position: 7
+description: Writing the why behind every component and link into the graph itself, and reading it back as a page of the design.
+---
+
+<Hero eyebrow="Guide" title="The graph knows what; Knowledge says why">
+A drawing says that a topic feeds a database. It does not say what the data is, why that
+sink was chosen, or which business rule depends on it. Knowledge is that text, written
+on the cell itself, kept with the design, and shown as its own page of the diagram.
+</Hero>
+
+<Figure caption="One cell, one paper, one text. The rationale is stored in the graph next to the cell, so the design page and the API read and write the same thing; the generated stack never sees it.">
+<svg viewBox="0 0 900 300" role="img" aria-label="A rationale written on the design page or through the API is stored on the cell inside the graph, under the paper's name, and read back by the Rationale Graph; the generated stack never reads it.">
+  <text x="40" y="38" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">ONE CELL · ONE PAPER · ONE TEXT · STORED IN THE GRAPH</text>
+  <rect x="40" y="70" width="190" height="70" rx="12" fill="var(--stk-panel)" />
+  <rect x="40" y="70" width="190" height="70" rx="12" fill="var(--stk-blue)" fillOpacity="0.06" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" />
+  <text x="135" y="98" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">design page</text>
+  <text x="135" y="116" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">Switch Paper → Knowledge</text>
+  <text x="135" y="130" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">select a cell · Rationale</text>
+  <rect x="40" y="170" width="190" height="70" rx="12" fill="var(--stk-panel)" />
+  <rect x="40" y="170" width="190" height="70" rx="12" fill="var(--stk-blue)" fillOpacity="0.06" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" />
+  <text x="135" y="198" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">API or MCP</text>
+  <text x="135" y="216" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">set system · rationale</text>
+  <text x="135" y="230" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">stacktic_rationale</text>
+  <path d="M230 105 L340 140" fill="none" stroke="var(--stk-steel)" strokeWidth="1.4" strokeOpacity="0.7" />
+  <path d="M230 205 L340 170" fill="none" stroke="var(--stk-steel)" strokeWidth="1.4" strokeOpacity="0.7" />
+  <rect x="340" y="95" width="230" height="120" rx="12" fill="var(--stk-panel)" />
+  <rect x="340" y="95" width="230" height="120" rx="12" fill="var(--stk-mint)" fillOpacity="0.06" stroke="var(--stk-mint)" strokeOpacity="0.6" strokeWidth="1.3" />
+  <text x="455" y="122" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">the cell, in the graph</text>
+  <text x="455" y="146" fontSize="9.7" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">rationales</text>
+  <text x="455" y="164" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">knowledge: "why this sink…"</text>
+  <text x="455" y="180" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">security: "who may read it"</text>
+  <text x="455" y="200" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">one text per paper</text>
+  <path d="M570 130 L680 105" fill="none" stroke="var(--stk-steel)" strokeWidth="1.4" strokeOpacity="0.7" />
+  <path d="M570 180 L680 205" fill="none" stroke="var(--stk-steel)" strokeWidth="1.4" strokeOpacity="0.7" strokeDasharray="4 4" />
+  <rect x="680" y="70" width="190" height="70" rx="12" fill="var(--stk-panel)" />
+  <rect x="680" y="70" width="190" height="70" rx="12" fill="var(--stk-blue)" fillOpacity="0.06" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" />
+  <text x="775" y="98" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">Rationale Graph</text>
+  <text x="775" y="116" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">a cell, its links,</text>
+  <text x="775" y="130" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">its neighbours, their texts</text>
+  <rect x="680" y="170" width="190" height="70" rx="12" fill="var(--stk-panel)" />
+  <rect x="680" y="170" width="190" height="70" rx="12" fill="var(--stk-steel)" fillOpacity="0.05" stroke="var(--stk-steel)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <text x="775" y="198" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">generated stack</text>
+  <text x="775" y="216" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">never reads it</text>
+  <text x="775" y="230" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">no build · no validation</text>
+  <rect x="330" y="248" width="250" height="19" rx="9.5" fill="var(--stk-panel-2)" />
+  <text x="455" y="261.5" fontSize="11" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">stored with the design · versioned with it</text>
+</svg>
+</Figure>
+
+## Papers
+
+A **paper** is a named sheet in the catalog. It has a category: **Rationale** papers hold
+knowledge, **Test** papers hold validation tests, **Data** papers are reserved. The Papers
+page under the catalog lists yours next to the ones Stacktic ships, and lets you create one.
+A paper named *Knowledge* is the usual place for the why of a stack; nothing stops you from
+keeping a second one, say *Security*, for a different audience. When you create one, choose
+**Rationale** — the dialog starts on *Data*, which nothing reads yet.
+
+## Writing knowledge on the design page
+
+<Steps>
+  <Step title="Switch paper">
+    On the design page, use <em>Switch Paper</em> and pick a Rationale paper. The diagram opens
+    as that paper: same cells, same links, a different layer of text.
+  </Step>
+  <Step title="Select a cell">
+    A component, a sub-component or a link. Its inspector gains a <em>Rationale</em> field.
+  </Step>
+  <Step title="Write and save">
+    The Rationale Editor holds the text for that cell and that paper. Save the design as usual:
+    the text is stored with the cell and travels with every version of the design.
+  </Step>
+</Steps>
+
+With <em>Show Rationale Graph</em> on, clicking a cell opens the Rationale Graph: the cell's
+text in the middle, every inbound and outbound link with its own text, the neighbouring cells,
+and the sub-components a component contains. It is the quickest way to read a topology as a
+story rather than as a drawing.
+
+## Through the API and the MCP
+
+The same text can be written by automation: an agent that has read your repository can fill
+the Knowledge paper of a whole stack, cell by cell, and the design page shows it the next
+time it opens. The platform API lists the papers and attaches a rationale to one cell of a
+system without touching anything else in it; the MCP exposes it as one tool that lists,
+reads and writes. Writing knowledge never triggers a build, a validation or a re-render,
+and it needs the Admin, Maintain or Write role on the system.
+
+Three facts to know when you automate it:
+
+- **Cells are addressed by their label.** Two cells with the same label, for instance an
+  application and the identity client named after it, cannot both be reached; keep labels
+  unique on a stack you plan to document this way.
+- **The text is shown as HTML.** Paragraph and line-break tags render; a bare newline does not.
+- **Keep credentials out of it.** Knowledge is read by people and by AI tools.
+
+## What it is not
+
+Knowledge is documentation, not configuration. No template reads it, no policy is derived from
+it, and no test runs from it. It is also stored in the graph rather than the catalog, so it
+belongs to one system: the same component type on another stack starts with an empty page.
+
+Nor is it the MCP's [knowledge layer](/docs/mcp/knowledge) — the platform knowledge an AI
+client reads to design correctly. This page holds the why of *your* design; that one holds
+what the platform can express.
+
+:::caution
+A single-attribute update made through the API rewrites the graph through a typed model that
+does not carry rationales. Change attributes from the design page, or through the MCP, which
+detects a documented stack and writes through the full graph instead. A design page left open
+while automation writes knowledge will overwrite it on its next save; reload it first.
+:::
+
+→ [Catalog and sections](/docs/platform/sections) · [Platform API](/docs/reference/api) ·
+[Tool surface](/docs/mcp/tools)

@@ -71,8 +71,11 @@ actively probes. Every run is scored, stored and hash-chained.
 | **RBAC** | Role bindings, cluster-admin holders, wildcard roles, score | Deeper analysis and per-finding evidence |
 | **Secrets** | Whether every secret a workload references exists and, where applicable, is synced from its store | Per-finding evidence — the query that produced it and what it returned, never the secret value |
 | **Configuration posture** | The declared attribute surface evaluated against declarative rules — insecure defaults, missing hardening toggles, values that contradict each other | — |
+| **Penetration test** | A time-boxed test of what the stack exposes, against the OWASP testing guide and the API Top 10, with real dynamic testing — scoped to one component or one category when you need it fast | Every reachable target |
 | **Vulnerabilities** | Exposed routes, default credentials, obvious misconfiguration | Technology-specific checks per component type; dedicated network and TLS modes |
-| **Application security** | Source-code scanning across your application components | Severity-filtered findings |
+| **Image vulnerabilities** | Known vulnerabilities in the images the stack runs: coverage, a triage queue, and a recorded decision per finding — accept, mitigate or false positive, once the agent's `cve_decisions_enabled` attribute is on | — |
+| **Application security** | Weaknesses in your own code, from a code-quality component linked to each application with scanning switched on — kept apart from image vulnerabilities, never added to them | Severity-filtered findings |
+| **AI model serving** | Per-model health of every served model, from live metrics and the declared model sub-components | — |
 | **Backup** | The structural resources that protection depends on | The only mode that can prove data actually exists — see [Backup and recovery](/docs/day2/backup) |
 | **Compliance frameworks** | Control validation with real cluster evidence | Adds hardening scans, admission dry-runs and deep analysis; a report mode renders a full audit document — see [Compliance](/docs/compliance/) |
 

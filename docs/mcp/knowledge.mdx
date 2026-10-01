@@ -122,3 +122,44 @@ first. It never silently picks something outdated, and it never invents a versio
 `knowledge(action='refresh')` re-pulls the knowledge layer into a running MCP server.
 Several of the files hot-reload on change without even that. Nothing about updating
 platform knowledge requires touching your stack.
+
+## Access to the repository
+
+The knowledge repository is **private and licensed**. Its coordinates come with the MCP
+license and are set as three lines in the MCP component's `configmap` attribute — one
+`KEY=VALUE` per line, appended to the pod's environment:
+
+```text
+MCP_KNOWLEDGE_REPO_URL=<repository URL from your license>
+MCP_KNOWLEDGE_REPO_TOKEN=<token issued with your license>
+MCP_KNOWLEDGE_REPO_BRANCH=main
+```
+
+Without it the server cannot design, explain or guide, and it says so instead of
+improvising. `server_info`, `/readyz`, `workflow` and every `knowledge` answer report the
+state of the repository, the reason when it fails, and the exact fix:
+
+| Reason | What it means |
+|---|---|
+| `not_configured` · `placeholder_url` | The URL is missing, or still the placeholder |
+| `auth_failed` | The token is missing, expired or rotated |
+| `not_found_or_no_access` | The URL is wrong, or the token cannot see the repository |
+| `network` | The server cannot reach the git host — check egress policy, DNS and proxy |
+| `branch_missing` | The branch does not exist |
+| `incomplete_repo` | The repository was reached but is not a knowledge repository |
+| `stale` | The last pull failed; the server is answering from its previous copy |
+
+A failed sync is retried on the next call, so a fixed token or a restored network is
+picked up without restarting the pod. Changing the `configmap` attribute itself needs a
+build, an apply, and a pod restart.
+
+:::tip Air-gapped stacks
+Mirror the knowledge repository inside your network and point `MCP_KNOWLEDGE_REPO_URL`
+at the mirror.
+:::
+
+:::note Not the Knowledge page
+This page is about the platform knowledge the MCP server reads. The *why* of your own
+design — the rationale written on each component and link — is a different thing, kept in
+your graph: see [Knowledge](/docs/platform/knowledge).
+:::

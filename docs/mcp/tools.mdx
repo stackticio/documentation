@@ -91,14 +91,24 @@ appears.
 </svg>
 </Figure>
 
+## Orientation — where the stack is, and whether the server works
+
+| Tool | What it answers |
+|---|---|
+| `workflow` | The guided journey: measures where the stack is — design, build, install, automate, secure, prove, operate — and returns **one** next step with the exact call to make, the questions to ask you first, and the docs page that explains it. The server tells the model to call it first in a conversation and after every milestone |
+| `server_info` | What this server can do right now: knowledge repository access, platform account, stack agent, cluster access, Argo CD, and the tool modules that loaded |
+| `self_check` | Tests every credential and connection the server runs on, live, and names the attribute that fixes what is broken |
+| `ping` | Whether the server answers at all |
+
 ## Knowledge — what the platform can express
 
 | Tool | What it answers |
 |---|---|
 | `knowledge` | Component and link deep knowledge, search, recipes, recommendations, curated patterns from working stacks, and ad-hoc access to the knowledge files |
-| `get_attribute_impact` | Which generated files and downstream components a given attribute touches |
-| `validate_component_knowledge` | Whether a component in the stack is configured the way its template actually expects |
-| `refresh_knowledge` | Pull the latest platform knowledge without redeploying anything |
+| `knowledge(action='impact')` | Which generated files and downstream components a given attribute touches |
+| `knowledge(action='validate')` | Whether a component in the stack is configured the way its template actually expects |
+| `knowledge(action='refresh')` | Pull the latest platform knowledge without redeploying anything |
+| `platform_gap` | A need the catalog cannot express: prove it is really missing, cover it with the flexibility that exists, and report it to the platform team instead of improvising |
 
 → [The knowledge layer](/docs/mcp/knowledge)
 
@@ -120,12 +130,12 @@ target, how badly, and what the recommended order of operations is.
 | Tool | What it does |
 |---|---|
 | `stack_test` | Runs real end-to-end validation against the live topology: connections, credentials, certificates, routes |
-| `scan` | Scored security scans — admission policy, network policy, Kubernetes hardening, vulnerability scanning |
+| `scan` | Scored scans through the stack agent: penetration test, link validation, admission policy, network policy, Kubernetes hardening, RBAC, secrets, configuration posture, vulnerability sweep, PCI DSS and ISO 27001 |
 | `evidence` | The attestation trail: versioned runs, hash chains, deltas, finding memory |
 | `backup` | What is protected, what can be proven, restore points, and guarded day-2 operations |
-| `cve` | Vulnerability posture and recorded decisions |
+| `cve` | Vulnerability findings from two sources that are never added together — weaknesses in your own code, and known vulnerabilities in images — with the decision recorded for each |
 | `lifecycle` | Upgrade and migration status and plans per component, from declarative recipes |
-| `kubectl` | Last resort only — pod status, events, restarts. Never used for discovery or scanning |
+| `kubectl_*` | Last resort only — pod status, events, logs, restarts. Never used for discovery or scanning |
 
 ## Compliance
 
@@ -143,13 +153,29 @@ target, how badly, and what the recommended order of operations is.
 These are the tools that make the model an operator rather than an advisor. Every one of
 them writes to the graph, never to the cluster directly.
 
+**Drawing a design.** The model assembles a working diagram in its session and pushes it
+in one step:
+
+| Tool | What it does |
+|---|---|
+| `stacktic_login` | Session for the platform account, as a specific user |
+| `stacktic_get_components_*` · `stacktic_get_selected_components_*` | The catalog pieces for a design: component types, the links they allow, their attributes, their sub-components, and the reason each one matters |
+| `stacktic_describe` | Every attribute of one component type: its key, type, default, options, the pattern free text must match, and whether it is a secret |
+| `stacktic_new_diagram` · `stacktic_get_diagram` | Open a working diagram seeded from the live system, and read it back |
+| `stacktic_add_cell` · `stacktic_add_link` · `stacktic_add_many` · `stacktic_add_zone` | Add components, sub-components, links and labelled background zones to the working diagram |
+| `stacktic_update_cell` · `stacktic_remove_cell` | Fix or remove one cell without redrawing the graph |
+| `stacktic_validate_diagram` | Check the working diagram against the rules the platform enforces on push, before pushing |
+| `stacktic_set_system` | Push the working diagram. The pushed graph **replaces** the system, which is why the working diagram always starts from the live one |
+| `stacktic_get_system` | Read a system as it is stored |
+
+**Changing what exists.**
+
 | Tool | What it changes |
 |---|---|
-| `stacktic_login` | Session for the platform account |
-| `stacktic_get` | Current state of a system, component, link or attribute |
 | `stacktic_attr` | One attribute, several attributes, or a link attribute |
-| `stacktic_system` | Topology changes — add or remove a component, add or remove a link — and the build |
-| `user_lifecycle` | System users and groups, as declared identity attributes, with a report of exactly what propagates where on the next build |
+| `stacktic_system` | Build, build logs, duplicate, delete, synchronise with the catalog, and removing a component or a link |
+| `stacktic_rationale` | The Knowledge page — list the papers, read or write the rationale stored on a component, sub-component or link |
+| `design_doctor` | Why a push, an attribute update or a build was refused, in plain words, and which cell or attribute fixes it |
 
 The workflow the server enforces is always the same: **get the current value, show it,
 state the blast radius, ask, then change.** A build never runs without explicit
@@ -159,8 +185,12 @@ confirmation.
 
 | Tool | What it does |
 |---|---|
-| `source_code` | Reads and works with the code of your application components — the ground truth for behaviour |
-| `spec_kit` | Spec-driven development for application components, with a constitution generated from the actual stack |
+| `list_repos` · `clone_repo` · `browse_files` · `read_file` · `search_code` · `get_project_structure` · `get_entry_points` · `get_runtime_context` · `get_security_posture` | Read the code of the application components linked to the server — the ground truth for behaviour |
+| `write_file` · `delete_file` · `diff` · `create_branch` · `commit_and_push` · `discard_changes` | Change that code on a branch and push it |
+| `stack_repo_write` | Write a new application into the stack repository itself — one folder per application under `apps/`, with its own Dockerfile — using the token the platform already holds |
+| `spec_kit` | Spec-driven development for application components, with a constitution generated from the actual stack. Switched on by the MCP component's `ai_workflow` attribute |
+
+The code tools appear for each application component the MCP server is linked to.
 
 Before recommending application work, the model checks what specifications and tasks are
 already in flight, so two sessions do not design the same feature twice. Shared project
@@ -187,6 +217,9 @@ reconfigure it, because configuration belongs to the graph.
   <Pill>GitOps delivery</Pill>
   <Pill>AI workflow builder</Pill>
   <Pill>application APIs</Pill>
+  <Pill>ERP</Pill>
+  <Pill>file sharing</Pill>
+  <Pill>wiki</Pill>
 </Pills>
 
 ## Guided prompts
@@ -197,6 +230,14 @@ who does not want to think in tools.
 <Cards>
   <Card kicker="Orientation" title="start_here · explain_stack">
     What this stack is, what it runs, and what the model can do with it.
+  </Card>
+  <Card kicker="Journey" title="next_step · install_my_stack · add_gitops">
+    The one next thing to do; how a built stack reaches the cluster; and adding automated
+    delivery — always asking scope and mode first.
+  </Card>
+  <Card kicker="Gaps" title="request_platform_change">
+    Something the catalog cannot express: prove it, cover it with what exists, and send the
+    suggestion to the platform team.
   </Card>
   <Card kicker="Build" title="deploy_my_app · add_to_my_app">
     Take an application from a repository or a description to a running, wired stack.
@@ -230,3 +271,11 @@ conversation would, track token usage and cost per task, and report by webhook o
 Chained tasks pass their result to the next one. This is how a nightly compliance run, a
 weekly dependency review or a continuous drift watch is expressed — as part of the stack,
 versioned with it.
+
+| Tool | What it does |
+|---|---|
+| `dark_factory_status` | Every agent's configuration and every task's state, last run and result |
+| `dark_factory_history` | The run history of one task |
+| `dark_factory_run_now` | Run a task immediately, skipping its schedule; a chain continues on success |
+| `dark_factory_toggle_agent` | Switch an agent on or off at runtime, without a redeploy |
+| `dark_factory_cost` | Token usage and estimated cost per task, and in total |

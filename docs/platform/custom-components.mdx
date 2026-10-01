@@ -1,0 +1,114 @@
+---
+id: platform-custom-components
+slug: /platform/custom-components
+title: Your own components
+sidebar_label: Your own components
+sidebar_position: 6
+description: Adding a component type of your own to the catalog — its attributes, links and versions, its template repository, and the template the platform can write for you.
+---
+
+<Hero eyebrow="Catalog" title="When the catalog does not have it, add it">
+The catalog is not closed. A component type of your own is a catalog entry like any other —
+its attributes, links and sub-components are validated the same way — and its template
+lives in a git repository you own.
+</Hero>
+
+<Figure caption="A component type of your own. You define it in the catalog and point it at your template repository; the platform can write the first template for you; from then on every build renders it like any other component.">
+<svg viewBox="0 0 900 300" role="img" aria-label="A custom component type is defined in the catalog and points at a template repository you own. Optionally the platform writes the first template into that repository. Every build then renders the type like any other component.">
+  <defs>
+    <marker id="customABlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-blue)" /></marker>
+    <marker id="customAMint" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-mint)" /></marker>
+  </defs>
+  <text x="40" y="38" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">DEFINE · TEMPLATE · RENDER</text>
+  <rect x="40" y="64" width="230" height="200" rx="12" fill="var(--stk-panel)" />
+  <rect x="40" y="64" width="230" height="200" rx="12" fill="var(--stk-blue)" fillOpacity="0.06" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" />
+  <text x="155" y="92" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">catalog entry</text>
+  <text x="155" y="118" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">technical id · label · logo</text>
+  <text x="155" y="138" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">attributes · patterns</text>
+  <text x="155" y="158" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">permitted links</text>
+  <text x="155" y="178" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">sub-components · guides</text>
+  <text x="155" y="198" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">versions · default version</text>
+  <text x="155" y="218" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">git url · branch · credential</text>
+  <rect x="96" y="232" width="118" height="19" rx="9.5" fill="var(--stk-panel-2)" />
+  <text x="155" y="245.5" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">validated</text>
+  <path d="M270 120 L368 120" fill="none" stroke="var(--stk-mint)" strokeWidth="1.4" strokeDasharray="4 4" markerEnd="url(#customAMint)" />
+  <text x="319" y="110" fontSize="9.7" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">optional</text>
+  <rect x="370" y="64" width="200" height="110" rx="12" fill="var(--stk-panel)" />
+  <rect x="370" y="64" width="200" height="110" rx="12" fill="var(--stk-mint)" fillOpacity="0.06" stroke="var(--stk-mint)" strokeOpacity="0.6" strokeWidth="1.3" />
+  <text x="470" y="92" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">the platform writes it</text>
+  <text x="470" y="116" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">Source Code · Helm</text>
+  <text x="470" y="134" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">hook with your links</text>
+  <text x="470" y="152" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">commit · stackticbot</text>
+  <path d="M470 174 L470 196" fill="none" stroke="var(--stk-mint)" strokeWidth="1.4" markerEnd="url(#customAMint)" />
+  <path d="M270 228 L368 228" fill="none" stroke="var(--stk-blue)" strokeWidth="1.4" markerEnd="url(#customABlue)" />
+  <rect x="370" y="198" width="200" height="66" rx="12" fill="var(--stk-panel)" />
+  <rect x="370" y="198" width="200" height="66" rx="12" fill="var(--stk-steel)" fillOpacity="0.05" stroke="var(--stk-steel)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <text x="470" y="224" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">your template repository</text>
+  <text x="470" y="244" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">one folder per type</text>
+  <path d="M570 231 L668 231" fill="none" stroke="var(--stk-blue)" strokeWidth="1.4" markerEnd="url(#customABlue)" />
+  <rect x="670" y="160" width="200" height="104" rx="12" fill="var(--stk-panel)" />
+  <rect x="670" y="160" width="200" height="104" rx="12" fill="var(--stk-blue)" fillOpacity="0.06" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" />
+  <text x="770" y="188" fontSize="12.3" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">every build</text>
+  <text x="770" y="210" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">clones it · renders it</text>
+  <text x="770" y="228" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">like any component</text>
+  <text x="770" y="246" fontSize="9.7" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">links resolved</text>
+</svg>
+</Figure>
+
+## Before you write one
+
+Most needs fit the existing catalog: an attribute, a free-form configuration field, a link
+that already exists. The MCP's `platform_gap` checks exactly that — whether the need is
+really missing, and what existing flexibility covers it — and reports a genuine gap to the
+platform team.
+
+## What a component type defines
+
+Under **Catalog → Components**, a new type has:
+
+| Part | What you set |
+|---|---|
+| **Identity** | A technical id — which is also the name of the type's folder in the template repository — a label, a description, the description shown on the diagram, a group, a family, and a logo |
+| **Attributes** | Each with its type, options, the pattern free text must match, and a default |
+| **Links** | The component types it may connect to, and the attributes each link carries |
+| **Sub-components** | The sub-component types it can own |
+| **Guides** | Help text per attribute, shown in a *Guide* window on the design page |
+| **Versions** | Several versions side by side, one marked as the default new designs get |
+| **Template repository** | The git URL and branch of the template, and the credential that clones it |
+
+The type then appears in your catalog next to Stacktic's, is offered on the design page, and
+is validated like every other entry. Marking a type **ignored** keeps it drawable but stops
+every build from rendering it.
+
+:::note Personal access tokens are git credentials
+The *Personal access tokens* under your profile are the credentials a component type uses
+to clone its template repository — a user name and a password or token for your git host.
+They are not tokens for the platform API.
+:::
+
+## Let the platform write the template
+
+Tick **Source Code**, **Helm**, or both, and save. With **Helm** ticked, the form also asks
+for the chart's repository, name, URL and values. The platform clones the template
+repository, writes a template for the type, and commits it as `stackticbot`:
+
+| Part | Contents |
+|---|---|
+| Every template | The variables file, and a generation hook that already detects every link and sub-component type you declared |
+| **Source Code** | A workload, its RBAC, a resource patch, a clean-up job and an image-signature check, the registry secret, and an overlay |
+| **Helm** | The values file, a script that renders the chart, an ingress, a namespace, a kustomization, and an overlay |
+
+It is a starting point: open the repository and write what the type actually generates.
+
+:::caution Untick both boxes once you edit the template
+Every save with a box ticked deletes the type's folder in the template repository and writes
+it again. Keep them ticked only while you are scaffolding.
+:::
+
+## Changing a type later
+
+Saving a type notifies every system that uses it. Their designs show a synchronisation
+notice, and programmatic changes to those systems are refused until it is acknowledged — so
+nothing is built against a definition that moved underneath it.
+
+→ [Catalog and sections](/docs/platform/sections) · [Link types](/docs/reference/links)

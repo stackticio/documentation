@@ -91,6 +91,16 @@ kubectl apply -k k8s/build/overlays/<environment>/ --server-side=true --force-co
 The loop for an application change is therefore: edit the code in your application
 repository → build → deploy. The stack itself only changes when the graph changes.
 
+### Develop against the cluster
+
+Each application component's folder in the stack repository carries a `dev_tools/` kit:
+
+| File | What it gives you |
+|---|---|
+| `Tiltfile` | A live-update loop against the cluster, generated from the component's `framework_type` — Spring, Node.js, Python frameworks, Rails, Laravel or generic — so a code change syncs into the running pod instead of waiting for an image |
+| `AGENTS.md` | The brief for any AI coding agent working on the application: where the source of truth is, and what the stack has already wired, so the agent writes application code instead of rebuilding what the stack provides |
+| `spec-kit/` | Spec-driven development, with a constitution generated from the actual stack — switched on for the whole stack by the MCP component's `ai_workflow` attribute |
+
 ## Deploy
 
 ```bash
@@ -101,6 +111,14 @@ Or the whole environment:
 
 ```bash
 kubectl apply -k k8s/deploy/overlays/<environment>/ --server-side=true --force-conflicts=true
+```
+
+Two generated folders sit outside the overlays and are applied on their own — the network
+policies the links imply, and the cluster roles granted to people:
+
+```bash
+kubectl apply -f networkpolicy/
+kubectl apply -f rbac/rbac.yaml
 ```
 
 :::tip The apply contract
@@ -114,6 +132,44 @@ deleted before being re-applied.
 
 If you see `no matches for kind ... in version ...` on a first install, apply again. It
 means a custom resource was applied in the same pass that installed its definition.
+
+## Three ways to apply
+
+The same rendered files reach the cluster in one of three ways:
+
+| Way | How it works | When to use it |
+|---|---|---|
+| **kubectl** | You, or your CI, run the commands above | The default |
+| **The stack agent's deploy arm** | The agent applies a committed branch in a fixed order: jobs removed first, server-side apply, then a bounded wait for every rollout | When the stack opts in with the agent's `deploy_access` attribute. Without it the agent has no permission to write |
+| **Argo CD** | An Argo CD component generates one Application per managed component and keeps it in sync with git | When the stack should deploy itself from every commit |
+
+### Argo CD
+
+Which components Argo CD manages is decided on the graph:
+
+| On the graph | What Argo CD manages |
+|---|---|
+| `gitops` off | Nothing — Argo CD is installed and idle |
+| `gitops` on, no links from Argo CD | Every component in the stack |
+| `gitops` on, links to some components | Only the linked ones — the recommended way |
+| Another stack's Argo CD links a component | That stack's Argo CD manages it |
+| A link between two Argo CD components | Multi-cluster: one Argo CD manages the stacks of other clusters |
+
+`argocd_mode` decides when it syncs: **Automatic** applies every new commit, **Manual** waits
+for someone to press Sync. Self-healing — reverting a drifted resource on its own — is set
+per link, works in automatic mode only, and is off by default for databases.
+
+:::note Argo CD never deletes data
+Pruning and cascade deletion are off on every Application, and the Argo CD component
+installs an admission policy that refuses any deletion by Argo CD of volumes, namespaces,
+resource definitions and database or storage resources — whatever a person clicks.
+Removing data stays a deliberate action outside Argo CD.
+:::
+
+Argo CD and the platform's own `kubectl apply --server-side` work on the same objects
+without fighting, so either can deploy at any time. A changed secret or configuration is
+applied but read only by new pods: add a **Reloader** component when a configuration change
+should restart the pods that use it.
 
 ## Environments
 
@@ -151,12 +207,15 @@ separate wiki.
 
 ## Air-gapped installation
 
-The same stack installs with no internet access. The post-generation chain inventories
-every image the stack references, generates a migration script that copies them into your
-own registry, and rewrites the kustomizations to pull from there.
+The same stack installs with no internet access. Set the section value `air_gapped` to
+`true` and the build inventories every image the stack references, writes a migration
+script that copies them into the registry on your configuration page, and rewrites the
+kustomizations to pull from there. You run the script once, then apply as usual.
 
-The stack does not become a different stack in the process — the graph, the policies and
-the validation surface are identical. Only the registry changes.
+The graph, the policies and the validation surface are the same stack's; what moves is
+where images come from — and your registry has to be on the image policy's allowed list.
+
+→ [Air-gapped installation](/docs/day0/air-gapped)
 
 ## Rolling behaviour
 

@@ -33,7 +33,9 @@ module.exports = {
         { type: 'doc', id: 'platform/platform-history', label: 'History and rollback' },
         { type: 'doc', id: 'platform/platform-liveview', label: 'LiveView' },
         { type: 'doc', id: 'platform/platform-sections', label: 'Catalog and sections' },
+        { type: 'doc', id: 'platform/platform-custom-components', label: 'Your own components' },
         { type: 'doc', id: 'platform/platform-collaboration', label: 'Collaboration' },
+        { type: 'doc', id: 'platform/platform-knowledge', label: 'Knowledge' },
       ],
     },
     {
@@ -44,6 +46,7 @@ module.exports = {
         { type: 'doc', id: 'day0/day0-index', label: 'Overview' },
         { type: 'doc', id: 'day0/day0-graph-to-code', label: 'From graph to repository' },
         { type: 'doc', id: 'day0/day0-build-deploy', label: 'Build and deploy' },
+        { type: 'doc', id: 'day0/day0-air-gapped', label: 'Air-gapped installation' },
         { type: 'doc', id: 'day0/day0-identity-secrets', label: 'Identity and secrets' },
       ],
     },

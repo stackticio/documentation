@@ -91,6 +91,12 @@ your-stack-repository/
 │     └─ overlays/<environment>/  per-environment values
 ├─ doc/                           generated documentation, per component and for the system
 ├─ scripts/                       decrypt, validate, operate
+├─ networkpolicy/                 the network policies the links imply
+├─ rbac/                          cluster roles for the people the graph grants access to
+├─ audit/                         a security audit of the design, regenerated every build
+├─ versioning/                    image inventory and migration script (air-gapped stacks)
+├─ kustomization-build-all.yaml   every build manifest in one apply
+├─ kustomization-deploy-all.yaml  every deploy manifest in one apply
 ├─ stack-metadata.yaml            the graph, as data
 └─ README.md                      the architecture, rendered as a diagram
 ```
@@ -118,8 +124,9 @@ between them and the operational wiring around them, in one pass.
 
 ## The post-generation chain
 
-After every component has rendered, a fixed chain runs across the whole tree. This is
-where the cross-cutting concerns are produced — the things no single component can know.
+After every component has rendered, a chain runs across the whole tree. This is where the
+cross-cutting concerns are produced — the things no single component can know. The first
+step always runs; the others are switched by the system's [section values](/docs/platform/sections).
 
 <Steps>
   <Step title="Stack metadata">
@@ -131,20 +138,24 @@ where the cross-cutting concerns are produced — the things no single component
     Namespace-level microsegmentation generated directly from the graph — including
     sub-component to component edges, component to sub-component edges, and cross-stack
     links. Nothing that was not declared is permitted, and nothing has to be maintained by
-    hand.
+    hand. Switched by <code>microsegmentation_level</code>; <code>none</code> turns it off.
   </Step>
-  <Step title="Regulated-scope network policies">
-    An additional, stricter policy set for the components that sit inside a regulated
-    boundary.
+  <Step title="Or the strict, regulated set">
+    With <code>microsegmentation_level</code> set to <code>pci_dss_strict</code>, a stricter set
+    replaces the standard one for the whole stack: a default-deny baseline in every
+    namespace, no blanket allow rules, no blanket internet egress, and internet ingress only
+    through the gateway. Every declared link still works.
   </Step>
   <Step title="Configuration checksums (optional)">
     Adds content checksums to the workload pod template, so that changing a secret or a
     configuration value actually rolls the pod instead of sitting unread in the API server.
+    Switched on by <code>checksum_annotations</code>.
   </Step>
-  <Step title="Image inventory and air-gap rewrite">
+  <Step title="Image inventory and air-gap rewrite (optional)">
     Every image the stack uses is inventoried; a migration script and a set of image
     rewrites are produced so the same stack can be installed from a private registry with
-    no internet access.
+    no internet access. Switched on by <code>air_gapped</code> — see
+    [Air-gapped installation](/docs/day0/air-gapped).
   </Step>
 </Steps>
 

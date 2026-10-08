@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stacktic Vision - Optimized</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Fira Code', 'Courier New', monospace;
+            background: #2a2847;
+            color: #e2e8f0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            position: relative;
+        }
+
+        /* Main title */
+        .main-title {
+            text-align: center;
+            margin-bottom: 60px;
+            opacity: 0;
+            animation: titleReveal 1s forwards;
+        }
+
+        @keyframes titleReveal {
+            to { 
+                opacity: 1;
+            }
+        }
+
+        .main-title h1 {
+            font-size: 42px;
+            background: linear-gradient(135deg, #60d5ff, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+            font-weight: 700;
+            position: relative;
+            text-shadow: 0 2px 20px rgba(96, 213, 255, 0.3);
+        }
+
+        .main-title h1::before {
+            content: "{ ";
+            color: #64748b;
+            opacity: 0.5;
+            font-weight: 300;
+        }
+
+        .main-title h1::after {
+            content: " }";
+            color: #64748b;
+            opacity: 0.5;
+            font-weight: 300;
+        }
+
+        /* Vision blocks */
+        .vision-block {
+            margin-bottom: 50px;
+            opacity: 0;
+            animation: fadeInBlock 0.6s forwards;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .vision-block:nth-child(1) { animation-delay: 0.2s; }
+        .vision-block:nth-child(2) { animation-delay: 0.4s; }
+        .vision-block:nth-child(3) { animation-delay: 0.6s; }
+        .vision-block:nth-child(4) { animation-delay: 0.8s; }
+
+        @keyframes fadeInBlock {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .vision-header {
+            display: flex;
+            align-items: baseline;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .vision-number {
+            font-size: 32px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #60d5ff, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            flex-shrink: 0;
+        }
+
+        .vision-number::before {
+            content: "//";
+            margin-right: 8px;
+            opacity: 0.4;
+            font-size: 0.7em;
+            color: #94a3b8;
+        }
+
+        .vision-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #f1f5f9;
+            letter-spacing: 0.5px;
+        }
+
+        .vision-content {
+            font-size: 17px;
+            line-height: 1.9;
+            color: #cbd5e1;
+            margin-left: 60px;
+            position: relative;
+        }
+
+        .text-line {
+            margin-bottom: 8px;
+        }
+
+        /* Highlighted text */
+        .highlight {
+            color: #34d399;
+            font-weight: 600;
+            padding: 0 4px;
+            position: relative;
+            background: linear-gradient(120deg, transparent 0%, rgba(52, 211, 153, 0.15) 50%, transparent 100%);
+            border-radius: 3px;
+        }
+
+        /* Section separator */
+        .separator {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.3), transparent);
+            margin: 35px 0;
+        }
+
+        /* Subtle floating elements */
+        .float-element {
+            position: absolute;
+            font-size: 12px;
+            color: rgba(148, 163, 184, 0.2);
+            font-family: 'Fira Code', monospace;
+            pointer-events: none;
+            animation: gentleFloat 20s ease-in-out infinite;
+        }
+
+        @keyframes gentleFloat {
+            0%, 100% {
+                transform: translate3d(0, 0, 0);
+                opacity: 0.1;
+            }
+            50% {
+                transform: translate3d(10px, -20px, 0);
+                opacity: 0.2;
+            }
+        }
+
+        .float-1 {
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+
+        .float-2 {
+            top: 30%;
+            right: 8%;
+            animation-delay: 5s;
+        }
+
+        .float-3 {
+            bottom: 20%;
+            left: 10%;
+            animation-delay: 10s;
+        }
+
+        .float-4 {
+            bottom: 40%;
+            right: 5%;
+            animation-delay: 15s;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .main-title h1 {
+                font-size: 32px;
+            }
+            
+            .vision-number {
+                font-size: 26px;
+            }
+            
+            .vision-title {
+                font-size: 20px;
+            }
+            
+            .vision-content {
+                font-size: 15px;
+                margin-left: 45px;
+            }
+
+            .float-element {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-title h1 {
+                font-size: 26px;
+            }
+            
+            .vision-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .vision-content {
+                margin-left: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Subtle floating elements -->
+    <span class="float-element float-1">{ metadata }</span>
+    <span class="float-element float-2">function()</span>
+    <span class="float-element float-3">&lt;stack/&gt;</span>
+    <span class="float-element float-4">=&gt; automate</span>
+
+    <div class="container">
+        <div class="main-title">
+            <h1>OUR VISION</h1>
+        </div>
+
+        <div class="vision-block">
+            <div class="vision-header">
+                <span class="vision-number">1.</span>
+                <span class="vision-title">Open Source Unification</span>
+            </div>
+            <div class="vision-content">
+                <div class="text-line">Stacktic bridges the gap between open foundations and</div>
+                <div class="text-line">the open-source ecosystem.</div>
+                <div class="text-line">&nbsp;</div>
+                <div class="text-line">We unify automation across frameworks, services, and databases —</div>
+                <div class="text-line">building a <span class="highlight">stable, end-to-end solution stack</span></div>
+                <div class="text-line">powered entirely by <span class="highlight">pure open source</span>.</div>
+            </div>
+            <div class="separator"></div>
+        </div>
+
+        <div class="vision-block">
+            <div class="vision-header">
+                <span class="vision-number">2.</span>
+                <span class="vision-title">Holistic Stack Generator</span>
+            </div>
+            <div class="vision-content">
+                <div class="text-line">Built on the principle of <span class="highlight">Stack Version Control</span>,</div>
+                <div class="text-line">Stacktic enables a fully automated lifecycle from</div>
+                <div class="text-line"><span class="highlight">Day 0 to Day 2</span>.</div>
+                <div class="text-line">&nbsp;</div>
+                <div class="text-line">Your entire stack can be created, saved, duplicated,</div>
+                <div class="text-line">modified, and rolled back with ease —</div>
+                <div class="text-line">turning complex infrastructure into a versioned, living system.</div>
+            </div>
+            <div class="separator"></div>
+        </div>
+
+        <div class="vision-block">
+            <div class="vision-header">
+                <span class="vision-number">3.</span>
+                <span class="vision-title">Fastest Path to Production, Minimal Ops</span>
+            </div>
+            <div class="vision-content">
+                <div class="text-line">Stacktic eliminates every blocker to rapid release —</div>
+                <div class="text-line">automating <span class="highlight">security, versioning, and observability</span></div>
+                <div class="text-line">from the start.</div>
+                <div class="text-line">&nbsp;</div>
+                <div class="text-line">Go from idea to Day 0 in hours and maintain Day 2 with</div>
+                <div class="text-line"><span class="highlight">near-zero integration overhead</span>.</div>
+                <div class="text-line">Speed and stability, redefined.</div>
+            </div>
+            <div class="separator"></div>
+        </div>
+
+        <div class="vision-block">
+            <div class="vision-header">
+                <span class="vision-number">4.</span>
+                <span class="vision-title">Designed for Adaptability</span>
+            </div>
+            <div class="vision-content">
+                <div class="text-line">Stacktic is built on <span class="highlight">relational logic</span> —</div>
+                <div class="text-line">inherently adaptive and future-proof.</div>
+                <div class="text-line">&nbsp;</div>
+                <div class="text-line">It integrates the latest open-source technologies,</div>
+                <div class="text-line">connects with legacy and managed systems, and lets users</div>
+                <div class="text-line"><span class="highlight">automate on their own terms</span>.</div>
+                <div class="text-line">&nbsp;</div>
+                <div class="text-line">Whatever your stack looks like — Stacktic evolves with it.</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

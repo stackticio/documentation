@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stacktic Hero</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: #2a2847;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            color: #e0e0e0;
+        }
+        
+        .universe-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #2a2847;
+        }
+        
+        .code-rain {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            opacity: 0.15;
+        }
+        
+        .code-line {
+            position: absolute;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #00ff88;
+            white-space: nowrap;
+            animation: codeScroll 25s linear infinite;
+            will-change: transform;
+        }
+        
+        .code-line:nth-child(1) { left: 10%; animation-duration: 22s; }
+        .code-line:nth-child(2) { left: 60%; animation-duration: 28s; animation-delay: -10s; color: #00d4ff; }
+        .code-line:nth-child(3) { left: 85%; animation-duration: 25s; animation-delay: -15s; color: #7c3aed; }
+        
+        @keyframes codeScroll {
+            0% { transform: translateY(-100vh); opacity: 0; }
+            10% { opacity: 0.15; }
+            90% { opacity: 0.15; }
+            100% { transform: translateY(100vh); opacity: 0; }
+        }
+        
+        .contribution-graph {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            display: grid;
+            grid-template-columns: repeat(10, 10px);
+            grid-template-rows: repeat(2, 10px);
+            gap: 3px;
+            opacity: 0.12;
+        }
+        
+        .contrib-cell {
+            width: 10px;
+            height: 10px;
+            background: #00ff88;
+            border-radius: 2px;
+            animation: contribPulse 6s ease-in-out infinite;
+        }
+        
+        .contrib-cell:nth-child(odd) { animation-delay: 0.3s; opacity: 0.6; }
+        .contrib-cell:nth-child(even) { animation-delay: 0.6s; opacity: 0.9; }
+        .contrib-cell:nth-child(3n) { background: #00d4ff; }
+        .contrib-cell:nth-child(5n) { background: #7c3aed; }
+        
+        @keyframes contribPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .hero-hologram {
+            position: relative;
+            z-index: 100;
+            animation: hologramFloat 8s ease-in-out infinite;
+            margin-top: 60px;
+            max-width: 95%;
+        }
+        
+        @keyframes hologramFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .morph-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(20px, 3vw, 38px);
+            font-weight: 400;
+            position: relative;
+            line-height: 1.6;
+            color: #d0d0d0;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+        
+        .static-text {
+            display: inline-block;
+        }
+        
+        .morph-line {
+            display: inline-block;
+            position: relative;
+            height: 1.6em;
+            vertical-align: bottom;
+            margin: 0 0.5em;
+            min-width: 200px;
+            border-bottom: 2px solid rgba(0, 255, 136, 0.3);
+        }
+        
+        .morph-word {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateY(100%);
+        }
+        
+        .morph-word:nth-child(1) { 
+            animation: showWord 10s ease-in-out infinite;
+            animation-delay: 0s;
+            color: #00ff88;
+            text-shadow: 0 0 25px rgba(0, 255, 136, 0.6);
+        }
+        .morph-word:nth-child(2) { 
+            animation: showWord 10s ease-in-out infinite;
+            animation-delay: 2s;
+            color: #00d4ff;
+            text-shadow: 0 0 25px rgba(0, 212, 255, 0.6);
+        }
+        .morph-word:nth-child(3) { 
+            animation: showWord 10s ease-in-out infinite;
+            animation-delay: 4s;
+            color: #7c3aed;
+            text-shadow: 0 0 25px rgba(124, 58, 237, 0.6);
+        }
+        .morph-word:nth-child(4) { 
+            animation: showWord 10s ease-in-out infinite;
+            animation-delay: 6s;
+            color: #ff6b9d;
+            text-shadow: 0 0 25px rgba(255, 107, 157, 0.6);
+        }
+        .morph-word:nth-child(5) { 
+            animation: showWord 10s ease-in-out infinite;
+            animation-delay: 8s;
+            color: #fbbf24;
+            text-shadow: 0 0 25px rgba(251, 191, 36, 0.6);
+        }
+        
+        @keyframes showWord {
+            0% {
+                opacity: 0;
+                transform: translateY(100%);
+            }
+            5% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            15% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            20% {
+                opacity: 0;
+                transform: translateY(-100%);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100%);
+            }
+        }
+        
+        .bottom-text {
+            display: block;
+            margin-top: 10px;
+        }
+        
+        .bottom-text .code-accent {
+            color: #7c3aed;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            margin-left: 4px;
+            opacity: 0.9;
+        }
+        
+        .subtitle-wave {
+            font-family: 'JetBrains Mono', sans-serif;
+            font-size: clamp(14px, 2.2vw, 24px);
+            margin-top: 35px;
+            color: rgba(208, 208, 208, 0.85);
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+            line-height: 1.8;
+            font-weight: 400;
+        }
+        
+        .wave-word {
+            display: inline-block;
+            margin: 0 0.25em;
+            animation: gentleWave 5s ease-in-out infinite;
+        }
+        
+        @keyframes gentleWave {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        .wave-word:nth-child(1) { animation-delay: 0s; }
+        .wave-word:nth-child(2) { animation-delay: 0.1s; }
+        .wave-word:nth-child(3) { animation-delay: 0.2s; }
+        .wave-word:nth-child(4) { animation-delay: 0.3s; }
+        .wave-word:nth-child(5) { animation-delay: 0.4s; }
+        .wave-word:nth-child(6) { animation-delay: 0.5s; }
+        .wave-word:nth-child(7) { animation-delay: 0.6s; }
+        
+        .highlight-word {
+            font-family: 'JetBrains Mono', monospace;
+            color: #00ff88;
+            font-weight: 700;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+        }
+        
+        .glass-container {
+            background: linear-gradient(135deg,
+                rgba(42, 40, 71, 0.7) 0%,
+                rgba(50, 48, 80, 0.6) 50%,
+                rgba(42, 40, 71, 0.7) 100%);
+            backdrop-filter: blur(15px) saturate(120%);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 20px;
+            padding: 60px 70px;
+            box-shadow: 
+                0 25px 80px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 0 40px rgba(0, 255, 136, 0.08),
+                0 0 120px rgba(0, 212, 255, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .glass-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(0, 255, 136, 0.6) 30%,
+                rgba(0, 212, 255, 0.6) 50%,
+                rgba(124, 58, 237, 0.6) 70%,
+                transparent);
+            animation: scanline 8s linear infinite;
+        }
+        
+        .glass-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(0, 255, 136, 0.03) 0px,
+                    transparent 2px,
+                    transparent 4px
+                );
+            pointer-events: none;
+            opacity: 0.5;
+        }
+        
+        @keyframes scanline {
+            0% { transform: translateY(0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(400px); opacity: 0; }
+        }
+        
+        @media (max-width: 768px) {
+            .glass-container {
+                padding: 40px 30px;
+            }
+            
+            .contribution-graph {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="universe-container">
+        <div class="contribution-graph">
+            <div class="contrib-cell"></div>
+            <div class="contrib-cell"></div>
+            <div class="contrib-cell"></div>
+            <div class="contrib-cell"></div>
+            <div class="contrib-cell"></div>
+            <div class="contrib-cell"></div>
+            <div class="contrib-cell"></div>
+            <div class="contrib-cell"></div>
+            <div class="contrib-cell"></div>
+            <div class="contrib-cell"></div>
+            <div class="contrib-cell"></div>
+            <div class="contrib-cell"></div>
+            <div class="contrib-cell"></div>
+            <div class="contrib-cell"></div>
+            <div class="contrib-cell"></div>
+            <div class="contrib-cell"></div>
+            <div class="contrib-cell"></div>
+            <div class="contrib-cell"></div>
+            <div class="contrib-cell"></div>
+            <div class="contrib-cell"></div>
+        </div>
+        
+        <div class="code-rain">
+            <div class="code-line">// git clone https://github.com/stacktic/core.git</div>
+            <div class="code-line">// kubectl apply -f open-source.yaml</div>
+            <div class="code-line">// pip install stacktic --upgrade</div>
+        </div>
+        
+        <div class="hero-hologram">
+            <div class="glass-container">
+                <div class="morph-text">
+                    <span class="static-text">Redefines the standard for</span>
+                    <div class="morph-line">
+                        <div class="morph-word">SecOps</div>
+                        <div class="morph-word">DataOps</div>
+                        <div class="morph-word">MLOps</div>
+                        <div class="morph-word">GitOps</div>
+                        <div class="morph-word">AIOps</div>
+                    </div>
+                    <span class="bottom-text">automation<span class="code-accent">.next()</span></span>
+                </div>
+                
+                <div class="subtitle-wave">
+                    <span class="wave-word">Open-source</span>
+                    <span class="wave-word">stack</span>
+                    <span class="wave-word">unification</span>
+                    <span class="wave-word">platform</span>
+                    <span class="wave-word">for</span>
+                    <span class="wave-word">a</span>
+                    <span class="wave-word highlight-word">resilient</span><span>,</span>
+                    <span class="wave-word highlight-word">sovereign</span><span>,</span>
+                    <span class="wave-word">and</span>
+                    <span class="wave-word highlight-word">cloud-agnostic</span>
+                    <span class="wave-word">future</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

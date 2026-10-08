@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stacktic — Business One-Pager</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --indigo: #4f46e5;
+            --indigo-light: #818cf8;
+            --purple: #7c3aed;
+            --cyan: #0891b2;
+            --green: #059669;
+            --green-light: #34d399;
+            --amber: #fbbf24;
+            --red: #dc2626;
+            --pink: #ec4899;
+            --dark: #1a1a2e;
+            --slate-600: #475569;
+            --slate-500: #64748b;
+            --slate-400: #94a3b8;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+            --slate-50: #f8fafc;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+        html, body { width: 100%; }
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: white;
+            color: var(--dark);
+            line-height: 1.5;
+        }
+        .page {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 28px 20px;
+        }
+        .serif { font-family: 'DM Serif Display', Georgia, serif; }
+
+        /* ---------- HEADER ---------- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 22px;
+            gap: 12px;
+        }
+        .logo {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 38px;
+            color: var(--indigo);
+            line-height: 1;
+            letter-spacing: -1px;
+        }
+        .tagline {
+            font-size: 12px;
+            color: var(--slate-500);
+            margin-top: 4px;
+            font-weight: 500;
+        }
+        .contact {
+            text-align: right;
+            font-size: 11px;
+        }
+        .contact .url { color: var(--dark); font-weight: 700; }
+        .contact .email { color: var(--slate-400); margin-top: 2px; }
+
+        /* ---------- SECTION CARD ---------- */
+        .card {
+            border-radius: 16px;
+            padding: 22px;
+            margin-bottom: 18px;
+        }
+        .card-dark { background: var(--dark); color: white; }
+        .card-light { background: linear-gradient(135deg, var(--slate-50), var(--slate-100)); border: 1px solid var(--slate-200); }
+        .card-green { background: linear-gradient(135deg, #f0fdf4, #ecfdf5); border: 1px solid #bbf7d0; }
+
+        .label {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            margin-bottom: 14px;
+        }
+        .label-indigo { color: var(--indigo); }
+        .label-purple { color: #c4b5fd; }
+        .label-amber { color: var(--amber); }
+        .label-cyan { color: var(--cyan); }
+        .label-green { color: var(--green); }
+        .label-slate { color: var(--slate-600); }
+        .label-pink { color: #f472b6; }
+
+        /* ---------- INTRO ---------- */
+        .intro-statement {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 22px;
+            line-height: 1.4;
+            margin-bottom: 18px;
+        }
+        .intro-statement .indigo { color: var(--indigo); }
+        .intro-statement .purple { color: var(--purple); }
+        .intro-statement .cyan { color: var(--cyan); }
+        .intro-statement .green { color: var(--green); }
+
+        .compliance-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .compliance-pill {
+            border-radius: 6px;
+            padding: 7px 4px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 800;
+        }
+        .pill-pci { background: #fef3c7; border: 1px solid #fbbf24; color: #92400e; }
+        .pill-hipaa { background: #dbeafe; border: 1px solid #60a5fa; color: #1e40af; }
+        .pill-soc2 { background: #d1fae5; border: 1px solid #34d399; color: #065f46; }
+        .pill-dora { background: #ede9fe; border: 1px solid #a78bfa; color: #5b21b6; }
+
+        .layers {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .layer {
+            color: white;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .layer-num { opacity: 0.5; font-variant-numeric: tabular-nums; }
+        .layer-1 { background: var(--indigo); }
+        .layer-2 { background: var(--purple); }
+        .layer-3 { background: var(--cyan); }
+        .layer-4 { background: var(--green); }
+
+        /* ---------- DEMOS ---------- */
+        .demo-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .demo-item {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 14px;
+        }
+        .demo-item video {
+            width: 100%;
+            border-radius: 10px;
+            background: #000;
+            display: block;
+        }
+        .demo-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: white;
+            margin: 10px 0 4px;
+        }
+        .demo-desc {
+            font-size: 13px;
+            color: var(--slate-400);
+            line-height: 1.5;
+        }
+        .demo-link {
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--indigo-light);
+            text-decoration: none;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            word-break: break-all;
+        }
+        .demo-link:hover { text-decoration: underline; }
+
+        /* ---------- PROBLEMS ---------- */
+        .problem-head {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 22px;
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+        .problem-head .red { color: #f87171; }
+        .problem-list { display: flex; flex-direction: column; gap: 0; }
+        .problem-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--slate-500);
+            margin-bottom: 8px;
+        }
+        .problem-meta .right { color: var(--indigo-light); }
+        .problem-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 0;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        .problem-row:first-of-type { border-top: 1px solid rgba(255,255,255,0.12); }
+        .problem-text { font-size: 14px; color: #cbd5e1; line-height: 1.35; flex: 1; }
+        .problem-stat { font-size: 22px; font-weight: 900; white-space: nowrap; }
+        .stat-green { color: var(--green-light); }
+        .stat-amber { color: var(--amber); }
+        .stat-indigo { color: var(--indigo-light); }
+
+        /* ---------- STRUCTURAL SHIFT ---------- */
+        .shift-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .shift-item-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 6px;
+        }
+        .shift-item-text {
+            font-size: 14px;
+            color: var(--slate-500);
+            line-height: 1.5;
+        }
+        .shift-item-text strong.indigo { color: var(--indigo); }
+        .shift-item-text strong.red { color: var(--red); }
+        .shift-item-text strong.purple { color: var(--purple); }
+        .shift-item-text strong.dark { color: var(--dark); }
+        .shift-summary {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid var(--slate-200);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--slate-600);
+            text-align: center;
+            line-height: 1.5;
+        }
+        .shift-summary .red { color: var(--red); display: block; }
+        .shift-summary .indigo { color: var(--indigo); display: block; margin-top: 2px; }
+
+        /* ---------- HOW IT WORKS ---------- */
+        .how-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+        .how-tag {
+            font-size: 11px;
+            font-weight: 600;
+            text-align: center;
+            border-radius: 6px;
+            padding: 7px;
+        }
+        .tag-devops { background: rgba(167,139,250,0.15); border: 1px solid rgba(167,139,250,0.3); color: #c4b5fd; }
+        .tag-secops { background: rgba(34,211,238,0.15); border: 1px solid rgba(34,211,238,0.3); color: #67e8f9; }
+        .tag-dataops { background: rgba(244,114,182,0.15); border: 1px solid rgba(244,114,182,0.3); color: #f9a8d4; }
+        .tag-manager { background: rgba(251,191,36,0.15); border: 1px solid rgba(251,191,36,0.3); color: #fde68a; }
+        .tag-ai { background: rgba(52,211,153,0.15); border: 1px solid rgba(52,211,153,0.3); color: #6ee7b7; grid-column: span 2; }
+
+        .arrow-down { text-align: center; color: var(--slate-600); font-size: 18px; margin: 8px 0; }
+
+        .platform-box {
+            border: 2px solid var(--indigo);
+            border-radius: 14px;
+            padding: 16px 12px;
+            background: rgba(79,70,229,0.08);
+            position: relative;
+            margin-bottom: 8px;
+        }
+        .platform-label {
+            position: absolute;
+            top: -10px;
+            left: 16px;
+            background: var(--dark);
+            padding: 0 8px;
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--indigo-light);
+            letter-spacing: 1px;
+        }
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+        }
+        .platform-cell {
+            border-radius: 8px;
+            padding: 10px 8px;
+            text-align: center;
+            color: white;
+        }
+        .platform-cell .name { font-size: 12px; font-weight: 700; }
+        .platform-cell .sub { font-size: 9px; opacity: 0.55; margin-top: 2px; }
+        .cell-integrate { background: var(--indigo); }
+        .cell-automate { background: var(--purple); }
+        .cell-generate { background: var(--cyan); }
+        .cell-govern { background: var(--green); }
+
+        .outcomes {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-top: 12px;
+        }
+        .outcome-cell {
+            border-radius: 8px;
+            padding: 10px 6px;
+            text-align: center;
+        }
+        .outcome-cell .title { font-size: 11px; font-weight: 800; }
+        .outcome-cell .sub { font-size: 9px; margin-top: 2px; }
+        .out-green { background: rgba(52,211,153,0.15); border: 1px solid rgba(52,211,153,0.3); }
+        .out-green .title { color: var(--green-light); }
+        .out-green .sub { color: #6ee7b7; }
+        .out-indigo { background: rgba(129,140,248,0.15); border: 1px solid rgba(129,140,248,0.3); }
+        .out-indigo .title { color: var(--indigo-light); }
+        .out-indigo .sub { color: #a5b4fc; }
+        .out-amber { background: rgba(251,191,36,0.15); border: 1px solid rgba(251,191,36,0.3); }
+        .out-amber .title { color: var(--amber); }
+        .out-amber .sub { color: #fde68a; }
+
+        /* ---------- WHY STACKTIC ---------- */
+        .why-list { display: flex; flex-direction: column; gap: 14px; }
+        .why-item { display: flex; gap: 14px; align-items: flex-start; }
+        .why-badge {
+            flex-shrink: 0;
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 900;
+            font-size: 18px;
+        }
+        .badge-1 { background: linear-gradient(135deg, var(--indigo), var(--purple)); font-size: 20px; }
+        .badge-2 { background: linear-gradient(135deg, var(--red), #f59e0b); font-size: 16px; }
+        .badge-3 { background: linear-gradient(135deg, var(--green), #22d3ee); font-size: 20px; }
+        .badge-4 { background: linear-gradient(135deg, var(--cyan), var(--indigo-light)); font-size: 20px; }
+        .why-content .title { font-size: 16px; font-weight: 700; color: var(--dark); margin-bottom: 3px; }
+        .why-content .desc { font-size: 13px; color: var(--slate-500); line-height: 1.5; }
+        .why-content .desc strong.indigo { color: var(--indigo); }
+        .why-content .desc strong.red { color: var(--red); }
+        .why-content .desc strong.green { color: var(--green); }
+        .why-content .desc strong.cyan { color: var(--cyan); }
+
+        /* ---------- ENTERPRISE IMPACT ---------- */
+        .impact-scenario {
+            font-size: 13px;
+            color: var(--slate-400);
+            margin-bottom: 14px;
+        }
+        .impact-scenario strong { color: white; }
+        .impact-legend {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--slate-500);
+            margin-bottom: 12px;
+        }
+        .swatch {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+        .sw-trad { background: var(--slate-600); }
+        .sw-stk { background: var(--green-light); margin-left: 12px; }
+        .impact-bars { display: flex; flex-direction: column; gap: 14px; margin-bottom: 14px; }
+        .impact-row .impact-label { font-size: 12px; color: var(--slate-400); margin-bottom: 5px; font-weight: 600; }
+        .impact-bar { display: flex; gap: 6px; align-items: center; }
+        .impact-bar .bar { height: 22px; border-radius: 4px; }
+        .impact-bar .val { font-size: 12px; white-space: nowrap; }
+        .impact-bar.trad .bar { background: var(--slate-600); }
+        .impact-bar.trad .val { color: var(--slate-400); }
+        .impact-bar.stk { margin-top: 4px; }
+        .impact-bar.stk .bar { background: linear-gradient(90deg, var(--green), var(--green-light)); }
+        .impact-bar.stk .val { color: var(--green-light); font-weight: 700; }
+
+        .roi {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .roi-cell { border-radius: 10px; padding: 12px 10px; }
+        .roi-cell .num { font-size: 20px; font-weight: 900; line-height: 1; }
+        .roi-cell .lab { font-size: 9px; color: var(--slate-400); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+        .roi-1 { background: rgba(52,211,153,0.1); border-left: 3px solid var(--green-light); }
+        .roi-1 .num { color: var(--green-light); }
+        .roi-2 { background: rgba(129,140,248,0.1); border-left: 3px solid var(--indigo-light); }
+        .roi-2 .num { color: var(--indigo-light); }
+        .roi-3 { background: rgba(251,191,36,0.1); border-left: 3px solid var(--amber); }
+        .roi-3 .num { color: var(--amber); }
+
+        /* ---------- LONG-TERM VALUE ---------- */
+        .value-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .value-cell {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--slate-200);
+            padding: 16px 10px;
+            text-align: center;
+        }
+        .value-cell .big { font-size: 28px; font-weight: 900; line-height: 1; }
+        .value-cell .title { font-size: 13px; color: var(--slate-600); margin-top: 6px; font-weight: 700; }
+        .value-cell .sub { font-size: 11px; color: var(--slate-400); margin-top: 3px; }
+        .big-1 { color: var(--green); }
+        .big-2 { color: var(--indigo); }
+        .big-3 { color: var(--cyan); }
+        .big-4 { color: var(--purple); font-size: 22px !important; }
+
+        /* ---------- COVERAGE ---------- */
+        .coverage-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .cov-cell {
+            text-align: center;
+            border-radius: 12px;
+            padding: 14px 6px;
+        }
+        .cov-icon {
+            width: 38px;
+            height: 38px;
+            margin: 0 auto 8px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .cov-cell .name { font-size: 13px; font-weight: 700; }
+        .cov-cell .sub { font-size: 10px; margin-top: 3px; }
+        .cov-ops { background: rgba(79,70,229,0.15); border: 1px solid rgba(79,70,229,0.3); }
+        .cov-ops .cov-icon { background: linear-gradient(135deg, var(--indigo), var(--purple)); }
+        .cov-ops .name { color: #c4b5fd; }
+        .cov-ops .sub { color: var(--indigo-light); }
+        .cov-sec { background: rgba(34,211,238,0.15); border: 1px solid rgba(34,211,238,0.3); }
+        .cov-sec .cov-icon { background: linear-gradient(135deg, var(--cyan), #22d3ee); }
+        .cov-sec .name { color: #67e8f9; }
+        .cov-sec .sub { color: #22d3ee; }
+        .cov-data { background: rgba(244,114,182,0.15); border: 1px solid rgba(244,114,182,0.3); }
+        .cov-data .cov-icon { background: linear-gradient(135deg, var(--pink), #f472b6); }
+        .cov-data .name { color: #f9a8d4; }
+        .cov-data .sub { color: #f472b6; }
+        .cov-net { background: rgba(52,211,153,0.15); border: 1px solid rgba(52,211,153,0.3); }
+        .cov-net .cov-icon { background: linear-gradient(135deg, var(--green), var(--green-light)); }
+        .cov-net .name { color: #6ee7b7; }
+        .cov-net .sub { color: var(--green-light); }
+        .cov-ver { background: rgba(251,191,36,0.15); border: 1px solid rgba(251,191,36,0.3); }
+        .cov-ver .cov-icon { background: linear-gradient(135deg, #d97706, var(--amber)); }
+        .cov-ver .name { color: #fde68a; }
+        .cov-ver .sub { color: var(--amber); }
+        .cov-ai { background: rgba(129,140,248,0.15); border: 1px solid rgba(129,140,248,0.3); }
+        .cov-ai .cov-icon { background: linear-gradient(135deg, #6366f1, var(--indigo-light)); }
+        .cov-ai .name { color: #a5b4fc; }
+        .cov-ai .sub { color: var(--indigo-light); }
+
+        /* ---------- DEPLOY ---------- */
+        .deploy-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+        .chip {
+            background: white;
+            border: 1px solid #d1fae5;
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #065f46;
+        }
+        .deploy-note {
+            margin-top: 12px;
+            font-size: 12px;
+            color: var(--green);
+            font-weight: 700;
+        }
+
+        /* ---------- DESIGNED FOR ---------- */
+        .designed-list { display: flex; flex-direction: column; gap: 8px; }
+        .designed-item { font-size: 13px; color: #334155; line-height: 1.45; }
+        .designed-item strong.indigo { color: var(--indigo); }
+        .designed-item strong.purple { color: var(--purple); }
+        .designed-item strong.cyan { color: var(--cyan); }
+        .designed-item strong.green { color: var(--green); }
+        .designed-item strong.red { color: var(--red); }
+
+        /* ---------- DESKTOP ENHANCEMENTS ---------- */
+        @media (min-width: 768px) {
+            .page { max-width: 680px; padding: 36px 28px; }
+            .logo { font-size: 46px; }
+            .tagline { font-size: 14px; }
+            .contact { font-size: 13px; }
+            .intro-statement { font-size: 26px; }
+            .problem-head { font-size: 26px; }
+            .problem-text { font-size: 15px; }
+            .problem-stat { font-size: 24px; }
+            .demo-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 14px;
+            }
+        }
+
+        /* ---------- PRINT / PDF ---------- */
+        @page {
+            size: 80mm 297mm; /* tall mobile-style PDF */
+            margin: 0;
+        }
+        @media print {
+            html, body { background: white; }
+            .page { max-width: 100%; padding: 8mm 6mm; }
+            .card { break-inside: avoid; page-break-inside: avoid; }
+            .demo-item video { display: none; }
+            .demo-item::after {
+                content: "▶ Scan QR or open URL below";
+                display: block;
+                background: #0b1020;
+                color: #818cf8;
+                border-radius: 8px;
+                padding: 18px;
+                text-align: center;
+                font-size: 11px;
+                font-weight: 700;
+                letter-spacing: 1px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div>
+            <div class="logo">Stacktic</div>
+            <div class="tagline">Next-Generation App Factory</div>
+        </div>
+        <div class="contact">
+            <div class="url">stacktic.io</div>
+            <div class="email">info@stacktic.io</div>
+        </div>
+    </div>
+
+    <!-- INTRO STATEMENT -->
+    <div class="intro-statement serif">
+        An <span class="indigo">app factory</span> that <span class="purple">automates stack layers</span> and their operations &mdash; <span class="cyan">standardized and tuned</span> to meet the strictest compliance requirements like PCI-DSS, HIPAA, SOC2, and DORA. <span class="green">From day one.</span>
+    </div>
+
+    <!-- COMPLIANCE + LAYERS -->
+    <div class="compliance-row">
+        <div class="compliance-pill pill-pci">PCI-DSS</div>
+        <div class="compliance-pill pill-hipaa">HIPAA</div>
+        <div class="compliance-pill pill-soc2">SOC2</div>
+        <div class="compliance-pill pill-dora">DORA</div>
+    </div>
+    <div class="layers" style="margin-bottom: 22px;">
+        <div class="layer layer-1"><span class="layer-num">01</span>Platform Governance</div>
+        <div class="layer layer-2"><span class="layer-num">02</span>Code &amp; Git Security</div>
+        <div class="layer layer-3"><span class="layer-num">03</span>Stack (K8s) Automation</div>
+        <div class="layer layer-4"><span class="layer-num">04</span>AI Agent Governance</div>
+    </div>
+
+    <!-- DEMOS -->
+    <div class="card card-dark">
+        <div class="label label-purple">See It In Action</div>
+        <div class="demo-grid">
+            <div class="demo-item">
+                <video controls preload="metadata" playsinline>
+                    <source src="https://video.wixstatic.com/video/06ddae_f04851cf3d8344c387c51363260cfee9/1080p/mp4/file.mp4" type="video/mp4">
+                </video>
+                <div class="demo-title">Core Automation</div>
+                <div class="demo-desc">Watch Stacktic auto-wire every stack layer &mdash; from app to data to platform &mdash; in a single generation.</div>
+                <a class="demo-link" href="https://video.wixstatic.com/video/06ddae_f04851cf3d8344c387c51363260cfee9/1080p/mp4/file.mp4" target="_blank">Open video &rarr;</a>
+            </div>
+            <div class="demo-item">
+                <video controls preload="metadata" playsinline>
+                    <source src="https://video.wixstatic.com/video/06ddae_5df7d01bdd864007bc94cee77fc9f2cd/1080p/mp4/file.mp4" type="video/mp4">
+                </video>
+                <div class="demo-title">Intelligent Validation Insight</div>
+                <div class="demo-desc">Beyond observability &mdash; deep metadata intelligence that understands and validates every stack relationship.</div>
+                <a class="demo-link" href="https://video.wixstatic.com/video/06ddae_5df7d01bdd864007bc94cee77fc9f2cd/1080p/mp4/file.mp4" target="_blank">Open video &rarr;</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- HIDDEN PROBLEMS -->
+    <div class="card card-dark">
+        <div class="problem-head serif">The hidden problems <span class="red">every company has</span></div>
+        <div class="problem-list">
+            <div class="problem-meta">
+                <span>The Problem</span>
+                <span class="right">Stacktic</span>
+            </div>
+            <div class="problem-row">
+                <div class="problem-text">Operations cost too much.</div>
+                <div class="problem-stat stat-green">-70%</div>
+            </div>
+            <div class="problem-row">
+                <div class="problem-text">Compliance is slow and expensive.</div>
+                <div class="problem-stat stat-green">-80%</div>
+            </div>
+            <div class="problem-row">
+                <div class="problem-text">Legacy systems block modernization.</div>
+                <div class="problem-stat stat-amber">0 legacy</div>
+            </div>
+            <div class="problem-row">
+                <div class="problem-text">Vendor lock-in restricts flexibility.</div>
+                <div class="problem-stat stat-indigo">0 lock-in</div>
+            </div>
+            <div class="problem-row">
+                <div class="problem-text">Tech decisions locked by people, politics &amp; past choices.</div>
+                <div class="problem-stat stat-green">-90%</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STRUCTURAL SHIFT -->
+    <div class="card card-light">
+        <div class="label label-slate">The Structural Shift</div>
+        <div class="shift-grid">
+            <div>
+                <div class="shift-item-title">The Stack Is Exploding</div>
+                <div class="shift-item-text">K8s &amp; open source: <strong class="indigo">+22-26%</strong> growth. AI open source: <strong class="indigo">+35%</strong>. Multi-cloud rising. <strong class="dark">More tools, more layers, more friction.</strong></div>
+            </div>
+            <div>
+                <div class="shift-item-title">Dependency Is Decreasing</div>
+                <div class="shift-item-text">Managed services growth slowing. Enterprises reducing hyperscaler dependency. Sovereignty regulations rising. <strong class="red">Vendor lock-in = strategic risk.</strong></div>
+            </div>
+            <div>
+                <div class="shift-item-title">AI-Driven Threats Are Coming</div>
+                <div class="shift-item-text">AI agents will attack your stack at <strong class="purple">machine speed</strong>. <strong class="red">Manual security can't keep up.</strong> Automated compliance is no longer optional &mdash; <strong class="dark">it's survival.</strong></div>
+            </div>
+        </div>
+        <div class="shift-summary">
+            <span class="red">Complexity now grows faster than engineering capacity.</span>
+            <span class="indigo">The future is autonomous, not managed.</span>
+        </div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <div class="card card-dark">
+        <div class="label label-purple">How It Works</div>
+        <div class="how-row">
+            <div class="how-tag tag-devops">DevOps</div>
+            <div class="how-tag tag-secops">SecOps</div>
+            <div class="how-tag tag-dataops">DataOps</div>
+            <div class="how-tag tag-manager">Manager</div>
+            <div class="how-tag tag-ai">AI Agent</div>
+        </div>
+        <div class="arrow-down">&#8595;</div>
+        <div class="platform-box">
+            <div class="platform-label">STACKTIC PLATFORM</div>
+            <div class="platform-grid">
+                <div class="platform-cell cell-integrate">
+                    <div class="name">Integrate</div>
+                    <div class="sub">Connect components</div>
+                </div>
+                <div class="platform-cell cell-automate">
+                    <div class="name">Automate</div>
+                    <div class="sub">Resolve relationships</div>
+                </div>
+                <div class="platform-cell cell-generate">
+                    <div class="name">Generate</div>
+                    <div class="sub">Full stack as code</div>
+                </div>
+                <div class="platform-cell cell-govern">
+                    <div class="name">Govern</div>
+                    <div class="sub">Ops &amp; compliance</div>
+                </div>
+            </div>
+        </div>
+        <div class="arrow-down">&#8595;</div>
+        <div class="outcomes">
+            <div class="outcome-cell out-green">
+                <div class="title">Production Ready</div>
+                <div class="sub">Day 0 to Day 2</div>
+            </div>
+            <div class="outcome-cell out-indigo">
+                <div class="title">Fully Compliant</div>
+                <div class="sub">PCI, HIPAA, SOC2</div>
+            </div>
+            <div class="outcome-cell out-amber">
+                <div class="title">Cloud Agnostic</div>
+                <div class="sub">Zero lock-in</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WHY STACKTIC -->
+    <div style="margin-bottom: 18px;">
+        <div class="label label-indigo" style="padding-bottom: 8px; border-bottom: 2px solid #e0e7ff;">Why Stacktic</div>
+        <div class="why-list" style="margin-top: 14px;">
+            <div class="why-item">
+                <div class="why-badge badge-1">80%</div>
+                <div class="why-content">
+                    <div class="title">Automates Ops &amp; SecOps</div>
+                    <div class="desc">Freeing teams to focus on what matters. <strong class="indigo">Worth millions in savings annually.</strong></div>
+                </div>
+            </div>
+            <div class="why-item">
+                <div class="why-badge badge-2">-80%</div>
+                <div class="why-content">
+                    <div class="title">Automated Security &amp; Compliance</div>
+                    <div class="desc">PCI-DSS built-in. Ready for AI-driven threats. <strong class="red">-80% SEC-OPEX.</strong></div>
+                </div>
+            </div>
+            <div class="why-item">
+                <div class="why-badge badge-3">0</div>
+                <div class="why-content">
+                    <div class="title">Zero Vendor Lock-in</div>
+                    <div class="desc"><strong class="green">Multi-cloud portable stacks.</strong> Deploy anywhere: air-gapped, on-prem, any cloud. <strong class="green">-30% costs.</strong></div>
+                </div>
+            </div>
+            <div class="why-item">
+                <div class="why-badge badge-4">0</div>
+                <div class="why-content">
+                    <div class="title">Eliminates Legacy</div>
+                    <div class="desc">Accelerates modern technology adoption. <strong class="cyan">No legacy, no migration risk, no rebuild.</strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ENTERPRISE IMPACT -->
+    <div class="card card-dark">
+        <div class="label label-amber">Enterprise Impact</div>
+        <div class="impact-scenario">
+            Scenario: <strong>20 engineers &middot; 10 stacks &middot; &euro;3M annual ops</strong>
+        </div>
+        <div class="impact-legend">
+            <span class="swatch sw-trad"></span>Traditional
+            <span class="swatch sw-stk"></span>With Stacktic
+        </div>
+        <div class="impact-bars">
+            <div class="impact-row">
+                <div class="impact-label">OPEX (annual)</div>
+                <div class="impact-bar trad">
+                    <div class="bar" style="width: 90%;"></div>
+                    <span class="val">&euro;3M</span>
+                </div>
+                <div class="impact-bar stk">
+                    <div class="bar" style="width: 30%;"></div>
+                    <span class="val">&euro;900K</span>
+                </div>
+            </div>
+            <div class="impact-row">
+                <div class="impact-label">Time to Production</div>
+                <div class="impact-bar trad">
+                    <div class="bar" style="width: 80%;"></div>
+                    <span class="val">6-9 mo</span>
+                </div>
+                <div class="impact-bar stk">
+                    <div class="bar" style="width: 18%;"></div>
+                    <span class="val">1-2 mo</span>
+                </div>
+            </div>
+            <div class="impact-row">
+                <div class="impact-label">PCI Compliance (per app)</div>
+                <div class="impact-bar trad">
+                    <div class="bar" style="width: 70%;"></div>
+                    <span class="val">$150-400K</span>
+                </div>
+                <div class="impact-bar stk">
+                    <div class="bar" style="width: 6%;"></div>
+                    <span class="val">Built-in</span>
+                </div>
+            </div>
+        </div>
+        <div class="roi">
+            <div class="roi-cell roi-1">
+                <div class="num">&euro;2.1M</div>
+                <div class="lab">Ops Savings</div>
+            </div>
+            <div class="roi-cell roi-2">
+                <div class="num">&euro;0.5M</div>
+                <div class="lab">Speed Revenue</div>
+            </div>
+            <div class="roi-cell roi-3">
+                <div class="num">6-12mo</div>
+                <div class="lab">Payback</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LONG-TERM VALUE -->
+    <div class="card card-light">
+        <div class="label label-green">Long-Term Strategic Value</div>
+        <div class="value-grid">
+            <div class="value-cell">
+                <div class="big big-1">100%</div>
+                <div class="title">Legacy Eliminated</div>
+                <div class="sub">No rebuild needed</div>
+            </div>
+            <div class="value-cell">
+                <div class="big big-2">-40%</div>
+                <div class="title">Hidden Costs Cut</div>
+                <div class="sub">OSS replaces commercial</div>
+            </div>
+            <div class="value-cell">
+                <div class="big big-3">100%</div>
+                <div class="title">Multi-Cloud Ready</div>
+                <div class="sub">Any cloud, air-gapped, on-prem</div>
+            </div>
+            <div class="value-cell">
+                <div class="big big-4">AI-Ready</div>
+                <div class="title">Governed AI Adoption</div>
+                <div class="sub">MCP-based agent control</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 360 COVERAGE -->
+    <div class="card card-dark">
+        <div class="label label-purple">360&deg; Automation Coverage</div>
+        <div class="coverage-grid">
+            <div class="cov-cell cov-ops">
+                <div class="cov-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+                <div class="name">Ops</div>
+                <div class="sub">Day 0-2 automated</div>
+            </div>
+            <div class="cov-cell cov-sec">
+                <div class="cov-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+                <div class="name">SecOps</div>
+                <div class="sub">Policies as code</div>
+            </div>
+            <div class="cov-cell cov-data">
+                <div class="cov-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
+                <div class="name">DataOps</div>
+                <div class="sub">Pipelines automated</div>
+            </div>
+            <div class="cov-cell cov-net">
+                <div class="cov-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+                <div class="name">NetOps</div>
+                <div class="sub">Zero-trust network</div>
+            </div>
+            <div class="cov-cell cov-ver">
+                <div class="cov-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+                <div class="name">Versioning</div>
+                <div class="sub">Rollback any state</div>
+            </div>
+            <div class="cov-cell cov-ai">
+                <div class="cov-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1.07A7 7 0 0 1 14 23h-4a7 7 0 0 1-6.93-4H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/><circle cx="9.5" cy="15.5" r="1"/><circle cx="14.5" cy="15.5" r="1"/></svg></div>
+                <div class="name">AI Gov</div>
+                <div class="sub">MCP guardrails</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DEPLOY ANYWHERE -->
+    <div class="card card-green">
+        <div class="label label-green">Deploy Anywhere</div>
+        <div class="deploy-chips">
+            <span class="chip">AWS</span>
+            <span class="chip">Azure</span>
+            <span class="chip">GCP</span>
+            <span class="chip">On-Prem</span>
+            <span class="chip">Air-Gapped</span>
+            <span class="chip">Edge / Car</span>
+        </div>
+        <div class="deploy-note">Same stack definition. Any target. Zero changes.</div>
+    </div>
+
+    <!-- DESIGNED FOR -->
+    <div class="card card-light">
+        <div class="label label-indigo">Designed For</div>
+        <div class="designed-list">
+            <div class="designed-item"><strong class="indigo">Private AI in air-gapped environments</strong> &mdash; secure, isolated, compliant AI / RAG.</div>
+            <div class="designed-item"><strong class="purple">Compliant multi-cloud data pipelines</strong> &mdash; distributed messaging, PCI-DSS ready.</div>
+            <div class="designed-item"><strong class="cyan">Modern apps with 80% less ops</strong> &mdash; strict security, production-ready, automated Ops.</div>
+            <div class="designed-item"><strong class="green">Standardized app factory</strong> &mdash; versioned, rollback-ready, fully logged.</div>
+            <div class="designed-item"><strong class="red">Compliance without the price tag</strong> &mdash; built-in, not million-dollar cost.</div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

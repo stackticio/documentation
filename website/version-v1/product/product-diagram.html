@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stacktic Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #2a2847;
+            color: #e0e6ed;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Animated background particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.3;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: linear-gradient(45deg, #00d4ff, #7e57c2);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
+        }
+
+        /* Header */
+        .header {
+            background: rgba(42, 40, 71, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+            padding: 0.8rem 1.5rem;
+            width: 100%;
+            z-index: 100;
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .header-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.5)); }
+            to { filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.8)); }
+        }
+
+        .nav-controls {
+            display: flex;
+            gap: 0.6rem;
+        }
+
+        .nav-btn {
+            padding: 0.4rem 0.9rem;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #a5b4fc;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+
+        .nav-btn:hover {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: rgba(99, 102, 241, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1100px;
+            margin: 1.5rem auto;
+            padding: 0 1.5rem;
+            position: relative;
+            z-index: 1;
+            width: 100%;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 240px 1fr 260px;
+            gap: 1.5rem;
+            min-height: 600px;
+        }
+
+        /* Left Panel - Services */
+        .services-panel {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            padding: 1.2rem;
+            animation: slideInLeft 0.8s ease-out;
+            height: fit-content;
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .panel-title {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .service-category {
+            margin-bottom: 1.5rem;
+        }
+
+        .service-category:last-child {
+            margin-bottom: 0;
+        }
+
+        .category-title {
+            color: #64748b;
+            font-size: 0.75rem;
+            margin-bottom: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+        }
+
+        .service-item {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(99, 102, 241, 0.1);
+            border-radius: 10px;
+            padding: 0.8rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-item::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .service-item:hover::before {
+            opacity: 1;
+        }
+
+        .service-item:hover {
+            transform: translateY(-5px) scale(1.05);
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+        }
+
+        .service-icon {
+            font-size: 1.6rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .service-name {
+            font-size: 0.75rem;
+            color: #cbd5e1;
+        }
+
+        /* Center - Architecture Diagram */
+        .architecture-view {
+            background: rgba(15, 23, 42, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 1s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .architecture-canvas {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            aspect-ratio: 1;
+            background: radial-gradient(ellipse at center, rgba(99, 102, 241, 0.05) 0%, transparent 70%);
+        }
+
+        /* Animated connection lines */
+        .connection-lines {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+
+        .connection {
+            stroke: rgba(99, 102, 241, 0.3);
+            stroke-width: 2;
+            fill: none;
+            stroke-dasharray: 5, 5;
+            animation: dash 20s linear infinite;
+        }
+
+        @keyframes dash {
+            to { stroke-dashoffset: -100; }
+        }
+
+        /* Node styling */
+        .node {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            background: rgba(30, 41, 59, 0.9);
+            border: 2px solid rgba(99, 102, 241, 0.4);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: nodeFloat 3s ease-in-out infinite;
+        }
+
+        .node:nth-child(odd) {
+            animation-delay: 0.5s;
+        }
+
+        @keyframes nodeFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .node:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.6);
+            border-color: rgba(99, 102, 241, 0.8);
+            z-index: 10;
+        }
+
+        .node-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .node-label {
+            font-size: 0.65rem;
+            color: #94a3b8;
+        }
+
+        /* Right Panel - Configuration */
+        .config-panel {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            padding: 1.2rem;
+            animation: slideInRight 0.8s ease-out;
+            height: fit-content;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .config-item {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(99, 102, 241, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .config-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .config-item:hover {
+            background: rgba(99, 102, 241, 0.05);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .config-label {
+            color: #64748b;
+            font-size: 0.75rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .config-value {
+            color: #e2e8f0;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .config-input {
+            width: 100%;
+            padding: 0.7rem;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .config-input:focus {
+            outline: none;
+            border-color: rgba(99, 102, 241, 0.6);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 45px;
+            height: 22px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 22px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: rgba(99, 102, 241, 0.3);
+            border-color: rgba(99, 102, 241, 0.6);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: #94a3b8;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active .toggle-slider {
+            left: 25px;
+            background: #818cf8;
+        }
+
+        /* Pulse animation for active nodes */
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(99, 102, 241, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        }
+
+        .node.active {
+            animation: pulse 2s infinite;
+        }
+
+        /* Status indicator */
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            animation: blink 2s infinite;
+        }
+
+        .status-indicator.online {
+            background: #10b981;
+        }
+
+        .status-indicator.offline {
+            background: #ef4444;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 0.5rem 1rem;
+            }
+
+            .logo {
+                font-size: 1rem;
+            }
+
+            .nav-controls {
+                gap: 0.4rem;
+                flex-wrap: wrap;
+            }
+
+            .nav-btn {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.65rem;
+            }
+
+            .container {
+                margin: 1rem auto;
+                padding: 0 0.8rem;
+            }
+
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .services-panel,
+            .config-panel {
+                padding: 1rem;
+            }
+
+            .architecture-canvas {
+                max-width: 100%;
+                height: 400px;
+            }
+
+            .node {
+                width: 50px;
+                height: 50px;
+            }
+
+            .node-icon {
+                font-size: 1.2rem;
+            }
+
+            .node-label {
+                font-size: 0.55rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particle Background -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">STACKTIC</div>
+            <div class="nav-controls">
+                <button class="nav-btn">Save</button>
+                <button class="nav-btn">Export</button>
+                <button class="nav-btn">Import</button>
+                <button class="nav-btn">Send to Front</button>
+                <button class="nav-btn">Send to Back</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="main-grid">
+            <!-- Left Panel - Services -->
+            <div class="services-panel">
+                <h2 class="panel-title">External Systems</h2>
+                
+                <div class="service-category">
+                    <div class="category-title">Backend</div>
+                    <div class="service-grid">
+                        <div class="service-item">
+                            <div class="service-icon">⚡</div>
+                            <div class="service-name">FastAPI</div>
+                        </div>
+                        <div class="service-item">
+                            <div class="service-icon">🚀</div>
+                            <div class="service-name">Node.js</div>
+                        </div>
+                        <div class="service-item">
+                            <div class="service-icon">☕</div>
+                            <div class="service-name">Spring</div>
+                        </div>
+                        <div class="service-item">
+                            <div class="service-icon">💎</div>
+                            <div class="service-name">Ruby</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="service-category">
+                    <div class="category-title">Data</div>
+                    <div class="service-grid">
+                        <div class="service-item">
+                            <div class="service-icon">🐘</div>
+                            <div class="service-name">PostgreSQL</div>
+                        </div>
+                        <div class="service-item">
+                            <div class="service-icon">🍃</div>
+                            <div class="service-name">MongoDB</div>
+                        </div>
+                        <div class="service-item">
+                            <div class="service-icon">📊</div>
+                            <div class="service-name">Redis</div>
+                        </div>
+                        <div class="service-item">
+                            <div class="service-icon">🔍</div>
+                            <div class="service-name">Elastic</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="service-category">
+                    <div class="category-title">SecOps</div>
+                    <div class="service-grid">
+                        <div class="service-item">
+                            <div class="service-icon">🛡️</div>
+                            <div class="service-name">Vault</div>
+                        </div>
+                        <div class="service-item">
+                            <div class="service-icon">🔐</div>
+                            <div class="service-name">OAuth</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="service-category">
+                    <div class="category-title">Traffic Control</div>
+                    <div class="service-grid">
+                        <div class="service-item">
+                            <div class="service-icon">🕸️</div>
+                            <div class="service-name">Istio</div>
+                        </div>
+                        <div class="service-item">
+                            <div class="service-icon">🌊</div>
+                            <div class="service-name">APISIX</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="service-category">
+                    <div class="category-title">AI/ML</div>
+                    <div class="service-grid">
+                        <div class="service-item">
+                            <div class="service-icon">🦙</div>
+                            <div class="service-name">Llama</div>
+                        </div>
+                        <div class="service-item">
+                            <div class="service-icon">🔄</div>
+                            <div class="service-name">Flowise</div>
+                        </div>
+                        <div class="service-item">
+                            <div class="service-icon">💬</div>
+                            <div class="service-name">Open WebUI</div>
+                        </div>
+                        <div class="service-item">
+                            <div class="service-icon">🔍</div>
+                            <div class="service-name">Qdrant</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center - Architecture Diagram -->
+            <div class="architecture-view">
+                <div class="architecture-canvas">
+                    <!-- SVG Connection Lines -->
+                    <svg class="connection-lines" viewBox="0 0 500 500">
+                        <line class="connection" x1="100" y1="80" x2="250" y2="120" />
+                        <line class="connection" x1="250" y1="120" x2="400" y2="80" />
+                        <line class="connection" x1="100" y1="200" x2="250" y2="250" />
+                        <line class="connection" x1="250" y1="250" x2="400" y2="200" />
+                        <line class="connection" x1="175" y1="80" x2="175" y2="330" />
+                        <line class="connection" x1="325" y1="80" x2="325" y2="330" />
+                    </svg>
+
+                    <!-- Nodes -->
+                    <div class="node active" style="top: 8%; left: 8%;">
+                        <div class="node-icon">🔷</div>
+                        <div class="node-label">Ingress</div>
+                    </div>
+                    <div class="node" style="top: 8%; left: 43%;">
+                        <div class="node-icon">⚡</div>
+                        <div class="node-label">Gateway</div>
+                    </div>
+                    <div class="node" style="top: 8%; left: 78%;">
+                        <div class="node-icon">🔄</div>
+                        <div class="node-label">Balancer</div>
+                    </div>
+                    <div class="node active" style="top: 35%; left: 25%;">
+                        <div class="node-icon">🎯</div>
+                        <div class="node-label">Service A</div>
+                    </div>
+                    <div class="node" style="top: 35%; left: 60%;">
+                        <div class="node-icon">🚀</div>
+                        <div class="node-label">Service B</div>
+                    </div>
+                    <div class="node" style="top: 62%; left: 8%;">
+                        <div class="node-icon">💾</div>
+                        <div class="node-label">Database</div>
+                    </div>
+                    <div class="node" style="top: 62%; left: 43%;">
+                        <div class="node-icon">📊</div>
+                        <div class="node-label">Cache</div>
+                    </div>
+                    <div class="node active" style="top: 62%; left: 78%;">
+                        <div class="node-icon">📨</div>
+                        <div class="node-label">Queue</div>
+                    </div>
+                    <div class="node" style="top: 88%; left: 43%;">
+                        <div class="node-icon">📈</div>
+                        <div class="node-label">Monitor</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Configuration -->
+            <div class="config-panel">
+                <h2 class="panel-title">Configuration</h2>
+                
+                <div class="config-item">
+                    <div class="config-label">Stack Name</div>
+                    <input type="text" class="config-input" value="production-stack" />
+                </div>
+
+                <div class="config-item">
+                    <div class="config-label">Kafka Partitions</div>
+                    <input type="number" class="config-input" value="3" />
+                </div>
+
+                <div class="config-item">
+                    <div class="config-label">Replication Factor</div>
+                    <input type="number" class="config-input" value="2" />
+                </div>
+
+                <div class="config-item">
+                    <div class="config-label">Auto Scaling</div>
+                    <div class="toggle-switch active" onclick="toggleSwitch(this)">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+
+                <div class="config-item">
+                    <div class="config-label">SSL/TLS</div>
+                    <div class="toggle-switch active" onclick="toggleSwitch(this)">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+
+                <div class="config-item">
+                    <div class="config-label">Status</div>
+                    <div class="config-value">
+                        <span class="status-indicator online"></span>
+                        All Systems Operational
+                    </div>
+                </div>
+
+                <div class="config-item">
+                    <div class="config-label">Last Updated</div>
+                    <div class="config-value">2 minutes ago</div>
+                </div>
+
+                <div class="config-item">
+                    <div class="config-label">Version</div>
+                    <div class="config-value">v2.4.1</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create particle effect
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = window.innerWidth < 768 ? 25 : 50;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // Toggle switch functionality
+        function toggleSwitch(element) {
+            element.classList.toggle('active');
+        }
+
+        // Add click animation to nodes
+        document.querySelectorAll('.node').forEach(node => {
+            node.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+        });
+
+        // Add hover effect to service items
+        document.querySelectorAll('.service-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                const ripple = document.createElement('div');
+                ripple.style.position = 'absolute';
+                ripple.style.width = '100%';
+                ripple.style.height = '100%';
+                ripple.style.top = '0';
+                ripple.style.left = '0';
+                ripple.style.background = 'radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, transparent 70%)';
+                ripple.style.animation = 'ripple 0.6s ease-out';
+                this.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        // Animate connection lines dynamically
+        function animateConnections() {
+            const svg = document.querySelector('.connection-lines');
+            const activeNodes = document.querySelectorAll('.node.active');
+            
+            // Keep base connections
+            const baseConnections = svg.querySelectorAll('line');
+            
+            for (let i = 0; i < activeNodes.length - 1; i++) {
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.classList.add('connection');
+                line.style.strokeWidth = '3';
+                line.style.stroke = 'rgba(99, 102, 241, 0.5)';
+                
+                const rect1 = activeNodes[i].getBoundingClientRect();
+                const rect2 = activeNodes[i + 1].getBoundingClientRect();
+                const container = svg.getBoundingClientRect();
+                
+                line.setAttribute('x1', (rect1.left - container.left + rect1.width / 2) * (500 / container.width));
+                line.setAttribute('y1', (rect1.top - container.top + rect1.height / 2) * (500 / container.height));
+                line.setAttribute('x2', (rect2.left - container.left + rect2.width / 2) * (500 / container.width));
+                line.setAttribute('y2', (rect2.top - container.top + rect2.height / 2) * (500 / container.height));
+                
+                svg.appendChild(line);
+                setTimeout(() => line.remove(), 2000);
+            }
+        }
+
+        // Initialize
+        createParticles();
+        setInterval(animateConnections, 2000);
+
+        // Add CSS animation for ripple
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                from {
+                    transform: scale(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: scale(1);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Simulate real-time updates
+        setInterval(() => {
+            const lastUpdated = document.querySelectorAll('.config-value')[1];
+            const minutes = Math.floor(Math.random() * 5) + 1;
+            if (lastUpdated) {
+                lastUpdated.textContent = `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+            }
+        }, 10000);
+    </script>
+</body>
+</html>

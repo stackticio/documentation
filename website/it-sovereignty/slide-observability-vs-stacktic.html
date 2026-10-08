@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>Observability vs Stacktic Metadata Intelligence</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&family=DM+Serif+Display&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{width:1440px;height:810px;overflow:hidden;font-family:'DM Sans',sans-serif;background:#080b16}
+  canvas{display:block}
+</style>
+</head>
+<body>
+<canvas id="c" width="2880" height="1620"></canvas>
+<script>
+const C=document.getElementById('c');
+C.style.width='1440px';C.style.height='810px';
+const X=C.getContext('2d');
+const W=2880,H=1620;
+
+function easeOutExpo(t){return t===1?1:1-Math.pow(2,-10*t)}
+function easeOutBack(t){const c=1.7;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2)}
+function easeInOutCubic(t){return t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}
+function easeOutElastic(t){if(t===0||t===1)return t;return Math.pow(2,-10*t)*Math.sin((t-0.075)*2*Math.PI/0.3)+1}
+function easeOutCubic(t){return 1-Math.pow(1-t,3)}
+function clamp01(t){return Math.max(0,Math.min(1,t))}
+function lerp(a,b,t){return a+(b-a)*t}
+function P(n,f,t){return clamp01((n-f)/(t-f))}
+
+// ─── Section timing ───
+const SI=0;    // INTRO: Chaos → Auto-Assembly
+const S0=20;   // HERO: Beyond Observability
+const S1=30;   // OBSERVABILITY
+const S2=47;   // STACKTIC METADATA
+const S3=70;   // SIDE-BY-SIDE
+const S4=90;   // DEEP DIVE
+const S5=110;  // FINALE
+
+const comps=[
+  {name:'Kafka',short:'KFK',color:'#f97316',cat:'data'},
+  {name:'PostgreSQL',short:'PG',color:'#336791',cat:'data'},
+  {name:'MongoDB',short:'MDB',color:'#47A248',cat:'data'},
+  {name:'Redis',short:'RDS',color:'#DC382D',cat:'data'},
+  {name:'APISIX',short:'GW',color:'#f43f5e',cat:'platform'},
+  {name:'Keycloak',short:'SSO',color:'#6366f1',cat:'platform'},
+  {name:'FastAPI',short:'API',color:'#059669',cat:'app'},
+  {name:'LangFlow',short:'RAG',color:'#fb923c',cat:'ai'},
+  {name:'Ollama',short:'LLM',color:'#d946ef',cat:'ai'},
+  {name:'Rocket.Chat',short:'CHAT',color:'#3b82f6',cat:'app'},
+  {name:'Prometheus',short:'MON',color:'#f59e0b',cat:'ops'},
+  {name:'Grafana',short:'GRF',color:'#84cc16',cat:'ops'},
+  {name:'Cert-Manager',short:'TLS',color:'#14b8a6',cat:'platform'},
+  {name:'Milvus',short:'VDB',color:'#f472b6',cat:'ai'},
+  {name:'ERPNext',short:'ERP',color:'#f97316',cat:'app'},
+  {name:'SuiteCRM',short:'CRM',color:'#ef4444',cat:'app'},
+  {name:'n8n',short:'n8n',color:'#f472b6',cat:'app'},
+  {name:'Velero',short:'BAK',color:'#64748b',cat:'ops'},
+];
+comps.forEach((c,i)=>{c.baseAngle=i*(Math.PI*2/comps.length);c.phase=Math.random()*Math.PI*2;});
+
+class Spark{
+  constructor(x,y,color,vx,vy,life){this.x=x;this.y=y;this.color=color;this.vx=vx;this.vy=vy;this.life=life;this.max=life;this.size=1+Math.random()*3;}
+  update(dt){this.x+=this.vx*dt;this.y+=this.vy*dt;this.life-=dt;}
+  draw(a){if(this.life<=0)return;X.save();X.globalAlpha=a*(this.life/this.max);X.beginPath();X.arc(this.x,this.y,this.size,0,Math.PI*2);X.fillStyle=this.color;X.shadowColor=this.color;X.shadowBlur=8;X.fill();X.restore();}
+}
+let sparks=[];
+function burst(x,y,c,n,s){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,sp=s*(0.3+Math.random());sparks.push(new Spark(x,y,c,Math.cos(a)*sp,Math.sin(a)*sp,1+Math.random()*1.5));}}
+
+const ambDots=[];
+for(let i=0;i<60;i++) ambDots.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-0.5)*10,vy:(Math.random()-0.5)*10,ph:Math.random()*Math.PI*2,c:['#4f46e5','#7c3aed','#0891b2','#059669'][Math.floor(Math.random()*4)]});
+
+function drawBG(now){
+  const bg=X.createRadialGradient(W/2,H/2,100,W/2,H/2,W*0.7);
+  bg.addColorStop(0,'#0d1025');bg.addColorStop(1,'#080b16');
+  X.fillStyle=bg;X.fillRect(0,0,W,H);
+  X.save();X.globalAlpha=0.02;X.fillStyle='#4f46e5';
+  for(let gx=0;gx<W;gx+=60)for(let gy=0;gy<H;gy+=60){X.beginPath();X.arc(gx,gy,1,0,Math.PI*2);X.fill();}
+  X.restore();
+  ambDots.forEach(d=>{d.x+=d.vx*0.016;d.y+=d.vy*0.016;if(d.x<0||d.x>W)d.vx*=-1;if(d.y<0||d.y>H)d.vy*=-1;X.save();X.globalAlpha=0.06*(0.5+0.5*Math.sin(now*0.5+d.ph));X.beginPath();X.arc(d.x,d.y,1.5,0,Math.PI*2);X.fillStyle=d.c;X.fill();X.restore();});
+}
+
+function drawTopBar(a){
+  if(a<0.01)return;
+  X.save();X.globalAlpha=a;
+  X.fillStyle='#4f46e5';X.fillRect(0,0,W,6);
+  X.font='700 26px "DM Sans"';X.fillStyle='#4f46e5';X.textAlign='left';X.textBaseline='top';
+  X.fillText('STACKTIC',60,22);
+  X.font='400 22px "DM Sans"';X.fillStyle='#475569';
+  X.fillText('Platform Engineering',230,24);
+  X.restore();
+}
+
+function drawNode(x,y,comp,alpha,scale,showName){
+  if(alpha<0.01)return;
+  const s=scale||1, R=32*s;
+  X.save();X.globalAlpha=alpha;
+  const g=X.createRadialGradient(x,y,R*0.3,x,y,R*2);
+  g.addColorStop(0,comp.color+'20');g.addColorStop(1,comp.color+'00');
+  X.beginPath();X.arc(x,y,R*2,0,Math.PI*2);X.fillStyle=g;X.fill();
+  X.beginPath();X.arc(x,y,R,0,Math.PI*2);
+  X.fillStyle=comp.color+'15';X.strokeStyle=comp.color+'80';X.lineWidth=2.5*s;
+  X.fill();X.stroke();
+  X.font=`700 ${Math.round(18*s)}px "DM Sans"`;X.fillStyle=comp.color;
+  X.textAlign='center';X.textBaseline='middle';
+  X.fillText(comp.short,x,y);
+  if(showName){X.font=`400 ${Math.round(15*s)}px "DM Sans"`;X.fillStyle=comp.color+'90';X.fillText(comp.name,x,y+R+16*s);}
+  X.restore();
+}
+
+function drawEnergyLine(x1,y1,x2,y2,color,alpha,now,idx){
+  if(alpha<0.01)return;
+  X.save();X.globalAlpha=alpha*0.4;
+  X.beginPath();X.moveTo(x1,y1);X.lineTo(x2,y2);
+  X.strokeStyle=color+'60';X.lineWidth=2;X.shadowColor=color;X.shadowBlur=8;X.stroke();X.shadowBlur=0;
+  const t=((now*0.5+idx*0.2)%1);
+  X.globalAlpha=alpha*0.7*Math.sin(t*Math.PI);
+  X.beginPath();X.arc(lerp(x1,x2,t),lerp(y1,y2,t),4,0,Math.PI*2);
+  X.fillStyle=color;X.shadowColor=color;X.shadowBlur=10;X.fill();X.restore();
+}
+
+function drawMetricWave(cx,cy,w,h,alpha,now,color,freq){
+  if(alpha<0.01)return;
+  X.save();X.globalAlpha=alpha;X.beginPath();
+  for(let px=0;px<=w;px+=3){const t=px/w;const val=Math.sin(t*freq+now*2)*0.4+Math.sin(t*freq*2.3+now*1.5)*0.2+0.5;const py=cy-val*h;if(px===0)X.moveTo(cx,py);else X.lineTo(cx+px,py);}
+  X.strokeStyle=color;X.lineWidth=3;X.shadowColor=color;X.shadowBlur=8;X.stroke();X.shadowBlur=0;
+  X.lineTo(cx+w,cy+h*0.2);X.lineTo(cx,cy+h*0.2);X.closePath();X.fillStyle=color+'10';X.fill();X.restore();
+}
+
+function drawRelationship(x1,y1,x2,y2,label,color,alpha,now,idx,thick){
+  if(alpha<0.01)return;
+  X.save();X.globalAlpha=alpha;
+  const mx=(x1+x2)/2,my=(y1+y2)/2;
+  const perpX=-(y2-y1)*0.15,perpY=(x2-x1)*0.15;
+  const cpx=mx+perpX,cpy=my+perpY;
+  X.beginPath();X.moveTo(x1,y1);X.quadraticCurveTo(cpx,cpy,x2,y2);
+  X.strokeStyle=color;X.lineWidth=thick||3;X.shadowColor=color;X.shadowBlur=12;X.stroke();X.shadowBlur=0;
+  const dt=((now*0.4+idx*0.3)%1);
+  const tx=(1-dt)*(1-dt)*x1+2*(1-dt)*dt*cpx+dt*dt*x2;
+  const ty=(1-dt)*(1-dt)*y1+2*(1-dt)*dt*cpy+dt*dt*y2;
+  X.globalAlpha=alpha*Math.sin(dt*Math.PI);
+  X.beginPath();X.arc(tx,ty,6,0,Math.PI*2);X.fillStyle=color;X.shadowColor=color;X.shadowBlur=15;X.fill();X.shadowBlur=0;
+  X.globalAlpha=alpha;
+  const angle=Math.atan2(y2-cpy,x2-cpx);
+  X.beginPath();X.moveTo(x2-14*Math.cos(angle-0.3),y2-14*Math.sin(angle-0.3));X.lineTo(x2,y2);X.lineTo(x2-14*Math.cos(angle+0.3),y2-14*Math.sin(angle+0.3));
+  X.strokeStyle=color;X.lineWidth=3;X.stroke();
+  if(label){
+    const lx=(x1+2*cpx+x2)/4,ly=(y1+2*cpy+y2)/4;
+    X.font='700 20px "DM Sans"';const tw=X.measureText(label).width+24;
+    X.globalAlpha=alpha*0.9;X.beginPath();X.roundRect(lx-tw/2,ly-16,tw,32,16);
+    X.fillStyle='#0d1025';X.fill();X.strokeStyle=color+'60';X.lineWidth=1.5;X.stroke();
+    X.fillStyle=color;X.textAlign='center';X.textBaseline='middle';X.fillText(label,lx,ly);
+  }
+  X.restore();
+}
+
+let startTime=0,lastTime=0;
+
+function frame(ts){
+  if(!startTime)startTime=ts;
+  const now=(ts-startTime)/1000;
+  const dt=lastTime?Math.min((ts-lastTime)/1000,0.05):0.016;
+  lastTime=ts;
+  X.clearRect(0,0,W,H);drawBG(now);
+  sparks.forEach(s=>s.update(dt));sparks=sparks.filter(s=>s.life>0);
+
+  const cx=W/2,cy=H/2;
+
+  // ══════════════════════════════════════
+  // INTRO: Chaos → Auto-Assembly (0-20)
+  // Components fly from scattered chaos into a fully wired topology,
+  // then operations ring wraps, then compliance shield forms.
+  // ══════════════════════════════════════
+  const intIn=easeOutExpo(P(now,SI,SI+1));
+  const intOut=1-easeOutExpo(P(now,SI+18,SI+20));
+  const intA=intIn*Math.max(intOut,0);
+
+  if(intA>0.01){
+    // ── Phase 1 (0-4s): Components scattered as chaos ──
+    // Each component starts at a random position and drifts
+    const chaosToOrder=easeInOutCubic(P(now,SI+2,SI+6)); // 0→1 as they assemble
+    const assemblyDone=P(now,SI+6,SI+6.5);
+
+    // pre-computed random start positions (seeded by index)
+    const targetR=320;
+    comps.forEach((c,i)=>{
+      // chaos position: spread wildly
+      const chaosX=cx+Math.cos(i*2.7+0.5)*700+Math.sin(i*1.3)*400;
+      const chaosY=cy+Math.sin(i*2.1+1.2)*500+Math.cos(i*3.1)*300;
+      // ordered position: ring around center
+      const angle=i*Math.PI*2/comps.length-Math.PI/2;
+      const orderX=cx+Math.cos(angle)*targetR;
+      const orderY=cy+Math.sin(angle)*targetR;
+
+      const finalX=lerp(chaosX,orderX,chaosToOrder);
+      const finalY=lerp(chaosY,orderY,chaosToOrder);
+
+      // components appear immediately
+      const cIn=easeOutExpo(P(now,SI+0.2+i*0.08,SI+1+i*0.08));
+      const scale=lerp(0.5,1,chaosToOrder);
+
+      drawNode(finalX,finalY,c,intA*cIn,scale,chaosToOrder>0.8);
+
+      // during chaos: random drift lines (messy)
+      if(chaosToOrder<0.5&&cIn>0.5){
+        const messIdx=(i*7)%comps.length;
+        const messX=cx+Math.cos(messIdx*2.7+0.5)*700+Math.sin(messIdx*1.3)*400;
+        const messY=cy+Math.sin(messIdx*2.1+1.2)*500+Math.cos(messIdx*3.1)*300;
+        X.save();X.globalAlpha=intA*cIn*0.06*(1-chaosToOrder*2);
+        X.beginPath();X.moveTo(finalX,finalY);X.lineTo(messX,messY);
+        X.strokeStyle=c.color+'40';X.lineWidth=1;X.stroke();
+        X.restore();
+      }
+
+      // burst when reaching final position
+      if(Math.abs(chaosToOrder-0.95)<0.02&&i%3===0&&sparks.length<200){
+        burst(orderX,orderY,c.color,4,50);
+      }
+    });
+
+    // ── Phase 2 (4-8s): Relationships auto-wire ──
+    const wirePhase=P(now,SI+5,SI+9);
+    if(wirePhase>0.01){
+      const autoRels=[
+        {from:0,to:2,label:'topic → sink',color:'#f97316'},
+        {from:8,to:9,label:'model → chat',color:'#d946ef'},
+        {from:4,to:6,label:'route → API',color:'#f43f5e'},
+        {from:5,to:4,label:'SSO → gateway',color:'#6366f1'},
+        {from:6,to:1,label:'query → db',color:'#059669'},
+        {from:7,to:8,label:'RAG → LLM',color:'#fb923c'},
+        {from:0,to:1,label:'stream → table',color:'#336791'},
+        {from:10,to:3,label:'scrape → cache',color:'#f59e0b'},
+      ];
+      autoRels.forEach((rel,ri)=>{
+        const relA=easeOutCubic(P(now,SI+5.5+ri*0.4,SI+7+ri*0.4));
+        if(relA<0.01)return;
+        const fAngle=rel.from*Math.PI*2/comps.length-Math.PI/2;
+        const tAngle=rel.to*Math.PI*2/comps.length-Math.PI/2;
+        const fx=cx+Math.cos(fAngle)*targetR, fy=cy+Math.sin(fAngle)*targetR;
+        const tx=cx+Math.cos(tAngle)*targetR, ty=cy+Math.sin(tAngle)*targetR;
+        drawRelationship(fx,fy,tx,ty,relA>0.7?rel.label:null,rel.color,intA*relA*0.8,now,ri,2.5);
+      });
+    }
+
+    // ── Phase 3 (8-11s): Operations ring wraps around ──
+    const opsPhase=easeOutCubic(P(now,SI+8,SI+11));
+    if(opsPhase>0.01){
+      X.save();X.globalAlpha=intA*opsPhase;
+
+      // outer ring sweeping in
+      const opsR=targetR+120;
+      const sweepAngle=-Math.PI/2+opsPhase*Math.PI*2;
+      X.beginPath();X.arc(cx,cy,opsR,-Math.PI/2,sweepAngle);
+      X.strokeStyle='#0891b2';X.lineWidth=6;
+      X.shadowColor='#0891b2';X.shadowBlur=20;X.stroke();X.shadowBlur=0;
+
+      // ops badges around the ring
+      const opsBadges=['DEPLOY','PATCH','UPGRADE','MONITOR','BACKUP','DR'];
+      const opsColors=['#0891b2','#06b6d4','#0891b2','#06b6d4','#0891b2','#06b6d4'];
+      opsBadges.forEach((badge,bi)=>{
+        const bAngle=-Math.PI/2+bi*(Math.PI*2/opsBadges.length);
+        // only show if sweep has passed this angle
+        const bProgress=P(bAngle+Math.PI/2,0,Math.PI*2);
+        if(opsPhase<bProgress)return;
+        const bIn=easeOutElastic(P(now,SI+8.5+bi*0.3,SI+10+bi*0.3));
+        X.save();X.globalAlpha=intA*opsPhase*bIn;
+        const bx=cx+Math.cos(bAngle)*(opsR+5);
+        const by=cy+Math.sin(bAngle)*(opsR+5);
+
+        X.beginPath();X.roundRect(bx-50,by-14,100,28,14);
+        X.fillStyle='#0d1025';X.fill();
+        X.strokeStyle=opsColors[bi]+'60';X.lineWidth=1.5;X.stroke();
+        X.font='700 14px "DM Sans"';X.fillStyle=opsColors[bi];
+        X.textAlign='center';X.textBaseline='middle';
+        X.fillText(badge,bx,by);
+        X.restore();
+      });
+
+      X.restore();
+    }
+
+    // ── Phase 4 (11-14s): Compliance shield forms ──
+    const compPhase=easeOutCubic(P(now,SI+11,SI+14));
+    if(compPhase>0.01){
+      X.save();X.globalAlpha=intA*compPhase;
+
+      const shieldR=targetR+200;
+
+      // shield arcs (3 rotating)
+      for(let i=0;i<4;i++){
+        const aOff=i*Math.PI/2;
+        const arcLen=0.35*compPhase;
+        X.beginPath();X.arc(cx,cy,shieldR,aOff,aOff+arcLen);
+        X.strokeStyle='rgba(5,150,105,0.3)';X.lineWidth=5;
+        X.shadowColor='#059669';X.shadowBlur=12;X.stroke();X.shadowBlur=0;
+      }
+
+      // counter-rotating inner arcs
+      for(let i=0;i<3;i++){
+        const aOff=-now*0.15+i*Math.PI*2/3;
+        X.beginPath();X.arc(cx,cy,shieldR-20,aOff,aOff+0.25);
+        X.strokeStyle='rgba(5,150,105,0.15)';X.lineWidth=3;X.stroke();
+      }
+
+      // compliance badges
+      const compBadges=[
+        {text:'PCI-DSS',angle:-Math.PI*0.8},{text:'HIPAA',angle:-Math.PI*0.3},
+        {text:'SOC2',angle:Math.PI*0.2},{text:'DORA',angle:Math.PI*0.7}
+      ];
+      compBadges.forEach((cb,cbi)=>{
+        const cbIn=easeOutElastic(P(now,SI+12+cbi*0.5,SI+14+cbi*0.5));
+        X.save();X.globalAlpha=intA*compPhase*cbIn;
+        const cbx=cx+Math.cos(cb.angle)*(shieldR+5);
+        const cby=cy+Math.sin(cb.angle)*(shieldR+5);
+
+        X.beginPath();X.roundRect(cbx-55,cby-16,110,32,16);
+        X.fillStyle='#059669'+'12';X.fill();
+        X.strokeStyle='#059669'+'50';X.lineWidth=1.5;X.stroke();
+        X.font='700 16px "DM Sans"';X.fillStyle='#059669';
+        X.textAlign='center';X.textBaseline='middle';
+        X.fillText(cb.text,cbx,cby);
+        X.restore();
+
+        if(Math.abs(cbIn-0.5)<0.06&&sparks.length<200) burst(cbx,cby,'#059669',5,40);
+      });
+
+      X.restore();
+    }
+
+    // ── Central hub appears after assembly ──
+    const hubPhase=easeOutElastic(P(now,SI+6.5,SI+9));
+    if(hubPhase>0.01){
+      X.save();X.globalAlpha=intA*hubPhase;
+      // glow
+      const hg=X.createRadialGradient(cx,cy,20,cx,cy,120);
+      hg.addColorStop(0,'rgba(79,70,229,0.15)');hg.addColorStop(1,'rgba(79,70,229,0)');
+      X.beginPath();X.arc(cx,cy,120,0,Math.PI*2);X.fillStyle=hg;X.fill();
+      // circle
+      X.beginPath();X.arc(cx,cy,55,0,Math.PI*2);
+      X.fillStyle='rgba(79,70,229,0.08)';X.strokeStyle='#4f46e5';X.lineWidth=3;
+      X.shadowColor='#4f46e5';X.shadowBlur=30;X.fill();X.stroke();X.shadowBlur=0;
+      X.font='800 18px "DM Sans"';X.fillStyle='#4f46e5';
+      X.textAlign='center';X.textBaseline='middle';
+      X.fillText('STACKTIC',cx,cy-6);
+      X.font='600 14px "DM Sans"';
+      X.fillText('ENGINE',cx,cy+14);
+      X.restore();
+    }
+
+    // ── Text overlays ──
+    // Phase 1 text: chaos state
+    const chaosTextA=easeOutExpo(P(now,SI+0.3,SI+1.5))*(1-easeOutExpo(P(now,SI+3,SI+4.5)));
+    if(chaosTextA>0.01){
+      X.save();X.globalAlpha=intA*Math.max(chaosTextA,0);
+      X.font='800 70px "DM Sans"';X.fillStyle='#ef4444';
+      X.textAlign='center';X.textBaseline='middle';
+      X.fillText('18 components. Unconnected. Unmanaged.',cx,160);
+      X.restore();
+    }
+
+    // Phase 2 text: assembly
+    const wireTextA=easeOutExpo(P(now,SI+4.5,SI+6))*(1-easeOutExpo(P(now,SI+8,SI+9.5)));
+    if(wireTextA>0.01){
+      X.save();X.globalAlpha=intA*Math.max(wireTextA,0);
+      X.font='800 70px "DM Sans"';X.fillStyle='#4f46e5';
+      X.textAlign='center';X.textBaseline='middle';
+      X.shadowColor='#4f46e5';X.shadowBlur=30;
+      X.fillText('Stacktic auto-wires every relationship.',cx,140);
+      X.shadowBlur=0;
+      X.font='400 36px "DM Sans"';X.fillStyle='#94a3b8';
+      X.fillText('Topics to databases. Models to services. Routes to APIs.',cx,210);
+      X.restore();
+    }
+
+    // Phase 3 text: operations
+    const opsTextA=easeOutExpo(P(now,SI+9,SI+10.5))*(1-easeOutExpo(P(now,SI+12,SI+13)));
+    if(opsTextA>0.01){
+      X.save();X.globalAlpha=intA*Math.max(opsTextA,0);
+      X.font='800 60px "DM Sans"';X.fillStyle='#0891b2';
+      X.textAlign='center';X.textBaseline='middle';
+      X.fillText('Operations wrap automatically.',cx,140);
+      X.font='400 34px "DM Sans"';X.fillStyle='#94a3b8';
+      X.fillText('Deploy. Patch. Upgrade. Monitor. Backup. DR.',cx,205);
+      X.restore();
+    }
+
+    // Phase 4 text: compliance
+    const compTextA=easeOutExpo(P(now,SI+12.5,SI+14))*(1-easeOutExpo(P(now,SI+15.5,SI+17)));
+    if(compTextA>0.01){
+      X.save();X.globalAlpha=intA*Math.max(compTextA,0);
+      X.font='800 60px "DM Sans"';X.fillStyle='#059669';
+      X.textAlign='center';X.textBaseline='middle';
+      X.fillText('Compliance validated across every layer.',cx,140);
+      X.font='400 34px "DM Sans"';X.fillStyle='#94a3b8';
+      X.fillText('PCI-DSS. HIPAA. SOC2. DORA — continuously.',cx,205);
+      X.restore();
+    }
+
+    // Final text: the question
+    const qTextA=easeOutExpo(P(now,SI+15,SI+17));
+    if(qTextA>0.01){
+      X.save();X.globalAlpha=intA*qTextA;
+      X.font='500 40px "DM Sans"';X.fillStyle='#64748b';
+      X.textAlign='center';X.textBaseline='middle';
+      X.fillText('But how does it know everything is wired correctly?',cx,cy+targetR+280);
+
+      const arrowA=easeOutExpo(P(now,SI+16.5,SI+18.5));
+      X.globalAlpha=intA*qTextA*arrowA;
+      X.font='700 36px "DM Sans"';X.fillStyle='#4f46e5';
+      X.fillText('Not observability — Metadata Intelligence.',cx,cy+targetR+340);
+      X.restore();
+    }
+  }
+
+  // ══════════════════════════════════════
+  // HERO: Beyond Observability (16-26)
+  // ══════════════════════════════════════
+  const heroIn=easeOutExpo(P(now,S0,S0+2));
+  const heroOut=1-easeOutExpo(P(now,S0+8,S0+10));
+  const heroA=heroIn*Math.max(heroOut,0);
+
+  if(heroA>0.01){
+    X.save();X.globalAlpha=heroA*0.5;
+    const cg=X.createRadialGradient(cx,cy,30,cx,cy,550);
+    cg.addColorStop(0,'rgba(79,70,229,0.2)');cg.addColorStop(1,'rgba(79,70,229,0)');
+    X.beginPath();X.arc(cx,cy,550,0,Math.PI*2);X.fillStyle=cg;X.fill();
+    X.restore();
+
+    const t1=easeOutBack(P(now,S0+0.5,S0+2.5));
+    X.save();X.globalAlpha=heroA*t1;
+    X.font='800 120px "DM Sans"';X.fillStyle='#e2e8f0';
+    X.textAlign='center';X.textBaseline='middle';
+    X.fillText('Beyond Observability',cx,cy-80);
+    X.font='800 120px "DM Sans"';X.fillStyle='#4f46e5';
+    X.shadowColor='#4f46e5';X.shadowBlur=50;
+    X.fillText('Metadata Intelligence',cx,cy+60);
+    X.shadowBlur=0;
+    X.restore();
+
+    const sub=easeOutExpo(P(now,S0+2,S0+4));
+    X.save();X.globalAlpha=heroA*sub;
+    X.font='400 42px "DM Sans"';X.fillStyle='#94a3b8';
+    X.textAlign='center';
+    X.fillText('Observability tells you what happened.  Stacktic understands why.',cx,cy+190);
+    X.restore();
+  }
+
+  // ══════════════════════════════════════
+  // OBSERVABILITY (26-43)
+  // ══════════════════════════════════════
+  const obsIn=easeOutExpo(P(now,S1,S1+2));
+  const obsOut=1-easeOutExpo(P(now,S1+15,S1+17));
+  const obsA=obsIn*Math.max(obsOut,0);
+
+  if(obsA>0.01){
+    X.save();X.globalAlpha=obsA;
+    drawTopBar(obsA);
+
+    X.save();X.globalAlpha=obsA*0.04;
+    X.font='800 550px "DM Sans"';X.fillStyle='#f59e0b';
+    X.textAlign='center';X.textBaseline='middle';
+    X.fillText('OBS',cx,cy);
+    X.restore();
+
+    const obsT=easeOutBack(P(now,S1+0.5,S1+2));
+    X.save();X.globalAlpha=obsA*obsT;
+    X.font='800 80px "DM Sans"';X.fillStyle='#f59e0b';
+    X.textAlign='center';X.textBaseline='middle';
+    X.fillText('Traditional Observability',cx,120);
+    X.font='400 38px "DM Sans"';X.fillStyle='#64748b';
+    X.fillText('Collects signals from the surface — metrics, traces, logs',cx,195);
+    X.restore();
+
+    // 3 pillars centered
+    const opils=[
+      {title:'METRICS',color:'#f59e0b',desc:'CPU, memory, latency, error rates'},
+      {title:'TRACES',color:'#0ea5e9',desc:'Request paths through services'},
+      {title:'LOGS',color:'#84cc16',desc:'Text output from applications'},
+    ];
+    const opW=800,opH=480,opGap=55;
+    const opTotal=opils.length*opW+(opils.length-1)*opGap;
+    const opStart=cx-opTotal/2;
+
+    opils.forEach((pil,pi)=>{
+      const pilIn=easeOutCubic(P(now,S1+2+pi*1,S1+4+pi*1));
+      const pa=obsA*pilIn;
+      if(pa<0.01)return;
+      const px=opStart+pi*(opW+opGap), py=280;
+
+      X.save();X.globalAlpha=pa;
+      X.beginPath();X.roundRect(px,py,opW,opH,18);
+      X.fillStyle='rgba(15,18,35,0.7)';X.fill();
+      X.strokeStyle=pil.color+'30';X.lineWidth=2;X.stroke();
+      X.fillStyle=pil.color;X.fillRect(px+20,py,opW-40,5);
+
+      X.font='800 34px "DM Sans"';X.fillStyle=pil.color;
+      X.textAlign='center';X.textBaseline='middle';
+      X.fillText(pil.title,px+opW/2,py+50);
+      X.font='400 24px "DM Sans"';X.fillStyle='#94a3b8';
+      X.fillText(pil.desc,px+opW/2,py+90);
+
+      // visual per pillar
+      if(pi===0){
+        for(let wi=0;wi<3;wi++){
+          const wIn=easeOutExpo(P(now,S1+4+wi*0.5,S1+6+wi*0.5));
+          drawMetricWave(px+40,py+140+wi*100,opW-80,65,pa*wIn,now,['#f59e0b','#ef4444','#22d3ee'][wi],[8,12,6][wi]);
+          X.save();X.globalAlpha=pa*wIn;
+          X.font='600 18px "DM Sans"';X.fillStyle=['#f59e0b','#ef4444','#22d3ee'][wi];
+          X.textAlign='left';X.textBaseline='middle';
+          X.fillText(['CPU Usage','Error Rate','Latency p99'][wi],px+50,py+125+wi*100);
+          X.restore();
+        }
+      } else if(pi===1){
+        const spans=[{name:'gateway',w:650,color:'#f43f5e',off:0},{name:'auth',w:420,color:'#6366f1',off:80},{name:'api',w:320,color:'#059669',off:170},{name:'database',w:160,color:'#336791',off:300}];
+        spans.forEach((sp,si)=>{
+          const spIn=easeOutExpo(P(now,S1+4+si*0.5,S1+6+si*0.5));
+          X.save();X.globalAlpha=pa*spIn;
+          const sy=py+130+si*80;
+          X.beginPath();X.roundRect(px+50+sp.off*spIn,sy,sp.w*spIn,28,4);
+          X.fillStyle=sp.color+'40';X.fill();X.strokeStyle=sp.color;X.lineWidth=1.5;X.stroke();
+          X.font='600 17px "DM Sans"';X.fillStyle=sp.color;X.textAlign='left';X.fillText(sp.name,px+55+sp.off*spIn,sy+14);
+          X.font='400 15px "DM Sans"';X.fillStyle='#64748b';X.textAlign='right';
+          X.fillText([120,45,30,8][si]+'ms',px+45+sp.off*spIn+sp.w*spIn,sy+14);
+          X.restore();
+        });
+      } else {
+        const msgs=[
+          {time:'10:24:01',lvl:'INFO',msg:'Consumer group active',lc:'#84cc16'},
+          {time:'10:24:03',lvl:'WARN',msg:'High consumer lag detected',lc:'#f59e0b'},
+          {time:'10:24:05',lvl:'INFO',msg:'MongoDB write latency: 12ms',lc:'#84cc16'},
+          {time:'10:24:07',lvl:'ERROR',msg:'Connection timeout to replica',lc:'#ef4444'},
+          {time:'10:24:09',lvl:'DEBUG',msg:'GC pause: 12ms',lc:'#64748b'},
+        ];
+        msgs.forEach((m,mi)=>{
+          const mIn=easeOutExpo(P(now,S1+4+mi*0.3,S1+5.5+mi*0.3));
+          X.save();X.globalAlpha=pa*mIn;
+          const ly=py+130+mi*60;
+          X.font='500 17px "DM Sans"';X.fillStyle='#475569';X.textAlign='left';X.fillText(m.time,px+30,ly);
+          X.font='700 15px "DM Sans"';X.fillStyle=m.lc;X.fillText(m.lvl,px+230,ly);
+          X.font='400 17px "DM Sans"';X.fillStyle='#94a3b8';X.fillText(m.msg,px+330,ly);
+          X.restore();
+        });
+      }
+      X.restore();
+    });
+
+    // Surface-level callout centered
+    const surfA=easeOutExpo(P(now,S1+8,S1+10))*obsA;
+    if(surfA>0.01){
+      X.save();X.globalAlpha=surfA;
+      X.beginPath();X.roundRect(cx-750,850,1500,130,16);
+      X.fillStyle='rgba(245,158,11,0.04)';X.fill();X.strokeStyle='#f59e0b25';X.lineWidth=2;X.stroke();
+      X.font='700 38px "DM Sans"';X.fillStyle='#f59e0b';X.textAlign='center';X.textBaseline='middle';
+      X.fillText('Surface-Level Visibility',cx,900);
+      X.font='400 28px "DM Sans"';X.fillStyle='#94a3b8';
+      X.fillText('Tells you "the database is slow" — but not why, or what depends on it',cx,950);
+      X.restore();
+    }
+
+    // Limitations centered
+    const limA=easeOutExpo(P(now,S1+10,S1+13))*obsA;
+    if(limA>0.01){
+      const lims=[
+        'Cannot validate if a topic is correctly sinking to its target database',
+        'Cannot verify if an AI model is properly integrated with the chat service',
+        'Cannot check if API routes match declared schemas and configurations',
+        'Cannot assess compliance posture across the entire stack',
+      ];
+      lims.forEach((lim,li)=>{
+        const lIn=easeOutExpo(P(now,S1+10.5+li*0.5,S1+12+li*0.5));
+        X.save();X.globalAlpha=limA*lIn;
+        const ly=1060+li*60;
+        X.font='700 26px "DM Sans"';X.fillStyle='#ef4444';X.textAlign='center';X.textBaseline='middle';
+        X.fillText('✗   '+lim,cx,ly);
+        X.restore();
+      });
+    }
+
+    X.restore();
+  }
+
+  // ══════════════════════════════════════
+  // STACKTIC METADATA INTELLIGENCE (43-66)
+  // ══════════════════════════════════════
+  const stkIn=easeOutExpo(P(now,S2,S2+2));
+  const stkOut=1-easeOutExpo(P(now,S2+21,S2+23));
+  const stkA=stkIn*Math.max(stkOut,0);
+
+  if(stkA>0.01){
+    X.save();X.globalAlpha=stkA;
+    drawTopBar(stkA);
+
+    X.save();X.globalAlpha=stkA*0.04;
+    X.font='800 550px "DM Sans"';X.fillStyle='#4f46e5';
+    X.textAlign='center';X.textBaseline='middle';
+    X.fillText('META',cx,cy);
+    X.restore();
+
+    const stkT=easeOutBack(P(now,S2+0.5,S2+2));
+    X.save();X.globalAlpha=stkA*stkT;
+    X.font='800 80px "DM Sans"';X.fillStyle='#4f46e5';
+    X.textAlign='center';X.textBaseline='middle';
+    X.fillText('Stacktic Metadata Intelligence',cx,120);
+    X.font='400 38px "DM Sans"';X.fillStyle='#94a3b8';
+    X.fillText('Reads deep into your stack metadata — understands every relationship',cx,200);
+    X.restore();
+
+    // Central cluster
+    const clR=380;
+
+    // Hub
+    const hubA=easeOutElastic(P(now,S2+2,S2+5));
+    if(hubA>0.01){
+      X.save();X.globalAlpha=stkA*hubA;
+      const pulse=1+Math.sin(now*1.2)*0.03;
+      [clR+110,clR+55,clR].forEach((r,ri)=>{X.beginPath();X.arc(cx,cy+60,r*pulse,0,Math.PI*2);X.strokeStyle=`rgba(79,70,229,${0.04+ri*0.02})`;X.lineWidth=1.5;X.stroke();});
+      const scanAng=now*0.5;
+      X.beginPath();X.arc(cx,cy+60,(clR+110)*pulse,scanAng,scanAng+0.6);
+      X.strokeStyle='rgba(79,70,229,0.25)';X.lineWidth=5;X.shadowColor='#4f46e5';X.shadowBlur=12;X.stroke();X.shadowBlur=0;
+      X.beginPath();X.arc(cx,cy+60,clR*pulse,-scanAng*0.7,-scanAng*0.7+0.4);
+      X.strokeStyle='rgba(124,58,237,0.2)';X.lineWidth=3;X.stroke();
+      X.beginPath();X.arc(cx,cy+60,70,0,Math.PI*2);
+      X.fillStyle='rgba(79,70,229,0.08)';X.strokeStyle='#4f46e5';X.lineWidth=3;
+      X.shadowColor='#4f46e5';X.shadowBlur=25;X.fill();X.stroke();X.shadowBlur=0;
+      X.font='700 22px "DM Sans"';X.fillStyle='#4f46e5';X.textAlign='center';X.textBaseline='middle';
+      X.fillText('METADATA',cx,cy+50);X.fillText('ENGINE',cx,cy+74);
+      X.restore();
+    }
+
+    // Components orbiting
+    const dispComps=comps.slice(0,12);
+    const cPos=[];
+    dispComps.forEach((c,i)=>{
+      const cIn=easeOutElastic(P(now,S2+3+i*0.2,S2+5+i*0.2));
+      const angle=i*Math.PI*2/dispComps.length-Math.PI/2+now*0.02;
+      const tx2=cx+Math.cos(angle)*clR;
+      const ty2=cy+60+Math.sin(angle)*clR;
+      cPos.push({x:tx2,y:ty2});
+      drawNode(tx2,ty2,c,stkA*cIn,1,true);
+    });
+
+    // Relationships
+    const rels=[
+      {from:0,to:2,label:'topic → sink',color:'#f97316'},
+      {from:0,to:1,label:'topic → table',color:'#336791'},
+      {from:8,to:9,label:'model → chat',color:'#d946ef'},
+      {from:7,to:8,label:'RAG → LLM',color:'#fb923c'},
+      {from:4,to:6,label:'route → API',color:'#f43f5e'},
+      {from:5,to:4,label:'SSO → gateway',color:'#6366f1'},
+      {from:6,to:1,label:'query → db',color:'#059669'},
+      {from:10,to:3,label:'scrape → cache',color:'#f59e0b'},
+      {from:7,to:2,label:'vectors → store',color:'#f472b6'},
+    ];
+
+    rels.forEach((rel,ri)=>{
+      const relIn=easeOutCubic(P(now,S2+7+ri*0.7,S2+9+ri*0.7));
+      if(relIn<0.01||!cPos[rel.from]||!cPos[rel.to])return;
+      drawRelationship(cPos[rel.from].x,cPos[rel.from].y,cPos[rel.to].x,cPos[rel.to].y,rel.label,rel.color,stkA*relIn,now,ri);
+    });
+
+    // Validation badges
+    const validA=easeOutExpo(P(now,S2+14,S2+17))*stkA;
+    if(validA>0.01){
+      rels.forEach((rel,ri)=>{
+        const vIn=easeOutElastic(P(now,S2+14+ri*0.3,S2+16+ri*0.3));
+        if(vIn<0.01||!cPos[rel.from]||!cPos[rel.to])return;
+        const mx2=(cPos[rel.from].x+cPos[rel.to].x)/2,my2=(cPos[rel.from].y+cPos[rel.to].y)/2;
+        X.save();X.globalAlpha=validA*vIn;
+        X.beginPath();X.arc(mx2+30,my2-25,14,0,Math.PI*2);
+        X.fillStyle='#059669';X.shadowColor='#059669';X.shadowBlur=10;X.fill();X.shadowBlur=0;
+        X.font='700 16px "DM Sans"';X.fillStyle='#fff';X.textAlign='center';X.textBaseline='middle';
+        X.fillText('✓',mx2+30,my2-25);
+        X.restore();
+        if(Math.abs(vIn-0.5)<0.06&&sparks.length<200) burst(mx2+30,my2-25,'#059669',5,40);
+      });
+    }
+
+    // Capabilities centered
+    const capA=easeOutExpo(P(now,S2+17,S2+20))*stkA;
+    if(capA>0.01){
+      const caps=[
+        'Validates topic sinks are connected to correct databases',
+        'Verifies AI models are integrated with target services',
+        'Checks API routes match declared schemas end-to-end',
+        'Assesses full compliance posture across every layer',
+      ];
+      caps.forEach((cap,ci)=>{
+        const capIn=easeOutExpo(P(now,S2+17.5+ci*0.5,S2+19+ci*0.5));
+        X.save();X.globalAlpha=capA*capIn;
+        const cy3=1230+ci*55;
+        X.font='700 28px "DM Sans"';X.fillStyle='#059669';X.textAlign='center';X.textBaseline='middle';
+        X.fillText('✓   '+cap,cx,cy3);
+        X.restore();
+      });
+    }
+
+    X.restore();
+  }
+
+  // ══════════════════════════════════════
+  // SIDE-BY-SIDE COMPARISON (66-86)
+  // ══════════════════════════════════════
+  const cmpIn=easeOutExpo(P(now,S3,S3+2));
+  const cmpOut=1-easeOutExpo(P(now,S3+18,S3+20));
+  const cmpA=cmpIn*Math.max(cmpOut,0);
+
+  if(cmpA>0.01){
+    X.save();X.globalAlpha=cmpA;
+    drawTopBar(cmpA);
+
+    const cmpT=easeOutBack(P(now,S3+0.5,S3+2));
+    X.save();X.globalAlpha=cmpA*cmpT;
+    X.font='800 72px "DM Sans"';X.fillStyle='#e2e8f0';X.textAlign='center';X.textBaseline='middle';
+    X.fillText('Same Scenario — Two Views',cx,100);
+    X.restore();
+
+    // scenario pill
+    const scA=easeOutExpo(P(now,S3+2,S3+3.5))*cmpA;
+    if(scA>0.01){
+      X.save();X.globalAlpha=scA;
+      X.beginPath();X.roundRect(cx-520,160,1040,55,28);
+      X.fillStyle='rgba(79,70,229,0.08)';X.fill();X.strokeStyle='#4f46e5'+'40';X.lineWidth=1.5;X.stroke();
+      X.font='600 26px "DM Sans"';X.fillStyle='#94a3b8';X.textAlign='center';
+      X.fillText('Kafka topic "orders"  →  MongoDB collection "order_events"',cx,188);
+      X.restore();
+    }
+
+    // Two columns — centered with gap
+    const colW=1300,colGap=80;
+    const leftX=cx-colW-colGap/2,rightX=cx+colGap/2,colY=270,colH=1250;
+
+    // LEFT: Observability
+    const lIn=easeOutCubic(P(now,S3+3,S3+5));
+    if(lIn>0.01){
+      X.save();X.globalAlpha=cmpA*lIn;
+      X.beginPath();X.roundRect(leftX,colY,colW,colH,18);
+      X.fillStyle='rgba(15,18,35,0.5)';X.fill();X.strokeStyle='#f59e0b25';X.lineWidth=2;X.stroke();
+      X.fillStyle='#f59e0b';X.fillRect(leftX+20,colY,colW-40,5);
+
+      X.font='800 36px "DM Sans"';X.fillStyle='#f59e0b';X.textAlign='center';
+      X.fillText('OBSERVABILITY',leftX+colW/2,colY+50);
+
+      // Kafka metrics
+      const km=easeOutExpo(P(now,S3+4,S3+6));
+      X.save();X.globalAlpha=cmpA*lIn*km;
+      X.font='600 22px "DM Sans"';X.fillStyle='#f97316';X.textAlign='left';
+      X.fillText('Kafka Metrics',leftX+40,colY+110);
+      drawMetricWave(leftX+40,colY+140,colW-80,70,cmpA*lIn*km,now,'#f97316',10);
+      X.font='400 18px "DM Sans"';X.fillStyle='#64748b';
+      X.fillText('messages/sec: 1,247     consumer lag: 342',leftX+40,colY+230);
+      X.restore();
+
+      // MongoDB metrics
+      const mm=easeOutExpo(P(now,S3+5,S3+7));
+      X.save();X.globalAlpha=cmpA*lIn*mm;
+      X.font='600 22px "DM Sans"';X.fillStyle='#47A248';X.textAlign='left';
+      X.fillText('MongoDB Metrics',leftX+40,colY+280);
+      drawMetricWave(leftX+40,colY+310,colW-80,70,cmpA*lIn*mm,now,'#47A248',7);
+      X.font='400 18px "DM Sans"';X.fillStyle='#64748b';
+      X.fillText('ops/sec: 894     connections: 47',leftX+40,colY+400);
+      X.restore();
+
+      // Logs
+      const lg=easeOutExpo(P(now,S3+6,S3+8));
+      X.save();X.globalAlpha=cmpA*lIn*lg;
+      X.font='600 22px "DM Sans"';X.fillStyle='#84cc16';X.textAlign='left';
+      X.fillText('Log Output',leftX+40,colY+450);
+      const logs=[{t:'10:24:01',l:'INFO',m:'Consumer group active',c:'#84cc16'},{t:'10:24:03',l:'WARN',m:'High consumer lag detected',c:'#f59e0b'},{t:'10:24:05',l:'INFO',m:'MongoDB write latency: 12ms',c:'#84cc16'},{t:'10:24:07',l:'ERROR',m:'Connection timeout to replica',c:'#ef4444'}];
+      logs.forEach((lo,li)=>{
+        const loIn=easeOutExpo(P(now,S3+7+li*0.4,S3+8.5+li*0.4));
+        X.save();X.globalAlpha=cmpA*lIn*lg*loIn;
+        const ly=colY+490+li*42;
+        X.font='500 17px "DM Sans"';X.fillStyle='#475569';X.textAlign='left';X.fillText(lo.t,leftX+40,ly);
+        X.font='700 16px "DM Sans"';X.fillStyle=lo.c;X.fillText(lo.l,leftX+230,ly);
+        X.font='400 17px "DM Sans"';X.fillStyle='#94a3b8';X.fillText(lo.m,leftX+330,ly);
+        X.restore();
+      });
+      X.restore();
+
+      // BLIND SPOTS
+      const gapA2=easeOutExpo(P(now,S3+9,S3+12))*cmpA*lIn;
+      if(gapA2>0.01){
+        X.save();X.globalAlpha=gapA2;
+        X.beginPath();X.roundRect(leftX+30,colY+700,colW-60,500,14);
+        X.fillStyle='rgba(239,68,68,0.03)';X.fill();X.strokeStyle='#ef4444'+'20';X.lineWidth=2;X.setLineDash([6,6]);X.stroke();X.setLineDash([]);
+        X.font='700 28px "DM Sans"';X.fillStyle='#ef4444';X.textAlign='center';
+        X.fillText('BLIND SPOTS',leftX+colW/2,colY+745);
+        const blinds=['Is "orders" topic actually sinking to "order_events"?','Is the sink connector configured correctly?','Does the schema match between source and target?','Is the data reaching the right collection?','Are there missing fields or type mismatches?','Is this relationship compliant with data policy?'];
+        blinds.forEach((b,bi)=>{
+          const bIn=easeOutExpo(P(now,S3+10+bi*0.35,S3+11.5+bi*0.35));
+          X.save();X.globalAlpha=gapA2*bIn;
+          X.font='500 24px "DM Sans"';X.fillStyle='#ef4444';X.textAlign='left';X.fillText('?',leftX+70,colY+800+bi*58);
+          X.font='400 24px "DM Sans"';X.fillStyle='#94a3b8';X.fillText(b,leftX+105,colY+800+bi*58);
+          X.restore();
+        });
+        X.restore();
+      }
+
+      X.restore();
+    }
+
+    // RIGHT: Stacktic Metadata
+    const rIn=easeOutCubic(P(now,S3+4,S3+6));
+    if(rIn>0.01){
+      X.save();X.globalAlpha=cmpA*rIn;
+      X.beginPath();X.roundRect(rightX,colY,colW,colH,18);
+      X.fillStyle='rgba(15,18,35,0.5)';X.fill();X.strokeStyle='#4f46e5'+'25';X.lineWidth=2;X.stroke();
+      X.fillStyle='#4f46e5';X.fillRect(rightX+20,colY,colW-40,5);
+
+      X.font='800 36px "DM Sans"';X.fillStyle='#4f46e5';X.textAlign='center';
+      X.fillText('STACKTIC METADATA',rightX+colW/2,colY+50);
+
+      // Graph: Kafka → Sink → MongoDB
+      const grA=easeOutCubic(P(now,S3+5,S3+8));
+      if(grA>0.01){
+        X.save();X.globalAlpha=cmpA*rIn*grA;
+        const kx=rightX+200,ky=colY+200;
+        drawNode(kx,ky,comps[0],cmpA*rIn*grA,1.3,true);
+        const conIn=easeOutElastic(P(now,S3+6,S3+8.5));
+        const conX2=rightX+colW/2,conY2=colY+200;
+        X.save();X.globalAlpha=cmpA*rIn*grA*conIn;
+        X.beginPath();X.arc(conX2,conY2,35,0,Math.PI*2);
+        X.fillStyle='rgba(251,191,36,0.1)';X.strokeStyle='#fbbf24';X.lineWidth=2.5;X.fill();X.stroke();
+        X.font='700 16px "DM Sans"';X.fillStyle='#fbbf24';X.textAlign='center';X.textBaseline='middle';
+        X.fillText('SINK',conX2,conY2);
+        X.restore();
+        const mx3=rightX+colW-200,my3=colY+200;
+        drawNode(mx3,my3,comps[2],cmpA*rIn*grA,1.3,true);
+        if(conIn>0.3){
+          drawRelationship(kx+40,ky,conX2-40,conY2,'topic: orders',comps[0].color,cmpA*rIn*grA*conIn,now,20);
+          drawRelationship(conX2+40,conY2,mx3-40,my3,'collection: order_events',comps[2].color,cmpA*rIn*grA*conIn,now,21);
+        }
+        X.restore();
+      }
+
+      // Validation cards
+      const vals=[
+        {title:'Schema Validation',desc:'Source schema matches sink target',detail:'topics.orders.schema → collections.order_events.schema'},
+        {title:'Sink Configuration',desc:'Connector properly configured',detail:'connector.type=mongodb-sink, tasks.max=3'},
+        {title:'Field Mapping',desc:'All 12 fields mapped correctly',detail:'order_id→_id, timestamp→created_at, amount→total'},
+        {title:'Data Policy',desc:'PII fields encrypted at rest',detail:'customer_email: encrypted, customer_phone: encrypted'},
+        {title:'Throughput Match',desc:'Sink rate matches source rate',detail:'source: 1,247/s → sink: 1,245/s (99.8% match)'},
+      ];
+      vals.forEach((v,vi)=>{
+        const vIn=easeOutCubic(P(now,S3+8+vi*0.7,S3+10+vi*0.7));
+        X.save();X.globalAlpha=cmpA*rIn*vIn;
+        const vy=colY+330+vi*160;
+        X.beginPath();X.roundRect(rightX+35,vy,colW-70,140,12);
+        X.fillStyle='rgba(5,150,105,0.03)';X.fill();X.strokeStyle='#059669'+'25';X.lineWidth=1.5;X.stroke();
+        X.fillStyle='#059669';X.fillRect(rightX+35,vy,5,140);
+        // badge
+        X.beginPath();X.roundRect(rightX+colW-180,vy+12,125,34,17);
+        X.fillStyle='#059669'+'15';X.fill();X.strokeStyle='#059669';X.lineWidth=1.5;X.stroke();
+        X.font='700 18px "DM Sans"';X.fillStyle='#059669';X.textAlign='center';X.textBaseline='middle';
+        X.fillText('✓ PASS',rightX+colW-118,vy+29);
+        // text
+        X.font='700 26px "DM Sans"';X.fillStyle='#e2e8f0';X.textAlign='left';
+        X.fillText(v.title,rightX+65,vy+38);
+        X.font='400 22px "DM Sans"';X.fillStyle='#94a3b8';
+        X.fillText(v.desc,rightX+65,vy+75);
+        X.font='400 18px "DM Sans"';X.fillStyle='#4f46e5';
+        X.fillText(v.detail,rightX+65,vy+110);
+        X.restore();
+        if(Math.abs(vIn-0.5)<0.06&&sparks.length<200) burst(rightX+colW-118,vy+29,'#059669',4,30);
+      });
+
+      X.restore();
+    }
+
+    // center divider
+    const dvA=easeOutExpo(P(now,S3+3,S3+5))*cmpA;
+    if(dvA>0.01){X.save();X.globalAlpha=dvA*0.25;X.beginPath();X.moveTo(cx,colY+60);X.lineTo(cx,colY+colH-30);X.strokeStyle='#1e293b';X.lineWidth=2;X.setLineDash([6,6]);X.stroke();X.setLineDash([]);X.restore();}
+
+    X.restore();
+  }
+
+  // ══════════════════════════════════════
+  // DEEP DIVE (86-106)
+  // ══════════════════════════════════════
+  const deepIn=easeOutExpo(P(now,S4,S4+2));
+  const deepOut=1-easeOutExpo(P(now,S4+18,S4+20));
+  const deepA=deepIn*Math.max(deepOut,0);
+
+  if(deepA>0.01){
+    X.save();X.globalAlpha=deepA;
+    drawTopBar(deepA);
+
+    const deepT=easeOutBack(P(now,S4+0.5,S4+2));
+    X.save();X.globalAlpha=deepA*deepT;
+    X.font='800 72px "DM Sans"';X.fillStyle='#e2e8f0';X.textAlign='center';X.textBaseline='middle';
+    X.fillText('What Stacktic Validates',cx,100);
+    X.font='400 34px "DM Sans"';X.fillStyle='#64748b';
+    X.fillText('Every relationship in your stack — verified through metadata',cx,170);
+    X.restore();
+
+    const examples=[
+      {title:'Topic Sink → Database',from:comps[0],to:comps[2],label:'orders → order_events',checks:['Schema compatibility','Field mapping','Sink connector config','Throughput match'],color:'#f97316'},
+      {title:'AI Model → Chat Service',from:comps[8],to:comps[9],label:'llama3 → rocket.chat',checks:['Model endpoint reachable','Token limits configured','Response format valid','Fallback model set'],color:'#d946ef'},
+      {title:'API Gateway → Backend',from:comps[4],to:comps[6],label:'route /api/* → FastAPI',checks:['Route schema matches API','Auth policy applied','Rate limits configured','TLS termination valid'],color:'#f43f5e'},
+      {title:'Full Compliance Scan',from:comps[5],to:comps[12],label:'SSO → TLS → all services',checks:['All services behind SSO','TLS certificates valid','Encryption at rest enabled','Audit logging active'],color:'#059669'},
+    ];
+
+    const exW=1280,exH=560,exGap=70;
+    const grid=[
+      {x:cx-exW-exGap/2,y:240},{x:cx+exGap/2,y:240},
+      {x:cx-exW-exGap/2,y:240+exH+exGap},{x:cx+exGap/2,y:240+exH+exGap},
+    ];
+
+    examples.forEach((ex,ei)=>{
+      const exIn2=easeOutCubic(P(now,S4+2+ei*1.8,S4+4.5+ei*1.8));
+      const ea=deepA*exIn2;if(ea<0.01)return;
+      const gp=grid[ei];
+
+      X.save();X.globalAlpha=ea;
+      X.beginPath();X.roundRect(gp.x,gp.y,exW,exH,18);
+      X.fillStyle='rgba(15,18,35,0.6)';X.fill();X.strokeStyle=ex.color+'30';X.lineWidth=2;X.stroke();
+      X.fillStyle=ex.color;X.fillRect(gp.x+20,gp.y,exW-40,5);
+
+      X.font='700 32px "DM Sans"';X.fillStyle=ex.color;X.textAlign='left';X.textBaseline='middle';
+      X.fillText(ex.title,gp.x+35,gp.y+50);
+
+      const fnx=gp.x+170,fny=gp.y+180;
+      const tnx=gp.x+exW-170,tny=gp.y+180;
+      drawNode(fnx,fny,ex.from,ea,1.1,true);
+      drawNode(tnx,tny,ex.to,ea,1.1,true);
+
+      const rlIn=easeOutExpo(P(now,S4+3.5+ei*1.8,S4+5+ei*1.8));
+      if(rlIn>0.3) drawRelationship(fnx+40,fny,tnx-40,tny,ex.label,ex.color,ea*rlIn,now,30+ei,3);
+
+      ex.checks.forEach((ch,ci)=>{
+        const chIn=easeOutExpo(P(now,S4+5+ei*1.8+ci*0.4,S4+6.5+ei*1.8+ci*0.4));
+        X.save();X.globalAlpha=ea*chIn;
+        const cy4=gp.y+310+ci*52;
+        X.beginPath();X.arc(gp.x+65,cy4,14,0,Math.PI*2);
+        X.fillStyle='#059669'+'20';X.strokeStyle='#059669';X.lineWidth=1.5;X.fill();X.stroke();
+        X.font='700 16px "DM Sans"';X.fillStyle='#059669';X.textAlign='center';X.textBaseline='middle';
+        X.fillText('✓',gp.x+65,cy4);
+        X.font='400 24px "DM Sans"';X.fillStyle='#cbd5e1';X.textAlign='left';
+        X.fillText(ch,gp.x+95,cy4);
+        X.restore();
+      });
+
+      X.restore();
+    });
+
+    X.restore();
+  }
+
+  // ══════════════════════════════════════
+  // FINALE (106+)
+  // ══════════════════════════════════════
+  const finIn=easeOutExpo(P(now,S5,S5+3));
+  if(finIn>0.01){
+    X.save();X.globalAlpha=finIn;
+    X.fillStyle='rgba(8,11,22,0.97)';X.fillRect(0,0,W,H);
+    X.fillStyle='#4f46e5';X.fillRect(0,0,W,6);
+
+    const fcy=cy-60;
+
+    const orbitA=easeOutCubic(P(now,S5+1,S5+5));
+    comps.forEach((c,i)=>{
+      const tIn=easeOutElastic(P(now,S5+1+i*0.05,S5+3+i*0.05));
+      const angle=c.baseAngle+now*0.12;
+      const r=280+((i*37)%200);
+      const tx=cx+Math.cos(angle)*r*orbitA;
+      const ty=fcy+Math.sin(angle)*r*0.5*orbitA;
+      drawNode(tx,ty,c,finIn*tIn*0.4,0.55,false);
+      if(i%2===0&&i<comps.length-2){
+        const next=comps[i+2];const na=next.baseAngle+now*0.12;const nr=280+((((i+2))*37)%200);
+        drawEnergyLine(tx,ty,cx+Math.cos(na)*nr*orbitA,fcy+Math.sin(na)*nr*0.5*orbitA,c.color,finIn*tIn*0.06,now,i);
+      }
+    });
+
+    const tBg=X.createRadialGradient(cx,fcy,80,cx,fcy,380);
+    tBg.addColorStop(0,'rgba(8,11,22,0.92)');tBg.addColorStop(1,'rgba(8,11,22,0)');
+    X.beginPath();X.arc(cx,fcy,380,0,Math.PI*2);X.fillStyle=tBg;X.fill();
+
+    X.font='800 130px "DM Sans"';X.fillStyle='#4f46e5';X.textAlign='center';X.textBaseline='middle';
+    X.shadowColor='#4f46e5';X.shadowBlur=60;
+    X.fillText('STACKTIC',cx,fcy-60);X.shadowBlur=0;
+
+    const tag1=easeOutExpo(P(now,S5+2,S5+4));
+    X.save();X.globalAlpha=finIn*tag1;
+    X.font='400 58px "DM Serif Display"';X.fillStyle='#e2e8f0';
+    X.fillText('Metadata Intelligence',cx,fcy+50);
+    X.restore();
+
+    // strip
+    const stripIn=easeOutExpo(P(now,S5+4,S5+6));
+    if(stripIn>0.01){
+      const strips=[{text:'Observability sees symptoms',color:'#f59e0b'},{text:'→',color:'#64748b'},{text:'Stacktic understands causes',color:'#4f46e5'}];
+      X.save();X.globalAlpha=finIn*stripIn;
+      X.font='600 36px "DM Sans"';X.textAlign='center';
+      strips.forEach((s,si)=>{
+        const sIn=easeOutExpo(P(now,S5+4.5+si*0.5,S5+6+si*0.5));
+        X.save();X.globalAlpha=finIn*stripIn*sIn;X.fillStyle=s.color;
+        X.fillText(s.text,cx+(si-1)*520,fcy+160);X.restore();
+      });
+      X.restore();
+    }
+
+    const keyA=easeOutExpo(P(now,S5+6,S5+8));
+    X.save();X.globalAlpha=finIn*keyA;
+    const divW=750*keyA;
+    X.beginPath();X.moveTo(cx-divW/2,fcy+240);X.lineTo(cx+divW/2,fcy+240);
+    X.strokeStyle='#4f46e5';X.lineWidth=3;X.stroke();
+    X.font='600 34px "DM Sans"';X.fillStyle='#4f46e5';X.textAlign='center';
+    X.fillText('Every component. Every relationship. Every validation.',cx,fcy+300);
+    X.restore();
+
+    const pillA=easeOutExpo(P(now,S5+7,S5+9));
+    if(pillA>0.01){
+      const pills=[{text:'Topic → DB Validation',color:'#f97316'},{text:'Model → Service Integration',color:'#d946ef'},{text:'API Route Verification',color:'#f43f5e'},{text:'Compliance Posture',color:'#059669'}];
+      const plW=440,plGap=30;
+      const plTotal=pills.length*plW+(pills.length-1)*plGap;
+      const plStart=cx-plTotal/2;
+      pills.forEach((pl,pi)=>{
+        const plIn=easeOutExpo(P(now,S5+7.5+pi*0.3,S5+9+pi*0.3));
+        X.save();X.globalAlpha=finIn*pillA*plIn;
+        const px=plStart+pi*(plW+plGap);
+        X.beginPath();X.roundRect(px,fcy+360,plW,56,28);
+        X.fillStyle=pl.color+'12';X.strokeStyle=pl.color+'50';X.lineWidth=2;X.fill();X.stroke();
+        X.font='600 22px "DM Sans"';X.fillStyle=pl.color;X.textAlign='center';
+        X.fillText(pl.text,px+plW/2,fcy+388);
+        if(pi<pills.length-1){X.beginPath();X.arc(px+plW+plGap/2,fcy+388,4,0,Math.PI*2);X.fillStyle='#4f46e5'+'40';X.fill();}
+        X.restore();
+      });
+    }
+
+    X.restore();
+  }
+
+  sparks.forEach(s=>s.draw(0.8));
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

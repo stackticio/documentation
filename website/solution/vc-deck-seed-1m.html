@@ -1,0 +1,1915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stacktic — Seed Round · €1M</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #2A2847;
+      --bg-deep: #1a1830;
+      --purple: #a78bfa;
+      --purple-bright: #c084fc;
+      --cyan: #60d5ff;
+      --cyan-bright: #38bdf8;
+      --amber: #fbbf24;
+      --amber-bright: #f59e0b;
+      --green: #34d399;
+      --green-bright: #10b981;
+      --red: #f87171;
+      --white: #ffffff;
+      --slate-200: #e2e8f0;
+      --slate-300: #cbd5e1;
+      --slate-400: #94a3b8;
+      --slate-500: #64748b;
+    }
+
+    html { scroll-behavior: smooth; scrollbar-width: none; -ms-overflow-style: none; }
+    html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+    body {
+      font-family: 'Fira Code', monospace;
+      background:
+        radial-gradient(ellipse at 20% 0%, rgba(167, 139, 250, 0.12), transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(96, 213, 255, 0.10), transparent 50%),
+        var(--bg);
+      color: var(--slate-200);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Ambient drift ── */
+    .ambient { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+    .ambient::before, .ambient::after {
+      content: ''; position: absolute; inset: 0;
+      background-image:
+        radial-gradient(circle at 15% 25%, rgba(192, 132, 252, 0.5) 0, transparent 2px),
+        radial-gradient(circle at 75% 65%, rgba(96, 213, 255, 0.5) 0, transparent 2px),
+        radial-gradient(circle at 45% 85%, rgba(52, 211, 153, 0.5) 0, transparent 2px),
+        radial-gradient(circle at 90% 15%, rgba(251, 191, 36, 0.4) 0, transparent 2px),
+        radial-gradient(circle at 30% 55%, rgba(167, 139, 250, 0.4) 0, transparent 2px);
+      background-size: 280px 280px;
+      animation: drift 60s linear infinite;
+      opacity: 0.7;
+    }
+    .ambient::after {
+      background-size: 420px 420px;
+      animation-duration: 100s;
+      animation-direction: reverse;
+      opacity: 0.4;
+    }
+    @keyframes drift { from { transform: translate(0,0); } to { transform: translate(-280px,-280px); } }
+
+    /* ── Top chrome ── */
+    .top-brand {
+      position: fixed; top: 22px; left: 32px; z-index: 100;
+      font-size: 14px; font-weight: 700;
+      background: rgba(42, 40, 71, 0.7);
+      backdrop-filter: blur(8px);
+      padding: 8px 14px; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .top-brand .br { color: var(--purple); }
+    .top-brand .tx {
+      background: linear-gradient(135deg, var(--purple), var(--cyan), var(--green));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .top-right {
+      position: fixed; top: 22px; right: 32px; z-index: 100;
+      font-size: 11px; letter-spacing: 3px;
+      color: var(--slate-400);
+      background: rgba(42, 40, 71, 0.7);
+      backdrop-filter: blur(8px);
+      padding: 8px 14px; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .top-right .grn { color: var(--green); text-shadow: 0 0 8px var(--green); }
+
+    /* ── Scroll rail — 6 chapter dots ── */
+    .scroll-rail {
+      position: fixed; right: 24px; top: 50%;
+      transform: translateY(-50%);
+      display: flex; flex-direction: column; gap: 18px;
+      z-index: 100;
+    }
+    .rail-dot {
+      position: relative;
+      display: flex; align-items: center; gap: 12px;
+      cursor: pointer;
+      padding: 4px 0;
+    }
+    .rail-dot .ball {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      transition: all 0.3s ease;
+    }
+    .rail-dot.active .ball {
+      background: var(--green);
+      box-shadow: 0 0 14px var(--green);
+      transform: scale(1.4);
+    }
+    .rail-dot .lbl {
+      font-size: 10px;
+      letter-spacing: 2.5px;
+      color: var(--slate-400);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      white-space: nowrap;
+      font-weight: 600;
+      position: absolute;
+      right: 22px;
+      background: rgba(42,40,71,0.85);
+      backdrop-filter: blur(6px);
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .rail-dot:hover .lbl, .rail-dot.active .lbl { opacity: 1; }
+    .rail-dot.active .lbl { color: var(--white); }
+
+    /* ── Scene base ── */
+    .scene {
+      position: relative;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 90px 48px;
+      z-index: 10;
+    }
+    .scene + .scene { border-top: 1px solid rgba(255,255,255,0.04); }
+
+    .scene-tag {
+      font-size: 11px; letter-spacing: 5px;
+      color: var(--slate-400);
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .scene-tag .dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      animation: blink 1.5s ease-in-out infinite;
+    }
+    .scene-tag.c1 .dot { background: var(--purple); box-shadow: 0 0 12px var(--purple); }
+    .scene-tag.c2 .dot { background: var(--red); box-shadow: 0 0 12px var(--red); }
+    .scene-tag.c3 .dot { background: var(--cyan); box-shadow: 0 0 12px var(--cyan); }
+    .scene-tag.c4 .dot { background: var(--amber); box-shadow: 0 0 12px var(--amber); }
+    .scene-tag.c5 .dot { background: var(--green); box-shadow: 0 0 12px var(--green); }
+    .scene-tag .line-h {
+      width: 40px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--slate-400), transparent);
+    }
+    @keyframes blink { 50% { opacity: 0.3; } }
+
+    /* ── Typography ── */
+    .line {
+      font-size: 28px; font-weight: 500;
+      text-align: center;
+      max-width: 1100px;
+      line-height: 1.4;
+      letter-spacing: -0.5px;
+      color: var(--white);
+    }
+    .line.huge { font-size: 56px; font-weight: 700; letter-spacing: -2px; }
+    .line.big { font-size: 40px; font-weight: 700; letter-spacing: -1.2px; }
+    .line.small { font-size: 17px; color: var(--slate-300); font-weight: 400; }
+    .line.comment { font-size: 14px; color: var(--slate-400); letter-spacing: 0.5px; }
+    .line + .line { margin-top: 16px; }
+
+    .grad {
+      background: linear-gradient(135deg, var(--purple), var(--cyan), var(--green));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 24px rgba(96, 213, 255, 0.4));
+    }
+    .purple { color: var(--purple-bright); text-shadow: 0 0 24px rgba(192,132,252,0.5); }
+    .cyan { color: var(--cyan); text-shadow: 0 0 24px rgba(96,213,255,0.5); }
+    .amber { color: var(--amber); text-shadow: 0 0 24px rgba(251,191,36,0.5); }
+    .green { color: var(--green); text-shadow: 0 0 24px rgba(52,211,153,0.5); }
+    .red { color: var(--red); text-shadow: 0 0 18px rgba(248,113,113,0.5); }
+
+    /* ── In-view animation ── */
+    .anim { opacity: 0; transform: translateY(30px); transition: opacity 0.9s ease, transform 0.9s ease; }
+    .scene.in-view .anim { opacity: 1; transform: translateY(0); }
+    .scene.in-view .anim.d1 { transition-delay: 0.1s; }
+    .scene.in-view .anim.d2 { transition-delay: 0.3s; }
+    .scene.in-view .anim.d3 { transition-delay: 0.5s; }
+    .scene.in-view .anim.d4 { transition-delay: 0.7s; }
+    .scene.in-view .anim.d5 { transition-delay: 0.9s; }
+    .scene.in-view .anim.d6 { transition-delay: 1.1s; }
+    .scene.in-view .anim.d7 { transition-delay: 1.3s; }
+    .anim.zoom { transform: scale(0.85); }
+    .scene.in-view .anim.zoom { transform: scale(1); }
+
+    /* ╭───────────────────────────────────╮
+       │ CHAPTER DIVIDER (the spine)       │
+       ╰───────────────────────────────────╯ */
+    .chapter-stage {
+      position: relative;
+      width: 100%;
+      max-width: 1200px;
+      text-align: center;
+      padding: 60px 0;
+    }
+    .chapter-pre {
+      font-size: 14px;
+      letter-spacing: 8px;
+      color: var(--slate-400);
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+    .chapter-num {
+      font-size: clamp(180px, 30vw, 480px);
+      font-weight: 700;
+      line-height: 0.9;
+      letter-spacing: -10px;
+      color: rgba(255,255,255,0.05);
+      position: relative;
+      display: inline-block;
+    }
+    .chapter-num::before,
+    .chapter-num::after {
+      content: '/';
+      position: absolute;
+      font-size: 0.3em;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0.5;
+      font-weight: 400;
+    }
+    .chapter-num::before { left: -1.2em; }
+    .chapter-num::after { right: -1.2em; }
+    .chapter-stage.c1 .chapter-num::before, .chapter-stage.c1 .chapter-num::after { color: var(--purple); }
+    .chapter-stage.c2 .chapter-num::before, .chapter-stage.c2 .chapter-num::after { color: var(--red); }
+    .chapter-stage.c3 .chapter-num::before, .chapter-stage.c3 .chapter-num::after { color: var(--cyan); }
+    .chapter-stage.c4 .chapter-num::before, .chapter-stage.c4 .chapter-num::after { color: var(--amber); }
+    .chapter-stage.c5 .chapter-num::before, .chapter-stage.c5 .chapter-num::after { color: var(--green); }
+
+    .chapter-name {
+      font-size: clamp(40px, 6vw, 96px);
+      font-weight: 700;
+      letter-spacing: -2px;
+      margin-top: clamp(-60px, -6vw, -120px);
+      background: linear-gradient(135deg, var(--purple), var(--cyan), var(--green));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 30px rgba(96,213,255,0.4));
+      position: relative;
+      z-index: 2;
+    }
+    .chapter-teaser {
+      font-size: clamp(14px, 1.4vw, 20px);
+      color: var(--slate-300);
+      letter-spacing: 3px;
+      max-width: 800px;
+      margin: 36px auto 0;
+      line-height: 1.6;
+    }
+    .chapter-progress {
+      margin-top: 50px;
+      display: flex; gap: 10px;
+      align-items: center; justify-content: center;
+    }
+    .chapter-progress .step {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .chapter-progress .pill {
+      width: 50px; height: 4px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      transition: all 0.4s ease;
+    }
+    .chapter-progress .step.done .pill {
+      background: rgba(167,139,250,0.4);
+    }
+    .chapter-progress .step.current .pill {
+      background: linear-gradient(90deg, var(--purple), var(--cyan), var(--green));
+      box-shadow: 0 0 14px rgba(96,213,255,0.5);
+      width: 80px;
+    }
+    .chapter-progress .step-lbl {
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: var(--slate-500);
+      font-weight: 600;
+    }
+    .chapter-progress .step.current .step-lbl { color: var(--white); }
+
+    /* ── COVER ── */
+    .cover-logo {
+      font-size: clamp(70px, 11vw, 160px);
+      font-weight: 700;
+      letter-spacing: -5px;
+      background: linear-gradient(135deg, var(--purple), var(--cyan), var(--green));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+      filter: drop-shadow(0 0 40px rgba(167,139,250,0.4));
+      animation: logoFloat 4s ease-in-out infinite;
+    }
+    .cover-logo .br { color: var(--purple); -webkit-text-fill-color: var(--purple); }
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); filter: drop-shadow(0 16px 50px rgba(96,213,255,0.5)); }
+    }
+    .cover-tag {
+      font-size: clamp(14px, 1.5vw, 22px);
+      letter-spacing: 8px;
+      color: var(--white);
+      margin-top: 14px;
+      text-transform: uppercase;
+      font-weight: 600;
+      opacity: 0.9;
+    }
+    .cover-teaser {
+      margin-top: 40px;
+      font-size: clamp(15px, 1.4vw, 19px);
+      color: var(--slate-300);
+      letter-spacing: 1.5px;
+      padding: 14px 28px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .cover-teaser .hi { color: var(--green); font-weight: 700; text-shadow: 0 0 12px rgba(52,211,153,0.5); }
+    .cover-meta {
+      margin-top: 44px;
+      display: flex; gap: 18px;
+      flex-wrap: wrap; justify-content: center;
+    }
+    .cover-meta-chip {
+      padding: 12px 22px;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.03);
+      font-size: 13px; letter-spacing: 2px;
+      color: var(--white);
+    }
+    .cover-meta-chip .lbl { color: var(--slate-400); margin-right: 8px; }
+    .cover-meta-chip .v { color: var(--green); text-shadow: 0 0 12px rgba(52,211,153,0.5); font-weight: 700; }
+    .cover-roadmap {
+      margin-top: 50px;
+      display: flex; gap: 0;
+      align-items: center; justify-content: center;
+      flex-wrap: wrap;
+      max-width: 900px;
+    }
+    .cover-rm-step {
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--slate-400);
+      padding: 8px 14px;
+      font-weight: 600;
+    }
+    .cover-rm-step .num {
+      color: var(--white);
+      font-weight: 700;
+      margin-right: 6px;
+    }
+    .cover-rm-step.c1 .num { color: var(--purple-bright); }
+    .cover-rm-step.c2 .num { color: var(--red); }
+    .cover-rm-step.c3 .num { color: var(--cyan); }
+    .cover-rm-step.c4 .num { color: var(--amber); }
+    .cover-rm-step.c5 .num { color: var(--green); }
+    .cover-rm-arrow {
+      color: var(--slate-500);
+      font-size: 12px;
+      opacity: 0.5;
+    }
+
+    /* ── BOMB (Chapter 4 opener) ── */
+    .never-banner {
+      width: 100vw;
+      margin-left: calc(50% - 50vw);
+      padding: 24px 0;
+      background:
+        linear-gradient(90deg,
+          rgba(248,113,113,0) 0%,
+          rgba(248,113,113,0.15) 20%,
+          rgba(248,113,113,0.25) 50%,
+          rgba(248,113,113,0.15) 80%,
+          rgba(248,113,113,0) 100%);
+      border-top: 2px solid rgba(248,113,113,0.4);
+      border-bottom: 2px solid rgba(248,113,113,0.4);
+      text-align: center;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 30px;
+    }
+    .never-banner::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(248,113,113,0.15) 50%,
+        transparent 100%);
+      animation: neverPulse 3s ease-in-out infinite;
+    }
+    @keyframes neverPulse {
+      0%, 100% { transform: translateX(-100%); }
+      50% { transform: translateX(100%); }
+    }
+    .never-banner-text {
+      font-size: clamp(32px, 5vw, 78px);
+      font-weight: 700;
+      letter-spacing: clamp(4px, 1vw, 14px);
+      color: var(--red);
+      text-shadow:
+        0 0 30px rgba(248,113,113,0.6),
+        0 0 60px rgba(248,113,113,0.3);
+      position: relative;
+      z-index: 1;
+      line-height: 1.1;
+    }
+    .never-banner-sub {
+      font-size: clamp(12px, 1.2vw, 18px);
+      letter-spacing: clamp(3px, 0.8vw, 10px);
+      color: var(--white);
+      margin-top: 12px;
+      opacity: 0.85;
+      font-weight: 600;
+      position: relative;
+      z-index: 1;
+    }
+    .bomb-stage {
+      display: flex; align-items: center; justify-content: center;
+      gap: clamp(20px, 4vw, 80px);
+      flex-wrap: wrap;
+      margin: 50px 0 30px;
+      width: 100%;
+    }
+    .bomb-col { text-align: center; }
+    .bomb-num {
+      font-size: clamp(180px, 28vw, 440px);
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--purple-bright), var(--cyan));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 0.9;
+      filter: drop-shadow(0 0 60px rgba(192,132,252,0.7));
+      animation: bombPulse 3s ease-in-out infinite;
+    }
+    @keyframes bombPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    .bomb-num-lbl {
+      font-size: clamp(14px, 1.5vw, 22px);
+      letter-spacing: clamp(4px, 0.8vw, 10px);
+      color: var(--purple-bright);
+      margin-top: 10px;
+      text-shadow: 0 0 14px rgba(192,132,252,0.6);
+      font-weight: 700;
+    }
+    .bomb-vs {
+      font-size: clamp(28px, 3vw, 48px);
+      color: var(--white);
+      letter-spacing: 4px;
+      opacity: 0.7;
+      font-weight: 300;
+      align-self: center;
+      margin-top: clamp(-40px, -4vw, -60px);
+    }
+    .bomb-logo {
+      font-size: clamp(150px, 22vw, 360px);
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: -3px;
+      line-height: 0.9;
+      text-shadow:
+        0 0 40px rgba(255,255,255,0.5),
+        0 0 100px rgba(96,213,255,0.4);
+      animation: bombPulse 3.2s ease-in-out infinite;
+      animation-delay: 0.4s;
+    }
+    .bomb-logo-lbl {
+      font-size: clamp(13px, 1.3vw, 20px);
+      letter-spacing: clamp(4px, 0.9vw, 10px);
+      color: var(--cyan);
+      margin-top: 12px;
+      text-shadow: 0 0 14px rgba(96,213,255,0.6);
+      font-weight: 700;
+    }
+    .bomb-stamp {
+      display: inline-block;
+      padding: clamp(14px, 1.8vw, 24px) clamp(28px, 4vw, 56px);
+      border: clamp(2.5px, 0.3vw, 4px) solid var(--green);
+      color: var(--green);
+      font-size: clamp(20px, 2.4vw, 36px);
+      font-weight: 700;
+      letter-spacing: clamp(4px, 0.8vw, 10px);
+      border-radius: 8px;
+      transform: rotate(-3deg);
+      box-shadow: 0 0 50px rgba(52,211,153,0.4);
+      text-shadow: 0 0 18px rgba(52,211,153,0.7);
+      background: rgba(52,211,153,0.08);
+      margin: 40px 0 50px;
+    }
+
+    /* ── Contrast grid ── */
+    .contrast-grid {
+      width: 100%;
+      max-width: 1200px;
+      margin: 30px 0 0;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 0;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1.5px solid rgba(255,255,255,0.12);
+      box-shadow: 0 0 80px rgba(0,0,0,0.3);
+    }
+    .contrast-side { padding: 30px 32px; }
+    .contrast-side.norm { background: linear-gradient(135deg, rgba(248,113,113,0.10), rgba(248,113,113,0.04)); }
+    .contrast-side.us { background: linear-gradient(135deg, rgba(52,211,153,0.12), rgba(52,211,153,0.04)); }
+    .contrast-vs-col {
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 20px;
+      background: rgba(0,0,0,0.2);
+      border-left: 1px solid rgba(255,255,255,0.06);
+      border-right: 1px solid rgba(255,255,255,0.06);
+      font-size: clamp(20px, 2vw, 32px);
+      font-weight: 700; color: var(--white);
+      letter-spacing: 4px; opacity: 0.6;
+    }
+    .contrast-h {
+      font-size: clamp(11px, 1vw, 14px);
+      letter-spacing: 4px;
+      margin-bottom: 22px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .contrast-side.norm .contrast-h { color: var(--red); }
+    .contrast-side.us .contrast-h { color: var(--green); }
+    .contrast-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      padding: 12px 0;
+      border-bottom: 1px dashed rgba(255,255,255,0.08);
+      gap: 16px;
+    }
+    .contrast-row:last-child { border-bottom: none; }
+    .contrast-label { font-size: clamp(11px, 1vw, 14px); color: var(--slate-400); letter-spacing: 1px; }
+    .contrast-val {
+      font-size: clamp(18px, 2vw, 28px);
+      font-weight: 700; letter-spacing: -0.5px; text-align: right;
+    }
+    .contrast-side.norm .contrast-val { color: var(--red); text-shadow: 0 0 10px rgba(248,113,113,0.4); }
+    .contrast-side.us .contrast-val { color: var(--green); text-shadow: 0 0 12px rgba(52,211,153,0.5); }
+
+    /* ── Pillars ── */
+    .pillars {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      width: 100%;
+      max-width: 1100px;
+      margin: 36px 0 30px;
+    }
+    .pillar {
+      position: relative;
+      padding: 28px 20px 22px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.08), transparent 70%),
+        linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+    .pillar::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: 14px 14px 0 0;
+    }
+    .pillar.p1::before { background: linear-gradient(90deg, var(--purple), var(--purple-bright)); box-shadow: 0 0 20px var(--purple); }
+    .pillar.p2::before { background: linear-gradient(90deg, var(--cyan), var(--cyan-bright)); box-shadow: 0 0 20px var(--cyan); }
+    .pillar.p3::before { background: linear-gradient(90deg, var(--amber), var(--amber-bright)); box-shadow: 0 0 20px var(--amber); }
+    .pillar.p4::before { background: linear-gradient(90deg, var(--green), var(--green-bright)); box-shadow: 0 0 20px var(--green); }
+    .pillar .icon { font-size: 32px; margin-bottom: 12px; display: block; line-height: 1; }
+    .pillar.p1 .icon, .pillar.p1 .h { color: var(--purple-bright); }
+    .pillar.p2 .icon, .pillar.p2 .h { color: var(--cyan); }
+    .pillar.p3 .icon, .pillar.p3 .h { color: var(--amber); }
+    .pillar.p4 .icon, .pillar.p4 .h { color: var(--green); }
+    .pillar .h { font-size: 14px; font-weight: 700; letter-spacing: 1.5px; }
+    .pillar .s {
+      font-size: 11px;
+      color: var(--slate-300);
+      margin-top: 10px;
+      letter-spacing: 0.5px;
+      line-height: 1.5;
+    }
+
+    /* ── Flow diagram ── */
+    .flow-stage {
+      display: grid;
+      grid-template-columns: auto 1fr auto 1fr auto;
+      align-items: center;
+      gap: 0;
+      width: 100%;
+      max-width: 1100px;
+      margin: 40px 0 30px;
+    }
+    .flow-node {
+      padding: 24px 30px;
+      border-radius: 14px;
+      text-align: center;
+      font-size: 16px; font-weight: 700;
+      letter-spacing: 2px;
+    }
+    .flow-node.ai-node {
+      background: radial-gradient(circle, rgba(167,139,250,0.30), rgba(167,139,250,0.05));
+      border: 1.5px solid rgba(167,139,250,0.55);
+      color: var(--purple-bright);
+      box-shadow: 0 0 50px rgba(167,139,250,0.35);
+      text-shadow: 0 0 14px rgba(192,132,252,0.6);
+    }
+    .flow-node.fw-node {
+      background: linear-gradient(135deg, rgba(167,139,250,0.25), rgba(96,213,255,0.18), rgba(52,211,153,0.25));
+      border: 1.5px solid rgba(255,255,255,0.25);
+      padding: 30px 36px;
+      box-shadow: 0 0 80px rgba(96,213,255,0.30), 0 0 40px rgba(167,139,250,0.20);
+    }
+    .flow-node.fw-node .fw-title {
+      font-size: 18px;
+      background: linear-gradient(135deg, var(--purple), var(--cyan), var(--green));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+      filter: drop-shadow(0 0 12px rgba(96,213,255,0.5));
+    }
+    .flow-node.fw-node .fw-sub {
+      font-size: 10px; color: var(--white);
+      letter-spacing: 4px; opacity: 0.85;
+    }
+    .flow-node.prod-node {
+      background: radial-gradient(circle, rgba(96,213,255,0.30), rgba(96,213,255,0.05));
+      border: 1.5px solid rgba(96,213,255,0.55);
+      color: var(--cyan);
+      box-shadow: 0 0 50px rgba(96,213,255,0.35);
+      text-shadow: 0 0 14px rgba(96,213,255,0.6);
+    }
+    .flow-pipe {
+      height: 4px; position: relative;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px; overflow: hidden;
+    }
+    .flow-pipe::after {
+      content: ''; position: absolute;
+      top: 0; left: -35%;
+      width: 35%; height: 100%;
+      animation: pipeFlow 1.8s linear infinite;
+    }
+    .flow-pipe.p1::after { background: linear-gradient(90deg, transparent, var(--purple-bright), transparent); box-shadow: 0 0 14px var(--purple); }
+    .flow-pipe.p2::after { background: linear-gradient(90deg, transparent, var(--green), transparent); box-shadow: 0 0 14px var(--green); }
+    @keyframes pipeFlow { to { left: 100%; } }
+    .flow-pipe-wrap { position: relative; margin: 0 8px; }
+    .flow-label {
+      position: absolute; top: -24px; left: 0; right: 0;
+      text-align: center;
+      font-size: 10px; letter-spacing: 3px;
+      color: var(--white); opacity: 0.7; font-weight: 600;
+    }
+
+    /* ── Traction ── */
+    .traction-card {
+      width: 100%; max-width: 1000px;
+      margin: 28px 0 20px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px; overflow: hidden;
+      background: rgba(255,255,255,0.02);
+    }
+    .traction-row {
+      display: grid;
+      grid-template-columns: 200px 1fr 180px;
+      padding: 22px 28px;
+      align-items: center; gap: 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .traction-row:last-child { border-bottom: none; }
+    .traction-logo {
+      font-size: 28px; font-weight: 700;
+      color: var(--white); letter-spacing: -1px;
+    }
+    .traction-logo .sub {
+      display: block;
+      font-size: 11px; color: var(--slate-400);
+      letter-spacing: 2px; font-weight: 400; margin-top: 2px;
+    }
+    .traction-detail { font-size: 13px; color: var(--slate-300); line-height: 1.6; }
+    .traction-detail .ck { color: var(--green); margin-right: 6px; }
+    .traction-status {
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 2px; text-align: center;
+    }
+    .traction-status.signed {
+      background: rgba(52,211,153,0.12);
+      border: 1.5px solid rgba(52,211,153,0.45);
+      color: var(--green);
+      text-shadow: 0 0 10px rgba(52,211,153,0.5);
+    }
+    .traction-status.gated {
+      background: rgba(251,191,36,0.10);
+      border: 1.5px solid rgba(251,191,36,0.4);
+      color: var(--amber);
+    }
+    .traction-status.pipe {
+      background: rgba(96,213,255,0.10);
+      border: 1.5px solid rgba(96,213,255,0.4);
+      color: var(--cyan);
+    }
+    .price-banner {
+      margin-top: 24px;
+      padding: 16px 28px;
+      background: rgba(52,211,153,0.08);
+      border: 1.5px solid rgba(52,211,153,0.35);
+      border-radius: 10px;
+      font-size: 15px; color: var(--white);
+      text-align: center; letter-spacing: 1px;
+    }
+    .price-banner .v {
+      color: var(--green); font-weight: 700;
+      font-size: 20px; text-shadow: 0 0 14px rgba(52,211,153,0.6);
+    }
+
+    /* ── Math card ── */
+    .math-card {
+      width: 100%; max-width: 950px;
+      margin: 30px 0 20px;
+      border-radius: 16px; overflow: hidden;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 0 60px rgba(96,213,255,0.1);
+    }
+    .math-row {
+      display: grid;
+      grid-template-columns: 1.5fr 100px 120px 140px;
+      padding: 18px 28px;
+      align-items: center; gap: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-size: 14px;
+    }
+    .math-row.header {
+      background: rgba(255,255,255,0.04);
+      font-size: 11px; letter-spacing: 2.5px;
+      color: var(--slate-400);
+      text-transform: uppercase; font-weight: 700;
+    }
+    .math-row.total {
+      background: linear-gradient(90deg, rgba(167,139,250,0.10), rgba(96,213,255,0.10), rgba(52,211,153,0.12));
+      border-bottom: none;
+      padding: 26px 28px;
+      font-weight: 700; font-size: 16px;
+    }
+    .math-row.total .arr {
+      color: var(--green); font-size: 22px;
+      text-shadow: 0 0 14px rgba(52,211,153,0.6);
+    }
+    .math-source { color: var(--white); }
+    .math-source .sub { display: block; font-size: 11px; color: var(--slate-400); letter-spacing: 0.5px; margin-top: 2px; }
+    .math-num { color: var(--cyan); font-weight: 700; text-align: right; }
+    .math-arr { color: var(--green); font-weight: 700; text-align: right; text-shadow: 0 0 8px rgba(52,211,153,0.4); }
+    .math-quote {
+      max-width: 950px; margin: 18px auto 0;
+      text-align: center;
+      font-size: 16px; color: var(--white);
+      font-style: italic; letter-spacing: 0.5px;
+      padding: 14px 24px;
+      border-left: 3px solid var(--green);
+      border-right: 3px solid var(--green);
+      background: rgba(52,211,153,0.05);
+      border-radius: 4px;
+    }
+
+    /* ── Funds ── */
+    .funds-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      width: 100%;
+      max-width: 1000px;
+      margin: 30px 0 0;
+    }
+    .funds-card {
+      padding: 22px 24px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      position: relative; overflow: hidden;
+    }
+    .funds-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 4px; height: 100%;
+    }
+    .funds-card.f1::before { background: var(--purple); box-shadow: 0 0 14px var(--purple); }
+    .funds-card.f2::before { background: var(--cyan); box-shadow: 0 0 14px var(--cyan); }
+    .funds-card.f3::before { background: var(--amber); box-shadow: 0 0 14px var(--amber); }
+    .funds-card.f4::before { background: var(--green); box-shadow: 0 0 14px var(--green); }
+    .funds-pct {
+      font-size: 28px; font-weight: 700; letter-spacing: -1px;
+    }
+    .funds-card.f1 .funds-pct { color: var(--purple-bright); }
+    .funds-card.f2 .funds-pct { color: var(--cyan); }
+    .funds-card.f3 .funds-pct { color: var(--amber); }
+    .funds-card.f4 .funds-pct { color: var(--green); }
+    .funds-h {
+      font-size: 14px; font-weight: 700;
+      color: var(--white);
+      margin: 4px 0 8px;
+      letter-spacing: 1px;
+    }
+    .funds-mile {
+      font-size: 12px; color: var(--slate-300);
+      letter-spacing: 0.5px; line-height: 1.5;
+    }
+    .funds-mile .lbl {
+      color: var(--slate-400);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-size: 9px;
+      display: block; margin-bottom: 4px;
+    }
+
+    /* ── Why now ── */
+    .why-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      width: 100%;
+      max-width: 1000px;
+      margin: 30px 0 20px;
+    }
+    .why-item {
+      padding: 22px 26px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex; gap: 18px; align-items: flex-start;
+    }
+    .why-item .ic { font-size: 28px; flex-shrink: 0; line-height: 1; }
+    .why-item.w1 .ic { color: var(--purple-bright); }
+    .why-item.w2 .ic { color: var(--cyan); }
+    .why-item.w3 .ic { color: var(--amber); }
+    .why-item.w4 .ic { color: var(--green); }
+    .why-item .h {
+      font-size: 15px; color: var(--white);
+      font-weight: 700;
+      margin-bottom: 6px;
+      letter-spacing: 1px;
+    }
+    .why-item .s {
+      font-size: 12px; color: var(--slate-300);
+      letter-spacing: 0.5px; line-height: 1.5;
+    }
+
+    /* ── Ask ── */
+    .ask-stage {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 22px;
+      max-width: 1100px;
+      width: 100%;
+      margin: 30px 0 0;
+    }
+    .ask-main {
+      padding: 32px 32px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(167,139,250,0.18), rgba(96,213,255,0.12), rgba(52,211,153,0.18));
+      border: 1.5px solid rgba(255,255,255,0.2);
+      box-shadow: 0 0 60px rgba(96,213,255,0.2);
+    }
+    .ask-upgrade {
+      padding: 32px 28px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.03);
+      border: 1px dashed rgba(255,255,255,0.2);
+    }
+    .ask-h {
+      font-size: 11px; letter-spacing: 4px;
+      color: var(--slate-400);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .ask-amount {
+      font-size: 62px; font-weight: 700;
+      background: linear-gradient(135deg, var(--purple), var(--cyan), var(--green));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -2px;
+      line-height: 1; margin-bottom: 8px;
+      filter: drop-shadow(0 0 24px rgba(96,213,255,0.4));
+    }
+    .ask-upgrade .ask-amount {
+      font-size: 44px;
+      background: linear-gradient(135deg, var(--cyan), var(--green));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .ask-tag {
+      font-size: 12px; letter-spacing: 3px;
+      color: var(--white); font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .ask-list { list-style: none; padding: 0; }
+    .ask-list li {
+      font-size: 13px; color: var(--slate-200);
+      padding: 6px 0; padding-left: 22px;
+      position: relative; letter-spacing: 0.5px;
+    }
+    .ask-list li::before {
+      content: '▸';
+      position: absolute; left: 0;
+      color: var(--green);
+      text-shadow: 0 0 8px var(--green);
+    }
+    .ask-upgrade .ask-list li::before { color: var(--cyan); text-shadow: 0 0 8px var(--cyan); }
+
+    /* ── Team ── */
+    .team-card {
+      padding: 40px 36px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.03);
+      border: 1px dashed rgba(255,255,255,0.2);
+      max-width: 900px; width: 100%;
+      text-align: center;
+      margin: 24px 0 0;
+    }
+    .team-card .ph {
+      font-size: 14px; color: var(--slate-400);
+      letter-spacing: 2px;
+      margin-bottom: 18px;
+    }
+    .team-slots {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+    .team-slot {
+      padding: 18px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .team-slot .nm { font-size: 18px; color: var(--white); font-weight: 700; }
+    .team-slot .rl { font-size: 11px; color: var(--purple-bright); letter-spacing: 2px; margin-top: 4px; }
+    .team-slot .bio { font-size: 12px; color: var(--slate-400); margin-top: 8px; line-height: 1.5; }
+
+    /* ── Metric pillars (Chapter 01 — −80% / −40% / +10× / 0) ── */
+    .metrics-pillars {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      width: 100%;
+      max-width: 1100px;
+      margin: 40px 0 20px;
+    }
+    .m-pillar {
+      padding: 36px 22px 28px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.10), transparent 70%),
+        linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .m-pillar::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+    .m-pillar::before { background: linear-gradient(90deg, var(--purple), var(--purple-bright)); box-shadow: 0 0 20px var(--purple); }
+    .m-pillar.p2::before { background: linear-gradient(90deg, var(--cyan), var(--cyan-bright)); box-shadow: 0 0 20px var(--cyan); }
+    .m-pillar.p3::before { background: linear-gradient(90deg, var(--amber), var(--amber-bright)); box-shadow: 0 0 20px var(--amber); }
+    .m-pillar.p4::before { background: linear-gradient(90deg, var(--green), var(--green-bright)); box-shadow: 0 0 20px var(--green); }
+    .m-pillar .m-v {
+      font-size: clamp(46px, 5.5vw, 88px);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -3px;
+      color: var(--purple-bright);
+      text-shadow: 0 0 40px rgba(192,132,252,0.5);
+    }
+    .m-pillar.p2 .m-v { color: var(--cyan); text-shadow: 0 0 40px rgba(96,213,255,0.5); }
+    .m-pillar.p3 .m-v { color: var(--amber); text-shadow: 0 0 40px rgba(251,191,36,0.5); }
+    .m-pillar.p4 .m-v { color: var(--green); text-shadow: 0 0 40px rgba(52,211,153,0.5); }
+    .m-pillar .m-l {
+      font-size: clamp(10px, 1vw, 13px);
+      letter-spacing: 3px;
+      color: var(--slate-300);
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-top: 16px;
+    }
+
+    /* ── Detail rows (business-voice expansion under headline) ── */
+    .detail-rows {
+      width: 100%;
+      max-width: 1050px;
+      margin: 36px 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 22px;
+    }
+    .detail-row {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      align-items: baseline;
+      gap: 28px;
+      padding: 14px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-row .verb {
+      font-size: clamp(15px, 1.3vw, 20px);
+      letter-spacing: 2.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .detail-row.r1 .verb { color: var(--purple-bright); text-shadow: 0 0 14px rgba(192,132,252,0.4); }
+    .detail-row.r2 .verb { color: var(--cyan); text-shadow: 0 0 14px rgba(96,213,255,0.4); }
+    .detail-row.r3 .verb { color: var(--amber); text-shadow: 0 0 14px rgba(251,191,36,0.4); }
+    .detail-row.r4 .verb { color: var(--green); text-shadow: 0 0 14px rgba(52,211,153,0.4); }
+    .detail-row .what {
+      font-size: clamp(13px, 1.1vw, 16px);
+      color: var(--slate-200);
+      letter-spacing: 0.3px;
+      line-height: 1.6;
+    }
+    .detail-row .what strong {
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    /* ── Ops strip (Chapter 01 — six *Ops surfaces) ── */
+    .ops-strip {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      width: 100%;
+      max-width: 1100px;
+      margin: 26px 0 14px;
+    }
+    .ops-chip {
+      padding: 14px 22px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1.5px solid rgba(255,255,255,0.15);
+      font-size: clamp(13px, 1.2vw, 17px);
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      color: var(--white);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    .ops-chip::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+    }
+    .ops-chip:hover {
+      background: rgba(255,255,255,0.07);
+      transform: translateY(-2px);
+    }
+    .ops-chip.o1::before { background: var(--purple-bright); box-shadow: 0 0 10px var(--purple); }
+    .ops-chip.o2::before { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+    .ops-chip.o3::before { background: var(--amber); box-shadow: 0 0 10px var(--amber); }
+    .ops-chip.o4::before { background: var(--green); box-shadow: 0 0 10px var(--green); }
+    .ops-chip.o5::before { background: var(--purple-bright); box-shadow: 0 0 10px var(--purple); }
+    .ops-chip.o6::before { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+
+    /* ── What-It-Is checklist (Chapter 01) ── */
+    .what-list {
+      width: 100%;
+      max-width: 980px;
+      margin: 32px 0 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .what-list-row {
+      display: grid;
+      grid-template-columns: 38px minmax(220px, auto) 1fr;
+      align-items: center;
+      gap: clamp(16px, 2vw, 32px);
+      padding: 18px 24px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+    .what-list-row:hover {
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(255,255,255,0.18);
+    }
+    .what-list-row .ck {
+      font-size: 22px;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1;
+    }
+    .what-list-row.k1 .ck { color: var(--purple-bright); text-shadow: 0 0 12px rgba(192,132,252,0.6); }
+    .what-list-row.k2 .ck { color: var(--cyan); text-shadow: 0 0 12px rgba(96,213,255,0.6); }
+    .what-list-row.k3 .ck { color: var(--amber); text-shadow: 0 0 12px rgba(251,191,36,0.6); }
+    .what-list-row.k4 .ck { color: var(--green); text-shadow: 0 0 12px rgba(52,211,153,0.6); }
+    .what-list-row .kw {
+      font-size: clamp(14px, 1.4vw, 18px);
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+    .what-list-row.k1 .kw { color: var(--purple-bright); }
+    .what-list-row.k2 .kw { color: var(--cyan); }
+    .what-list-row.k3 .kw { color: var(--amber); }
+    .what-list-row.k4 .kw { color: var(--green); }
+    .what-list-row .desc {
+      font-size: clamp(12px, 1vw, 14px);
+      color: var(--slate-200);
+      letter-spacing: 0.5px;
+      line-height: 1.5;
+    }
+    .what-list-row .desc .mono {
+      color: var(--white);
+      background: rgba(255,255,255,0.06);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      margin: 0 4px 0 0;
+    }
+
+    .definition-card {
+      max-width: 1000px;
+      width: 100%;
+      margin: 16px auto 0;
+      padding: 22px 32px;
+      background:
+        linear-gradient(135deg, rgba(167,139,250,0.10), rgba(96,213,255,0.06), rgba(52,211,153,0.10));
+      border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 14px;
+      text-align: center;
+      box-shadow: 0 0 50px rgba(96,213,255,0.12);
+    }
+    .definition-card .def-lbl {
+      font-size: 10px;
+      letter-spacing: 4px;
+      color: var(--slate-400);
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    .definition-card .def-text {
+      font-size: clamp(16px, 1.8vw, 24px);
+      color: var(--white);
+      line-height: 1.55;
+      font-weight: 500;
+      letter-spacing: -0.2px;
+    }
+
+    /* ── Stamps ── */
+    .stamps {
+      display: flex; gap: 14px;
+      margin-top: 28px;
+      justify-content: center; flex-wrap: wrap;
+    }
+    .stamp {
+      padding: 10px 18px;
+      border-radius: 8px;
+      background: rgba(52,211,153,0.10);
+      border: 1.5px solid rgba(52,211,153,0.4);
+      color: var(--green);
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 2px;
+      box-shadow: 0 0 24px rgba(52,211,153,0.15);
+      text-shadow: 0 0 12px rgba(52,211,153,0.5);
+    }
+    .stamp .ck { margin-right: 8px; color: var(--green); }
+
+    /* ── Responsive ── */
+    @media (max-width: 1024px) {
+      .line { font-size: 24px; }
+      .line.huge { font-size: 40px; }
+      .line.big { font-size: 30px; }
+      .pillars, .funds-grid, .why-grid { grid-template-columns: repeat(2, 1fr); }
+      .ask-stage { grid-template-columns: 1fr; }
+      .traction-row { grid-template-columns: 1fr; gap: 12px; }
+      .math-row { grid-template-columns: 1fr; gap: 8px; padding: 14px 18px; }
+      .math-row.header { display: none; }
+      .scroll-rail { right: 12px; }
+    }
+    @media (max-width: 700px) {
+      .scene { padding: 80px 22px; padding-top: 100px; }
+      .line { font-size: 20px; }
+      .line.huge { font-size: 28px; }
+      .line.big { font-size: 24px; }
+      .pillars, .funds-grid, .why-grid, .team-slots { grid-template-columns: 1fr; }
+      .contrast-grid { grid-template-columns: 1fr; }
+      .contrast-vs-col {
+        padding: 14px;
+        border-left: none; border-right: none;
+        border-top: 1px solid rgba(255,255,255,0.06);
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+      }
+      .flow-stage { grid-template-columns: 1fr; gap: 14px; }
+      .flow-pipe { height: 32px; width: 4px; margin: 0 auto; }
+      .scroll-rail { display: none; }
+      .top-brand, .top-right { font-size: 11px; padding: 6px 10px; }
+      .cover-roadmap { gap: 4px; }
+      .cover-rm-step { font-size: 9px; padding: 4px 6px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient"></div>
+
+  <div class="top-brand">
+    <span class="br">{</span><span class="tx">Stacktic</span><span class="br">}</span>
+  </div>
+  <div class="top-right">
+    SEED · <span class="grn">€1M</span> · 2026
+  </div>
+
+  <!-- ── 6-dot rail: cover + 5 chapters ── -->
+  <div class="scroll-rail">
+    <div class="rail-dot active" data-target="cover"><span class="lbl">COVER</span><span class="ball"></span></div>
+    <div class="rail-dot" data-target="ch1"><span class="lbl">01 · WHAT IT IS</span><span class="ball"></span></div>
+    <div class="rail-dot" data-target="ch2"><span class="lbl">02 · THE PROBLEM</span><span class="ball"></span></div>
+    <div class="rail-dot" data-target="ch3"><span class="lbl">03 · THE SOLUTION</span><span class="ball"></span></div>
+    <div class="rail-dot" data-target="ch4"><span class="lbl">04 · THE VALUE</span><span class="ball"></span></div>
+    <div class="rail-dot" data-target="ch5"><span class="lbl">05 · THE POTENTIAL</span><span class="ball"></span></div>
+  </div>
+
+  <!-- ╭───────────────────────────────────╮
+       │ COVER                              │
+       ╰───────────────────────────────────╯ -->
+  <section class="scene" id="cover" data-chapter="0">
+    <div class="cover-logo anim zoom d1">
+      <span class="br">{</span>Stacktic<span class="br">}</span>
+    </div>
+    <div class="cover-tag anim d2">The Production Interface for AI</div>
+
+    <div class="cover-teaser anim d3">
+      Built by <span class="hi">2 engineers</span> · Already paid by <span class="hi">PwC</span>
+    </div>
+
+    <div class="cover-meta anim d4">
+      <div class="cover-meta-chip"><span class="lbl">ROUND</span><span class="v">SEED</span></div>
+      <div class="cover-meta-chip"><span class="lbl">RAISING</span><span class="v">€1M</span></div>
+      <div class="cover-meta-chip"><span class="lbl">MILESTONE</span><span class="v">€1M ARR</span></div>
+      <div class="cover-meta-chip"><span class="lbl">YEAR</span><span class="v">2026</span></div>
+    </div>
+
+    <div class="cover-roadmap anim d5">
+      <div class="cover-rm-step c1"><span class="num">01</span>WHAT IT IS</div>
+      <div class="cover-rm-arrow">›</div>
+      <div class="cover-rm-step c2"><span class="num">02</span>PROBLEM</div>
+      <div class="cover-rm-arrow">›</div>
+      <div class="cover-rm-step c3"><span class="num">03</span>SOLUTION</div>
+      <div class="cover-rm-arrow">›</div>
+      <div class="cover-rm-step c4"><span class="num">04</span>VALUE</div>
+      <div class="cover-rm-arrow">›</div>
+      <div class="cover-rm-step c5"><span class="num">05</span>POTENTIAL</div>
+    </div>
+  </section>
+
+  <!-- ╭───────────────────────────────────╮
+       │ CHAPTER 01 — WHAT IT IS            │
+       ╰───────────────────────────────────╯ -->
+  <section class="scene" id="ch1" data-chapter="1">
+    <div class="chapter-stage c1 anim d1">
+      <div class="chapter-pre">CHAPTER ONE</div>
+      <div class="chapter-num">01</div>
+      <div class="chapter-name">What It Is</div>
+      <div class="chapter-progress">
+        <div class="step current"><div class="pill"></div></div>
+        <div class="step"><div class="pill"></div></div>
+        <div class="step"><div class="pill"></div></div>
+        <div class="step"><div class="pill"></div></div>
+        <div class="step"><div class="pill"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene" data-chapter="1">
+    <div class="scene-tag c1 anim d1">
+      <span class="dot"></span>01 · What It Is<span class="line-h"></span>
+    </div>
+
+    <div class="line huge anim d2">
+      Stacktic builds, secures and operates<br>
+      your entire software stack &mdash; <span class="grad">automatically.</span>
+    </div>
+
+    <div class="line anim d3" style="margin-top: 28px;">
+      One definition &nbsp;·&nbsp; any cloud &nbsp;·&nbsp; every regulation.
+    </div>
+
+    <div class="metrics-pillars anim d4">
+      <div class="m-pillar">
+        <div class="m-v">&minus;80%</div>
+        <div class="m-l">Ops Cost</div>
+      </div>
+      <div class="m-pillar p2">
+        <div class="m-v">&minus;40%</div>
+        <div class="m-l">Infra &amp; Licensing</div>
+      </div>
+      <div class="m-pillar p3">
+        <div class="m-v">+10&times;</div>
+        <div class="m-l">Faster Delivery</div>
+      </div>
+      <div class="m-pillar p4">
+        <div class="m-v">0</div>
+        <div class="m-l">Vendor Lock-in</div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ╭───────────────────────────────────╮
+       │ CHAPTER 02 — THE PROBLEM           │
+       ╰───────────────────────────────────╯ -->
+  <section class="scene" id="ch2" data-chapter="2">
+    <div class="chapter-stage c2 anim d1">
+      <div class="chapter-pre">CHAPTER TWO</div>
+      <div class="chapter-num">02</div>
+      <div class="chapter-name">The Problem</div>
+      <div class="chapter-teaser">
+        AI is exploding. <span class="red">Production is the wall it cannot cross.</span><br>
+        Four mega-shifts are colliding — and every one of them needs the same missing piece.
+      </div>
+      <div class="chapter-progress">
+        <div class="step done"><div class="pill"></div></div>
+        <div class="step current"><div class="pill"></div></div>
+        <div class="step"><div class="pill"></div></div>
+        <div class="step"><div class="pill"></div></div>
+        <div class="step"><div class="pill"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene" data-chapter="2">
+    <div class="scene-tag c2 anim d1">
+      <span class="dot"></span>02 · The Problem · The Wall<span class="line-h"></span>
+    </div>
+
+    <div class="line huge anim d2">
+      AI is stuck in <span class="red">PowerPoint.</span>
+    </div>
+
+    <div class="line anim d3" style="margin-top: 30px;">
+      Every enterprise has dozens of AI pilots.<br>
+      <span class="cyan">Almost none reach production.</span>
+    </div>
+
+    <div class="line small anim d4" style="margin-top: 40px; max-width: 800px;">
+      Every CISO, every auditor, every compliance officer blocks the door.<br>
+      No governance. No audit trail. No source of truth.<br>
+      <span class="amber">Billions in AI investment — zero production impact.</span>
+    </div>
+
+    <div class="line big anim d5" style="margin-top: 40px;">
+      Production is the <span class="red">wall</span> AI cannot cross.
+    </div>
+  </section>
+
+  <section class="scene" data-chapter="2">
+    <div class="scene-tag c2 anim d1">
+      <span class="dot"></span>02 · The Problem · The Market<span class="line-h"></span>
+    </div>
+
+    <div class="line big anim d2">
+      Four shifts colliding.<br><span class="grad">One missing piece.</span>
+    </div>
+
+    <div class="pillars anim d3">
+      <div class="pillar p1">
+        <span class="icon">⊕</span>
+        <div class="h">OPEN SOURCE</div>
+        <div class="s">eats SaaS<br><br>Every CIO wants out of vendor lock-in</div>
+      </div>
+      <div class="pillar p2">
+        <span class="icon">⌘</span>
+        <div class="h">SOVEREIGNTY</div>
+        <div class="s">eats cloud<br><br>EU + CH demand data on-prem, by law</div>
+      </div>
+      <div class="pillar p3">
+        <span class="icon">⊗</span>
+        <div class="h">PRIVATE AI</div>
+        <div class="s">eats public AI<br><br>Restricted · on-prem · audited</div>
+      </div>
+      <div class="pillar p4">
+        <span class="icon">§</span>
+        <div class="h">REGULATION</div>
+        <div class="s">eats freedom<br><br>EU AI Act · DORA · NIS2</div>
+      </div>
+    </div>
+
+    <div class="line anim d5" style="margin-top: 30px;">
+      Every shift needs the same thing:<br>
+      a <span class="grad">control layer</span> for AI in production.
+    </div>
+  </section>
+
+  <!-- ╭───────────────────────────────────╮
+       │ CHAPTER 03 — THE SOLUTION          │
+       ╰───────────────────────────────────╯ -->
+  <section class="scene" id="ch3" data-chapter="3">
+    <div class="chapter-stage c3 anim d1">
+      <div class="chapter-pre">CHAPTER THREE</div>
+      <div class="chapter-num">03</div>
+      <div class="chapter-name">The Solution</div>
+      <div class="chapter-teaser">
+        Stacktic enforces four guarantees on every AI action:<br>
+        <span class="cyan">governance · security · compliance · operational</span>.<br>
+        Plus the deeper moat: <span class="green">a single source of truth for both worlds</span>.
+      </div>
+      <div class="chapter-progress">
+        <div class="step done"><div class="pill"></div></div>
+        <div class="step done"><div class="pill"></div></div>
+        <div class="step current"><div class="pill"></div></div>
+        <div class="step"><div class="pill"></div></div>
+        <div class="step"><div class="pill"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene" data-chapter="3">
+    <div class="scene-tag c3 anim d1">
+      <span class="dot"></span>03 · The Solution · The Framework<span class="line-h"></span>
+    </div>
+
+    <div class="line huge anim d2">
+      Four guarantees. <span class="grad">Every action.</span>
+    </div>
+
+    <div class="pillars anim d3">
+      <div class="pillar p1">
+        <span class="icon">⊕</span>
+        <div class="h">GOVERNANCE</div>
+        <div class="s">policies · roles · audit trail</div>
+      </div>
+      <div class="pillar p2">
+        <span class="icon">⚿</span>
+        <div class="h">SECURITY</div>
+        <div class="s">secrets · scopes · zero-trust</div>
+      </div>
+      <div class="pillar p3">
+        <span class="icon">✓</span>
+        <div class="h">COMPLIANCE</div>
+        <div class="s">ISO 27001 · PCI · DORA</div>
+      </div>
+      <div class="pillar p4">
+        <span class="icon">⏱</span>
+        <div class="h">OPERATIONAL</div>
+        <div class="s">SLOs · health · rollback</div>
+      </div>
+    </div>
+
+    <div class="line small anim d4" style="margin-top: 22px;">
+      Every change <span class="green">traced</span>. Every action <span class="green">validated</span>. Every outcome <span class="green">aligned</span> with production reality.
+    </div>
+
+    <div class="line anim d5" style="margin-top: 30px;">
+      AI becomes a <span class="green">trusted operator</span>, not a powerful assistant.
+    </div>
+  </section>
+
+  <section class="scene" data-chapter="3">
+    <div class="scene-tag c3 anim d1">
+      <span class="dot"></span>03 · The Solution · The Moat<span class="line-h"></span>
+    </div>
+
+    <div class="line huge anim d2">
+      The real moat:<br><span class="grad">source of truth for both worlds.</span>
+    </div>
+
+    <div class="line anim d3" style="margin-top: 36px;">
+      Production needs a <span class="cyan">source of truth.</span>
+    </div>
+    <div class="line anim d4">
+      AI needs the <span class="purple">same source of truth</span> to operate safely.
+    </div>
+    <div class="line big anim d5" style="margin-top: 20px;">
+      <span class="red">Nobody has one.</span>
+    </div>
+    <div class="line big anim d6" style="margin-top: 20px;">
+      <span class="green">Stacktic does.</span>
+    </div>
+
+    <div class="stamps anim d7">
+      <div class="stamp"><span class="ck">⊕</span>6 PATENTS PLANNED</div>
+      <div class="stamp"><span class="ck">⊕</span>FRAMEWORK DEFENSIBLE</div>
+      <div class="stamp"><span class="ck">⊕</span>FIRST MOVER</div>
+    </div>
+  </section>
+
+  <!-- ╭───────────────────────────────────╮
+       │ CHAPTER 04 — THE VALUE             │
+       ╰───────────────────────────────────╯ -->
+  <section class="scene" id="ch4" data-chapter="4">
+    <div class="chapter-stage c4 anim d1">
+      <div class="chapter-pre">CHAPTER FOUR</div>
+      <div class="chapter-num">04</div>
+      <div class="chapter-name">The Value</div>
+      <div class="chapter-teaser">
+        The proof isn't a pitch deck. <span class="amber">It's a signed contract with PwC.</span><br>
+        Built by two engineers, with no funding and no sales team —<br>
+        something that has <span class="red">never happened before</span> in enterprise tech.
+      </div>
+      <div class="chapter-progress">
+        <div class="step done"><div class="pill"></div></div>
+        <div class="step done"><div class="pill"></div></div>
+        <div class="step done"><div class="pill"></div></div>
+        <div class="step current"><div class="pill"></div></div>
+        <div class="step"><div class="pill"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene" data-chapter="4">
+    <div class="scene-tag c4 anim d1">
+      <span class="dot"></span>04 · The Value · The Proof<span class="line-h"></span>
+    </div>
+
+    <div class="never-banner anim d2">
+      <div class="never-banner-text">NEVER HAPPENED BEFORE</div>
+      <div class="never-banner-sub">// IN THE HISTORY OF ENTERPRISE TECH</div>
+    </div>
+
+    <div class="bomb-stage anim zoom d3">
+      <div class="bomb-col">
+        <div class="bomb-num">2</div>
+        <div class="bomb-num-lbl">ENGINEERS</div>
+      </div>
+      <div class="bomb-vs">───►</div>
+      <div class="bomb-col">
+        <div class="bomb-logo">PwC</div>
+        <div class="bomb-logo-lbl">SIGNED · PAYING · EXPANDING</div>
+      </div>
+    </div>
+
+    <div class="anim d4">
+      <div class="bomb-stamp">CONTRACT SIGNED · 2026</div>
+    </div>
+
+    <div class="contrast-grid anim d5">
+      <div class="contrast-side norm">
+        <div class="contrast-h">// TYPICAL BIG-FOUR ENTERPRISE SALE</div>
+        <div class="contrast-row"><div class="contrast-label">Sales team</div><div class="contrast-val">50+ people</div></div>
+        <div class="contrast-row"><div class="contrast-label">Procurement cycle</div><div class="contrast-val">12–24 months</div></div>
+        <div class="contrast-row"><div class="contrast-label">Customer acquisition cost</div><div class="contrast-val">$1–5M</div></div>
+        <div class="contrast-row"><div class="contrast-label">Funding raised</div><div class="contrast-val">Series B+</div></div>
+        <div class="contrast-row"><div class="contrast-label">Reference customers required</div><div class="contrast-val">5–10</div></div>
+      </div>
+      <div class="contrast-vs-col">VS</div>
+      <div class="contrast-side us">
+        <div class="contrast-h">// STACKTIC ↦ PwC</div>
+        <div class="contrast-row"><div class="contrast-label">Sales team</div><div class="contrast-val">2 engineers</div></div>
+        <div class="contrast-row"><div class="contrast-label">Procurement cycle</div><div class="contrast-val">7 months</div></div>
+        <div class="contrast-row"><div class="contrast-label">Customer acquisition cost</div><div class="contrast-val">€0</div></div>
+        <div class="contrast-row"><div class="contrast-label">Funding raised</div><div class="contrast-val">€0 (pre-seed)</div></div>
+        <div class="contrast-row"><div class="contrast-label">Reference customers required</div><div class="contrast-val">0</div></div>
+      </div>
+    </div>
+
+    <div class="line huge anim d6" style="margin-top: 50px;">
+      The pain is so acute,<br><span class="grad">PwC bypassed the rulebook.</span>
+    </div>
+  </section>
+
+  <section class="scene" data-chapter="4">
+    <div class="scene-tag c4 anim d1">
+      <span class="dot"></span>04 · The Value · Traction<span class="line-h"></span>
+    </div>
+
+    <div class="line huge anim d2">
+      Real money. Real logos. <span class="green">Today.</span>
+    </div>
+
+    <div class="traction-card anim d3">
+      <div class="traction-row">
+        <div class="traction-logo">PwC<span class="sub">GERMANY</span></div>
+        <div class="traction-detail">
+          <span class="ck">✓</span>POC complete (3 months) &nbsp;
+          <span class="ck">✓</span>Security review passed (4 months) &nbsp;
+          <span class="ck">✓</span>Contract signed · live in production
+        </div>
+        <div class="traction-status signed">SIGNED</div>
+      </div>
+      <div class="traction-row">
+        <div class="traction-logo">Swisscom<span class="sub">SWITZERLAND</span></div>
+        <div class="traction-detail">
+          <span class="ck">✓</span>POC complete · successful results &nbsp;
+          <span class="ck">⏵</span>Gated on €1M raise for vendor stability
+        </div>
+        <div class="traction-status gated">€1M GATED</div>
+      </div>
+      <div class="traction-row">
+        <div class="traction-logo">PwC<span class="sub">US + REST OF EU</span></div>
+        <div class="traction-detail">
+          <span class="ck">⏵</span>Active conversations &nbsp;
+          <span class="ck">⏵</span>PwC DE is a small slice of PwC Global
+        </div>
+        <div class="traction-status pipe">PIPELINE</div>
+      </div>
+    </div>
+
+    <div class="price-banner anim d4">
+      Validated pricing: <span class="v">€500 / stack / month</span> · pay-as-use · expand by stack
+    </div>
+
+    <div class="line small anim d5" style="margin-top: 30px; max-width: 800px;">
+      <em>"Our enterprise customers told us to raise this round."</em>
+    </div>
+  </section>
+
+  <section class="scene" data-chapter="4">
+    <div class="scene-tag c4 anim d1">
+      <span class="dot"></span>04 · The Value · The Math<span class="line-h"></span>
+    </div>
+
+    <div class="line huge anim d2">
+      <span class="green">€1M</span> closes <span class="grad">€1M ARR.</span>
+    </div>
+
+    <div class="math-card anim d3">
+      <div class="math-row header">
+        <div>SOURCE</div>
+        <div style="text-align: right;">STACKS</div>
+        <div style="text-align: right;">MO. ARR</div>
+        <div style="text-align: right;">ANNUAL ARR</div>
+      </div>
+      <div class="math-row">
+        <div class="math-source">PwC Germany<span class="sub">signed · expanding</span></div>
+        <div class="math-num">60</div>
+        <div class="math-num">€30K</div>
+        <div class="math-arr">€360K</div>
+      </div>
+      <div class="math-row">
+        <div class="math-source">Swisscom<span class="sub">unlocks at €1M closed</span></div>
+        <div class="math-num">80</div>
+        <div class="math-num">€40K</div>
+        <div class="math-arr">€480K</div>
+      </div>
+      <div class="math-row">
+        <div class="math-source">PwC US + EU early<span class="sub">active pipeline</span></div>
+        <div class="math-num">30</div>
+        <div class="math-num">€15K</div>
+        <div class="math-arr">€180K</div>
+      </div>
+      <div class="math-row total">
+        <div>Total in 12 months</div>
+        <div class="math-num" style="color: var(--white);">170</div>
+        <div class="math-num" style="color: var(--white);">€85K</div>
+        <div class="math-arr arr">~€1.02M</div>
+      </div>
+    </div>
+
+    <div class="math-quote anim d4">
+      "Buy our next 12 months of revenue at <span class="green">1× ARR</span> —<br>we'll tell you the customers' names."
+    </div>
+  </section>
+
+  <!-- ╭───────────────────────────────────╮
+       │ CHAPTER 05 — THE POTENTIAL         │
+       ╰───────────────────────────────────╯ -->
+  <section class="scene" id="ch5" data-chapter="5">
+    <div class="chapter-stage c5 anim d1">
+      <div class="chapter-pre">CHAPTER FIVE</div>
+      <div class="chapter-num">05</div>
+      <div class="chapter-name">The Potential</div>
+      <div class="chapter-teaser">
+        Two engineers got us to PwC. <span class="green">€1M gets us to €1M ARR.</span><br>
+        €5M makes us the category leader before hyperscalers wake up.<br>
+        Investor's choice: bridge to the category, or own it.
+      </div>
+      <div class="chapter-progress">
+        <div class="step done"><div class="pill"></div></div>
+        <div class="step done"><div class="pill"></div></div>
+        <div class="step done"><div class="pill"></div></div>
+        <div class="step done"><div class="pill"></div></div>
+        <div class="step current"><div class="pill"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene" data-chapter="5">
+    <div class="scene-tag c5 anim d1">
+      <span class="dot"></span>05 · The Potential · Use of Funds<span class="line-h"></span>
+    </div>
+
+    <div class="line huge anim d2">
+      Every euro tied to a <span class="green">milestone.</span>
+    </div>
+
+    <div class="funds-grid anim d3">
+      <div class="funds-card f1">
+        <div class="funds-pct">45%</div>
+        <div class="funds-h">PwC Global Rollout</div>
+        <div class="funds-mile">
+          <span class="lbl">Milestone</span>
+          Engineering + customer success capacity to land PwC US + rest of EU
+        </div>
+      </div>
+      <div class="funds-card f2">
+        <div class="funds-pct">25%</div>
+        <div class="funds-h">Close Swisscom + DACH</div>
+        <div class="funds-mile">
+          <span class="lbl">Milestone</span>
+          Swisscom signed and in production · 1–2 additional DACH logos
+        </div>
+      </div>
+      <div class="funds-card f3">
+        <div class="funds-pct">15%</div>
+        <div class="funds-h">Core Patent (1 of 6)</div>
+        <div class="funds-mile">
+          <span class="lbl">Milestone</span>
+          Framework patent filed and defensible · moat established
+        </div>
+      </div>
+      <div class="funds-card f4">
+        <div class="funds-pct">15%</div>
+        <div class="funds-h">Sales + Marketing Seed</div>
+        <div class="funds-mile">
+          <span class="lbl">Milestone</span>
+          Category creation · first inbound qualified pipeline
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene" data-chapter="5">
+    <div class="scene-tag c5 anim d1">
+      <span class="dot"></span>05 · The Potential · Why Now<span class="line-h"></span>
+    </div>
+
+    <div class="line huge anim d2">
+      The <span class="amber">18-month window.</span>
+    </div>
+
+    <div class="why-grid anim d3">
+      <div class="why-item w1">
+        <div class="ic">⊕</div>
+        <div>
+          <div class="h">AGENTIC AI BREAKOUT</div>
+          <div class="s">Every CEO wants production agents in 2026. None know how to ship them safely.</div>
+        </div>
+      </div>
+      <div class="why-item w2">
+        <div class="ic">§</div>
+        <div>
+          <div class="h">REGULATORS DEMAND IT</div>
+          <div class="s">EU AI Act · DORA · NIS2 — control layers are no longer optional, they're law.</div>
+        </div>
+      </div>
+      <div class="why-item w3">
+        <div class="ic">⌘</div>
+        <div>
+          <div class="h">SOVEREIGNTY INFLECTION</div>
+          <div class="s">K8s + open source + on-prem — biggest infrastructure shift in 20 years.</div>
+        </div>
+      </div>
+      <div class="why-item w4">
+        <div class="ic">⏱</div>
+        <div>
+          <div class="h">BEFORE HYPERSCALERS</div>
+          <div class="s">AWS/Azure/GCP will bolt this on. 18 months to own the category first.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="line big anim d4" style="margin-top: 30px;">
+      We are <span class="green">first</span>. We are <span class="green">paid</span>. The window is <span class="amber">open.</span>
+    </div>
+  </section>
+
+  <section class="scene" data-chapter="5">
+    <div class="scene-tag c5 anim d1">
+      <span class="dot"></span>05 · The Potential · The Team<span class="line-h"></span>
+    </div>
+
+    <div class="line huge anim d2">
+      Built by <span class="grad">two engineers.</span>
+    </div>
+    <div class="line anim d3" style="margin-top: 18px;">
+      The same two that signed PwC.
+    </div>
+
+    <div class="team-card anim d4">
+      <div class="ph">// FILL IN: NAMES · ROLES · PRIOR WINS</div>
+      <div class="team-slots">
+        <div class="team-slot">
+          <div class="nm">[Founder Name]</div>
+          <div class="rl">FOUNDER · CEO</div>
+          <div class="bio">[1-line bio: prior role / company / domain expertise]</div>
+        </div>
+        <div class="team-slot">
+          <div class="nm">[Co-founder Name]</div>
+          <div class="rl">FOUNDER · CTO</div>
+          <div class="bio">[1-line bio: prior role / company / domain expertise]</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="line small anim d5" style="margin-top: 30px; max-width: 700px;">
+      We did this with two people and no budget.<br>
+      <span class="green">Imagine us with €1M.</span>
+    </div>
+  </section>
+
+  <section class="scene" data-chapter="5">
+    <div class="scene-tag c5 anim d1">
+      <span class="dot"></span>05 · The Potential · The Ask<span class="line-h"></span>
+    </div>
+
+    <div class="line huge anim d2">
+      <span class="green">€1M</span> to <span class="green">€1M ARR.</span>
+    </div>
+    <div class="line small anim d3" style="margin-top: 12px;">
+      With an upgrade path to category lead.
+    </div>
+
+    <div class="ask-stage anim d4">
+      <div class="ask-main">
+        <div class="ask-h">// THE ROUND</div>
+        <div class="ask-amount">€1M</div>
+        <div class="ask-tag">SEED · LEAD INVESTOR WANTED</div>
+        <ul class="ask-list">
+          <li>Structure: <strong>[SAFE / priced — TBD]</strong></li>
+          <li>Use: PwC expansion + Swisscom unlock + core patent</li>
+          <li>Milestone: <strong>€1M ARR in 12 months</strong></li>
+          <li>Swisscom signs the day this closes</li>
+          <li>PwC US + EU rollout begins immediately</li>
+        </ul>
+      </div>
+      <div class="ask-upgrade">
+        <div class="ask-h">// UPGRADE OPTION</div>
+        <div class="ask-amount">€5M</div>
+        <div class="ask-tag">SAME STORY · BIGGER AMBITION</div>
+        <ul class="ask-list">
+          <li>5 Enterprises · 10 SMBs · 20 Startups</li>
+          <li>~€2.6M ARR target</li>
+          <li>All 6 patents · US sales · category creation</li>
+          <li>Own AI-Production-Layer before hyperscalers</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="line big anim d5" style="margin-top: 44px;">
+      Bridge to category, or <span class="green">own it from day one.</span>
+    </div>
+    <div class="line small anim d6" style="margin-top: 14px;">
+      Investor's choice.
+    </div>
+  </section>
+
+<script>
+(function() {
+  const scenes = document.querySelectorAll('.scene');
+  const dots = document.querySelectorAll('.rail-dot');
+
+  // Map data-chapter (0–5) → rail dot target id (cover, ch1…ch5)
+  const chapterToTarget = { '0': 'cover', '1': 'ch1', '2': 'ch2', '3': 'ch3', '4': 'ch4', '5': 'ch5' };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+        const chap = entry.target.dataset.chapter;
+        const target = chapterToTarget[chap];
+        if (target) {
+          dots.forEach(d => d.classList.toggle('active', d.dataset.target === target));
+        }
+      }
+    });
+  }, { threshold: 0.30 });
+
+  scenes.forEach(s => observer.observe(s));
+
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const target = document.getElementById(dot.dataset.target);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+})();
+</script>
+</body>
+</html>

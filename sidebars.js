@@ -78,6 +78,17 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'Development security',
+      collapsed: true,
+      items: [
+        { type: 'doc', id: 'dev-security/dev-security-index', label: 'Overview' },
+        { type: 'doc', id: 'dev-security/dev-security-gates', label: 'Build gates' },
+        { type: 'doc', id: 'dev-security/dev-security-dast', label: 'DAST' },
+        { type: 'doc', id: 'dev-security/dev-security-compliance', label: 'Compliance mapping' },
+      ],
+    },
+    {
+      type: 'category',
       label: 'Blueprints',
       collapsed: true,
       items: [

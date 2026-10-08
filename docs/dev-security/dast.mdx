@@ -1,0 +1,90 @@
+---
+id: dev-security-dast
+slug: /dev-security/dast
+title: DAST as a design fact
+sidebar_label: DAST
+sidebar_position: 3
+description: Dynamic testing of what the stack exposes is a component whose links are the scan contracts. Every run is pushed to the stack agent, which judges coverage, keeps the evidence and names the link that closes a gap.
+---
+
+<Hero eyebrow="What the stack exposes" title="A scan you can see on the diagram">
+The `nuclei` component scans nothing by itself. Draw a link from it to the gateway and every route
+that gateway publishes is swept on a schedule. Draw a link to one of your applications and that
+application gets a deep contract: fuzzing, its OpenAPI document, authentication. Delete the link and
+the scan is gone. The design is the scope.
+</Hero>
+
+## The three links
+
+<Figure caption="Contracts are links. The gateway link sweeps the public surface; an app link fuzzes one application; the agent link turns runs into evidence and lets the agent start a run.">
+<svg viewBox="0 0 900 250" role="img" aria-label="The nuclei component with three outgoing links: nuclei-apisix to the gateway (sweep every published route), nuclei-app to one application (deep contract with fuzzing, OpenAPI and auth), nuclei-stack_agent to the stack agent (push every run, agent may start a run).">
+  <defs><marker id="dArrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-red)" /></marker><marker id="dArrowMint" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-mint)" /></marker></defs>
+  <g fontFamily="Fira Code, ui-monospace, monospace" fontSize="11" textAnchor="middle">
+    <rect x="40" y="95" width="150" height="60" rx="10" fill="var(--stk-ink)" stroke="var(--stk-red)" strokeWidth="1.5" /><text x="115" y="120" fill="var(--stk-red)" fontWeight="700">nuclei</text><text x="115" y="139" fill="var(--stk-muted)" fontSize="10">version · templates_version</text>
+    <rect x="420" y="20" width="200" height="56" rx="10" fill="var(--stk-ink)" stroke="var(--stk-steel)" /><text x="520" y="43" fill="var(--stk-ink-contrast, #fff)" fontWeight="600">apisix (gateway)</text><text x="520" y="61" fill="var(--stk-muted)" fontSize="10">every published route</text>
+    <rect x="420" y="97" width="200" height="56" rx="10" fill="var(--stk-ink)" stroke="var(--stk-steel)" /><text x="520" y="120" fill="var(--stk-ink-contrast, #fff)" fontWeight="600">your application</text><text x="520" y="138" fill="var(--stk-muted)" fontSize="10">its route, or its Service</text>
+    <rect x="420" y="174" width="200" height="56" rx="10" fill="var(--stk-ink)" stroke="var(--stk-mint)" /><text x="520" y="197" fill="var(--stk-mint)" fontWeight="600">stack_agent</text><text x="520" y="215" fill="var(--stk-muted)" fontSize="10">evidence · trigger</text>
+    <line x1="190" y1="118" x2="420" y2="48" stroke="var(--stk-red)" strokeWidth="1.5" markerEnd="url(#dArrow)" /><text x="300" y="68" fill="var(--stk-red)" fontSize="10">nuclei-apisix · profile, severity, schedule</text>
+    <line x1="190" y1="125" x2="420" y2="125" stroke="var(--stk-red)" strokeWidth="1.5" markerEnd="url(#dArrow)" /><text x="305" y="116" fill="var(--stk-red)" fontSize="10">nuclei-&lt;app&gt; · + dast, openapi_path, auth</text>
+    <line x1="190" y1="132" x2="420" y2="202" stroke="var(--stk-mint)" strokeWidth="1.5" markerEnd="url(#dArrowMint)" /><text x="305" y="190" fill="var(--stk-mint)" fontSize="10">nuclei-stack_agent · runs pushed</text>
+    <text x="760" y="48" fill="var(--stk-muted)" fontSize="10">one CronJob per link</text><text x="760" y="125" fill="var(--stk-muted)" fontSize="10">empty schedule = on demand</text><text x="760" y="202" fill="var(--stk-muted)" fontSize="10">POST /scans/ingest/dast_run</text>
+  </g>
+</svg>
+</Figure>
+
+| Link | What it scans | Attributes |
+|---|---|---|
+| `nuclei-apisix` | Every route the gateway publishes — the `subdomain` and `additional_domain` of each `apisix-<type>` link, on the stack's domain — unauthenticated, as the outside sees it | `profile`, `severity`, `schedule`, `rate_limit` |
+| `nuclei-<app>` (`external_source_code`, `image_base`, `fastapi`, `fastmcp`) | That one application: its public route, or its in-cluster Service when it has none | the four above, plus `dast` (`off` · `low` · `medium` · `high`), `openapi_path`, `auth` (`none` · `oidc_client`) |
+| `nuclei-stack_agent` | Nothing — every run is pushed to the agent, and the agent gains a Role to start a run on demand | — |
+
+`profile` names one of nuclei's own template profiles (`compliance`, `pentest`, `recommended`,
+`kev`, `cves`, `misconfigurations`, `default-login`) or `automatic` (technology detection chooses
+the tags). `dast` adds nuclei's fuzzing templates — SQL, command and template injection, XSS, SSRF,
+file inclusion, XXE, redirects — which **send attack payloads into the application**; keep it to
+non-production contracts or a schedule a person approved. `openapi_path` is what makes fuzzing real: a
+bare URL carries no parameters; an OpenAPI document gives every endpoint and parameter (FastAPI serves
+`/openapi.json`, springdoc `/v3/api-docs`). `auth: oidc_client` takes the client credentials from
+the application's own gateway link and scans as that client.
+
+Component attributes: `version` (nuclei release, also the image tag), `templates_version` (the
+template corpus, pinned), `exclude_tags`, `custom_templates` (your own templates — write nuclei's
+`BaseURL` as `${BaseURL}`), `internal_sweep` and `internal_schedule` (in-cluster services of every
+other component, not link-bound).
+
+## What a run records, honestly
+
+Each CronJob runs one contract and pushes one record. The record says:
+
+- every target with its probe result — a route that answers 502 is **listed and not scanned**, and a
+  contract with nothing reachable is `no_targets`, never "clean";
+- every step (`profile`, `dast`, `custom`) with whether it **finished**, how many templates nuclei
+  loaded, how long it took — a step cut off by its time budget is `completed: false`;
+- out-of-band testing is off (no interactsh server), and the record says which templates that excludes;
+- findings deduplicated per host and template, with CVE/CWE/CVSS, references and the request and
+  response that matched.
+
+## What the agent shows
+
+**DAST Coverage** (`/dast_scan`) answers three questions in order: is every public route under a
+contract; did every contract actually run; what did the runs find. Below them: every public route with
+the contracts covering it, every contract with its newest run (status, steps, templates, top findings),
+and a findings list where each gap carries the **action that closes it** — `add_link nuclei-apisix` for
+an unscanned gateway, `add_link nuclei-<type>` with the recommended deep contract for an application
+that is only swept, `set_attribute openapi_path` for fuzzing without parameters, `run` for a contract
+that never ran. *Full* starts every contract's Job through the Role the agent link rendered and waits.
+
+The **Penetration Test** reads the same runs for its signature checks (SQLi, XSS, SSRF, file
+inclusion, default logins, exposed panels, TLS): a route with no contract makes those checks SKIPPED, a
+cut-off run makes them INCONCLUSIVE, a match makes them FAIL — never PASS by absence.
+
+## Two things to know before trusting a finding
+
+- **Redirects are not followed.** An "unauthenticated access" template requires a 200 with page
+  markers; a protected service answers 302 to its login page, and following it would produce a false
+  HIGH from the login page itself. The run uses nuclei's default; templates that need redirects declare it.
+- **A sweep has a budget.** The `compliance` profile loads several thousand templates; against ten
+  routes at the default rate it needs the better part of an hour. The step budget is sized for a weekly
+  sweep; a cut-off step is reported, not hidden.
+
+→ Next: [Which control reads what](/docs/dev-security/compliance) · Back: [The three build gates](/docs/dev-security/gates)

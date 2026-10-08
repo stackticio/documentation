@@ -1,0 +1,122 @@
+---
+id: dev-security-index
+slug: /dev-security/
+title: Development security
+sidebar_label: Overview
+sidebar_position: 1
+description: Every check a change passes on its way to production is generated from the design — a source scan, a code-pattern gate, a quality gate, a dynamic test of what is exposed — and every verdict lands in the stack agent as evidence.
+---
+
+<Hero eyebrow="From commit to evidence" title="Security checks you ask for, not pipelines you maintain">
+A developer adds a link or flips an attribute on the design. The build Job that is generated from it
+carries the gates; the scanner component that is generated from it runs the dynamic tests; the stack
+agent collects every verdict and maps it to the control an auditor will ask about. Nothing here is a
+CI script somebody wrote once and nobody dares to touch.
+</Hero>
+
+## What is in the chain
+
+<Figure caption="The chain a change passes through. Everything on the left is generated from the design; everything on the right is read by the stack agent.">
+<svg viewBox="0 0 900 300" role="img" aria-label="A change flows through the build Job gates (source scan, code-pattern gate, quality gate), the builder and rollout, admission, then runtime: the DAST component scans the exposed routes and pushes its runs to the stack agent, which maps all verdicts to controls.">
+  <defs>
+    <marker id="dsArrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-steel)" /></marker>
+    <marker id="dsArrowMint" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-mint)" /></marker>
+  </defs>
+  <text x="20" y="30" fontSize="11" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600">BUILD JOB  k8s/build/base/&lt;app&gt;  (generated per application)</text>
+  <rect x="20" y="42" width="560" height="96" rx="10" fill="none" stroke="var(--stk-steel)" strokeDasharray="4 4" />
+  <g fontFamily="Fira Code, ui-monospace, monospace" fontSize="11" textAnchor="middle">
+    <rect x="34" y="60" width="120" height="58" rx="8" fill="var(--stk-ink)" stroke="var(--stk-blue)" /><text x="94" y="84" fill="var(--stk-blue)" fontWeight="600">source-gate</text><text x="94" y="102" fill="var(--stk-muted)" fontSize="10">secrets · fixable CRITICAL</text>
+    <rect x="170" y="60" width="120" height="58" rx="8" fill="var(--stk-ink)" stroke="var(--stk-blue)" /><text x="230" y="84" fill="var(--stk-blue)" fontWeight="600">sast-gate</text><text x="230" y="102" fill="var(--stk-muted)" fontSize="10">your code patterns</text>
+    <rect x="306" y="60" width="120" height="58" rx="8" fill="var(--stk-ink)" stroke="var(--stk-blue)" /><text x="366" y="84" fill="var(--stk-blue)" fontWeight="600">sonar-gate</text><text x="366" y="102" fill="var(--stk-muted)" fontSize="10">quality gate, exact commit</text>
+    <rect x="442" y="60" width="124" height="58" rx="8" fill="var(--stk-ink)" stroke="var(--stk-steel)" /><text x="504" y="84" fill="var(--stk-ink-contrast, #fff)" fontWeight="600">build → roll</text><text x="504" y="102" fill="var(--stk-muted)" fontSize="10">image pushed by digest</text>
+    <line x1="154" y1="89" x2="170" y2="89" stroke="var(--stk-steel)" markerEnd="url(#dsArrow)" />
+    <line x1="290" y1="89" x2="306" y2="89" stroke="var(--stk-steel)" markerEnd="url(#dsArrow)" />
+    <line x1="426" y1="89" x2="442" y2="89" stroke="var(--stk-steel)" markerEnd="url(#dsArrow)" />
+  </g>
+  <text x="20" y="172" fontSize="11" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600">RUNTIME</text>
+  <g fontFamily="Fira Code, ui-monospace, monospace" fontSize="11" textAnchor="middle">
+    <rect x="34" y="184" width="150" height="58" rx="8" fill="var(--stk-ink)" stroke="var(--stk-red)" /><text x="109" y="208" fill="var(--stk-red)" fontWeight="600">nuclei component</text><text x="109" y="226" fill="var(--stk-muted)" fontSize="10">one CronJob per link</text>
+    <rect x="214" y="184" width="150" height="58" rx="8" fill="var(--stk-ink)" stroke="var(--stk-steel)" /><text x="289" y="208" fill="var(--stk-ink-contrast, #fff)" fontWeight="600">exposed routes</text><text x="289" y="226" fill="var(--stk-muted)" fontSize="10">gateway · OIDC · TLS</text>
+    <line x1="184" y1="213" x2="214" y2="213" stroke="var(--stk-red)" markerEnd="url(#dsArrow)" />
+  </g>
+  <rect x="640" y="42" width="240" height="200" rx="12" fill="none" stroke="var(--stk-mint)" />
+  <text x="760" y="70" fontSize="12" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="700" textAnchor="middle">STACK AGENT</text>
+  <g fontFamily="Fira Code, ui-monospace, monospace" fontSize="10.5" fill="var(--stk-ink-contrast, #fff)">
+    <text x="656" y="98">Builds &amp; Gates — every gate's verdict</text>
+    <text x="656" y="120">DAST Coverage — contracts vs runs</text>
+    <text x="656" y="142">Penetration Test — reads the runs</text>
+    <text x="656" y="164">Image vulnerabilities — decisions</text>
+    <text x="656" y="186">PCI DSS · ISO 27001 — the controls</text>
+    <text x="656" y="208">Evidence — versioned, hash-chained</text>
+    <text x="656" y="230" fill="var(--stk-muted)">one place, one record per run</text>
+  </g>
+  <line x1="580" y1="89" x2="640" y2="89" stroke="var(--stk-mint)" markerEnd="url(#dsArrowMint)" />
+  <line x1="364" y1="213" x2="640" y2="213" stroke="var(--stk-mint)" markerEnd="url(#dsArrowMint)" />
+  <text x="500" y="206" fontSize="10" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">runs pushed</text>
+  <text x="610" y="82" fontSize="10" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">logs read</text>
+</svg>
+</Figure>
+
+| Stage | What checks it | Where it is switched on | Where you see the verdict |
+|---|---|---|---|
+| Before the image exists | `source-gate` (Trivy): secrets in the build context, CRITICAL vulnerabilities with a fix in the dependency manifests | component attribute `build_gate` on the application | **Builds & Gates** tab, build log |
+| Before the image exists | `sast-gate` (Opengrep): your own code-pattern rules against the exact commit | component attributes `sast_gate`, `sast_rules`, `sast_version` | **Builds & Gates** tab, build log |
+| Before the image exists | `sonar-gate` (SonarQube): new bugs and vulnerabilities on the exact commit | link `sonarqube-<app>` with `enforce_quality_gate` | **Builds & Gates** tab, SonarQube |
+| While it runs | Trivy operator: known vulnerabilities in the running images | the `trivy` component | **Image vulnerabilities** tab, with decisions |
+| What it exposes | DAST (nuclei): the public routes, and injection fuzzing of your own apps | links `nuclei-apisix`, `nuclei-<app>` | **DAST Coverage** and **Penetration Test** tabs |
+| Always | Admission policy, network policy, RBAC, secrets | generated from the graph | **Admission**, **Network**, **RBAC**, **Secrets** scans |
+
+Three facts hold the chain together:
+
+- **A gate is an attribute or a link, not a pipeline file.** `build_gate: enforce` on an application
+  is the whole configuration; the generated build Job carries the init container. A `nuclei-apisix`
+  link *is* the scan of every route that gateway publishes.
+- **Every verdict is written in one place.** The build Job prints a verdict line per gate; the DAST
+  Job pushes its run to the agent; the agent reads both and keeps them as versioned, hash-chained
+  records, long after the Job itself is gone.
+- **The record is what the auditor sees.** The PCI DSS and ISO 27001 scans do not count components;
+  they read these records. A gate switched on but never run is "Not In Place", by design.
+
+## Asking for it
+
+The design tools of the MCP — and the platform UI — are the only interface. There is nothing to
+write by hand.
+
+<Steps>
+  <Step title="“Add code scanning to my app”">
+    The assistant adds a `sonarqube` component if the stack has none and a `sonarqube-<app>` link with
+    `scan_enabled` — the scan runs after each build and reports. With `enforce_quality_gate` on the
+    same link, the analysis moves into the build Job, in front of the builder, and a failed quality
+    gate pushes nothing. For your own rules it sets `sast_gate` and `sast_rules` on the application
+    instead: no server, no project, one attribute.
+  </Step>
+  <Step title="“Add DAST”">
+    The assistant adds a `nuclei` component, links it `nuclei-stack_agent` (so runs become evidence)
+    and `nuclei-apisix` (every published route, weekly), and for your own applications a
+    `nuclei-<app>` link with a fuzzing level and the OpenAPI document. The agent's DAST scan proposes
+    exactly these links when they are missing — as machine-readable actions the assistant can apply.
+  </Step>
+  <Step title="Build and watch">
+    `stacktic_auto_layout`, then `stacktic_set_system`, then a build. Argo CD applies the deploy
+    directories; the build directory of the application runs the gates on its next build. The agent's
+    tabs show the first verdicts without anything else being configured.
+  </Step>
+</Steps>
+
+<Cards cols={3}>
+  <Card to="/docs/dev-security/gates" kicker="Build" title="The three gates">
+    What each gate scans, the attribute or link that switches it, the exit-code contract, and what
+    the Builds &amp; Gates tab shows when the Job is long gone.
+  </Card>
+  <Card to="/docs/dev-security/dast" kicker="Runtime" title="DAST as a design fact">
+    The nuclei component, its three link types, what a run records honestly, and how the agent turns
+    gaps into the link to add.
+  </Card>
+  <Card to="/docs/dev-security/compliance" kicker="Prove" title="Which control reads what">
+    PCI DSS 6.x and 11.x, ISO 27001 A.8.x — the mechanism, the agent test and its rule, and what
+    automated testing does not claim.
+  </Card>
+</Cards>
+
+→ Related: [Build and deploy](/docs/day0/build-deploy) · [Scanners](/docs/day2/scanners) ·
+[Evidence and drift](/docs/day2/evidence) · [PCI DSS and ISO 27001](/docs/compliance/frameworks)

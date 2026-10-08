@@ -1,0 +1,64 @@
+---
+id: dev-security-compliance
+slug: /dev-security/compliance
+title: Which control reads what
+sidebar_label: Compliance mapping
+sidebar_position: 4
+description: Each development-security mechanism feeds a specific control test in the stack agent's PCI DSS and ISO 27001 scans. The test reads records, not the diagram — and says plainly what automated testing does not claim.
+---
+
+<Hero eyebrow="Prove" title="The test reads the record, not the diagram">
+A gate that is switched on is a configuration. A gate that ran, on a dated commit, with a verdict the
+agent kept, is evidence. The compliance scans only count the second kind — which is why the same page
+that shows you a gap also shows you what the auditor's scan will say.
+</Hero>
+
+## The map
+
+| Mechanism | Evidence the agent holds | PCI DSS v4 control(s) · agent test | What the test requires | ISO 27001:2022 |
+|---|---|---|---|---|
+| `source-gate` (Trivy) and `sast-gate` (Opengrep) in the build Job | Builds & Gates scan: configured mode per application, last verdict per gate | 6.2.2, 6.2.3 · `security_gates_active`; 6.3.1 · `trivy_vuln_reports_exist` | admission policy present and Trivy running; vulnerability reports exist | A.8.25, A.8.28 |
+| `sonar-gate` (SonarQube) | Builds & Gates scan; SonarQube project and gate state | 6.2.4 · `opa_and_apisix_prevent_attacks` (deps include `sonarqube`) | the admission and gateway protections, with code analysis present | A.8.28, A.8.29 |
+| Trivy operator + image vulnerabilities scan | VulnerabilityReports, SbomReports, recorded decisions | 6.3.1, 6.3.3 · `trivy_vuln_reports_exist`, `trivy_no_critical_unpatched` | reports exist; no unpatched CRITICAL without a decision | A.8.8 |
+| DAST runs (`nuclei` contracts) | `dast_run` records; DAST Coverage verdict | 6.2.3.1, 6.4.1 · `dast_or_pentest_web_scan` | a **completed** DAST run or a pen test within 365 days | A.8.8, A.8.29 |
+| DAST coverage of the public surface | contracts vs routes vs runs | 11.3.2 (own scans), 11.3.2.1, 11.4.3 · `dast_scan_results` | every public route under a contract **and** every contract completed a run within 90 days | A.8.8 |
+| Penetration Test (WSTG + API Top 10 checks, reading the DAST runs) | `pentest` records with per-check verdicts | 11.4.1 · `pentest_methodology_exists`; 11.4.2 · `internal_pentest_evidence` | the methodology catalogue is mounted; a pen test run within 12 months | A.8.29 |
+| Gateway protections (OIDC, rate limit, headers, body size) | configuration scan; pen test checks | 6.4.2 · `apisix_security_plugins` | the route plugins the links declare | A.8.26 |
+| Argo CD, versions, promotion by attribute | Argo applications; stack versions; evidence timeline | 6.5.1–6.5.3 (change control) | — documented in the generated compliance report | A.8.31, A.8.32 |
+
+The controls named in the first column are the ones the agent's `pci_scan` and `iso27001_scan`
+evaluate with the test in the third column; the generated compliance documents of the stack cite the
+same mechanisms in their narrative for A.8.8 and A.8.29.
+
+## What the tests say about a half-done chain
+
+The tests are written to refuse the comfortable reading:
+
+- a `no_targets` DAST run (the application answered 502) is **not** an assessment — the 365-day and
+  90-day rules count only `completed` runs;
+- a gate set to `report` that printed findings is a finding in the Builds & Gates scan ("findings that
+  were only printed"), not a pass;
+- a contract whose schedule is empty and that nobody started shows as "no run yet", and the control
+  stays *Not In Place* until it runs;
+- the DAST Coverage page previews these verdicts with the same rules, so the gap is closed before
+  the audit scan is run, not explained afterwards.
+
+## What automated testing does not claim
+
+- **Not an ASV scan.** PCI DSS 11.3.2 requires an Approved Scanning Vendor; the DAST runs are the
+  organisation's own external scans and the after-change scans of 11.3.2.1. The test says so in its
+  output.
+- **Not a penetration test.** 11.4 is human-led. The Penetration Test tab runs the WSTG checklist and
+  reads the DAST runs; checks that need judgement or provisioned identities are reported as *manual*,
+  never as a fabricated pass.
+- **Not a code review.** The quality gate analyses code; it does not replace the independent review
+  6.2.3.1 describes for manual reviews.
+
+## For the training programme
+
+Modules on the pipeline, dependencies, secrets and self-service tools map to this chapter one to one:
+the source scan is Gate 1, the SonarQube code gate is Gate 3, "run the DAST after you expose or change
+an endpoint" is the `nuclei-<app>` contract and the DAST Coverage tab, and the evidence rules are the
+records described here.
+
+→ Back: [Development security](/docs/dev-security/) · See also: [PCI DSS and ISO 27001](/docs/compliance/frameworks) · [Evidence and drift](/docs/day2/evidence)

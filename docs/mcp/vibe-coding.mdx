@@ -267,10 +267,18 @@ The fixes it proposes are changes to the design:
 | A weak login realm | On the identity provider: brute-force protection, password rules, email verification |
 | Secrets written into the repository | Add the External Secrets component with `external_secrets_enabled` on. Components that support it then take their credentials from the secret store instead of a secret file in the repository. `external_secret_sub` set to false keeps one component on the file |
 | No admission policies | A baseline or hardened policy plan for this topology, applied as design changes |
-| No image scanning, runtime detection or code scanning | A Trivy component, a Falco component, or SonarQube with a SonarQube → application link that has `scan_enabled` on |
+| No image scanning, runtime detection or code scanning | A Trivy component, a Falco component, or SonarQube with a SonarQube → application link that has `scan_enabled` on. That scan reports after the build; turn on `enforce_quality_gate` on the same link to analyse the exact commit that is built and, once SonarQube has taken the project over (from the first gated build after the takeover), stop new bugs or vulnerabilities before the image is pushed - existing issues never block |
 
 Network policies are not on this list because they are generated from the links on every
 build, unless the section value `microsegmentation_level` is `none`.
+
+Before an image exists, an application's build Job can run up to three gates in this order: a Trivy
+source gate (`build_gate` on the application, `enforce`, `report` or `off`: secrets and fixable
+critical CVEs), an Opengrep SAST gate (`sast_gate` on the application, the same three values: the
+platform's rules, the repository's `.opengrep/` folder and the `sast_rules` attribute), and the
+SonarQube gate (`enforce_quality_gate` on the SonarQube → application link, on or off; with
+`scan_enabled` alone SonarQube scans after the build and only reports).
+The stack agent's **Builds & Gates** page shows, per build, which gates exist and what each said.
 
 ## What to turn on in the stack agent
 
@@ -284,7 +292,7 @@ except where noted.
 | `delta_webhook` | Send confirmed regressions, as JSON, to a URL you give |
 | `evidence_push` | Commit every scan run to your stack repository on an `evidence` branch. It uses the platform's Git credential |
 | `cve_decisions_enabled` | Let people record signed decisions about vulnerabilities, such as an accepted risk. Scanning itself is always on |
-| `nuclei` | Install the Nuclei scanner for sweeps of exposed services |
+| `nuclei` | No longer read. Dynamic testing is the `nuclei` component: its links are the scan contracts and every run is pushed to the agent — see [DAST as a design fact](/docs/dev-security/dast) |
 | `deploy_access` | Let the agent deploy from the repository to the cluster. For staging and QA stacks, not production |
 | `backup_apply_access` | Let the agent run backups and restores. Reading the backup status is always available |
 | `backup_inplace_restore` | Allow a restore over live data. Needs `backup_apply_access` |
@@ -301,7 +309,7 @@ except where noted.
 | deploy | Change the design, build the repository, or apply it to the cluster | "add … to the design", "build it", "install it on the cluster" |
 | push | Save & Push (regenerate the files an attribute change affects), commit application code, or mirror scan evidence to Git | "push the attribute changes", "commit the code" |
 | test | The tests of a Test paper, the predefined stack tests, link validation, a penetration test, or your application's own tests | "run the predefined tests", "prove the links", "run a penetration test" |
-| scan | The configuration check, a cluster scan, the penetration test, a sweep of exposed services (Nuclei), or image vulnerabilities | Name the scan. "Pen test" means the penetration test, not Nuclei |
+| scan | The configuration check, a cluster scan, the penetration test, the DAST coverage of what the stack exposes, the build gates, or image vulnerabilities | Name the scan. "Pen test" means the penetration test; "DAST" means the coverage of the nuclei contracts |
 | version | The catalog version of a component type, the software version (an attribute, such as the PostgreSQL version), an image tag, or the Stacktic version of the stack-wide steps | "upgrade PostgreSQL to 17" changes the software version. Name a catalog version only if you mean one: older ones offer fewer attributes and links |
 | knowledge | The Knowledge paper of your design, or the MCP's knowledge repository | "Knowledge paper" or "knowledge repository" |
 | environment | An overlay of one design (dev, staging), or production as a separate system | "add a staging environment", "create the production system" |

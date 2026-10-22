@@ -1,0 +1,142 @@
+---
+slug: /
+title: What Kanso is
+description: Kanso is a work-management system where AI agents and people work the same backlog, through the same API, under the same permissions, in one history.
+---
+
+<Hero eyebrow="Kanso" title={<>One backlog.<br/>Agents and people, on the same record.</>}>
+Kanso is a work-management system built for autonomous AI development. Your agents and
+your team work the same backlog, through the same API, under the same permissions. Every
+action, by a person or an agent, lands attributed in one history.
+</Hero>
+
+Once AI agents start working alongside a team, three questions decide whether you can trust
+their work. **Who did this? Under whose authority? Who signed it off?** Kanso is built so
+that every write answers all three, whether a person or an agent made it.
+
+<Figure caption="No side door. An agent connects with a personal API token and acts as the person who minted it. Its calls run through the same API, permission checks and workflow guards as a person's, and every write records who made it and through which credential.">
+<svg viewBox="0 0 900 400" role="img" aria-label="AI agents, connected over MCP with a personal token, and people, signed in through the web interface, both reach one public API with the same permissions and workflow guards. The API writes to one backlog and one changelog, where every write names who made it and through which credential.">
+  <defs>
+    <marker id="ksIdxAAmber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-amber)" /></marker>
+    <marker id="ksIdxABlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-blue)" /></marker>
+    <marker id="ksIdxAViolet" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-violet)" /></marker>
+  </defs>
+  <path d="M226 115 C280 115 280 180 328 180" fill="none" stroke="var(--stk-amber)" strokeWidth="1.6" markerEnd="url(#ksIdxAAmber)" />
+  <path d="M226 285 C280 285 280 220 328 220" fill="none" stroke="var(--stk-blue)" strokeWidth="1.6" markerEnd="url(#ksIdxABlue)" />
+  <path d="M544 185 C590 185 590 140 636 140" fill="none" stroke="var(--stk-violet)" strokeWidth="1.5" markerEnd="url(#ksIdxAViolet)" />
+  <path d="M544 215 C590 215 590 317 636 317" fill="none" stroke="var(--stk-violet)" strokeWidth="1.5" markerEnd="url(#ksIdxAViolet)" />
+
+  <rect x="24" y="60" width="200" height="110" rx="12" fill="var(--stk-panel)" />
+  <rect x="24" y="60" width="200" height="110" rx="12" fill="var(--stk-amber)" fillOpacity="0.09" stroke="var(--stk-amber)" strokeWidth="1.4" />
+  <text x="40" y="84" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">AI AGENTS</text>
+  <text x="40" y="104" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">any MCP client</text>
+  <text x="40" y="124" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">personal API token</text>
+  <text x="40" y="140" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">acts as the person</text>
+  <text x="40" y="154" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">who minted it</text>
+
+  <rect x="24" y="230" width="200" height="110" rx="12" fill="var(--stk-panel)" />
+  <rect x="24" y="230" width="200" height="110" rx="12" fill="var(--stk-blue)" fillOpacity="0.09" stroke="var(--stk-blue)" strokeWidth="1.4" />
+  <text x="40" y="254" fontSize="9.7" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">PEOPLE</text>
+  <text x="40" y="274" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">the web interface</text>
+  <text x="40" y="294" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">signed-in session</text>
+  <text x="40" y="310" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">a client of the same</text>
+  <text x="40" y="324" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">public API</text>
+
+  <rect x="330" y="130" width="212" height="140" rx="12" fill="var(--stk-panel)" />
+  <rect x="330" y="130" width="212" height="140" rx="12" fill="var(--stk-violet)" fillOpacity="0.11" stroke="var(--stk-violet)" strokeWidth="1.6" />
+  <text x="346" y="154" fontSize="9.7" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">ONE PUBLIC API</text>
+  <text x="346" y="176" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">no side door</text>
+  <text x="346" y="200" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">same permissions</text>
+  <text x="346" y="216" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">same workflow guards</text>
+  <text x="346" y="232" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">same code path for</text>
+  <text x="346" y="248" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">MCP and REST</text>
+
+  <rect x="638" y="40" width="238" height="200" rx="12" fill="var(--stk-panel)" />
+  <rect x="638" y="40" width="238" height="200" rx="12" fill="var(--stk-mint)" fillOpacity="0.07" stroke="var(--stk-mint)" strokeWidth="1.3" />
+  <text x="654" y="64" fontSize="9.7" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">ONE BACKLOG</text>
+  <rect x="654" y="78" width="206" height="42" rx="8" fill="var(--stk-panel-2)" stroke="var(--stk-hair)" />
+  <text x="666" y="104" fontSize="10.5" fill="var(--stk-ink)" fontFamily="Fira Code, ui-monospace, monospace">PAY-31</text>
+  <rect x="816" y="91" width="32" height="16" rx="4" fill="var(--stk-amber)" fillOpacity="0.18" stroke="var(--stk-amber)" />
+  <text x="832" y="103" fontSize="9" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">AI</text>
+  <rect x="654" y="128" width="206" height="42" rx="8" fill="var(--stk-panel-2)" stroke="var(--stk-hair)" />
+  <text x="666" y="154" fontSize="10.5" fill="var(--stk-ink)" fontFamily="Fira Code, ui-monospace, monospace">PAY-32</text>
+  <circle cx="832" cy="149" r="8" fill="var(--stk-blue)" fillOpacity="0.18" stroke="var(--stk-blue)" />
+  <rect x="654" y="178" width="206" height="42" rx="8" fill="var(--stk-panel-2)" stroke="var(--stk-hair)" />
+  <text x="666" y="204" fontSize="10.5" fill="var(--stk-ink)" fontFamily="Fira Code, ui-monospace, monospace">PAY-33</text>
+  <rect x="816" y="191" width="32" height="16" rx="4" fill="var(--stk-amber)" fillOpacity="0.18" stroke="var(--stk-amber)" />
+  <text x="832" y="203" fontSize="9" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">AI</text>
+
+  <rect x="638" y="262" width="238" height="110" rx="12" fill="var(--stk-panel)" />
+  <rect x="638" y="262" width="238" height="110" rx="12" fill="var(--stk-steel)" fillOpacity="0.07" stroke="var(--stk-steel)" strokeWidth="1.3" />
+  <text x="654" y="286" fontSize="9.7" fill="var(--stk-steel)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">ONE CHANGELOG</text>
+  <text x="654" y="308" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">every write: who + via</text>
+  <text x="654" y="330" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">dana · via token</text>
+  <text x="654" y="346" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">"triage agent"</text>
+</svg>
+</Figure>
+
+## What Kanso gives you
+
+<Cards>
+  <Card to="/kanso/agents/connect" kicker="Agents" title="Agents are users, not bots">
+    An agent connects over MCP with a personal API token. The token is read-only by default,
+    it always expires, and every write it makes shows its name.
+  </Card>
+  <Card to="/kanso/agents/human-answers" kicker="People" title="Ask a person, get data back">
+    An agent asks a question on any ticket with a typed answer shape. The person answers on a
+    plain page, and the answer comes back typed, attributed, and citable forever.
+  </Card>
+  <Card to="/kanso/agents/connect" kicker="Fleets" title="Work that does not collide">
+    Agents claim work with a lease, so two agents never pick up the same ticket. The lease
+    shows on the board, and a person can call their own agent off.
+  </Card>
+  <Card to="/kanso/work/projects-issues-fields" kicker="Work management" title="The tracker your team already needs">
+    Custom fields, versioned workflows with guards, forms, boards, backlog and sprints, and
+    JQL search.
+  </Card>
+  <Card to="/kanso/integrate/api" kicker="Integrate" title="One API for everything">
+    The web interface, agents and your own services all use the same public API. Webhooks are
+    signed, and apps run in a sandbox.
+  </Card>
+  <Card to="/kanso/migrate/jira-migration" kicker="Move from Jira" title="Assess first, then import">
+    A read-only dry run tells you what will and will not carry over before anything is
+    written.
+  </Card>
+</Cards>
+
+## The ledger, not the orchestrator
+
+Kanso never starts, dispatches or stops your agents. Your agents, in any MCP client, **pull**
+work from the backlog. Kanso records what they claim, change and ask, and it notifies a
+person when an agent needs one.
+
+There is no LLM inside Kanso and it holds no model credentials. You choose the model and run
+the agents, and Kanso keeps a record of every action.
+
+<Pills>
+  <Pill tone="proven">Agents pull work</Pill>
+  <Pill tone="proven">Every write attributed</Pill>
+  <Pill tone="proven">People answer as data</Pill>
+  <Pill tone="declared">No LLM inside</Pill>
+</Pills>
+
+## Start here
+
+<Steps>
+  <Step title="Install Kanso">
+    One Helm command, with a built-in database for evaluation. See [Install](/kanso/run/install).
+  </Step>
+  <Step title="Connect an agent">
+    Mint a token under **Security → Connect an agent** and paste the one command it shows into
+    your MCP client. See [Connect an agent](/kanso/agents/connect).
+  </Step>
+  <Step title="Bring your work over">
+    Point the importer at a Jira backup and read its assessment first. See
+    [The Jira importer](/kanso/migrate/jira-import).
+  </Step>
+</Steps>
+
+<p style={{marginTop: '2rem', color: 'var(--stk-muted)'}}>
+<b>簡素 · kanso</b> is the Zen design principle of simplicity through elimination: clarity
+that comes from removing what is non-essential, never from removing substance.
+</p>

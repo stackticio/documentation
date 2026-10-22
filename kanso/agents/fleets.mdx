@@ -1,0 +1,185 @@
+---
+title: Agent fleets and leases
+description: Run several agents on one queue without collisions. Leases say who is working on what, people can see them and call their own agent off, and an admin can make them binding.
+---
+
+<Hero eyebrow="Agents and people" title="Many agents, one queue, no collisions">
+When several agents take work from the same backlog, each one needs to know what the others
+have picked up. In Kanso that is a **lease**. An agent claims a ticket, holds it while it
+works, and lets it go when it is done. People see the lease on the card, and they can call
+their own agent off at any time.
+</Hero>
+
+<Figure caption="A lease belongs to one credential. It ends in one of four ways, and the ticket is free again. An agent finds out its lease was recalled or forced at its next renew.">
+<svg viewBox="0 0 900 400" role="img" aria-label="A free ticket is claimed with claim_next_issue or claim_issue and becomes held by one credential, which renews it with renew_lease. The lease ends when the holder releases it, the owner recalls it from the browser, a space admin forces it, or its time runs out. Another credential that tries to claim a held ticket is refused with issue_leased.">
+  <defs>
+    <marker id="ksFlAAmber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-amber)" /></marker>
+    <marker id="ksFlASteel" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-steel)" /></marker>
+    <marker id="ksFlARed" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-red)" /></marker>
+  </defs>
+
+  <path d="M176 190 L316 190" fill="none" stroke="var(--stk-amber)" strokeWidth="1.6" markerEnd="url(#ksFlAAmber)" />
+  <text x="246" y="178" fontSize="10.5" fill="var(--stk-ink)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">claim_next_issue</text>
+  <text x="246" y="210" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">or claim_issue</text>
+  <path d="M400 120 C400 66 490 66 490 118" fill="none" stroke="var(--stk-amber)" strokeWidth="1.4" markerEnd="url(#ksFlAAmber)" />
+  <text x="445" y="58" fontSize="10.5" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">renew_lease · every ⅓ of the TTL</text>
+  <path d="M572 190 C625 190 625 67 676 67" fill="none" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#ksFlASteel)" />
+  <path d="M572 190 C625 190 625 139 676 139" fill="none" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#ksFlASteel)" />
+  <path d="M572 190 C625 190 625 211 676 211" fill="none" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#ksFlASteel)" />
+  <path d="M572 190 C625 190 625 283 676 283" fill="none" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#ksFlASteel)" />
+  <path d="M445 300 L445 264" fill="none" stroke="var(--stk-red)" strokeWidth="1.5" markerEnd="url(#ksFlARed)" />
+
+  <rect x="24" y="150" width="150" height="80" rx="12" fill="var(--stk-panel)" stroke="var(--stk-steel)" strokeWidth="1.3" />
+  <text x="40" y="174" fontSize="9.7" fill="var(--stk-steel)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">FREE</text>
+  <text x="40" y="196" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">no lease</text>
+  <text x="40" y="216" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">anyone may claim</text>
+
+  <rect x="320" y="120" width="250" height="142" rx="12" fill="var(--stk-panel)" />
+  <rect x="320" y="120" width="250" height="142" rx="12" fill="var(--stk-amber)" fillOpacity="0.1" stroke="var(--stk-amber)" strokeWidth="1.6" />
+  <text x="336" y="144" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">HELD · ONE CREDENTIAL</text>
+  <text x="336" y="168" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">being worked on</text>
+  <text x="336" y="192" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">holder: sam</text>
+  <text x="336" y="210" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">via token "runner-2"</text>
+  <text x="336" y="228" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">ttl 900 s (60 to 14400)</text>
+  <text x="336" y="246" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">shown on the card</text>
+
+  <rect x="678" y="40" width="200" height="54" rx="10" fill="var(--stk-panel)" stroke="var(--stk-mint)" strokeWidth="1.3" />
+  <text x="692" y="61" fontSize="9.4" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1">RELEASED</text>
+  <text x="692" y="81" fontSize="11.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif">the holder, release_issue</text>
+  <rect x="678" y="112" width="200" height="54" rx="10" fill="var(--stk-panel)" stroke="var(--stk-blue)" strokeWidth="1.3" />
+  <text x="692" y="133" fontSize="9.4" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1">RECALLED</text>
+  <text x="692" y="153" fontSize="11.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif">the owner, from the browser</text>
+  <rect x="678" y="184" width="200" height="54" rx="10" fill="var(--stk-panel)" stroke="var(--stk-violet)" strokeWidth="1.3" />
+  <text x="692" y="205" fontSize="9.4" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1">FORCED</text>
+  <text x="692" y="225" fontSize="11.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif">a space admin</text>
+  <rect x="678" y="256" width="200" height="54" rx="10" fill="var(--stk-panel)" stroke="var(--stk-steel)" strokeWidth="1.3" />
+  <text x="692" y="277" fontSize="9.4" fill="var(--stk-steel)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1">EXPIRED</text>
+  <text x="692" y="297" fontSize="11.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif">the TTL ran out</text>
+  <text x="778" y="336" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">→ free again</text>
+
+  <rect x="320" y="302" width="250" height="64" rx="10" fill="var(--stk-panel)" stroke="var(--stk-red)" strokeWidth="1.3" />
+  <text x="336" y="324" fontSize="9.4" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1">ANOTHER CREDENTIAL</text>
+  <text x="336" y="346" fontSize="11.5" fill="var(--stk-ink)" fontFamily="Fira Code, ui-monospace, monospace">claim → issue_leased</text>
+  <text x="336" y="360" fontSize="10" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">refused, nothing written</text>
+</svg>
+</Figure>
+
+## The loop every agent runs
+
+<Steps>
+  <Step title="Claim one ticket">
+    Call `claim_next_issue` with the queue's JQL and an `ORDER BY`. The default order is
+    newest first. Kanso claims **one** free ticket that you are allowed to edit. If there is
+    none, the answer is `claimed: false`, which is a normal result, and three counts say why.
+    `examined: 0` with `notPermitted: 0` means there is no free matching work.
+    `notPermitted` above 0 means there is free work you may not edit. `contended` above 0
+    means other agents were faster, so call again.
+  </Step>
+  <Step title="Renew while you work">
+    Call `renew_lease` at least every third of the TTL. For the default 900-second lease,
+    that is every 5 minutes. A renew only ever extends a lease you hold. It never takes back
+    a lease you lost.
+  </Step>
+  <Step title="Release when you are done">
+    Call `release_issue` so the next agent can take the ticket.
+  </Step>
+</Steps>
+
+Pass an `idempotencyKey` to `claim_next_issue`. If the call is retried, for example after a
+network error, it returns the same lease instead of claiming a second ticket. To claim one
+specific ticket, use `claim_issue`. Claiming a ticket you already hold renews it.
+
+### What a claim returns
+
+```json
+{
+  "claimed": true, "examined": 1, "contended": 0,
+  "issue": { "key": "PAY-1", "summary": "Checkout times out on 3-D Secure",
+             "status": "To Do", "statusCategory": "todo",
+             "lease": { "holder": "sam", "credential": "kat_1",
+                        "expiresAt": "2026-10-22T19:42:13.849348Z" } },
+  "lease": { "holder": "sam", "heldByCaller": true, "callerMayRelease": true,
+             "acquiredAt": "2026-10-22T19:27:13.849348Z",
+             "expiresAt": "2026-10-22T19:42:13.849348Z" }
+}
+```
+
+## The holder is the credential, not the account
+
+A lease is held by the **credential** that claimed it: a token, a signed-in session, or an
+app. It is not held by the account. Two tokens of one person exclude each other exactly as
+two people's tokens do:
+
+```
+issue_leased: held unexpired by another credential of your own account (kat_1) — wait until
+2026-10-22T19:42:13.849348Z, or release it from a browser session of the account
+```
+
+That has two consequences for running a fleet:
+
+- **Give each agent its own token.** A pool of agents that shares one token is a single
+  holder, so the lease cannot keep them apart.
+- **One of your own tokens cannot release another's lease.** It is refused with
+  `lease_not_holder`. Only the holder, the account's browser session, or a space admin can
+  end it.
+
+## Calling an agent off
+
+A lease can end without the agent's help, in two ways:
+
+| Who | How | Recorded as |
+|---|---|---|
+| The person who owns the agent's token | From a signed-in browser session of the same account | `recalled` |
+| Anyone who administers the space | From their own session | `forced`, attributed to them |
+
+Neither one changes the ticket itself, so an agent waiting with `await_issue` is not woken
+by it. The agent finds out at its next `renew_lease`:
+
+```
+lease_not_found: no unexpired lease — yours ended (expired, released, recalled or forced);
+re-read the issue before claiming it again
+```
+
+The right response is to stop, re-read the ticket with `get_issue`, and claim it again only
+if it is still the agent's to do. A system that must hear about it within a second can
+subscribe a webhook to `issue.lease_released`. See
+[Webhooks and apps](/kanso/integrate/webhooks-and-apps).
+
+## Advisory or enforced
+
+By default a lease is **advisory**. It stops other agents from *claiming* the ticket, but it
+does not stop anyone from *writing* to it.
+
+A site admin can make leases **enforced**, under **Settings → AI access** or with
+`KANSO_AGENT_LEASES=enforced`. Then an agent cannot edit, transition or delete a ticket that
+another credential holds:
+
+```
+policy_lease_enforced — /policy/leases: enforced — override (Settings → AI access);
+/holder: sam; /holderCredential: kat_2
+```
+
+People are **never** blocked by a lease. A person can always edit a ticket an agent holds,
+and enforcement applies only to agents and apps.
+
+## What people see
+
+- **On the ticket:** while someone holds the lease, the header shows a chip such as *Being
+  worked on by Sam · token "runner-2" · until 14:30*.
+- **In search:** every ticket summary carries the lease, and JQL can find leased work:
+
+```
+project = PAY AND leasedBy IS NOT EMPTY
+```
+
+- **In the lease itself:** `get_lease` returns the holder, the credential that holds it
+  (`{id, kind, name}`), the TTL, when it was acquired and when it expires.
+
+## Limits worth knowing
+
+- A lease TTL runs from 60 to 14,400 seconds, and the default is 900.
+- `claim_next_issue` looks at 1 to 50 candidates per call (`maxCandidates`).
+- Each credential can make up to 120 tool calls a minute. Above that, the answer is `429`
+  with a `Retry-After`.
+- If an agent signs in with a username and password instead of a token, every new sign-in
+  is a new credential, and the leases it took before refuse its renewals. Use a token.

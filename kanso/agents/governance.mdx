@@ -1,0 +1,213 @@
+---
+title: Governing agents
+description: Decide what AI agents may do in Kanso. Token scopes, the agent access policy with its presets and switches, the actions no token can ever take, and the audit trail of every policy change.
+---
+
+<Hero eyebrow="Agents and people" title="You decide what agents may do">
+An agent in Kanso is never more powerful than the person whose token it carries, and usually
+less. A site admin sets the rules for every agent in one place, and some actions are closed
+to agents under any setting. Every request an agent makes passes the same checks, in the
+same order, and a refusal always says which check stopped it.
+</Hero>
+
+<Figure caption="Every agent request passes four checks before anything is written. Each refusal names its check and leaves nothing behind: no change, no event, no partial write.">
+<svg viewBox="0 0 900 330" role="img" aria-label="An agent request passes four checks in order: the token (valid and the right scope), the agent access policy (hard wall and switches), the owner's own permissions, and the rules of the work (workflow guards, forms, enforced leases, the publication gate). Only then is the write committed in one transaction, recorded with via token. Each check has its own refusal code.">
+  <defs>
+    <marker id="ksGvAViolet" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-violet)" /></marker>
+    <marker id="ksGvARed" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-red)" /></marker>
+  </defs>
+  <path d="M126 150 L142 150" fill="none" stroke="var(--stk-violet)" strokeWidth="1.5" markerEnd="url(#ksGvAViolet)" />
+  <path d="M284 150 L298 150" fill="none" stroke="var(--stk-violet)" strokeWidth="1.5" markerEnd="url(#ksGvAViolet)" />
+  <path d="M440 150 L454 150" fill="none" stroke="var(--stk-violet)" strokeWidth="1.5" markerEnd="url(#ksGvAViolet)" />
+  <path d="M596 150 L610 150" fill="none" stroke="var(--stk-violet)" strokeWidth="1.5" markerEnd="url(#ksGvAViolet)" />
+  <path d="M752 150 L768 150" fill="none" stroke="var(--stk-mint)" strokeWidth="1.6" markerEnd="url(#ksGvAViolet)" />
+  <path d="M214 212 L214 236" fill="none" stroke="var(--stk-red)" strokeWidth="1.2" strokeDasharray="3 3" markerEnd="url(#ksGvARed)" />
+  <path d="M370 212 L370 236" fill="none" stroke="var(--stk-red)" strokeWidth="1.2" strokeDasharray="3 3" markerEnd="url(#ksGvARed)" />
+  <path d="M526 212 L526 236" fill="none" stroke="var(--stk-red)" strokeWidth="1.2" strokeDasharray="3 3" markerEnd="url(#ksGvARed)" />
+  <path d="M682 212 L682 236" fill="none" stroke="var(--stk-red)" strokeWidth="1.2" strokeDasharray="3 3" markerEnd="url(#ksGvARed)" />
+
+  <rect x="16" y="110" width="110" height="80" rx="12" fill="var(--stk-panel)" />
+  <rect x="16" y="110" width="110" height="80" rx="12" fill="var(--stk-amber)" fillOpacity="0.09" stroke="var(--stk-amber)" strokeWidth="1.4" />
+  <text x="30" y="134" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">AGENT</text>
+  <text x="30" y="156" fontSize="13" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">a request</text>
+  <text x="30" y="174" fontSize="10" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">Bearer kat_…</text>
+
+  <rect x="144" y="88" width="140" height="124" rx="12" fill="var(--stk-panel)" stroke="var(--stk-violet)" strokeWidth="1.3" />
+  <text x="158" y="110" fontSize="9.4" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1">1 · TOKEN</text>
+  <text x="158" y="132" fontSize="12.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">valid, right scope</text>
+  <text x="158" y="154" fontSize="10" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">not expired</text>
+  <text x="158" y="170" fontSize="10" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">not revoked</text>
+  <text x="158" y="186" fontSize="10" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">read or write</text>
+
+  <rect x="300" y="88" width="140" height="124" rx="12" fill="var(--stk-panel)" stroke="var(--stk-violet)" strokeWidth="1.3" />
+  <text x="314" y="110" fontSize="9.4" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1">2 · POLICY</text>
+  <text x="314" y="132" fontSize="12.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">what agents may do</text>
+  <text x="314" y="154" fontSize="10" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">the hard wall</text>
+  <text x="314" y="170" fontSize="10" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">presets, switches</text>
+  <text x="314" y="186" fontSize="10" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">MCP on or off</text>
+
+  <rect x="456" y="88" width="140" height="124" rx="12" fill="var(--stk-panel)" stroke="var(--stk-violet)" strokeWidth="1.3" />
+  <text x="470" y="110" fontSize="9.4" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1">3 · THE OWNER</text>
+  <text x="470" y="132" fontSize="12.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">the owner's rights</text>
+  <text x="470" y="154" fontSize="10" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">never more than</text>
+  <text x="470" y="170" fontSize="10" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">the person's own</text>
+  <text x="470" y="186" fontSize="10" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">session could do</text>
+
+  <rect x="612" y="88" width="140" height="124" rx="12" fill="var(--stk-panel)" stroke="var(--stk-violet)" strokeWidth="1.3" />
+  <text x="626" y="110" fontSize="9.4" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1">4 · THE WORK</text>
+  <text x="626" y="132" fontSize="12.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">the work's rules</text>
+  <text x="626" y="154" fontSize="10" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">workflow guards</text>
+  <text x="626" y="170" fontSize="10" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">forms, leases</text>
+  <text x="626" y="186" fontSize="10" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">public spaces</text>
+
+  <rect x="770" y="100" width="118" height="100" rx="12" fill="var(--stk-panel)" />
+  <rect x="770" y="100" width="118" height="100" rx="12" fill="var(--stk-mint)" fillOpacity="0.1" stroke="var(--stk-mint)" strokeWidth="1.5" />
+  <text x="784" y="124" fontSize="9.4" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1">COMMITTED</text>
+  <text x="784" y="146" fontSize="12.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">one transaction</text>
+  <text x="784" y="166" fontSize="10" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">recorded with</text>
+  <text x="784" y="182" fontSize="10" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace">via token</text>
+
+  <rect x="144" y="240" width="140" height="62" rx="10" fill="var(--stk-red)" fillOpacity="0.07" stroke="var(--stk-red)" strokeOpacity="0.6" />
+  <text x="156" y="262" fontSize="9.5" fill="var(--stk-ink)" fontFamily="Fira Code, ui-monospace, monospace">401 unauthenticated</text>
+  <text x="156" y="280" fontSize="9.5" fill="var(--stk-ink)" fontFamily="Fira Code, ui-monospace, monospace">insufficient_scope</text>
+  <rect x="300" y="240" width="140" height="62" rx="10" fill="var(--stk-red)" fillOpacity="0.07" stroke="var(--stk-red)" strokeOpacity="0.6" />
+  <text x="312" y="262" fontSize="9.5" fill="var(--stk-ink)" fontFamily="Fira Code, ui-monospace, monospace">session_required</text>
+  <text x="312" y="280" fontSize="9.5" fill="var(--stk-ink)" fontFamily="Fira Code, ui-monospace, monospace">policy_forbids_…</text>
+  <rect x="456" y="240" width="140" height="62" rx="10" fill="var(--stk-red)" fillOpacity="0.07" stroke="var(--stk-red)" strokeOpacity="0.6" />
+  <text x="468" y="262" fontSize="9.5" fill="var(--stk-ink)" fontFamily="Fira Code, ui-monospace, monospace">permission_denied</text>
+  <rect x="612" y="240" width="140" height="62" rx="10" fill="var(--stk-red)" fillOpacity="0.07" stroke="var(--stk-red)" strokeOpacity="0.6" />
+  <text x="624" y="262" fontSize="9.5" fill="var(--stk-ink)" fontFamily="Fira Code, ui-monospace, monospace">a guard's reason</text>
+  <text x="624" y="278" fontSize="9.5" fill="var(--stk-ink)" fontFamily="Fira Code, ui-monospace, monospace">…lease_enforced</text>
+  <text x="624" y="294" fontSize="9.5" fill="var(--stk-ink)" fontFamily="Fira Code, ui-monospace, monospace">secret_detected</text>
+
+  <text x="16" y="40" fontSize="10" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">the same four checks, in this order, on REST and on MCP</text>
+</svg>
+</Figure>
+
+## 1 · The token
+
+An agent carries a **personal API token**. It acts as the person who minted it, so it can
+never reach more than that person can.
+
+- **Scope is fixed at creation.** A `read` token, the default, can only read. A `write`
+  token can also create, update, comment, transition and link. To change the scope, revoke
+  the token and mint another.
+- **Every token expires.** The default lifetime is 90 days (`KANSO_TOKEN_DEFAULT_DAYS`), and
+  the ceiling is 365 days (`KANSO_TOKEN_MAX_DAYS`). An operator can raise the ceiling but
+  cannot remove it.
+- **Revocation is immediate.** A revoked token fails on its very next request. A site admin
+  can revoke or re-time anyone's token under **Tokens**.
+- **A password change is the break-glass.** Changing a password deletes every token that
+  person owns, in the same transaction.
+
+An expired token, a revoked token and a token whose owner was deactivated all answer the
+same `401 unauthenticated`, so an attacker cannot tell which happened.
+
+## 2 · The agent access policy
+
+A site admin sets the policy for every agent under **Settings → AI access**. You pick a
+preset and, if you need to, override single switches.
+
+| Switch | What it allows a token to do | Strict | Standard (default) | Open |
+|---|---|---|---|---|
+| `tokenAppAdmin` | Create and manage apps | off | off | on |
+| `tokenConnectorAdmin` | Install and bind connectors | off | off | on |
+| `tokenCredentialAdmin` | Store, update and delete credentials | off | off | on |
+| `tokenConfigAdmin` | Change spaces, workflows, fields, forms, webhooks, export | off | off | on |
+| `tokenWaivers` | Create and delete waivers | off | off | on |
+| `tokenAttachments` | Start, complete and delete attachment uploads | on | on | on |
+| `agentQuestionsToGuests` | Ask questions of guest accounts | on | on | on |
+| `mcp` | The MCP endpoint: `on`, `read_only` or `off` | on | on | on |
+| `mcpToolGroups` | Optional MCP tool groups shown | none | apps, connectors, operations | apps, connectors, operations |
+| `leases` | Leases advisory or enforced | advisory | advisory | advisory |
+
+**Standard** follows one rule: nothing a token creates should keep acting after the token is
+revoked. That is why apps, connectors, credentials, configuration and waivers are opt-in.
+**Strict** also hides the optional tool groups. **Every** preset keeps the paths between
+agents and people open: tickets, comments, questions, answers, waiting, leases and
+attachments.
+
+When a switch is off, the refusal says which switch it is and how to change it:
+
+```
+policy_forbids_token_config_admin: this operation is not allowed for an API token under the
+current agent access policy. A site admin can allow it under Settings → AI access, or with
+KANSO_AGENT_TOKEN_CONFIG_ADMIN when the environment manages the policy.
+```
+
+Turning a switch on never lifts the owner's own permissions. The token still cannot do
+anything its owner's session could not.
+
+### Managing the policy as code
+
+The Helm chart's `agentPolicy` block, or the `KANSO_AGENT_*` environment variables, set the
+policy from the environment. When they do, they win over the settings screen, and every
+refusal names where its value came from. The settings for each variable are in
+[Configuration](/kanso/run/configuration).
+
+### The hard wall
+
+Some actions are closed to every token under every preset, Open included. They need a
+person, signed in, in a browser:
+
+- People, groups, roles, and permission and security schemes
+- Resolutions, the Jira importer, email settings, and the agent access policy itself
+- The person's own profile and notification preferences
+- Whether a space is public
+- Every token and session operation: a token cannot mint, list, extend or revoke tokens, and
+  cannot see or end sessions
+
+The refusal is `403 session_required`:
+
+```
+session_required: account administration is never available to an API token, under any
+setting — sign in …
+```
+
+Three more rules hold even under Open, because they depend on what the request asks for:
+
+- A token never installs or administers a **site-wide** app. It must name a space.
+- A token never stores a credential by reference. It supplies the secret itself.
+- Whatever a token installs, publishes or replays must stay within what its own owner holds
+  in that space (`token_install_exceeds_holder`).
+
+## 3 · The owner's rights
+
+After the policy, the request meets the same permission engine a person meets. A token
+reaches exactly what its owner can reach in each space. Over MCP, a tool the owner could
+never use is not even listed. An agent cannot see a ticket its owner cannot see, because
+there is no separate MCP path to the data.
+
+## 4 · The rules of the work
+
+Finally, the request meets the rules every writer meets:
+
+- **Workflow guards.** A guard that refuses a person's transition refuses the agent's too,
+  for the same reason. An agent cannot write a status directly. It must take a transition.
+- **Forms.** Required and read-only fields are enforced inside the write.
+- **Enforced leases.** If an admin enforces leases, an agent cannot change a ticket another
+  credential holds. See [Agent fleets and leases](/kanso/agents/fleets).
+- **Public spaces.** Text written into a public space is scanned for secrets before it is
+  written. An agent's write that matches is refused with `secret_detected`, and an agent can
+  never override that. Only a signed-in person can choose **Publish anyway**, and that
+  action is recorded. See [Connect an agent](/kanso/agents/connect#public-spaces-redact-and-retry).
+
+## Seeing and auditing the policy
+
+- **Any credential** can ask what it meets: `GET /api/v1/myself` returns `agentPolicy`,
+  with the preset, where it comes from, and every switch's effective value.
+- **A site admin** can read the whole catalogue with `GET /api/v1/settings/agent-policy`:
+  every switch, which operations and MCP tools each one governs, the hard wall, and the
+  presets.
+- **Every change is recorded.** `GET /api/v1/settings/agent-policy/changes` lists each
+  change with who made it, when, and the old and new values.
+
+```json
+{ "id": "apc_4", "version": 4, "changedAt": "2026-10-22T19:28:21.108475Z",
+  "changedBy": { "username": "admin", "name": "Administrator" },
+  "old": { "preset": "standard", "overrides": { "leases": "enforced" } },
+  "new": { "preset": "standard", "overrides": {} } }
+```
+
+For what agents did, as opposed to what they were allowed to do, see
+[Accountability](/kanso/agents/accountability).

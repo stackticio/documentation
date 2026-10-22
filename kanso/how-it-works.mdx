@@ -1,0 +1,198 @@
+---
+title: How it works
+description: How agents pick up work in Kanso, how they ask a person when they need one, and why every action is attributed and checked the same way as a person's.
+---
+
+<Hero eyebrow="How it works" title={<>Agents pull work.<br/>Kanso keeps the record.<br/>People answer when asked.</>}>
+Kanso does not run your agents. It is the shared record they work from. An agent claims a
+ticket, works it through the same API a person uses, asks a person when it needs a
+decision, and finishes the ticket. Kanso records every step and notifies the person when an
+answer is needed.
+</Hero>
+
+## The loop
+
+<Figure caption="One ticket, start to finish. The agent drives every step. Kanso holds the lease, versions every change, delivers the question and stores the answer, and the person only steps in when asked.">
+<svg viewBox="0 0 900 420" role="img" aria-label="Three lanes: agent, Kanso, person. The agent claims a ticket with claim_next_issue and Kanso holds the lease. The agent updates it and Kanso moves the version. The agent asks a question, Kanso notifies the person, the person answers on a plain page, and Kanso commits the answer with a citation. The agent's await returns the answer. The agent transitions the ticket to done and the lease is released.">
+  <defs>
+    <marker id="ksHowAAmber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-amber)" /></marker>
+    <marker id="ksHowAViolet" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-violet)" /></marker>
+    <marker id="ksHowAMint" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-mint)" /></marker>
+    <marker id="ksHowASteel" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-steel)" /></marker>
+  </defs>
+
+  <rect x="12" y="34" width="876" height="100" rx="14" fill="var(--stk-amber)" fillOpacity="0.035" stroke="var(--stk-amber)" strokeOpacity="0.25" />
+  <rect x="12" y="160" width="876" height="100" rx="14" fill="var(--stk-violet)" fillOpacity="0.06" stroke="var(--stk-violet)" strokeOpacity="0.35" />
+  <rect x="12" y="286" width="876" height="100" rx="14" fill="var(--stk-blue)" fillOpacity="0.035" stroke="var(--stk-blue)" strokeOpacity="0.25" />
+  <text x="28" y="80" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">AGENT</text>
+  <text x="28" y="96" fontSize="10" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">pulls work</text>
+  <text x="28" y="206" fontSize="9.7" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">KANSO</text>
+  <text x="28" y="222" fontSize="10" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">the ledger</text>
+  <text x="28" y="332" fontSize="9.7" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">PERSON</text>
+  <text x="28" y="348" fontSize="10" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">when asked</text>
+
+  <path d="M175 114 L175 184" fill="none" stroke="var(--stk-amber)" strokeWidth="1.5" markerEnd="url(#ksHowAAmber)" />
+  <path d="M320 114 L320 184" fill="none" stroke="var(--stk-amber)" strokeWidth="1.5" markerEnd="url(#ksHowAAmber)" />
+  <path d="M465 114 L465 184" fill="none" stroke="var(--stk-amber)" strokeWidth="1.5" markerEnd="url(#ksHowAAmber)" />
+  <path d="M755 114 L755 184" fill="none" stroke="var(--stk-amber)" strokeWidth="1.5" markerEnd="url(#ksHowAAmber)" />
+  <path d="M465 244 L465 314" fill="none" stroke="var(--stk-violet)" strokeWidth="1.5" markerEnd="url(#ksHowAViolet)" />
+  <path d="M610 316 L610 246" fill="none" stroke="var(--stk-mint)" strokeWidth="1.6" markerEnd="url(#ksHowAMint)" />
+  <path d="M610 186 L610 116" fill="none" stroke="var(--stk-mint)" strokeWidth="1.6" markerEnd="url(#ksHowAMint)" />
+  <path d="M241 216 L253 216" fill="none" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#ksHowASteel)" />
+  <path d="M386 216 L398 216" fill="none" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#ksHowASteel)" />
+  <path d="M531 216 L543 216" fill="none" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#ksHowASteel)" />
+  <path d="M676 216 L688 216" fill="none" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#ksHowASteel)" />
+
+  <rect x="110" y="58" width="130" height="56" rx="10" fill="var(--stk-panel)" stroke="var(--stk-amber)" strokeWidth="1.3" />
+  <text x="122" y="78" fontSize="9.4" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1">1 · CLAIM</text>
+  <text x="122" y="98" fontSize="10.5" fill="var(--stk-ink)" fontFamily="Fira Code, ui-monospace, monospace">claim_next_issue</text>
+  <rect x="255" y="58" width="130" height="56" rx="10" fill="var(--stk-panel)" stroke="var(--stk-amber)" strokeWidth="1.3" />
+  <text x="267" y="78" fontSize="9.4" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1">2 · WORK</text>
+  <text x="267" y="98" fontSize="10.5" fill="var(--stk-ink)" fontFamily="Fira Code, ui-monospace, monospace">update_issue</text>
+  <rect x="400" y="58" width="130" height="56" rx="10" fill="var(--stk-panel)" stroke="var(--stk-amber)" strokeWidth="1.3" />
+  <text x="412" y="78" fontSize="9.4" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1">3 · ASK</text>
+  <text x="412" y="98" fontSize="10.5" fill="var(--stk-ink)" fontFamily="Fira Code, ui-monospace, monospace">ask_question</text>
+  <rect x="545" y="58" width="130" height="56" rx="10" fill="var(--stk-panel)" stroke="var(--stk-mint)" strokeWidth="1.3" />
+  <text x="557" y="78" fontSize="9.4" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1">4 · WAIT</text>
+  <text x="557" y="98" fontSize="10.5" fill="var(--stk-ink)" fontFamily="Fira Code, ui-monospace, monospace">await_question</text>
+  <rect x="690" y="58" width="130" height="56" rx="10" fill="var(--stk-panel)" stroke="var(--stk-amber)" strokeWidth="1.3" />
+  <text x="702" y="78" fontSize="9.4" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1">5 · FINISH</text>
+  <text x="702" y="98" fontSize="10.5" fill="var(--stk-ink)" fontFamily="Fira Code, ui-monospace, monospace">transition_issue</text>
+
+  <rect x="110" y="188" width="130" height="56" rx="10" fill="var(--stk-panel)" stroke="var(--stk-violet)" strokeWidth="1.2" />
+  <text x="122" y="211" fontSize="12.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">lease held</text>
+  <text x="122" y="230" fontSize="10" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">shown on the card</text>
+  <rect x="255" y="188" width="130" height="56" rx="10" fill="var(--stk-panel)" stroke="var(--stk-violet)" strokeWidth="1.2" />
+  <text x="267" y="211" fontSize="12.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">version 4 → 5</text>
+  <text x="267" y="230" fontSize="10" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">change logged</text>
+  <rect x="400" y="188" width="130" height="56" rx="10" fill="var(--stk-panel)" stroke="var(--stk-violet)" strokeWidth="1.2" />
+  <text x="412" y="211" fontSize="12.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">question q_7</text>
+  <text x="412" y="230" fontSize="10" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">person notified</text>
+  <rect x="545" y="188" width="130" height="56" rx="10" fill="var(--stk-panel)" stroke="var(--stk-mint)" strokeWidth="1.3" />
+  <text x="557" y="211" fontSize="12.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">answer stored</text>
+  <text x="557" y="230" fontSize="10" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace">PAY-31/q_7</text>
+  <rect x="690" y="188" width="130" height="56" rx="10" fill="var(--stk-panel)" stroke="var(--stk-violet)" strokeWidth="1.2" />
+  <text x="702" y="211" fontSize="12.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">done</text>
+  <text x="702" y="230" fontSize="10" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">lease released</text>
+
+  <rect x="400" y="318" width="275" height="56" rx="10" fill="var(--stk-panel)" stroke="var(--stk-blue)" strokeWidth="1.3" />
+  <text x="414" y="341" fontSize="12.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">answers on a plain page</text>
+  <text x="414" y="360" fontSize="10" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">typed · attributed · written once</text>
+</svg>
+</Figure>
+
+<Steps>
+  <Step title="Claim">
+    The agent calls `claim_next_issue` with the queue's JQL. Kanso hands it **one** free ticket
+    it is allowed to edit and puts a lease on it, which shows on the card for everyone
+    watching the board. When several agents share a queue, the lease keeps them from picking
+    up the same ticket. If there is no free work, the answer is `claimed: false`, with counts
+    that say why.
+  </Step>
+  <Step title="Work">
+    The agent reads the ticket with `get_issue` and writes with `update_issue`, passing back
+    the `version` it read. If a person edited the ticket in the meantime, nothing is written
+    and the agent gets `stale_version`, so it re-reads instead of overwriting someone's edit.
+    While it works, it renews the lease with `renew_lease`.
+  </Step>
+  <Step title="Ask">
+    When the agent needs a decision, it calls `ask_question` on the ticket with a prompt and a
+    typed answer shape: a choice, several choices, text, a number, yes/no, or a file. Nothing
+    needs to be set up first, and the ticket itself does not change. When the agent names a
+    person who can see the ticket, Kanso puts the question in their inbox and notifies them.
+  </Step>
+  <Step title="Wait">
+    The agent calls `await_question`, a single held request of up to 60 seconds. It is not a
+    polling loop. When the person answers, `get_question` returns the values, typed, plus a
+    permanent citation such as `PAY-31/q_7` that re-reads the same answer forever. The person
+    can also decline and give a reason.
+  </Step>
+  <Step title="Finish">
+    The agent picks a transition that `get_issue` lists as available and calls
+    `transition_issue`. The workflow guards that apply to people apply to the agent, with the
+    same reason when they refuse. Then the agent calls `release_issue` so the next agent can
+    take a ticket.
+  </Step>
+</Steps>
+
+A person can **recall** their own agent's lease from the browser, and a space admin can
+force a lease off. The agent finds out at its next `renew_lease`, which answers
+`lease_not_found`. It then stops and re-reads the ticket before doing anything else.
+
+## No side door
+
+The web interface, MCP agents and your own services are all clients of **one public API**.
+There are no private endpoints.
+
+- **Same code path.** Every MCP tool runs the same code as its REST equivalent, with the
+  caller's credential. There is no MCP-only query, so an agent can never see a ticket its
+  owner cannot see.
+- **Same permissions.** A token acts as the person who minted it. With every policy switch
+  on, it still cannot do anything its owner's own session could not do.
+- **Same guards.** A workflow guard that refuses a person's transition refuses the agent's
+  too, for the same reason.
+
+## What a token can and cannot do
+
+<Split>
+  <Side tone="answer" head="An agent's token can">
+    <ul>
+      <li>Read everything its owner can read, with a <code>read</code> token (the default)</li>
+      <li>Create, update, comment, transition and link, with a <code>write</code> token</li>
+      <li>Ask people questions, wait for answers, and claim and release leases, under every policy preset</li>
+    </ul>
+  </Side>
+  <Side tone="problem" head="It can never">
+    <ul>
+      <li>Change its owner's password, or mint, list, extend or revoke tokens</li>
+      <li>Manage people, groups, roles or permission schemes, or run the importer</li>
+      <li>Change the agent access policy that governs it</li>
+      <li>Live forever: every token expires, after 90 days by default and 365 at most</li>
+    </ul>
+  </Side>
+</Split>
+
+A site admin decides the rest under **Settings → AI access**. There are three presets,
+**Strict**, **Standard** (the default) and **Open**, and each switch can be overridden. Under
+Standard, an agent cannot create apps, connectors, stored credentials or configuration
+unless an admin allows it. Details are in
+[Connect an agent](/kanso/agents/connect).
+
+## Every action is accountable
+
+- **Every write names its credential.** Each change, comment, worklog, question and
+  attachment carries a `via` beside its author. People see `via token "triage agent"` next
+  to the change.
+- **Search what the agents did.** `changedVia = token` finds every write any token made.
+  `changedVia = kat_12` finds one agent's.
+- **Every agent ticket says where it came from.** `create_issue` over MCP requires an
+  `origin`: the agent's session id and a sentence on what asked for the ticket. Kanso writes
+  it as the first line of the description, so people and other agents can trace it.
+- **Revocation is immediate.** A revoked token fails on its very next request. Changing a
+  password deletes every token that person owns, in the same transaction.
+
+## Every write is one transaction
+
+The database is the only source of truth. Each write runs as a single transaction: the
+permission check, the workflow guard, the change itself, the changelog entry, and the queued
+webhooks all commit together or not at all. A ticket can never change while its webhook is
+lost.
+
+```
+agent moves PAY-31 → "Done"
+          │
+          ▼
+   BEGIN ───────────────────────────────────────────────┐
+     check permission                                   │
+     evaluate workflow guards (pinned version)          │   ONE
+     UPDATE issue (status, version++)                   │   database
+     INSERT changelog event (with actor and via)        │   transaction
+     apply post-functions                               │
+     enqueue webhooks (same transaction)                │
+   COMMIT ──────────────────────────────────────────────┘
+          │
+          ▼
+   worker delivers webhooks · at-least-once · idempotent by version
+```
+
+More detail: [Architecture](/kanso/run/architecture).

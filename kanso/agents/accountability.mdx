@@ -1,0 +1,161 @@
+---
+title: Accountability
+description: Every change an agent makes in Kanso records the person behind it and the credential it used. Find what any agent did, trace a ticket back to the session that opened it, and cite a person's decision.
+---
+
+<Hero eyebrow="Agents and people" title="Every action says who did it, and how">
+When agents and people share a backlog, the history has to show who did what. In Kanso,
+every change records the person behind it **and** the credential it came through. You can
+search what any agent did, trace a ticket back to the run that opened it, and cite a
+person's answer forever.
+</Hero>
+
+<Figure caption="The real history of one ticket worked by an agent. Each entry names the person and the credential, so the agent's changes and the lead's edit sit side by side and are easy to tell apart.">
+<svg viewBox="0 0 900 380" role="img" aria-label="The history of ticket PAY-1. Four entries were made by Sam Developer via token triage agent: created, status To Do to In Progress, priority to high, and status to Done with resolution Fixed. One entry was made by Lee Lead via session: labels set to payments. Callouts explain who, via, and how to find, trace and cite the work.">
+  <defs>
+    <marker id="ksAcASteel" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-steel)" /></marker>
+  </defs>
+
+  <rect x="240" y="30" width="420" height="320" rx="14" fill="var(--stk-panel)" stroke="var(--stk-hair)" />
+  <text x="260" y="58" fontSize="9.7" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">PAY-1 · HISTORY</text>
+
+  <rect x="256" y="72" width="388" height="48" rx="8" fill="var(--stk-panel-2)" />
+  <text x="270" y="92" fontSize="12" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">Sam Developer</text>
+  <text x="372" y="92" fontSize="10.5" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace">via token "triage agent"</text>
+  <text x="270" y="110" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">created</text>
+
+  <rect x="256" y="128" width="388" height="48" rx="8" fill="var(--stk-panel-2)" />
+  <text x="270" y="148" fontSize="12" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">Lee Lead</text>
+  <text x="340" y="148" fontSize="10.5" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace">via session</text>
+  <text x="270" y="166" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">labels → payments</text>
+
+  <rect x="256" y="184" width="388" height="48" rx="8" fill="var(--stk-panel-2)" />
+  <text x="270" y="204" fontSize="12" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">Sam Developer</text>
+  <text x="372" y="204" fontSize="10.5" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace">via token "triage agent"</text>
+  <text x="270" y="222" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">status To Do → In Progress</text>
+
+  <rect x="256" y="240" width="388" height="48" rx="8" fill="var(--stk-panel-2)" />
+  <text x="270" y="260" fontSize="12" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">Sam Developer</text>
+  <text x="372" y="260" fontSize="10.5" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace">via token "triage agent"</text>
+  <text x="270" y="278" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">priority → high</text>
+
+  <rect x="256" y="296" width="388" height="48" rx="8" fill="var(--stk-panel-2)" />
+  <text x="270" y="316" fontSize="12" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">Sam Developer</text>
+  <text x="372" y="316" fontSize="10.5" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace">via token "triage agent"</text>
+  <text x="270" y="334" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">status → Done · resolution Fixed</text>
+
+  <text x="20" y="80" fontSize="9.4" fill="var(--stk-ink)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1">WHO</text>
+  <text x="20" y="98" fontSize="11" fill="var(--stk-muted)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif">the person who owns the</text>
+  <text x="20" y="114" fontSize="11" fill="var(--stk-muted)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif">credential: the bold name</text>
+
+  <text x="20" y="204" fontSize="9.4" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1">VIA</text>
+  <text x="20" y="222" fontSize="11" fill="var(--stk-muted)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif">which credential, by name:</text>
+  <text x="20" y="238" fontSize="11" fill="var(--stk-muted)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif">the amber text</text>
+
+  <text x="690" y="84" fontSize="9.4" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1">FIND IT</text>
+  <text x="690" y="102" fontSize="10.5" fill="var(--stk-ink)" fontFamily="Fira Code, ui-monospace, monospace">changedVia = kat_1</text>
+  <text x="690" y="118" fontSize="11" fill="var(--stk-muted)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif">one agent's work, in JQL</text>
+
+  <text x="690" y="174" fontSize="9.4" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1">TRACE IT</text>
+  <text x="690" y="192" fontSize="10.5" fill="var(--stk-ink)" fontFamily="Fira Code, ui-monospace, monospace">Agent origin</text>
+  <text x="690" y="208" fontSize="11" fill="var(--stk-muted)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif">session + why, line one</text>
+
+  <text x="690" y="264" fontSize="9.4" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1">CITE IT</text>
+  <text x="690" y="282" fontSize="10.5" fill="var(--stk-ink)" fontFamily="Fira Code, ui-monospace, monospace">PAY-1/q_1</text>
+  <text x="690" y="298" fontSize="11" fill="var(--stk-muted)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif">a person's answer, forever</text>
+</svg>
+</Figure>
+
+## Every write names its credential
+
+Each change, comment, worklog, record, question, attachment, waiver and feed entry carries
+two things: the **author**, which is the person, and the **via**, which is the credential
+the change came through.
+
+```json
+"via": { "kind": "token", "id": "kat_1", "name": "triage agent" }
+```
+
+| `via.kind` | The change came through |
+|---|---|
+| `token` | A personal API token, on REST or MCP (`kat_<n>` and the token's name) |
+| `session` | A signed-in session, on any route but MCP |
+| `session_mcp` | A signed-in session used on the MCP endpoint |
+| `app` | An installed app's run (`ains_<n>` and the app's key) |
+| `connector` | A connector binding (`cbind_<n>` and the connector's key) |
+| `import`, `system` | Kanso acting with no person behind it, such as the Jira importer or a lease that expired |
+
+People see `via token "triage agent"` next to a token's change, and `via MCP session` next
+to a session's change made over MCP.
+
+The history is written **in the same transaction** as the change. No code path changes a
+ticket without recording it.
+
+An answer to a question records the same pair, as `answeredBy` and `answeredVia`.
+Webhook deliveries carry the `via` of the act they report, so the systems you connect see
+the same attribution.
+
+An agent can recognise its own writes without an extra call. Its token's `via.id` is the
+part of the token before the dot, `kat_1` for `kat_1.<secret>`, so it compares
+`comment.via.id` with that prefix.
+
+## Find what the agents did
+
+`changedVia` is a JQL field. It finds every ticket whose history has a change through a
+given kind of credential, or through one specific token:
+
+```
+changedVia = token                      every ticket any agent token changed
+changedVia = kat_1                      everything one agent changed
+project = PAY AND changedVia = session  changes people made in the browser
+```
+
+These searches answer a simple question: is the AI earning its seat?
+
+Claiming and releasing leases is not a change to the ticket, so it does not appear in the
+history or in `changedVia`. Lease activity is reported as `issue.lease_acquired` and
+`issue.lease_released` events instead, with the reason a lease ended: `released`,
+`expired`, `recalled` or `forced`. See [Agent fleets and leases](/kanso/agents/fleets).
+
+## Trace a ticket back to its run
+
+A ticket an agent opens over MCP must say where it came from. `create_issue` requires an
+`origin` with two parts: the agent's `session`, which is the id of its conversation, job or
+run, and a `context` sentence on what asked for the ticket. Kanso writes it as the first
+line of the description:
+
+```
+> **Agent origin** — session `run-2026-10-22-a` — Triage of the payments error budget alert
+```
+
+People read it on the ticket. Other agents find related tickets with
+`text ~ "run-2026-10-22-a"`.
+
+## Cite a person's decision
+
+When an agent asks a person a question, the answer is written once and never changes. It
+has a permanent citation: `PAY-1/q_1` is the first question on PAY-1. The agent keeps that
+string wherever it uses the answer, in a commit message, a comment or a report, and anyone
+can re-read the same answer with it later.
+
+```json
+"answer": { "values": { "ship": true, "window": "after 18:00" },
+            "answeredBy": { "username": "lee", "name": "Lee Lead" },
+            "answeredVia": { "kind": "session" },
+            "citation": "PAY-1/q_1" }
+```
+
+See [Human answers](/kanso/agents/human-answers).
+
+## What Kanso can and cannot tell you
+
+Kanso records **credentials and routes, not intentions**. It cannot tell a person from a
+program that holds the same credential. If an agent signs in with a person's username and
+password, its changes look exactly like that person's own. Give every agent its own named
+token, and its work is always told apart.
+
+## Policy changes are audited too
+
+Changes to what agents are *allowed* to do are recorded as well. Every change to the agent
+access policy lists who made it, when, and the old and new settings. See
+[Governing agents](/kanso/agents/governance#seeing-and-auditing-the-policy).

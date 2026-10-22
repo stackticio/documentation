@@ -10,6 +10,8 @@ const config = {
   projectName: 'documentation',
   onBrokenLinks: 'warn',
   onBrokenAnchors: 'warn',
+  // .md files are plain Markdown (the Kanso guides), .mdx stays MDX
+  markdown: { format: 'detect' },
 
   themeConfig: {
     image: 'img/transparent_logo_black.png',
@@ -36,6 +38,7 @@ const config = {
         { to: '/docs/compliance/', label: 'Compliance', position: 'left' },
         { to: '/docs/blueprints/', label: 'Blueprints', position: 'left' },
         { to: '/docs/reference/components', label: 'Catalog', position: 'right' },
+        { to: '/kanso/', label: 'Kanso', position: 'right', activeBasePath: 'kanso' },
       ],
     },
     footer: {
@@ -66,6 +69,14 @@ const config = {
             { label: 'Platform API', to: '/docs/reference/api' },
           ],
         },
+        {
+          title: 'Kanso',
+          items: [
+            { label: 'What Kanso is', to: '/kanso/' },
+            { label: 'Connect an agent', to: '/kanso/agents/connect' },
+            { label: 'Install', to: '/kanso/run/install' },
+          ],
+        },
       ],
       copyright: `Stacktic · ${new Date().getFullYear()}`,
     },
@@ -85,6 +96,19 @@ const config = {
         },
         blog: false,
         theme: { customCss: require.resolve('./src/css/custom.css') },
+      },
+    ],
+  ],
+
+  // Kanso has its own docs set: /kanso/…, its own sidebar, same theme
+  plugins: [
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'kanso',
+        path: 'kanso',
+        routeBasePath: 'kanso',
+        sidebarPath: require.resolve('./sidebars-kanso.js'),
       },
     ],
   ],

@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-kanso docs-version-current docs-doc-page docs-doc-id-agents/connect" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.1.1">
+<title data-rh="true">Connect an agent (MCP) | Stacktic</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://stackticio.github.io/documentation/img/transparent_logo_black.png"><meta data-rh="true" name="twitter:image" content="https://stackticio.github.io/documentation/img/transparent_logo_black.png"><meta data-rh="true" property="og:url" content="https://stackticio.github.io/documentation/kanso/agents/connect"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-kanso-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-kanso-current"><meta data-rh="true" property="og:title" content="Connect an agent (MCP) | Stacktic"><meta data-rh="true" name="description" content="Connect an AI agent to Kanso over MCP with a personal API token, and know exactly what that token can and cannot do."><meta data-rh="true" property="og:description" content="Connect an AI agent to Kanso over MCP with a personal API token, and know exactly what that token can and cannot do."><link data-rh="true" rel="icon" href="/documentation/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://stackticio.github.io/documentation/kanso/agents/connect"><link data-rh="true" rel="alternate" href="https://stackticio.github.io/documentation/kanso/agents/connect" hreflang="en"><link data-rh="true" rel="alternate" href="https://stackticio.github.io/documentation/kanso/agents/connect" hreflang="x-default"><link rel="stylesheet" href="/documentation/assets/css/styles.9cbd5319.css">
+<script src="/documentation/assets/js/runtime~main.5a18b88c.js" defer="defer"></script>
+<script src="/documentation/assets/js/main.26d8e891.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<script>!function(){function t(t){document.documentElement.setAttribute("data-theme",t)}var e=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return localStorage.getItem("theme")}catch(t){}}();null!==e?t(e):window.matchMedia("(prefers-color-scheme: dark)").matches?t("dark"):window.matchMedia("(prefers-color-scheme: light)").matches?t("light"):t("dark")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_r2pC" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="navbar navbar--fixed-top"><div class="navbar__inner"><div class="navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" target="_self" href="/documentation/docs"><div class="navbar__logo"><img src="/documentation/img/transparent_logo_black.png" alt="Stacktic" class="themedComponent_MTc4 themedComponent--light_QdlC"><img src="/documentation/img/transparent_logo_black.png" alt="Stacktic" class="themedComponent_MTc4 themedComponent--dark_KiU1"></div><b class="navbar__title text--truncate">Stacktic</b></a><a class="navbar__item navbar__link" href="/documentation/docs">Docs</a><a class="navbar__item navbar__link" href="/documentation/docs/mcp/quickstart">Start with MCP</a><a class="navbar__item navbar__link" href="/documentation/docs/platform">Platform</a><a class="navbar__item navbar__link" href="/documentation/docs/compliance">Compliance</a><a class="navbar__item navbar__link" href="/documentation/docs/blueprints">Blueprints</a></div><div class="navbar__items navbar__items--right"><a class="navbar__item navbar__link" href="/documentation/docs/reference/components">Catalog</a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/documentation/kanso">Kanso</a><div class="toggle_P7Cl colorModeToggle_bgh6"><button class="clean-btn toggleButton_enmJ toggleButtonDisabled_tOVG" type="button" disabled="" title="Switch between dark and light mode (currently dark mode)" aria-label="Switch between dark and light mode (currently dark mode)" aria-live="polite"><svg viewBox="0 0 24 24" width="24" height="24" class="lightToggleIcon_PMg3"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" class="darkToggleIcon_D9cA"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg></button></div><div class="navbarSearchContainer_iKrS"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="main-wrapper mainWrapper_X_42"><div class="docsWrapper_KDci"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_L0fn" type="button"></button><div class="docRoot_KBJd"><aside class="theme-doc-sidebar-container docSidebarContainer_iwBL"><div class="sidebarViewport_WnZ1"><div class="sidebar_uvJV"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_JlYJ"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" aria-expanded="true" href="/documentation/kanso">Start</a></div><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/documentation/kanso">What Kanso is</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/documentation/kanso/how-it-works">How it works</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/documentation/kanso/concepts">Core concepts</a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret menu__link--active" aria-expanded="true" href="/documentation/kanso/agents/quickstart">Agents and people</a></div><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/documentation/kanso/agents/quickstart">Your first agent</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/documentation/kanso/agents/fleets">Fleets and leases</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/documentation/kanso/agents/human-answers">Human answers</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/documentation/kanso/agents/governance">Governing agents</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/documentation/kanso/agents/accountability">Accountability</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/documentation/kanso/agents/connect">MCP reference</a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" aria-expanded="false" href="/documentation/kanso/work/projects-issues-fields">Work management</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" aria-expanded="false" href="/documentation/kanso/integrate/api">Integrate</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" aria-expanded="false" href="/documentation/kanso/run/install">Run Kanso</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" aria-expanded="false" href="/documentation/kanso/migrate/jira-migration">Move from Jira</a></div></li></ul></nav><button type="button" title="Collapse sidebar" aria-label="Collapse sidebar" class="button button--secondary button--outline collapseSidebarButton_oPSl"><svg width="20" height="20" aria-hidden="true" class="collapseSidebarButtonIcon_kihG"><g fill="#7a7a7a"><path d="M9.992 10.023c0 .2-.062.399-.172.547l-4.996 7.492a.982.982 0 01-.828.454H1c-.55 0-1-.453-1-1 0-.2.059-.403.168-.551l4.629-6.942L.168 3.078A.939.939 0 010 2.528c0-.548.45-.997 1-.997h2.996c.352 0 .649.18.828.45L9.82 9.472c.11.148.172.347.172.55zm0 0"></path><path d="M19.98 10.023c0 .2-.058.399-.168.547l-4.996 7.492a.987.987 0 01-.828.454h-3c-.547 0-.996-.453-.996-1 0-.2.059-.403.168-.551l4.625-6.942-4.625-6.945a.939.939 0 01-.168-.55 1 1 0 01.996-.997h3c.348 0 .649.18.828.45l4.996 7.492c.11.148.168.347.168.55zm0 0"></path></g></svg></button></div></div></aside><main class="docMainContainer_ObMR"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VK0V"><div class="docItemContainer_tiUj"><article><nav class="theme-doc-breadcrumbs breadcrumbsContainer_gZw6" aria-label="Breadcrumbs"><ul class="breadcrumbs" itemscope="" itemtype="https://schema.org/BreadcrumbList"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/documentation/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_llMa"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><span class="breadcrumbs__link">Agents and people</span><meta itemprop="position" content="1"></li><li itemscope="" itemprop="itemListElement" itemtype="https://schema.org/ListItem" class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link" itemprop="name">MCP reference</span><meta itemprop="position" content="2"></li></ul></nav><div class="tocCollapsible_WDYN theme-doc-toc-mobile tocMobile_DLXf"><button type="button" class="clean-btn tocCollapsibleButton_NfQ5">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>Connect an agent (MCP)</h1></header><p>Every Kanso instance is an MCP server at <code>/api/v1/mcp</code>. Give an agent a personal API token and it works the same backlog your people do: it finds work, claims it, updates tickets, asks a person when it needs a decision, and records what it did. The agent acts as the person who minted the token, and everything it writes appears in the changelog under that person and the token&#x27;s name — no sidecar, no extra binary, no bot account sharing a human&#x27;s password.</p>
+<p>AI is a user here, not a feature: there is no LLM in Kanso. The tracker is the interface; MCP is how an agent reaches it.</p>
+<h2 class="anchor anchorWithStickyNavbar_EgYu" id="connect-in-one-command">Connect in one command<a href="#connect-in-one-command" class="hash-link" aria-label="Direct link to Connect in one command" title="Direct link to Connect in one command">​</a></h2>
+<ol>
+<li>Sign in, open <strong>Security</strong> in the sidebar, and choose <strong>Connect an agent</strong>.</li>
+<li>Name the token, pick <strong>Read only</strong> (the default) or <strong>Read &amp; write</strong>, and create it. The name is shown next to everything the token writes, so name it after the agent — <code>triage agent</code>, not <code>laptop</code>.</li>
+<li>Copy the command it shows you. It is complete:</li>
+</ol>
+<div class="language-bash codeBlockContainer_CtJl theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_rDtj"><pre tabindex="0" class="prism-code language-bash codeBlock_vSna thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_BawG"><span class="token-line" style="color:#bfc7d5"><span class="token plain">claude mcp </span><span class="token function" style="color:rgb(130, 170, 255)">add</span><span class="token plain"> </span><span class="token parameter variable" style="color:rgb(191, 199, 213)">--transport</span><span class="token plain"> http https://kanso.example.com/api/v1/mcp </span><span class="token punctuation" style="color:rgb(199, 146, 234)">\</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  </span><span class="token parameter variable" style="color:rgb(191, 199, 213)">--header</span><span class="token plain"> </span><span class="token string" style="color:rgb(195, 232, 141)">&quot;Authorization: Bearer kat_1.&lt;secret&gt;&quot;</span><br></span></code></pre><div class="buttonGroup_vSmX"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_hdcP" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_fi_K"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_c0rF"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>Add <code>--scope user</code> to make it available in every project rather than the current directory. Any MCP client that speaks Streamable HTTP works the same way — the URL and the header are the whole configuration.</p>
+<p>MCP servers attach when a client starts, so a newly added server appears in your <strong>next</strong> session, not the running one.</p>
+<p>A token minted before Kanso 0.71 keeps its name private: its writes show its id (<code>kat_7</code>) instead, and the token list says so. Mint a new one to get a named token.</p>
+<p>An agent can find the endpoint without anyone reading docs: <code>GET /api/v1/auth/methods</code> is open and returns <code>mcpEndpoint</code> when the instance knows its own public URL.</p>
+<div class="language-json codeBlockContainer_CtJl theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_rDtj"><pre tabindex="0" class="prism-code language-json codeBlock_vSna thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_BawG"><span class="token-line" style="color:#bfc7d5"><span class="token punctuation" style="color:rgb(199, 146, 234)">{</span><span class="token plain"> </span><span class="token property">&quot;local&quot;</span><span class="token operator" style="color:rgb(137, 221, 255)">:</span><span class="token plain"> </span><span class="token boolean" style="color:rgb(255, 88, 116)">true</span><span class="token punctuation" style="color:rgb(199, 146, 234)">,</span><span class="token plain"> </span><span class="token property">&quot;oidc&quot;</span><span class="token operator" style="color:rgb(137, 221, 255)">:</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(199, 146, 234)">{</span><span class="token plain"> </span><span class="token property">&quot;enabled&quot;</span><span class="token operator" style="color:rgb(137, 221, 255)">:</span><span class="token plain"> </span><span class="token boolean" style="color:rgb(255, 88, 116)">true</span><span class="token punctuation" style="color:rgb(199, 146, 234)">,</span><span class="token plain"> </span><span class="token property">&quot;providerName&quot;</span><span class="token operator" style="color:rgb(137, 221, 255)">:</span><span class="token plain"> </span><span class="token string" style="color:rgb(195, 232, 141)">&quot;Keycloak&quot;</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(199, 146, 234)">}</span><span class="token punctuation" style="color:rgb(199, 146, 234)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  </span><span class="token property">&quot;mcpEndpoint&quot;</span><span class="token operator" style="color:rgb(137, 221, 255)">:</span><span class="token plain"> </span><span class="token string" style="color:rgb(195, 232, 141)">&quot;https://kanso.example.com/api/v1/mcp&quot;</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(199, 146, 234)">}</span><br></span></code></pre><div class="buttonGroup_vSmX"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_hdcP" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_fi_K"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_c0rF"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>It advertises the URL and nothing else — never the tool list, never auth material.</p>
+<h2 class="anchor anchorWithStickyNavbar_EgYu" id="how-tokens-work">How tokens work<a href="#how-tokens-work" class="hash-link" aria-label="Direct link to How tokens work" title="Direct link to How tokens work">​</a></h2>
+<p>A personal API token is the credential an agent carries. It is not a password, not a service account and not a second identity: it is <strong>you, delegated</strong>, with a narrower blast radius.</p>
+<h3 class="anchor anchorWithStickyNavbar_EgYu" id="shape-and-storage">Shape and storage<a href="#shape-and-storage" class="hash-link" aria-label="Direct link to Shape and storage" title="Direct link to Shape and storage">​</a></h3>
+<p>The wire form is <code>kat_&lt;id&gt;.&lt;secret&gt;</code>:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Part</th><th>Example</th><th>Purpose</th></tr></thead><tbody><tr><td><code>kat_&lt;id&gt;</code></td><td><code>kat_7</code></td><td>Public identity. Appears in listings, logs and the revoke URL. Not secret.</td></tr><tr><td><code>.</code></td><td></td><td>Separator</td></tr><tr><td><code>&lt;secret&gt;</code></td><td>43 characters, base64url</td><td>32 random bytes. Never stored.</td></tr></tbody></table>
+<p>Kanso stores <code>sha256(secret)</code> and nothing else. The <code>kat_&lt;id&gt;</code> prefix makes verification a primary-key lookup plus one constant-time compare.</p>
+<p><strong>The secret is displayed exactly once</strong>, in the response that creates it. No endpoint, log line, error message or database column can give it back — not to you, and not to an administrator with direct database access. Lost it? Revoke it and mint another; that is the intended recovery path.</p>
+<h3 class="anchor anchorWithStickyNavbar_EgYu" id="scope">Scope<a href="#scope" class="hash-link" aria-label="Direct link to Scope" title="Direct link to Scope">​</a></h3>
+<p>Chosen at creation and fixed for life. There is no way to edit a token&#x27;s scope — only to delete it and mint another.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Scope</th><th>Can</th><th>Cannot</th></tr></thead><tbody><tr><td><code>read</code> (default)</td><td>Every <code>GET</code>; the 20 read tools, plus <code>describe_operation</code> and <code>call_operation</code> for any read</td><td>Any <code>POST</code>/<code>PUT</code>/<code>PATCH</code>/<code>DELETE</code>. The 19 write tools are not even listed to it, and <code>call_operation</code> refuses a write with <code>insufficient_scope</code></td></tr><tr><td><code>write</code></td><td>Everything <code>read</code> can, plus creating, updating, commenting, transitioning, linking</td><td>The credential surface (below)</td></tr></tbody></table>
+<p><code>read</code> is the default when you omit <code>scope</code> — deliberately the weaker option. The write tools are invisible to a read token, and calling one anyway is refused <code>403 insufficient_scope</code> before anything is dispatched, with no effect.</p>
+<p>The list is also shaped by the site&#x27;s agent access policy and by your own permissions (see <a href="#what-a-token-cannot-do">What a token cannot do</a>): a tool your account could never call is not listed at all. Under the default Standard policy:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Token</th><th>Tools listed</th></tr></thead><tbody><tr><td>A site admin&#x27;s read token</td><td>22</td></tr><tr><td>A site admin&#x27;s write token</td><td>34 — the seven app, connector and credential writes wait for their switch</td></tr><tr><td>A member&#x27;s read token</td><td>18</td></tr><tr><td>A member&#x27;s write token</td><td>29</td></tr></tbody></table>
+<p>Everything that is listed is callable.</p>
+<h3 class="anchor anchorWithStickyNavbar_EgYu" id="lifetime">Lifetime<a href="#lifetime" class="hash-link" aria-label="Direct link to Lifetime" title="Direct link to Lifetime">​</a></h3>
+<p>Every token expires. There is no &quot;never expires&quot; option and no setting that creates one.</p>
+<ul>
+<li>Default <strong>90 days</strong> (<code>KANSO_TOKEN_DEFAULT_DAYS</code>)</li>
+<li>Maximum <strong>365 days</strong> (<code>KANSO_TOKEN_MAX_DAYS</code>) — an operator can raise the ceiling, not remove it</li>
+<li>Asking for more than the ceiling is <code>422 validation_failed</code>, not a silent clamp</li>
+</ul>
+<p>An expired token, a revoked token and a token whose user was deactivated are <strong>indistinguishable on the wire</strong>: all three answer <code>401 unauthenticated</code> on the next request. Nothing tells an attacker which of the three happened.</p>
+<h3 class="anchor anchorWithStickyNavbar_EgYu" id="what-a-token-cannot-do">What a token cannot do<a href="#what-a-token-cannot-do" class="hash-link" aria-label="Direct link to What a token cannot do" title="Direct link to What a token cannot do">​</a></h3>
+<p>A leaked token must not be able to entrench itself. These endpoints refuse Bearer authentication with <code>403 session_required</code> and need an interactive browser session:</p>
+<ul>
+<li><code>POST /auth/password</code> — it cannot change your password</li>
+<li><code>POST|GET /auth/tokens</code>, <code>PATCH|DELETE /auth/tokens/{id}</code> — it cannot mint a successor, list your other tokens, extend or shorten them, or revoke them</li>
+<li><code>GET /tokens</code>, <code>PATCH|DELETE /tokens/{id}</code> — even a site admin&#x27;s token cannot reach the instance-wide token list or manage other people&#x27;s tokens</li>
+<li><code>GET /auth/sessions</code>, <code>DELETE /auth/sessions/{id}</code> — it cannot see or end your browser sessions</li>
+</ul>
+<p>Separately, every <strong>write</strong> (<code>POST</code>, <code>PUT</code>, <code>PATCH</code>, <code>DELETE</code>) to an operation that installed apps may never call is classified by the <strong>agent access policy</strong>. After the read-only check, one of three things happens to a token:</p>
+<ul>
+<li><strong>Hard — never, under any setting:</strong> <code>403 session_required</code> with a detail at <code>/policy/hard</code>. People, groups, roles, permission and security schemes, resolutions, the importer, the SMTP settings, the policy itself, your own profile (<code>PATCH /myself</code>), your notification preferences, a space&#x27;s publication, and every token or session operation. No preset or switch relaxes these.</li>
+<li><strong>A switch — when the site admin allows it:</strong> the class is off by default and answers <code>403 policy_forbids_token_…</code> (for example <code>policy_forbids_token_app_admin</code>) with a detail at <code>/policy/&lt;switch&gt;</code> saying the value and where it comes from (&quot;off — preset standard&quot;, &quot;off — override (Settings → AI access)&quot;, or &quot;off — set by KANSO_AGENT_…&quot;). The classes are <code>tokenAppAdmin</code> (apps), <code>tokenConnectorAdmin</code> (connectors), <code>tokenCredentialAdmin</code> (stored credentials), <code>tokenConfigAdmin</code> (spaces, workflows, fields, forms, webhooks, export), <code>tokenWaivers</code>, and <code>tokenAttachments</code> — the last one is <strong>on</strong> in every preset. When a switch is on, the handler&#x27;s own permission check still applies: a token never does what its user&#x27;s session could not.</li>
+<li><strong>Admitted — no switch:</strong> a few operations, such as <code>previewForm</code>, <code>materializeRequirementTask</code> and <code>validateApp</code> (a static check), pass like any other write.</li>
+</ul>
+<p><code>describe_operation</code> shows each operation&#x27;s class as <code>agentPolicy</code>.</p>
+<p>A site admin sets the policy under <strong>Settings → AI access</strong> — a preset (<strong>Strict</strong>, <strong>Standard</strong>, the default, or <strong>Open</strong>) plus per-switch overrides — or in the Helm chart&#x27;s <code>agentPolicy</code> block, which then wins over the UI. Every preset keeps every agent↔human path open: issues, comments, questions (guests included), answers, awaits, leases and attachments. Standard adds one rule: nothing a token creates keeps acting after the token is revoked, so apps, connectors, credentials, configuration and waivers are opt-in. Strict also hides the optional MCP tool groups. <code>GET /myself</code> → <code>agentPolicy</code> tells you what your credential meets; <code>GET /settings/agent-policy</code> (site admin) serves the whole catalogue — which operations and MCP tools each switch governs, the hard wall and the presets — so nothing here needs to be memorised.</p>
+<p>Three rules stay hard even under Open, because they depend on what the request says rather than which operation it is: a token never installs or administers a <strong>site-wide</strong> app install (give it a <code>projectKey</code>), never stores a credential by <strong><code>secretRef</code></strong> (it supplies the literal secret), and an install, version move, publish or replay it makes must stay within what its <strong>own user holds</strong> in that space (<code>403 token_install_exceeds_holder</code>, naming the missing permission). Two switches reach app principals too: <code>agentQuestionsToGuests</code> (<code>403 policy_forbids_agent_guest_questions</code>) and <code>leases: enforced</code> (<code>409 policy_lease_enforced</code> on an issue another holder has leased).</p>
+<p>The policy applies to writes only. A token still reads what its scope and the permission engine allow: anyone&#x27;s token reads <code>GET /resolutions</code>, and a site admin&#x27;s token reads <code>GET /settings/smtp</code>. An agent sets an issue&#x27;s resolution through the normal <code>{fields}</code> envelope; it just cannot add a new value to the shared list.</p>
+<p><strong>Attachments.</strong> A user&#x27;s write token may start an upload (<code>POST /issues/{key}/attachments</code>), seal it (<code>POST /attachments/{id}/complete</code>) and delete an attachment (<code>DELETE /attachments/{id}</code>), under the same attachment permissions as the browser, while <code>tokenAttachments</code> is on (it is, in every preset). Installed apps may not upload or delete. A read-only token gets <code>403 insufficient_scope</code>.</p>
+<p><strong>Over MCP</strong> the same classification decides what <code>tools/list</code> shows. A tool whose switch is off, whose group the policy hides, whose write the read-only mode or a read token cannot make, or whose account-level check (<code>manage_apps</code>, <code>manage_connectors</code>, credentials) your own account fails is not listed — and calling it anyway is an HTTP 403 with the same code, before anything is dispatched. What is listed is callable.</p>
+<p>So the worst a stolen token can do is act within its scope until you revoke it. It can never extend its own life or hide its own revocation.</p>
+<p><strong>The two schemes never mix.</strong> If a request carries <code>Authorization: Bearer</code>, the session cookie is ignored for that request. A bad token plus a valid cookie is <code>401</code>, not a quiet fallback to the cookie&#x27;s authority.</p>
+<h3 class="anchor anchorWithStickyNavbar_EgYu" id="revocation-and-rotation">Revocation and rotation<a href="#revocation-and-rotation" class="hash-link" aria-label="Direct link to Revocation and rotation" title="Direct link to Revocation and rotation">​</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Event</th><th>Effect</th></tr></thead><tbody><tr><td><code>DELETE /auth/tokens/{id}</code> (or <strong>Revoke</strong> in the UI)</td><td>Immediate — the token fails on its very next request</td></tr><tr><td><code>PATCH /auth/tokens/{id} {&quot;expiresInDays&quot;: n}</code> (or <strong>Expiry</strong> in the UI)</td><td>The token now expires <code>n</code> days from today (1 to <code>KANSO_TOKEN_MAX_DAYS</code>), sooner or later than before. The secret is unchanged, so the agent keeps working. An expired token cannot be extended — mint a new one</td></tr><tr><td>A site admin revokes or re-times it under <strong>Tokens</strong> (<code>DELETE</code> / <code>PATCH /tokens/{id}</code>)</td><td>Same effects; the admin&#x27;s action is logged, never with the secret. Your other tokens and sessions are untouched</td></tr><tr><td>Someone else&#x27;s token id</td><td><code>404 token_not_found</code>, never <code>403</code> (a 403 would confirm the id exists)</td></tr><tr><td><strong>You change your password</strong></td><td><strong>Every token you own is deleted</strong>, in the same transaction as the password change</td></tr><tr><td>Your account is deactivated</td><td>All your tokens stop working</td></tr></tbody></table>
+<p>The password row surprises people, and it is deliberate: changing your password is the break-glass action, so no credential minted before it survives it. Expect to mint new agent tokens after rotating your password.</p>
+<p><code>lastUsedAt</code> is updated at most once a minute — enough to spot a token that something you forgot about is still using.</p>
+<h3 class="anchor anchorWithStickyNavbar_EgYu" id="rate-ceiling">Rate ceiling<a href="#rate-ceiling" class="hash-link" aria-label="Direct link to Rate ceiling" title="Direct link to Rate ceiling">​</a></h3>
+<p><code>tools/call</code> is capped per credential at <strong>120 calls per rolling minute</strong> (<code>KANSO_MCP_RATE</code>). Over the cap you get <code>429</code> with a <code>Retry-After</code> header that never overstates the wait. Two tokens belonging to the same person have independent ceilings.</p>
+<h3 class="anchor anchorWithStickyNavbar_EgYu" id="doing-it-without-the-ui">Doing it without the UI<a href="#doing-it-without-the-ui" class="hash-link" aria-label="Direct link to Doing it without the UI" title="Direct link to Doing it without the UI">​</a></h3>
+<div class="language-bash codeBlockContainer_CtJl theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_rDtj"><pre tabindex="0" class="prism-code language-bash codeBlock_vSna thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_BawG"><span class="token-line" style="color:#bfc7d5"><span class="token comment" style="color:rgb(105, 112, 152);font-style:italic"># Mint (cookie session required — a token cannot mint a token)</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain"></span><span class="token function" style="color:rgb(130, 170, 255)">curl</span><span class="token plain"> </span><span class="token parameter variable" style="color:rgb(191, 199, 213)">-b</span><span class="token plain"> cookies.txt </span><span class="token parameter variable" style="color:rgb(191, 199, 213)">-X</span><span class="token plain"> POST </span><span class="token string" style="color:rgb(195, 232, 141)">&quot;</span><span class="token string variable" style="color:rgb(191, 199, 213)">$KANSO_URL</span><span class="token string" style="color:rgb(195, 232, 141)">/api/v1/auth/tokens&quot;</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(199, 146, 234)">\</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  </span><span class="token parameter variable" style="color:rgb(191, 199, 213)">-H</span><span class="token plain"> </span><span class="token string" style="color:rgb(195, 232, 141)">&#x27;Content-Type: application/json&#x27;</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(199, 146, 234)">\</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">  </span><span class="token parameter variable" style="color:rgb(191, 199, 213)">-d</span><span class="token plain"> </span><span class="token string" style="color:rgb(195, 232, 141)">&#x27;{&quot;name&quot;: &quot;triage agent&quot;, &quot;scope&quot;: &quot;write&quot;, &quot;expiresInDays&quot;: 30}&#x27;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain"></span><span class="token comment" style="color:rgb(105, 112, 152);font-style:italic"># {&quot;id&quot;:&quot;kat_7&quot;,&quot;name&quot;:&quot;triage agent&quot;,&quot;scope&quot;:&quot;write&quot;,&quot;createdAt&quot;:&quot;...&quot;,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain"></span><span class="token comment" style="color:rgb(105, 112, 152);font-style:italic">#  &quot;expiresAt&quot;:&quot;...&quot;,&quot;lastUsedAt&quot;:null,&quot;nameOnWrites&quot;:true,&quot;token&quot;:&quot;kat_7.&lt;secret&gt;&quot;}   &lt;- once</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain"></span><span class="token function" style="color:rgb(130, 170, 255)">curl</span><span class="token plain"> </span><span class="token parameter variable" style="color:rgb(191, 199, 213)">-b</span><span class="token plain"> cookies.txt </span><span class="token string" style="color:rgb(195, 232, 141)">&quot;</span><span class="token string variable" style="color:rgb(191, 199, 213)">$KANSO_URL</span><span class="token string" style="color:rgb(195, 232, 141)">/api/v1/auth/tokens&quot;</span><span class="token plain">          </span><span class="token comment" style="color:rgb(105, 112, 152);font-style:italic"># list (no secrets)</span><span class="token plain"></span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain"></span><span class="token function" style="color:rgb(130, 170, 255)">curl</span><span class="token plain"> </span><span class="token parameter variable" style="color:rgb(191, 199, 213)">-b</span><span class="token plain"> cookies.txt </span><span class="token parameter variable" style="color:rgb(191, 199, 213)">-X</span><span class="token plain"> DELETE </span><span class="token string" style="color:rgb(195, 232, 141)">&quot;</span><span class="token string variable" style="color:rgb(191, 199, 213)">$KANSO_URL</span><span class="token string" style="color:rgb(195, 232, 141)">/api/v1/auth/tokens/kat_7&quot;</span><span class="token plain">   </span><span class="token comment" style="color:rgb(105, 112, 152);font-style:italic"># 204</span><br></span></code></pre><div class="buttonGroup_vSmX"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_hdcP" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_fi_K"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_c0rF"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<h2 class="anchor anchorWithStickyNavbar_EgYu" id="the-tools">The tools<a href="#the-tools" class="hash-link" aria-label="Direct link to The tools" title="Direct link to The tools">​</a></h2>
+<p>The endpoint carries <strong>41</strong> tools, 22 of them reads. What a given credential is shown depends on its scope, the agent access policy and its own permissions. The instance&#x27;s own <code>tools/list</code> is the authoritative list, and everything it lists is callable.</p>
+<h3 class="anchor anchorWithStickyNavbar_EgYu" id="issues-questions-and-leases">Issues, questions and leases<a href="#issues-questions-and-leases" class="hash-link" aria-label="Direct link to Issues, questions and leases" title="Direct link to Issues, questions and leases">​</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Tool</th><th>Scope</th><th>What it does</th></tr></thead><tbody><tr><td><code>search_issues</code></td><td>read</td><td>JQL search, paged: <code>maxResults</code> (1–100, default 25) per call, then <code>nextPageToken</code> until <code>isLast</code> is true — there is no total. The grammar is served at <code>/api/v1/jql/grammar</code></td></tr><tr><td><code>get_issue</code></td><td>read</td><td>One issue in full: fields, links, the transitions actually available right now, the first 50 children (<code>childrenTruncated</code> says more exist), and the newest 50 comments (<code>commentsTotal</code>, <code>commentsStartAt</code>). A part that cannot be read fails the call; it is never served empty</td></tr><tr><td><code>get_create_form</code></td><td>read</td><td>The server-resolved create form — what a create needs, before attempting one</td></tr><tr><td><code>list_projects</code></td><td>read</td><td>Projects and their keys</td></tr><tr><td><code>await_issue</code></td><td>read</td><td>Block until an issue is <code>resolved</code> or has <code>changed</code> since a version (<code>key</code>, <code>until</code>, <code>timeout</code> 0–60 s, <code>since</code>) — one held request, answered within a second of the commit, or at the deadline with <code>satisfied:false</code>. The body is that of <code>GET /issues/{key}/await</code></td></tr><tr><td><code>get_answer</code></td><td>read</td><td>The committed answer of a resolved issue — the <code>GET /issues/{key}/answer</code> body with its permanent <code>citation</code>; optional <code>version</code> re-reads a cited answer</td></tr><tr><td><code>get_question</code></td><td>read</td><td>One question on an issue, with its answer once answered — the <code>GET /questions/{id}</code> body: the values, typed and in schema order, and the permanent <code>citation</code> <code>KEY/q_&lt;n&gt;</code></td></tr><tr><td><code>await_question</code></td><td>read</td><td>Block until a question is answered, declined or withdrawn (<code>id</code>, <code>timeout</code> 0–60 s) — one held request, <code>{satisfied, question}</code>, answered within a second of the commit or at the deadline with <code>satisfied:false</code>; charged once however long it holds</td></tr><tr><td><code>get_question_group</code></td><td>read</td><td>One question group (<code>qg_&lt;n&gt;</code>): every member question in <code>assignees</code> order with its own state and answer, and a summary counted on that read — the server computes no agreement</td></tr><tr><td><code>await_question_group</code></td><td>read</td><td>Block until every member of a group has ended (<code>id</code>, <code>timeout</code> 0–60 s) — one held request for the whole group, <code>{satisfied, group}</code></td></tr><tr><td><code>list_questions</code></td><td>read</td><td>The issue&#x27;s open and answered questions, oldest first — <code>GET /issues/{key}/questions</code></td></tr><tr><td><code>get_lease</code></td><td>read</td><td>Who holds an issue&#x27;s work lease: <code>holder</code>, <code>holderCredential</code>, <code>ttlSeconds</code>, <code>acquiredAt</code>, <code>expiresAt</code>, plus <code>heldByCaller</code> and <code>callerMayRelease</code> — <code>GET /issues/{key}/lease</code>. Refused <code>lease_not_found</code> when the issue is free</td></tr><tr><td><code>create_issue</code></td><td>write</td><td>Create, including custom <code>cf_n</code> fields. Requires <code>origin</code> (below)</td></tr><tr><td><code>update_issue</code></td><td>write</td><td>Field patch; pass <code>version</code> (from <code>get_issue</code>) to make it conditional on what you read</td></tr><tr><td><code>add_comment</code></td><td>write</td><td>Comment as the token&#x27;s user</td></tr><tr><td><code>transition_issue</code></td><td>write</td><td>Execute a workflow transition by id or name; an optional <code>fields</code> object is forwarded to the transition&#x27;s form, and an optional <code>version</code> makes it conditional on what you read</td></tr><tr><td><code>link_issues</code></td><td>write</td><td>Link two issues by link-type name</td></tr><tr><td><code>ask_question</code></td><td>write</td><td>Ask a question on an issue with its own answer schema (<code>key</code>, <code>prompt</code>, <code>schema</code>; optional <code>detail</code>, <code>context</code>, <code>assignee</code>) → <code>POST /issues/{key}/questions</code>. No field, form, workflow or issue type is involved; the result is the <code>Question</code> with its <code>citation</code>. With <code>assignees</code> (1–20 user ids, instead of <code>assignee</code>) it asks each of them under one group and returns the <code>QuestionGroup</code></td></tr><tr><td><code>claim_issue</code></td><td>write</td><td>Claim an advisory work lease (<code>key</code>, optional <code>ttlSeconds</code> 60–14400, default 900) → <code>POST /issues/{key}/lease</code>. Claiming an issue you already hold renews it</td></tr><tr><td><code>renew_lease</code></td><td>write</td><td>The heartbeat: extend a lease you hold → <code>POST /issues/{key}/lease {renew: true}</code>. It never re-acquires a lease you lost (<code>lease_not_found</code>)</td></tr><tr><td><code>release_issue</code></td><td>write</td><td>Release a lease you hold → <code>DELETE /issues/{key}/lease</code>; returns <code>{issue, released: true}</code></td></tr><tr><td><code>claim_next_issue</code></td><td>write</td><td>Claim ONE free issue matching a JQL query that you may edit (<code>jql</code>, optional <code>ttlSeconds</code>, <code>maxCandidates</code> 1–50, <code>idempotencyKey</code>) → <code>POST /leases/claim-next</code>. The issue comes back as its summary; <code>claimed:false</code> with <code>examined</code> / <code>notPermitted</code> / <code>contended</code> says why nothing was claimed</td></tr><tr><td><code>check_publication</code></td><td>write</td><td>Dry-run the publication gate: scan 1 to 20 texts of a space (<code>project</code>, <code>texts: [{field, text}]</code>, each at most 65,536 characters) against the effective rules → <code>POST /publication/check</code>, writing nothing; answers <code>{publicSpace, findings}</code>. It is a write tool because its REST sibling is a <code>POST</code>, so a read token is not shown it. See <a href="#public-spaces-redact-and-retry">Public spaces: redact and retry</a></td></tr></tbody></table>
+<p><code>get_issue</code>&#x27;s <code>issue</code> and <code>await_issue</code>&#x27;s <code>issue</code> carry the live work lease as <code>issue.lease</code> (null when the issue is free), and every issue summary — in <code>search_issues</code>, <code>create_issue</code>, <code>update_issue</code>, <code>transition_issue</code> and <code>claim_next_issue</code> results — carries a <code>lease</code> line <code>{holder, credential, expiresAt}</code> while someone holds one.</p>
+<p><strong>Every ticket an agent opens says where it came from.</strong> <code>create_issue</code> requires <code>origin</code>: your <code>session</code> (the id of the conversation, job or run you are in — whatever lets a person or another session find it) and a <code>context</code> sentence (what asked for the ticket: the person&#x27;s request, the parent issue, the repository and branch). The tool writes it as the first line of the description — <code>&gt; **Agent origin** — session `&lt;id&gt;` — &lt;context&gt;</code> — above whatever description you gave, so people read it on the ticket and other sessions find it with <code>search_issues</code> and <code>text ~ &quot;&lt;id&gt;&quot;</code>. A call without it is refused <code>origin_required</code> and writes nothing. Nothing is needed on REST: the line is the MCP tool&#x27;s contract.</p>
+<h3 class="anchor anchorWithStickyNavbar_EgYu" id="everything-else-describe_operation-and-call_operation">Everything else: <code>describe_operation</code> and <code>call_operation</code><a href="#everything-else-describe_operation-and-call_operation" class="hash-link" aria-label="Direct link to everything-else-describe_operation-and-call_operation" title="Direct link to everything-else-describe_operation-and-call_operation">​</a></h3>
+<p>The typed tools cover the daily loop. Everything else the API can do — create a space, publish a workflow, bind it, add a field or a form, pause or uninstall an app, bind a connector, set a webhook, export — is reachable through two generic tools that read the API contract itself.</p>
+<ul>
+<li><code>describe_operation</code> lists every operation (filter with <code>search</code> and <code>method</code>) or shows one in full: its parameters, the body schema, the error codes each response names, and <code>callable</code> — whether <strong>your</strong> credential passes the scope, policy and token checks for it right now, and the code it would meet if not.</li>
+<li><code>call_operation</code> performs it: <code>operationId</code>, then <code>path</code> and <code>query</code> parameters by name, a <code>body</code> (an object as JSON, a string verbatim — a YAML app or connector document stays byte-identical), <code>version</code> for If-Match and <code>idempotencyKey</code>. It answers <code>{status, body}</code>; a refusal carries the REST <code>code</code>, <code>message</code> and <code>details</code> in <code>structuredContent</code>, so read codes, not prose.</li>
+</ul>
+<p>There is no way to pass headers, a method or a raw path: the tool can only name what the contract declares, and every call goes through the same checks as REST with your credential. An API token still never reaches people, roles, permission schemes, tokens, the agent policy or the importer, under any setting. The pair is the optional tool group <code>operations</code> (shown under Standard and Open, hidden under Strict). Prefer a typed tool where one exists: <code>get_issue</code> composes four reads and <code>search_issues</code> summarises.</p>
+<h3 class="anchor anchorWithStickyNavbar_EgYu" id="apps-connectors-and-credentials">Apps, connectors and credentials<a href="#apps-connectors-and-credentials" class="hash-link" aria-label="Direct link to Apps, connectors and credentials" title="Direct link to Apps, connectors and credentials">​</a></h3>
+<p>Sixteen tools manage apps, connectors and stored credentials — see <a href="/documentation/kanso/integrate/app-development#through-mcp">App development</a>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Scope</th><th>Tools</th></tr></thead><tbody><tr><td>read</td><td><code>browse_app_library</code>, <code>browse_connector_catalog</code>, <code>get_app_runs</code>, <code>get_app_sdk</code>, <code>get_connector_deliveries</code>, <code>list_apps</code>, <code>list_connectors</code>, <code>list_credentials</code></td></tr><tr><td>write</td><td><code>connect_connector</code>, <code>create_app</code>, <code>dry_run_app</code>, <code>install_app</code>, <code>install_connector</code>, <code>install_library_app</code>, <code>store_credential</code>, <code>validate_app</code></td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_EgYu" id="same-rules-as-rest">Same rules as REST<a href="#same-rules-as-rest" class="hash-link" aria-label="Direct link to Same rules as REST" title="Direct link to Same rules as REST">​</a></h3>
+<p>Every tool runs the same code path as its REST equivalent, with your credential. There is no MCP-only query path and no MCP-only view — so an agent can never see an issue you cannot see, and a workflow guard that refuses your transition refuses the agent&#x27;s with the same reason.</p>
+<p><strong>Every write names the credential that made it.</strong> Each changelog group, comment, worklog, record, question, attachment, waiver and feed row carries a <code>via</code> — <code>{kind, id, name}</code> — beside its author. A token&#x27;s write reads <code>{&quot;kind&quot;:&quot;token&quot;,&quot;id&quot;:&quot;kat_12&quot;,&quot;name&quot;:&quot;ci-agent&quot;}</code> on every transport (<code>/mcp</code> and plain REST), and people see <code>via token &quot;ci-agent&quot;</code> next to it. A session cookie is recorded by the route it was presented to: on <code>/mcp</code> it is <code>session_mcp</code> (people see <code>via MCP session</code>); on any other route it is <code>session</code>, exactly like the browser. Kanso records credentials and routes, never intentions: it cannot tell a person from a program holding the same credential — which is why an agent should hold a token, not a password.</p>
+<p>An agent recognises its own writes without a call: its token&#x27;s <code>via.id</code> is the part of its wire value before the dot (<code>kat_12</code> for <code>kat_12.&lt;secret&gt;</code>), so it compares <code>comment.via.id</code> — or a webhook delivery&#x27;s <code>via.id</code> — with that prefix. Search what any agent did with <code>changedVia = token</code>, or one agent with <code>changedVia = kat_12</code> (see <a href="/documentation/kanso/work/search-jql">Search and JQL</a>).</p>
+<h2 class="anchor anchorWithStickyNavbar_EgYu" id="quick-guide-for-the-agent">Quick guide for the agent<a href="#quick-guide-for-the-agent" class="hash-link" aria-label="Direct link to Quick guide for the agent" title="Direct link to Quick guide for the agent">​</a></h2>
+<p><em>This section is written for the model on the other end of the connection. Paste it into your agent&#x27;s system prompt, or point the agent at this page.</em></p>
+<p>You are talking to <strong>Kanso</strong>, an issue tracker. You are not a bot account — you are acting as a specific human, and every issue you create, comment you post and transition you execute is permanently attributed to them, via this token, by name, in the changelog. Behave accordingly.</p>
+<p><strong>Orient before you act.</strong></p>
+<ol>
+<li><code>list_projects</code> — learn the project keys. Issue keys look like <code>PAY-31</code>.</li>
+<li><code>search_issues</code> with JQL to find work. Start narrow.</li>
+<li><code>get_issue</code> before changing anything — it returns the current state <em>and</em> the transitions that are legal right now.</li>
+</ol>
+<p><strong>Never guess the shape of a create.</strong> Call <code>get_create_form</code> for the target project first. It tells you which fields exist, which are required, and their types, including custom <code>cf_n</code> fields. Kanso projects differ from each other; a create that worked in one project can be invalid in the next. Every <code>create_issue</code> needs <code>origin</code>: your <code>session</code> id and a <code>context</code> sentence saying what asked for the ticket.</p>
+<p><strong>JQL, briefly.</strong> The grammar is served at <code>/api/v1/jql/grammar</code> — read it rather than guessing.</p>
+<div class="codeBlockContainer_CtJl theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_rDtj"><pre tabindex="0" class="prism-code language-text codeBlock_vSna thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_BawG"><span class="token-line" style="color:#bfc7d5"><span class="token plain">project = PAY AND statusCategory = in_progress ORDER BY created DESC</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">assignee = currentUser() AND statusCategory != done</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">labels = ai-triage AND created &gt;= &quot;2026-08-01&quot;</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">text ~ &quot;timeout&quot; AND project IN (PAY, WEB)</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">parent = PAY-10</span><br></span><span class="token-line" style="color:#bfc7d5"><span class="token plain">assignee IS EMPTY</span><br></span></code></pre><div class="buttonGroup_vSmX"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_hdcP" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_fi_K"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_c0rF"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>Three things that trip agents up:</p>
+<ul>
+<li><code>statusCategory</code> is one of <code>todo</code>, <code>in_progress</code>, <code>done</code>. Use it instead of hardcoding status names, which vary per workflow.</li>
+<li><strong>Dates are absolute and quoted.</strong> There are no relative literals — <code>created &gt;= -7d</code> is a syntax error. Compute the date yourself and quote it: <code>created &gt;= &quot;2026-08-01&quot;</code>.</li>
+<li><strong><code>currentUser()</code> is the only function.</strong> Anything else returns <code>unknown function</code>. Bare values are fine for keys, usernames, ids and labels; anything with spaces or punctuation must be quoted.</li>
+</ul>
+<p><strong>Transitions are not status writes.</strong> You cannot set a status field. Call <code>get_issue</code>, read <code>transitions</code>, pick one whose <code>isAvailable</code> is true, then <code>transition_issue</code> with its name or id. If a transition is unavailable the response tells you why — a workflow guard rejected it. That reason is authoritative: do not retry the same transition hoping for a different answer, and do not try to route around it by editing fields.</p>
+<p><strong>Writes are versioned — pass the version you read.</strong> <code>get_issue</code> returns <code>issue.version</code>; send it as <code>version</code> to <code>update_issue</code> and <code>transition_issue</code>. If a human edited the issue since your read, nothing is written and the refusal is <code>stale_version</code>: re-read with <code>get_issue</code> and re-apply your change on top. Without <code>version</code> the tool writes against whatever version is current when it runs, so a human&#x27;s edit made after your read is overwritten for every field you send. Never loop on a conflict without re-reading.</p>
+<p><strong>Read the kinds of failure differently.</strong></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>What you see</th><th>Meaning</th><th>What to do</th></tr></thead><tbody><tr><td>A tool result with <code>isError: true</code></td><td>A <em>domain</em> refusal — validation, a workflow guard, a missing issue</td><td>Read the reason. Adapt or explain to the human. This is normal.</td></tr><tr><td>HTTP <code>403 insufficient_scope</code></td><td>Your token is read-only</td><td>Stop. Do not retry. Tell the human they need to mint a token with write access.</td></tr><tr><td>HTTP <code>401</code></td><td>Your token is expired, revoked, or the account is deactivated</td><td>Stop. Tell the human to mint a new one. Retrying cannot help.</td></tr><tr><td>HTTP <code>429</code></td><td>You exceeded the call ceiling</td><td>Wait for <code>Retry-After</code> seconds, then continue. Reduce your call rate.</td></tr><tr><td>A tool result with <code>isError: true</code> naming <code>secret_detected</code></td><td>Your text would be published in a public space and matches a publication rule</td><td>Redact the named ranges and retry, or ask a person. See <a href="#public-spaces-redact-and-retry">Public spaces: redact and retry</a>.</td></tr></tbody></table>
+<p><strong>Be economical.</strong> <code>get_issue</code> returns comments, links, children and transitions in one call — do not fan out into separate calls for those. It serves the newest 50 comments and the first 50 children: <code>commentsStartAt</code> above 0 means older comments exist, and <code>childrenTruncated</code> means more children exist (list them with <code>search_issues</code> and <code>parent = &lt;key&gt;</code>). <code>search_issues</code> is paged — follow <code>nextPageToken</code> until <code>isLast</code> before you conclude something does not exist. Prefer one well-formed JQL query over many small ones. You have 120 tool calls a minute; a well-behaved agent rarely approaches that.</p>
+<p><strong>Waiting on a human.</strong> When a task needs a person&#x27;s answer, ask it on the issue the work is about with <code>ask_question</code>: the prompt, the items the answer consists of (<code>choice</code>, <code>multi</code>, <code>text</code>, <code>number</code>, <code>yesno</code>, <code>file</code> — each with a label and help text written in the person&#x27;s words), optionally the attachments they should look at (<code>context</code>) and who should answer (<code>assignee</code>, a <code>u_&lt;n&gt;</code>; omit it for anyone who can see the issue). Nothing has to be set up first and nothing outside the question changes.</p>
+<p>Read the result&#x27;s <code>delivery</code> first (each member&#x27;s, when you asked several people with <code>assignees</code>):</p>
+<ul>
+<li><code>assignee_notified</code> — the person can see the issue and the question is in their questions inbox, with a feed entry and mail as their own notification choices and the site&#x27;s mail setup allow (by default a feed entry, and mail where the site can send it). You need not send the link.</li>
+<li><code>assignee_cannot_see</code> — nobody was told, because they cannot see this issue: get them access, or withdraw and ask someone who can.</li>
+<li><code>no_assignee</code> — nobody was named, so nobody was told.</li>
+<li><code>asked_yourself</code> — you asked your own account through a password login, which reaches nobody: ask through an API token.</li>
+</ul>
+<p>When nobody was told, tell the human the link the result implies — <code>/answer/q_&lt;n&gt;</code>. Then call <code>await_question</code> with a <code>timeout</code> up to 60: one call per minute of waiting, not a poll loop with <code>get_question</code>. <code>satisfied: false</code> at the deadline is normal: call again. <code>satisfied: true</code> with <code>state: &quot;withdrawn&quot;</code> means the asker took it back; <code>state: &quot;declined&quot;</code> means the person could not answer, and <code>declineReason</code> says why. When it is answered, <code>get_question</code> returns the values, typed and in schema order, with a <code>citation</code> (<code>KEY/q_&lt;n&gt;</code>); keep that string wherever you use the answer — it re-reads the same answer forever. Do not ask twice for the same thing: <code>list_questions</code> on the issue shows what is already open or answered. There is no tool to answer a question — that half belongs to the person. (The other shape, an issue that resolves through a transition form, is <code>create_issue</code> → <code>await_issue</code> with <code>until: &quot;resolved&quot;</code> → <code>get_answer</code>; it works where a workflow already has such a form.) The <a href="/documentation/kanso/agents/human-answers">human answers guide</a> has the full loop. Holds are capped per credential (8 by default; issue and question holds count together): an <code>await_limit</code> refusal carries a <code>Retry-After</code> — wait it out, do not open more.</p>
+<p><strong>Working in a fleet: claim before you work.</strong> When several agents take work from the same queue, a lease says &quot;I am working on this, until then&quot; — to the other agents and to the people watching the board, where it shows on the card. It is advisory: it stops other <em>claimers</em>, never other writers (unless the site admin enforces leases). The loop:</p>
+<ol>
+<li><code>claim_next_issue</code> with the queue&#x27;s JQL and an <code>ORDER BY</code> (the default is newest first). It claims ONE free issue you may edit, or answers <code>claimed: false</code>. That is a normal answer, and the counts say why: <code>examined: 0, notPermitted: 0</code> is no free matching work; <code>notPermitted &gt; 0</code> is free work you may not edit; <code>contended &gt; 0</code> is others were faster — call again. Pass an <code>idempotencyKey</code> so a retried call returns the same lease instead of claiming a second issue. (To claim one specific issue, use <code>claim_issue</code>.)</li>
+<li>While you work, <code>renew_lease</code> at least every third of the TTL (a 900 s lease: every 5 minutes). It never re-acquires a lease you lost.</li>
+<li><strong>How you hear &quot;stop&quot;.</strong> A person can call off their own agent from the browser (a <em>recall</em>), and a space admin can force a lease off. Neither moves the issue&#x27;s version, so <code>await_issue</code> does not wake on it — you hear it at your next <code>renew_lease</code>, which answers <code>lease_not_found</code>. Stop working, re-read the issue with <code>get_issue</code>, and claim it again only if it is still yours to do. (A system that must hear it within a second subscribes a webhook to <code>issue.lease_released</code>.)</li>
+<li><code>release_issue</code> as soon as you are done, so the next agent can take it.</li>
+</ol>
+<p><strong>The holder is the credential, not the account.</strong> Two tokens of one account exclude each other exactly as two accounts do: give each agent its own token. A refusal that says <em>your own account</em> means another of your own credentials holds the issue — a sibling token, or a browser session. A pool of agents that SHARES one token is one holder.</p>
+<p><strong>Public spaces: check before you paste.</strong> Every issue carries <code>publiclyReadable</code>. When it is true, what you write there is readable by anyone on the internet, and the server scans it for secrets first. Never paste a credential, a token or a private hostname into such an issue; when you quote logs or configuration, run them through <code>check_publication</code> first. A <code>secret_detected</code> refusal changed nothing: redact the ranges it names and retry, or ask a person (<a href="#public-spaces-redact-and-retry">details</a>).</p>
+<p><strong>Prefer commenting over acting</strong> when you are unsure. A comment is cheap, visible, reversible, and reads naturally to the human reviewing it. A wrong transition on someone&#x27;s board is none of those things.</p>
+<p><strong>Say what you did.</strong> When you finish a batch of changes, tell the human the issue keys you touched and what changed on each. They can see it in the changelog, but they should not have to go looking.</p>
+<h2 class="anchor anchorWithStickyNavbar_EgYu" id="public-spaces-redact-and-retry">Public spaces: redact and retry<a href="#public-spaces-redact-and-retry" class="hash-link" aria-label="Direct link to Public spaces: redact and retry" title="Direct link to Public spaces: redact and retry">​</a></h2>
+<p>A site admin can <a href="/documentation/kanso/run/users-and-auth#public-spaces">make a space public</a>: its issues without a security level are readable by anyone, without an account. Text written into such an issue — and into a public space&#x27;s versions, components, sprints, board, hierarchy levels and name — is scanned for secrets <strong>before</strong> it is written. The rules are known credential formats (cloud and forge tokens, private-key headers, JWTs, <code>user:password@</code> URLs, <code>password=…</code> assignments, Kanso&#x27;s own <code>kat_</code> tokens) plus the private terms and patterns a site admin adds.</p>
+<p><strong>What an agent sees first.</strong> Every issue body carries <code>publiclyReadable</code>: true when its space is public and it has no security level — exactly what the scan treats as published. Writes into a private space, or into an issue with a security level, are never scanned.</p>
+<p><strong>The refusal.</strong> A scanned write whose text matches is refused <code>422 secret_detected</code>, and nothing is written — no row, no event, no gap in issue numbers. On <code>/mcp</code> it is an in-band tool error. The text names the code and, per finding, the rule, the field (for example <code>/body</code> or <code>/fields/description</code>) and the code-point range:</p>
+<div class="codeBlockContainer_CtJl theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_rDtj"><pre tabindex="0" class="prism-code language-text codeBlock_vSna thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_BawG"><span class="token-line" style="color:#bfc7d5"><span class="token plain">secret_detected: this text would be published in a public space and matches 1 publication rule — aws-access-key-id at /body, characters 4–24. Redact the text at these ranges and retry, or ask a person.</span><br></span></code></pre><div class="buttonGroup_vSmX"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_hdcP" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_fi_K"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_c0rF"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>The result&#x27;s <code>structuredContent</code> is the REST error body, with the <code>publication</code> member: <code>{acknowledgeable, findings: [{rule, description, field, start, end, fingerprint}]}</code>. No response, error, log line or event ever carries the matched text, and a finding of an administrator&#x27;s own rule says no more than &quot;A private term or pattern set by your administrator&quot;.</p>
+<p><strong>What to do.</strong> Redact the named ranges (<code>[redacted]</code> is fine) and retry the same call. If the text must be published as written, stop and ask a person. An agent credential — an API token on REST or <code>/mcp</code>, or an app — can never acknowledge a finding; a person signed in through the browser can (the <strong>Publish anyway</strong> action), and that act is attributed, evented (<code>publication.acknowledged</code>) and logged. A person&#x27;s session on <code>/mcp</code> cannot acknowledge either: <code>/mcp</code> forwards no acknowledgement.</p>
+<p><strong>Pre-check with <code>check_publication</code>.</strong> Pass the space key and the texts you are about to write — 1 to 20, each at most 65,536 characters — each with the <code>field</code> it would go in. It applies the same rules whether or not the space is public, writes nothing, and answers <code>{publicSpace, findings}</code>. A call that large is admitted although every other <code>/mcp</code> request is held to the 1 MiB body cap. Its fingerprints are informational: an acknowledgement uses the fingerprints of the write&#x27;s own refusal.</p>
+<p>The scan is a seatbelt, not a guarantee: it catches known formats and listed terms, not a secret described in prose, an encoded or split value, or one inside an image. Do not rely on it to decide what is safe to publish.</p>
+<h2 class="anchor anchorWithStickyNavbar_EgYu" id="operator-settings">Operator settings<a href="#operator-settings" class="hash-link" aria-label="Direct link to Operator settings" title="Direct link to Operator settings">​</a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Variable</th><th>Default</th><th>Effect</th></tr></thead><tbody><tr><td><code>KANSO_MCP_ENABLED</code></td><td><code>true</code></td><td><code>false</code> removes the endpoint entirely — it 404s like any unknown path, with no hint the feature exists</td></tr><tr><td><code>KANSO_MCP_RATE</code></td><td><code>120</code></td><td><code>tools/call</code> per rolling minute, per credential</td></tr><tr><td><code>KANSO_TOKEN_DEFAULT_DAYS</code></td><td><code>90</code></td><td>Lifetime when the caller does not ask for one</td></tr><tr><td><code>KANSO_TOKEN_MAX_DAYS</code></td><td><code>365</code></td><td>Ceiling on any requested lifetime</td></tr><tr><td><code>KANSO_AWAIT_MAX_PER_CREDENTIAL</code></td><td><code>8</code></td><td>Concurrent held awaits per credential — issue holds and question holds count together. <code>0</code> admits no hold, while instant checks (<code>timeout=0</code>) keep working; an invalid value keeps the default with a logged warning</td></tr><tr><td><code>KANSO_AWAIT_MAX_PER_USER</code></td><td><code>16</code></td><td>Concurrent held awaits per user, across all of that user&#x27;s credentials</td></tr><tr><td><code>KANSO_AWAIT_MAX_GLOBAL</code></td><td><code>256</code></td><td>Concurrent held awaits per <strong>process</strong> — every web and worker replica counts its own. Size it against the database pool (a hold issues up to four narrow point reads per second)</td></tr></tbody></table>
+<p>In the Helm chart these keep their defaults; override them through <code>extraEnv</code>. The chart never mints or stores a token — tokens belong to people, not to releases.</p>
+<p>The transport is deliberately minimal: POST only, JSON only, stateless. No SSE, no <code>Mcp-Session-Id</code>, no JSON-RPC batching (an array body is refused <code>-32600</code>). Authentication is resolved <em>before</em> the request body is parsed, so there is no anonymous handshake that reveals the tool catalogue.</p>
+<h2 class="anchor anchorWithStickyNavbar_EgYu" id="troubleshooting">Troubleshooting<a href="#troubleshooting" class="hash-link" aria-label="Direct link to Troubleshooting" title="Direct link to Troubleshooting">​</a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Symptom</th><th>Cause</th></tr></thead><tbody><tr><td><code>401</code> with a token you just made</td><td>You copied the display value including surrounding quotes, or only the <code>kat_7</code> part — the secret after the dot is required</td></tr><tr><td><code>401</code> on a token that worked yesterday</td><td>Expired, revoked, or someone changed the owner&#x27;s password (which revokes every token)</td></tr><tr><td><code>403 session_required</code></td><td>You pointed a token at <code>/auth/password</code>, <code>/auth/tokens*</code> or <code>/auth/sessions*</code>, or made a write the policy classifies as hard (people, groups, roles, schemes, resolutions, the importer, settings, <code>PATCH /myself</code>), or asked for a site-wide app install or a <code>secretRef</code>. Those need a browser session, by design — the detail at <code>/policy/hard</code> says so</td></tr><tr><td><code>403 policy_forbids_token_…</code></td><td>The write&#x27;s class is off under the agent access policy. The detail at <code>/policy/&lt;switch&gt;</code> names the switch and its source; a site admin can turn it on under <strong>Settings → AI access</strong> (or in the chart&#x27;s <code>agentPolicy</code> block)</td></tr><tr><td><code>403 policy_mcp_off</code> / <code>policy_mcp_read_only</code> / <code>policy_mcp_tool_group_hidden</code></td><td>The site admin turned the MCP endpoint off, made it read-only, or hid the app, connector or operations tool groups. REST with a token still works</td></tr><tr><td><code>403 token_install_exceeds_holder</code></td><td>Your token tried to give an app authority its own user does not hold in that space. The details name each missing permission</td></tr><tr><td><code>409 policy_lease_enforced</code></td><td>Leases are enforced here and another holder has leased the issue. Claim it, or wait for the lease to end</td></tr><tr><td><code>403 insufficient_scope</code></td><td>A read-only token attempted a write. Mint one with write scope</td></tr><tr><td><code>secret_detected</code> on a write</td><td>The issue is <code>publiclyReadable</code> and the text matches a publication rule. Redact the named ranges and retry, or ask a person — an agent credential cannot acknowledge</td></tr><tr><td><code>403 origin_forbidden</code></td><td>A browser sent a cross-origin request. Non-browser clients send no <code>Origin</code> and are unaffected</td></tr><tr><td><code>404</code> on <code>/api/v1/mcp</code></td><td>The operator set <code>KANSO_MCP_ENABLED=false</code>, or the URL is missing the <code>/api/v1</code> prefix</td></tr><tr><td><code>405</code></td><td>You used <code>GET</code>. The endpoint is POST-only</td></tr><tr><td>Client shows no tools, or fewer than expected</td><td>Read-only tokens legitimately see only the reads; the agent access policy may hide the optional tool groups (Strict) or every write (read-only mode), and tools your account could never call are not listed. Otherwise check the header is <code>Authorization: Bearer &lt;token&gt;</code></td></tr><tr><td><code>issue_leased</code> naming <em>your own account</em></td><td>Another of your credentials (a sibling token, or a browser session) holds the issue — wait until the <code>expiresAt</code> it names, or release it from a browser session of the account</td></tr><tr><td><code>renew_lease</code> answers <code>lease_not_found</code></td><td>Your lease ended — it expired, or a person recalled it or a space admin forced it. Re-read the issue before claiming it again</td></tr><tr><td><code>await_issue</code> or <code>await_question</code> returns a transport error or a <code>504</code> with no Kanso body</td><td>A proxy in front of Kanso cut the hold: a 60 s hold needs a proxy read timeout of at least 90 s (ingress-nginx defaults to 60 — see <a href="/documentation/kanso/run/install">Install</a>); a rollout also drops held connections. The call is idempotent and wrote nothing — issue it again</td></tr></tbody></table></div></article><nav class="pagination-nav docusaurus-mt-lg" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/documentation/kanso/agents/accountability"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Accountability</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/documentation/kanso/work/projects-issues-fields"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Projects, issues and fields</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_KXJu thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#connect-in-one-command" class="table-of-contents__link toc-highlight">Connect in one command</a></li><li><a href="#how-tokens-work" class="table-of-contents__link toc-highlight">How tokens work</a><ul><li><a href="#shape-and-storage" class="table-of-contents__link toc-highlight">Shape and storage</a></li><li><a href="#scope" class="table-of-contents__link toc-highlight">Scope</a></li><li><a href="#lifetime" class="table-of-contents__link toc-highlight">Lifetime</a></li><li><a href="#what-a-token-cannot-do" class="table-of-contents__link toc-highlight">What a token cannot do</a></li><li><a href="#revocation-and-rotation" class="table-of-contents__link toc-highlight">Revocation and rotation</a></li><li><a href="#rate-ceiling" class="table-of-contents__link toc-highlight">Rate ceiling</a></li><li><a href="#doing-it-without-the-ui" class="table-of-contents__link toc-highlight">Doing it without the UI</a></li></ul></li><li><a href="#the-tools" class="table-of-contents__link toc-highlight">The tools</a><ul><li><a href="#issues-questions-and-leases" class="table-of-contents__link toc-highlight">Issues, questions and leases</a></li><li><a href="#everything-else-describe_operation-and-call_operation" class="table-of-contents__link toc-highlight">Everything else: <code>describe_operation</code> and <code>call_operation</code></a></li><li><a href="#apps-connectors-and-credentials" class="table-of-contents__link toc-highlight">Apps, connectors and credentials</a></li><li><a href="#same-rules-as-rest" class="table-of-contents__link toc-highlight">Same rules as REST</a></li></ul></li><li><a href="#quick-guide-for-the-agent" class="table-of-contents__link toc-highlight">Quick guide for the agent</a></li><li><a href="#public-spaces-redact-and-retry" class="table-of-contents__link toc-highlight">Public spaces: redact and retry</a></li><li><a href="#operator-settings" class="table-of-contents__link toc-highlight">Operator settings</a></li><li><a href="#troubleshooting" class="table-of-contents__link toc-highlight">Troubleshooting</a></li></ul></div></div></div></div></main></div></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="col footer__col"><div class="footer__title">Start</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/documentation/docs">What Stacktic is</a></li><li class="footer__item"><a class="footer__link-item" href="/documentation/docs/how-it-works">How it works</a></li><li class="footer__item"><a class="footer__link-item" href="/documentation/docs/mcp/quickstart">Start with MCP</a></li></ul></div><div class="col footer__col"><div class="footer__title">Automation</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/documentation/docs/platform">The platform</a></li><li class="footer__item"><a class="footer__link-item" href="/documentation/docs/day0">Day 0–1 — design &amp; generate</a></li><li class="footer__item"><a class="footer__link-item" href="/documentation/docs/day2">Day 2 — operate</a></li><li class="footer__item"><a class="footer__link-item" href="/documentation/docs/compliance">Compliance</a></li></ul></div><div class="col footer__col"><div class="footer__title">Reference</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/documentation/docs/reference/components">Component catalog</a></li><li class="footer__item"><a class="footer__link-item" href="/documentation/docs/reference/links">Link types</a></li><li class="footer__item"><a class="footer__link-item" href="/documentation/docs/reference/api">Platform API</a></li></ul></div><div class="col footer__col"><div class="footer__title">Kanso</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/documentation/kanso">What Kanso is</a></li><li class="footer__item"><a class="footer__link-item" href="/documentation/kanso/agents/connect">Connect an agent</a></li><li class="footer__item"><a class="footer__link-item" href="/documentation/kanso/run/install">Install</a></li></ul></div></div><div class="footer__bottom text--center"><div class="footer__copyright">Stacktic · 2026</div></div></div></footer></div>
+</body>
+</html>

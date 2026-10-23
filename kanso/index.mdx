@@ -4,11 +4,22 @@ title: What Kanso is
 description: Kanso is a work-management system where AI agents and people work the same backlog, through the same API, under the same permissions, in one history.
 ---
 
-<Hero eyebrow="Kanso" title={<>One backlog.<br/>Agents and people, on the same record.</>}>
-Kanso is a work-management system built for autonomous AI development. Your agents and
-your team work the same backlog, through the same API, under the same permissions. Every
-action, by a person or an agent, lands attributed in one history.
-</Hero>
+<KHero kicker="Kanso · one backlog for agents and people" title={<>The ticketing system for <span className="k-accent">autonomous AI development.</span></>}>
+Agent sessions work one backlog in parallel. Each one claims a ticket and does the work. When
+it needs a decision, it asks a named person a typed question on the ticket, waits, and
+carries on with the answer. One Helm command, on your own cluster, with any model.
+</KHero>
+
+<Chips>
+  <Chip kind="live"><b>helm install kanso</b> · one command</Chip>
+  <Chip kind="live">release <b>0.77</b> · chart 1.28.0</Chip>
+  <Chip kind="fly"><b>next release</b> · operator tickets · agent sessions · token budgets</Chip>
+  <Chip>no model inside · any MCP client</Chip>
+</Chips>
+
+<Thesis seal="簡">
+<b>Agents do the work. People make the calls.</b>{' '}<span className="k-accent">The ticket holds both.</span>
+</Thesis>
 
 Once AI agents start working alongside a team, three questions decide whether you can trust
 their work. **Who did this? Under whose authority? Who signed it off?** Kanso is built so
@@ -101,6 +112,20 @@ that every write answers all three, whether a person or an agent made it.
   <Card to="/kanso/migrate/jira-migration" kicker="Move from Jira" title="Assess first, then import">
     A read-only dry run tells you what will and will not carry over before anything is
     written.
+  </Card>
+</Cards>
+
+## New in the next release
+
+<Cards cols={2}>
+  <Card to="/kanso/ops/operator-tickets" kicker="Operations · next release" title="From an alert to an agent on the case">
+    Your alerting opens exactly one ticket per problem. An agent claims it and investigates in
+    a session you can see and pause. A person makes the calls, and a problem that comes back
+    opens a new ticket linked to the old one.
+  </Card>
+  <Card to="/kanso/agents/token-economy" kicker="Cost · next release" title="Spend fewer tokens, know what each ticket cost">
+    A 17-tool worker set, children read as summaries (−83% on a 25-child epic), answers you
+    can search instead of asking twice, and per-ticket budgets agents respect.
   </Card>
 </Cards>
 

@@ -1,0 +1,201 @@
+---
+title: Token economy
+description: How Kanso keeps what an agent reads small, which settings tune it, and how per-ticket usage and budgets show and limit what agent work costs.
+---
+
+<KHero kicker="Agents · cost" title={<>Spend fewer tokens. <span className="k-accent">Know what each ticket cost.</span></>}>
+An agent pays for everything it reads: the tool list, the ticket, the waiting. Kanso keeps all
+three small, and lets the agent's harness report what each ticket actually cost, so a person
+can set a budget the agents respect.
+</KHero>
+
+<Status>
+  <Chip kind="live"><b>shipped</b> · 0.77</Chip>
+  <Chip kind="fly"><b>next release</b> · worker tool set, child summaries, answer search, usage and budgets, wake on answer</Chip>
+  <Chip kind="designed">in development · wait strategy</Chip>
+</Status>
+
+<Figure caption="Measured on the current build, from a member's write token. Left: the MCP tool list a client loads, full set against the worker set. Right: one get_issue on an epic with 25 children, children as full tickets against children as summaries. Each panel has its own scale.">
+<svg viewBox="0 0 900 260" role="img" aria-label="Two measurements. Tool list: 33,110 characters for the full set of 31 tools, 21,204 for the worker set of 17 tools, 36 percent less. An epic with 25 children: 35,102 characters as full tickets, 5,835 as summaries, 83 percent less.">
+  <text x="16" y="34" fontSize="13" fill="var(--k-ink)" fontFamily="Avenir Next, Futura, system-ui, sans-serif" fontWeight="600">The tool list</text>
+  <text x="16" y="52" fontSize="10.5" fill="var(--k-ink-soft)" fontFamily="ui-monospace, Menlo, monospace">tools/list, characters</text>
+  <rect x="16" y="68" width="300" height="26" rx="3" fill="var(--k-bar-before)"><title>Full set: 31 tools, 33,110 characters</title></rect>
+  <text x="324" y="86" fontSize="11" fill="var(--k-ink)" fontFamily="ui-monospace, Menlo, monospace">33,110</text>
+  <rect x="16" y="100" width="192" height="26" rx="3" fill="var(--k-bar-after)"><title>Worker set: 17 tools, 21,204 characters</title></rect>
+  <text x="216" y="118" fontSize="11" fill="var(--k-ink)" fontFamily="ui-monospace, Menlo, monospace">21,204</text>
+  <text x="16" y="160" fontSize="30" fill="var(--k-ink)" fontFamily="Avenir Next, Futura, system-ui, sans-serif" fontWeight="600">−36%</text>
+  <text x="16" y="182" fontSize="10.5" fill="var(--k-ink-soft)" fontFamily="ui-monospace, Menlo, monospace">31 tools → 17 tools</text>
+
+  <line x1="452" y1="20" x2="452" y2="200" stroke="var(--k-rule)" strokeWidth="1" />
+
+  <text x="484" y="34" fontSize="13" fill="var(--k-ink)" fontFamily="Avenir Next, Futura, system-ui, sans-serif" fontWeight="600">An epic with 25 children</text>
+  <text x="484" y="52" fontSize="10.5" fill="var(--k-ink-soft)" fontFamily="ui-monospace, Menlo, monospace">the children in get_issue, characters</text>
+  <rect x="484" y="68" width="300" height="26" rx="3" fill="var(--k-bar-before)"><title>Children as full tickets: 35,102 characters</title></rect>
+  <text x="792" y="86" fontSize="11" fill="var(--k-ink)" fontFamily="ui-monospace, Menlo, monospace">35,102</text>
+  <rect x="484" y="100" width="50" height="26" rx="3" fill="var(--k-bar-after)"><title>Children as summaries: 5,835 characters</title></rect>
+  <text x="542" y="118" fontSize="11" fill="var(--k-ink)" fontFamily="ui-monospace, Menlo, monospace">5,835</text>
+  <text x="484" y="160" fontSize="30" fill="var(--k-ink)" fontFamily="Avenir Next, Futura, system-ui, sans-serif" fontWeight="600">−83%</text>
+  <text x="484" y="182" fontSize="10.5" fill="var(--k-ink-soft)" fontFamily="ui-monospace, Menlo, monospace">full tickets → summaries</text>
+
+  <rect x="16" y="226" width="12" height="12" rx="2" fill="var(--k-bar-before)" />
+  <text x="34" y="236" fontSize="11" fill="var(--k-ink-mid)" fontFamily="Avenir Next, Futura, system-ui, sans-serif">Without: the full tool set, children as full tickets</text>
+  <rect x="452" y="226" width="12" height="12" rx="2" fill="var(--k-bar-after)" />
+  <text x="470" y="236" fontSize="11" fill="var(--k-ink-mid)" fontFamily="Avenir Next, Futura, system-ui, sans-serif">With Kanso: the worker set, children as summaries</text>
+</svg>
+</Figure>
+
+| Measurement | Without | With Kanso | Change | Where it comes from |
+|---|---|---|---|---|
+| MCP tool list, a member's write token | 33,110 chars, 31 tools | 21,204 chars, 17 tools | −36% | Measured on the current build |
+| An epic with 25 children, as `get_issue` returns them | 35,102 chars | 5,835 chars | −83% | Measured on the current build |
+| An epic with 25 children, on Kanso's own development board | 71,818 chars | 9,982 chars | −87% | Kanso team: the real board, with the summary size projected from the same data |
+| MCP tool list, a site admin with every group shown, against the worker set | 32,433 chars | about 16,500 chars | −49% | Kanso team, summed from per-tool sizes |
+
+## What already saves tokens
+
+<Chips>
+  <Chip kind="live"><b>shipped</b> · 0.77</Chip>
+</Chips>
+
+- **One call reads a whole ticket.** `get_issue` returns the ticket with the transitions
+  available right now, its links, its first 50 children and its newest 50 comments, in one
+  call. An agent does not fan out into five reads.
+- **Search returns summaries, a page at a time.** `search_issues` returns summary rows,
+  `maxResults` from 1 to 100 (default 25), and a `nextPageToken` until `isLast`.
+- **Waiting is one held request, not a poll loop.** `await_question` and `await_issue` hold
+  for up to 60 seconds and answer within a second of the change. Calling `get_question`
+  every few seconds instead burns a model turn each time.
+- **Fewer tools, smaller context.** The client loads the whole tool list into the model's
+  context. A read-only token sees only the read tools, and the agent access policy can hide
+  the optional groups. The Strict preset hides all of them.
+
+## Next release: four more
+
+<Chips>
+  <Chip kind="fly"><b>next release</b></Chip>
+</Chips>
+
+### The worker tool set
+
+Connect with `?profile=worker` on the MCP URL, and the agent gets the 17 tools it needs to
+work tickets: search, read, claim, update, transition, comment, file, link, ask and wait. The
+**Connect an agent** dialog offers it as the default **Tool set**.
+
+```bash
+claude mcp add --transport http "https://kanso.example.com/api/v1/mcp?profile=worker" \
+  --header "Authorization: Bearer kat_1.<secret>"
+```
+
+A profile only narrows what the token could already do. It never grants anything. A tool
+outside the profile is refused with a message that says how to get it:
+
+```
+mcp_tool_not_in_profile: the list_projects tool is not in the MCP tool profile "worker" this
+connection asked for (?profile=worker); connect without ?profile, or with ?profile=full …
+```
+
+### Children as summaries
+
+`get_issue` now returns each child as a summary: key, summary, type and status, plus
+assignee, parent, labels, priority, resolution and lease when they are set. There is nothing to configure. An epic with 25
+children cost 35,102 characters of children before, and 5,835 now.
+
+```json
+{ "key": "OPS-4", "summary": "Checkout follow-up 1: harden the payment client retry path",
+  "type": "Task", "status": "To Do", "statusCategory": "todo",
+  "parent": "OPS-3", "priority": "Medium", "labels": ["checkout", "reliability"] }
+```
+
+### Ask once: search past answers
+
+Before an agent asks a person, it can check whether someone already answered.
+`search_answers` searches answered questions by text, space, ticket, who asked, who answered,
+state and date, and returns each answer with its citation:
+
+```
+search_answers  text: "roll back"   →   OPS-1/q_1 · Lee Lead · { "rollback": true }
+```
+
+Kanso's team measured the old way of finding a past decision at 126 calls and 90,199
+characters for a single lookup. It is now one call.
+
+### Wake instead of wait
+
+An agent that asks a question can name a **wake target** (`wake: "<target>"` on
+`ask_question`) and exit instead of holding. When the person answers, Kanso rings the target,
+an app such as `wake-http` that starts your runner, and a new run of your agent continues
+from the ticket. A site admin registers the targets on the **Wake targets** screen.
+
+## Know what each ticket cost
+
+<Chips>
+  <Chip kind="fly"><b>next release</b></Chip>
+</Chips>
+
+Kanso does not count tokens. Only the agent's harness can. The harness **reports** what a
+run spent on a ticket, and Kanso keeps it as data next to the work:
+
+```bash
+curl -X POST "$KANSO_URL/api/v1/issues/OPS-2/usage" \
+  -H "Authorization: Bearer $KANSO_TOKEN" -H 'Idempotency-Key: run-1' \
+  -H 'Content-Type: application/json' \
+  -d '{"inputTokens": 182000, "outputTokens": 9400,
+       "cacheReadTokens": 150000, "cacheWriteTokens": 21000,
+       "costMicros": 812000, "model": "claude-sonnet", "source": "claude-code",
+       "harnessSession": "inc-2026-10-22-checkout"}'
+```
+
+The ticket now shows **Agent usage**: 362,400 tokens and $0.81 across one run. Usage
+reported after a ticket went back to a status it had left counts as **rework**. The **Usage**
+report, `GET /api/v1/reports/usage`, groups spend by ticket, parent, label, model, session,
+person, credential, source, status or day, over up to 92 days.
+
+### A budget the agents respect
+
+A person sets a token budget, a cost budget, or both, on a ticket. Only a signed-in person
+can: a token is refused with `session_required`. Once reported usage reaches the budget,
+agents stop picking the ticket up:
+
+```
+budget_exceeded: the agent budget of OPS-2 is spent (set by sam) — stop, release the issue
+and ask sam to raise it — /agentBudget/tokens: used 362400 of 150000
+```
+
+`claim_next_issue` skips tickets over budget and counts them in `overBudget`. The budget
+never blocks comments, questions, transitions or further usage reports, and it never blocks
+a person. It is a brake for well-behaved agents, not a security control. The access policy
+and the token are the security controls.
+
+## In development: the wait strategy
+
+<Chips>
+  <Chip kind="designed">in development</Chip>
+</Chips>
+
+The next step lets a space choose **how** an agent waits for a person: hold briefly, resume
+the same conversation when the answer comes, or start fresh from the ticket's handoff.
+Kanso's design compares the three with plain arithmetic. These are estimates, not
+measurements. They assume a 100,000-token conversation, an answer three hours later,
+published cache ratios (cached read 0.1×, cache write 1.25×, a 5-minute cache) and a
+15,000-token fresh read:
+
+| Way of waiting | Arithmetic | Input-token equivalents |
+|---|---|---|
+| Hold, once a minute for three hours | 180 × 100,000 × 0.1 | 1,800,000 |
+| Resume the conversation | 100,000 × 1.25 | 125,000 |
+| Start fresh from the handoff | 15,000 × 1.25 | 18,750 |
+
+## Tuning reference
+
+| Setting | Where | Default | Effect | Status |
+|---|---|---|---|---|
+| Token scope | **Connect an agent** | `read` | A read token sees only the read tools | shipped |
+| Optional tool groups | **Settings → AI access**, `KANSO_AGENT_MCP_TOOL_GROUPS`, chart `agentPolicy` | Standard: apps, connectors, operations | Hides groups from every token's tool list | shipped |
+| `maxResults` | `search_issues` | 25 (1–100) | Rows per page | shipped |
+| `timeout` | `await_question`, `await_issue` | 30 s (0–60) | How long one held call waits | shipped |
+| `KANSO_MCP_RATE` | Environment | 120 | Tool calls per minute, per credential | shipped |
+| `KANSO_AWAIT_MAX_PER_CREDENTIAL` | Environment | 8 | Held waits at once, per credential | shipped |
+| `?profile=worker` | MCP URL | `full` | The 17-tool worker set | next release |
+| `maxResults` | `search_answers` | 10 (1–50) | Answers per page | next release |
+| Agent budget | On the ticket, by a person | none | Agents stop claiming at the budget | next release |
+| Wake targets | **Wake targets** screen | none | Wake a runner on an answer, instead of holding | next release |

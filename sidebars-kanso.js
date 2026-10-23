@@ -18,9 +18,18 @@ module.exports = {
         { type: 'doc', id: 'agents/quickstart', label: 'Your first agent' },
         { type: 'doc', id: 'agents/fleets', label: 'Fleets and leases' },
         { type: 'doc', id: 'agents/human-answers', label: 'Human answers' },
+        { type: 'doc', id: 'agents/token-economy', label: 'Token economy' },
         { type: 'doc', id: 'agents/governance', label: 'Governing agents' },
         { type: 'doc', id: 'agents/accountability', label: 'Accountability' },
         { type: 'doc', id: 'agents/connect', label: 'MCP reference' },
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Operations',
+      collapsed: false,
+      items: [
+        { type: 'doc', id: 'ops/operator-tickets', label: 'Operator tickets' },
       ],
     },
     {

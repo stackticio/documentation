@@ -1,0 +1,369 @@
+/* ============================================================================
+   Kanso — the product's own look, from its one-pager (kanso/one-pager.html):
+   white paper, sumi ink, 和色 accents. Scoped to the Kanso docs instance
+   (Docusaurus puts plugin-id-kanso on <html>), so the Stacktic docs are untouched.
+
+   Status colours follow the one-pager: 朱 shu = shipped, 藍 ai = in flight,
+   鼠 nezumi = designed.
+   ========================================================================== */
+
+html.plugin-id-kanso {
+  --k-paper: #FFFFFF;     --k-paper-2: #FAFAF8;   --k-surface-2: #F4F3EF;
+  --k-ink: #26221E;       --k-ink-mid: #4C463F;   --k-ink-soft: #6A635A;
+  --k-rule: #E9E7E1;      --k-rule-firm: #CDC9C0;
+  --k-shu: #D91E18;       --k-shu-wash: #FDF0EE;
+  --k-ai: #2E5C8A;        --k-ai-wash: #EEF4FA;
+  --k-nezumi: #B0A99E;
+  --k-yamabuki: #C8871C;  --k-yamabuki-wash: #FDF6E9;
+  --k-matsuba: #4F8442;   --k-matsuba-wash: #F0F6EE;
+  --k-washi: rgba(38, 34, 30, .045);
+  /* chart marks: validated pair (dataviz validate_palette, light) */
+  --k-bar-before: #2B66B8;  --k-bar-after: #D91E18;
+
+  --k-display: "Avenir Next", Futura, "Century Gothic", system-ui, sans-serif;
+  --k-body: "Avenir Next", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --k-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, "Cascadia Mono", monospace;
+
+  --ifm-background-color: var(--k-paper);
+  --ifm-background-surface-color: var(--k-paper);
+  --ifm-navbar-background-color: rgba(255, 255, 255, .92);
+  --ifm-font-color-base: var(--k-ink);
+  --ifm-heading-color: var(--k-ink);
+  --ifm-font-family-base: var(--k-body);
+  --ifm-heading-font-family: var(--k-display);
+  --ifm-font-family-monospace: var(--k-mono);
+  --ifm-color-primary: #2E5C8A;
+  --ifm-color-primary-dark: #29537c;
+  --ifm-color-primary-darker: #274e75;
+  --ifm-color-primary-darkest: #204061;
+  --ifm-color-primary-light: #336598;
+  --ifm-color-primary-lighter: #356a9f;
+  --ifm-color-primary-lightest: #3c78b3;
+  --ifm-code-background: var(--k-surface-2);
+  --docusaurus-highlighted-code-line-bg: rgba(217, 30, 24, .08);
+
+  /* the shared diagrams draw with --stk-*; in Kanso they take its palette:
+     agents pine (as on the one-pager), people indigo, Kanso sumi ink,
+     outcomes gold, refusals vermilion, the rest nezumi */
+  --stk-panel: var(--k-paper);
+  --stk-panel-2: var(--k-surface-2);
+  --stk-hair: var(--k-rule);
+  --stk-ink: var(--k-ink);
+  --stk-muted: var(--k-ink-soft);
+  --stk-amber: var(--k-matsuba);
+  --stk-blue: var(--k-ai);
+  --stk-violet: var(--k-ink);
+  --stk-mint: var(--k-yamabuki);
+  --stk-red: var(--k-shu);
+  --stk-steel: #8C857B;
+}
+
+html.plugin-id-kanso[data-theme='dark'] {
+  --k-paper: #171512;     --k-paper-2: #1C1A16;   --k-surface-2: #24211C;
+  --k-ink: #EEEAE3;       --k-ink-mid: #D2CBC0;   --k-ink-soft: #A69E92;
+  --k-rule: #322E28;      --k-rule-firm: #4A453D;
+  --k-shu: #F2554D;       --k-shu-wash: #35191A;
+  --k-ai: #86AEDB;        --k-ai-wash: #1A2531;
+  --k-nezumi: #827A6F;
+  --k-yamabuki: #E3A94E;  --k-yamabuki-wash: #2F2617;
+  --k-matsuba: #86BC76;   --k-matsuba-wash: #1C2819;
+  --k-washi: rgba(238, 234, 227, .035);
+  --k-bar-before: #4F8AD8;  --k-bar-after: #EE4A42;
+
+  --ifm-navbar-background-color: rgba(23, 21, 18, .9);
+  --ifm-color-primary: #86AEDB;
+  --ifm-color-primary-dark: #6d9dd3;
+  --ifm-color-primary-darker: #6195cf;
+  --ifm-color-primary-darkest: #3e7dc3;
+  --ifm-color-primary-light: #9fbfe3;
+  --ifm-color-primary-lighter: #abc7e7;
+  --ifm-color-primary-lightest: #d0e0f1;
+  --docusaurus-highlighted-code-line-bg: rgba(242, 85, 77, .12);
+  --stk-steel: #8F877C;
+}
+
+/* ---- ground: the 七宝 shippō washi under everything ------------------------ */
+html.plugin-id-kanso .main-wrapper {
+  background-color: var(--k-paper);
+  background-image:
+    radial-gradient(circle at 0 0, transparent 21.5px, var(--k-washi) 22px, transparent 22.6px),
+    radial-gradient(circle at 44px 0, transparent 21.5px, var(--k-washi) 22px, transparent 22.6px),
+    radial-gradient(circle at 0 44px, transparent 21.5px, var(--k-washi) 22px, transparent 22.6px),
+    radial-gradient(circle at 44px 44px, transparent 21.5px, var(--k-washi) 22px, transparent 22.6px),
+    radial-gradient(circle at 22px 22px, transparent 21.5px, var(--k-washi) 22px, transparent 22.6px);
+  background-size: 44px 44px;
+  background-attachment: fixed;
+}
+html.plugin-id-kanso .navbar { border-bottom-color: var(--k-rule); }
+html.plugin-id-kanso .theme-doc-sidebar-container { border-right-color: var(--k-rule) !important; background: var(--k-paper); }
+html.plugin-id-kanso .table-of-contents { background: var(--k-paper); }
+
+/* ---- sidebar and breadcrumbs ---------------------------------------------- */
+html.plugin-id-kanso .menu__link--active:not(.menu__link--sublist) {
+  background: var(--k-shu-wash);
+  color: var(--k-shu);
+}
+html.plugin-id-kanso .menu__list-item-collapsible > .menu__link { color: var(--k-ink); }
+html.plugin-id-kanso .breadcrumbs__item--active .breadcrumbs__link {
+  background: var(--k-shu-wash);
+  color: var(--k-shu);
+}
+html.plugin-id-kanso .table-of-contents__link--active { color: var(--k-shu); }
+
+/* ---- type ----------------------------------------------------------------- */
+html.plugin-id-kanso .markdown h1 {
+  font-family: var(--k-display);
+  font-weight: 600;
+  letter-spacing: -.02em;
+}
+html.plugin-id-kanso .markdown h2 {
+  font-family: var(--k-display);
+  border-top: 2px solid var(--k-ink);
+  padding-top: 1.3rem;
+  letter-spacing: -.015em;
+}
+html.plugin-id-kanso .markdown h3 { font-family: var(--k-display); }
+html.plugin-id-kanso .markdown > p:first-of-type { color: var(--k-ink-mid); }
+html.plugin-id-kanso .markdown a {
+  color: var(--k-ai);
+  border-bottom: 2px solid color-mix(in srgb, var(--k-ai) 30%, transparent);
+}
+html.plugin-id-kanso .markdown a:hover { color: var(--k-shu); border-bottom-color: var(--k-shu); }
+html.plugin-id-kanso .markdown strong { color: var(--k-ink); }
+html.plugin-id-kanso .markdown blockquote {
+  border-left: 3px solid var(--k-shu);
+  background: linear-gradient(102deg, var(--k-shu-wash) 0%, var(--k-paper) 74%);
+  color: var(--k-ink);
+}
+html.plugin-id-kanso .markdown code {
+  background: var(--k-surface-2);
+  border-color: var(--k-rule);
+  color: var(--k-ink);
+}
+html.plugin-id-kanso div[class^='codeBlockContainer'] { border-radius: 4px; border-color: var(--k-rule-firm); }
+
+/* ---- tables --------------------------------------------------------------- */
+html.plugin-id-kanso .markdown table { border-radius: 3px; border-color: var(--k-rule-firm); background: var(--k-paper); }
+html.plugin-id-kanso .markdown table thead { background: var(--k-surface-2); }
+html.plugin-id-kanso .markdown table th {
+  font-family: var(--k-mono);
+  font-size: .7rem;
+  letter-spacing: .12em;
+  color: var(--k-ink-soft);
+}
+
+/* ---- the shared components, in Kanso's hand -------------------------------- */
+html.plugin-id-kanso .stk-hero {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: .6rem 0 1.6rem;
+  margin: -1rem 0 2rem;
+  border-bottom: 1px solid var(--k-rule);
+}
+html.plugin-id-kanso .stk-hero::after { display: none; }
+html.plugin-id-kanso .stk-hero .stk-eyebrow {
+  font-family: var(--k-mono);
+  font-size: 11px;
+  letter-spacing: .26em;
+  color: var(--k-ink-soft);
+}
+html.plugin-id-kanso .stk-hero .stk-eyebrow::before { content: "簡 素  ·  "; color: var(--k-shu); }
+html.plugin-id-kanso .stk-hero .stk-hero-title {
+  font-family: var(--k-display);
+  font-size: clamp(2rem, 4.6vw, 3.1rem);
+  line-height: 1.06;
+  letter-spacing: -.02em;
+  color: var(--k-ink);
+}
+html.plugin-id-kanso .stk-hero p { color: var(--k-ink-mid); font-size: 1.1rem; line-height: 1.55; max-width: 60ch; }
+html.plugin-id-kanso .k-accent { color: var(--k-shu); }
+html.plugin-id-kanso .k-indigo { color: var(--k-ai); }
+html.plugin-id-kanso .k-pine { color: var(--k-matsuba); }
+html.plugin-id-kanso .k-gold { color: var(--k-yamabuki); }
+
+html.plugin-id-kanso .stk-card {
+  border-radius: 3px;
+  border: 1px solid var(--k-rule-firm) !important;
+  background: var(--k-paper);
+}
+html.plugin-id-kanso .stk-card:hover { border-color: var(--k-ink) !important; }
+html.plugin-id-kanso .stk-card .stk-card-kicker { color: var(--k-shu); letter-spacing: .17em; }
+html.plugin-id-kanso .stk-card .stk-card-title { font-family: var(--k-display); color: var(--k-ink); }
+html.plugin-id-kanso .stk-card .stk-card-body { color: var(--k-ink-soft); }
+
+/* steps: numbered hanko seals instead of rings */
+html.plugin-id-kanso .stk-step { border-left-color: var(--k-rule-firm); }
+html.plugin-id-kanso .stk-step::before {
+  border-radius: 4px;
+  border: 0;
+  background: var(--k-shu);
+  color: #fff;
+  font-family: var(--k-display);
+  font-weight: 700;
+}
+html.plugin-id-kanso .stk-step .stk-step-title { font-family: var(--k-display); color: var(--k-ink); }
+html.plugin-id-kanso .stk-step .stk-step-body { color: var(--k-ink-mid); }
+
+/* chips: shipped / in flight / designed, as on the one-pager */
+html.plugin-id-kanso .stk-pill {
+  font-size: 10.5px;
+  letter-spacing: .05em;
+  padding: .32rem .7rem;
+  border-radius: 100px;
+  background: var(--k-paper);
+  border: 1px solid var(--k-rule-firm);
+  color: var(--k-ink-mid);
+}
+html.plugin-id-kanso .stk-pill.is-live { border-color: var(--k-shu); color: var(--k-shu); }
+html.plugin-id-kanso .stk-pill.is-fly { border-color: var(--k-ai); color: var(--k-ai); }
+html.plugin-id-kanso .stk-pill.is-designed { border-color: var(--k-nezumi); border-style: dashed; color: var(--k-ink-soft); }
+
+/* figures: a thin rule frame and a ruled caption */
+html.plugin-id-kanso .stk-figure {
+  border-radius: 2px;
+  border-color: var(--k-rule);
+  background: var(--k-paper);
+  padding: 1.2rem 1rem 1rem;
+}
+html.plugin-id-kanso .stk-figure:hover,
+html.plugin-id-kanso .stk-figure:focus-visible { border-color: var(--k-rule-firm); }
+html.plugin-id-kanso .stk-figure figcaption {
+  text-align: left;
+  color: var(--k-ink-soft);
+  padding-left: .9rem;
+  border-left: 1px solid var(--k-rule-firm);
+  max-width: 76ch;
+}
+html.plugin-id-kanso .stk-lightbox-inner { background: var(--k-paper); border-color: var(--k-rule); border-radius: 2px; }
+
+html.plugin-id-kanso .stk-split > div { border-radius: 3px; border-color: var(--k-rule-firm); background: var(--k-paper); }
+html.plugin-id-kanso .stk-split > .is-problem { background: var(--k-shu-wash); border-color: color-mix(in srgb, var(--k-shu) 40%, transparent); }
+html.plugin-id-kanso .stk-split > .is-answer { background: var(--k-matsuba-wash); border-color: color-mix(in srgb, var(--k-matsuba) 40%, transparent); }
+
+/* ---- Kanso-only components (src/components/kanso) ------------------------- */
+.k-hero {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: clamp(1.2rem, 4vw, 3rem);
+  align-items: center;
+  padding: .4rem 0 1.8rem;
+  margin: -1rem 0 2rem;
+  border-bottom: 1px solid var(--k-rule);
+}
+.k-hero .k-kicker {
+  font-family: var(--k-mono);
+  font-size: 11px;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--k-ink-soft);
+  margin-bottom: 1.1rem;
+}
+.k-hero .k-kicker b { color: var(--k-shu); font-weight: 500; }
+.k-hero .k-title {
+  font-family: var(--k-display);
+  font-weight: 600;
+  font-size: clamp(2.2rem, 5.4vw, 3.6rem);
+  line-height: 1.04;
+  letter-spacing: -.02em;
+  color: var(--k-ink);
+  margin: 0 0 1rem;
+}
+.k-hero .k-lede { font-size: 1.12rem; line-height: 1.55; color: var(--k-ink-mid); max-width: 46ch; margin: 0; }
+.k-mark { width: clamp(110px, 15vw, 170px); height: auto; display: block; }
+.k-mark .ring, .k-mark .letter { stroke: var(--k-ink); fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.k-mark .dot { fill: var(--k-shu); }
+.k-wordmark {
+  font-family: var(--k-display);
+  font-size: 1.35rem;
+  letter-spacing: .34em;
+  text-indent: .34em;
+  text-align: center;
+  margin-top: .6rem;
+  color: var(--k-ink);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .k-mark .ring-a { stroke-dasharray: 900; stroke-dashoffset: 900; animation: kdraw 1.6s cubic-bezier(.22,.61,.36,1) forwards; }
+  .k-mark .ring-b { stroke-dasharray: 700; stroke-dashoffset: 700; animation: kdraw 1.6s cubic-bezier(.22,.61,.36,1) .3s forwards; }
+  .k-mark .dot { opacity: 0; transform-origin: 336px 172px; animation: kpop .6s cubic-bezier(.34,1.56,.64,1) 1.4s forwards; }
+  @keyframes kdraw { to { stroke-dashoffset: 0; } }
+  @keyframes kpop { from { opacity: 0; transform: scale(.3); } to { opacity: 1; transform: scale(1); } }
+}
+@media (max-width: 760px) {
+  .k-hero { grid-template-columns: 1fr; }
+  .k-hero .k-brand { display: none; }
+}
+
+.k-chips { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1.3rem 0 0; }
+.k-chip {
+  font-family: var(--k-mono);
+  font-size: 10.5px;
+  letter-spacing: .05em;
+  padding: .32rem .7rem;
+  border-radius: 100px;
+  border: 1px solid var(--k-rule-firm);
+  color: var(--k-ink-mid);
+  background: var(--k-paper);
+  white-space: nowrap;
+}
+.k-chip b { color: var(--k-ink); font-weight: 600; }
+.k-chip.live { border-color: var(--k-shu); color: var(--k-shu); }
+.k-chip.live b { color: var(--k-shu); }
+.k-chip.fly { border-color: var(--k-ai); color: var(--k-ai); }
+.k-chip.fly b { color: var(--k-ai); }
+.k-chip.designed { border-color: var(--k-nezumi); border-style: dashed; color: var(--k-ink-soft); }
+
+.k-thesis {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1.1rem;
+  align-items: center;
+  border: 1px solid var(--k-rule);
+  border-left: 3px solid var(--k-seal, var(--k-shu));
+  background: linear-gradient(102deg, color-mix(in srgb, var(--k-seal, var(--k-shu)) 9%, var(--k-paper)) 0%, var(--k-paper) 74%);
+  padding: 1.15rem 1.35rem;
+  margin: 1.8rem 0;
+  font-size: 1.08rem;
+  line-height: 1.5;
+  color: var(--k-ink);
+}
+.k-thesis p:last-child { margin-bottom: 0; }
+.k-hanko {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  background: var(--k-seal, var(--k-shu));
+  color: #fff;
+  font-family: var(--k-display);
+  font-size: 17px;
+  line-height: 1;
+  flex: none;
+}
+
+.k-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .6rem 1rem;
+  margin: 0 0 1.6rem;
+  padding: .7rem .9rem;
+  border: 1px solid var(--k-rule);
+  border-left: 3px solid var(--k-ai);
+  background: var(--k-ai-wash);
+  font-size: .9rem;
+  color: var(--k-ink-mid);
+}
+.k-status.live { border-left-color: var(--k-shu); background: var(--k-shu-wash); }
+.k-status .k-chip { background: var(--k-paper); }
+
+/* a page that opens with a hero says its title there: the doc's own h1 stays
+   for screen readers and search, out of sight */
+html.plugin-id-kanso .markdown > header:has(+ .stk-hero, + .k-hero) {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+html.plugin-id-kanso .markdown > header + .stk-hero,
+html.plugin-id-kanso .markdown > header + .k-hero { margin-top: 0; }

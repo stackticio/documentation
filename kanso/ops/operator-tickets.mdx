@@ -1,0 +1,265 @@
+---
+title: Operator tickets
+description: Turn production alerts into tickets an AI agent can investigate. Kanso opens exactly one ticket per problem, an agent claims it and works it in a visible session, and a person makes the calls that need a person.
+---
+
+<KHero kicker="Operations" title={<>From an alert to an agent <span className="k-accent">on the case.</span></>}>
+When production breaks, your alerting already knows. Kanso turns each problem into exactly one
+ticket. An agent picks it up and investigates, a person makes the calls that need a person,
+and every step lands on the ticket.
+</KHero>
+
+<Status>
+  <Chip kind="fly"><b>next release</b> · signals, agent sessions, handoff</Chip>
+  <Chip kind="designed">in development · routing by ops policy</Chip>
+  <span>Built, and run end to end on the current build. These ship in the release after 0.77.0.</span>
+</Status>
+
+<Figure caption="A real run: an Alertmanager alert opens OPS-1, a repeat opens nothing, an agent claims the ticket in its own session and asks a person, the alert resolves, and when it fires again after OPS-1 is done, Kanso opens OPS-2 and links it.">
+<svg viewBox="0 0 900 400" role="img" aria-label="Five stations left to right: your alerting sends a webhook; the Kanso gate opens one ticket per problem; the ticket OPS-1 carries a firing signal record; an agent session claims it and investigates; a person answers the agent's question. Below: a repeat alert opens no new ticket, a resolved alert marks the signal cleared and leaves the ticket alone, and an alert that fires again after the ticket is done opens OPS-2 linked to OPS-1.">
+  <defs>
+    <marker id="ksOtA" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-steel)" /></marker>
+  </defs>
+  <path d="M168 125 L186 125" fill="none" stroke="var(--stk-steel)" strokeWidth="1.5" markerEnd="url(#ksOtA)" />
+  <path d="M346 125 L364 125" fill="none" stroke="var(--stk-steel)" strokeWidth="1.5" markerEnd="url(#ksOtA)" />
+  <path d="M524 125 L542 125" fill="none" stroke="var(--stk-steel)" strokeWidth="1.5" markerEnd="url(#ksOtA)" />
+  <path d="M702 125 L720 125" fill="none" stroke="var(--stk-steel)" strokeWidth="1.5" markerEnd="url(#ksOtA)" />
+
+  <rect x="10" y="50" width="156" height="150" rx="6" fill="var(--stk-panel)" stroke="var(--stk-steel)" strokeWidth="1.3" />
+  <text x="24" y="74" fontSize="9.4" fill="var(--stk-steel)" fontFamily="ui-monospace, Menlo, monospace" fontWeight="600" letterSpacing="1">1 · YOUR ALERTING</text>
+  <text x="24" y="98" fontSize="13" fill="var(--stk-ink)" fontFamily="Avenir Next, Futura, system-ui, sans-serif" fontWeight="600">an alert fires</text>
+  <text x="24" y="122" fontSize="10" fill="var(--stk-muted)" fontFamily="ui-monospace, Menlo, monospace">CheckoutErrorRate</text>
+  <text x="24" y="138" fontSize="10" fill="var(--stk-muted)" fontFamily="ui-monospace, Menlo, monospace">on checkout-7f9c</text>
+  <text x="24" y="162" fontSize="10" fill="var(--stk-muted)" fontFamily="ui-monospace, Menlo, monospace">Alertmanager, or</text>
+  <text x="24" y="178" fontSize="10" fill="var(--stk-muted)" fontFamily="ui-monospace, Menlo, monospace">any webhook</text>
+
+  <rect x="188" y="50" width="156" height="150" rx="6" fill="var(--stk-panel)" stroke="var(--stk-violet)" strokeWidth="1.5" />
+  <text x="202" y="74" fontSize="9.4" fill="var(--stk-violet)" fontFamily="ui-monospace, Menlo, monospace" fontWeight="600" letterSpacing="1">2 · THE GATE</text>
+  <text x="202" y="98" fontSize="13" fill="var(--stk-ink)" fontFamily="Avenir Next, Futura, system-ui, sans-serif" fontWeight="600">one problem,</text>
+  <text x="202" y="116" fontSize="13" fill="var(--stk-ink)" fontFamily="Avenir Next, Futura, system-ui, sans-serif" fontWeight="600">one ticket</text>
+  <text x="202" y="140" fontSize="10" fill="var(--stk-muted)" fontFamily="ui-monospace, Menlo, monospace">keyed by fingerprint</text>
+  <text x="202" y="156" fontSize="10" fill="var(--stk-muted)" fontFamily="ui-monospace, Menlo, monospace">storm cap 20 / 10 min</text>
+  <text x="202" y="172" fontSize="10" fill="var(--stk-muted)" fontFamily="ui-monospace, Menlo, monospace">the space decides</text>
+
+  <rect x="366" y="50" width="156" height="150" rx="6" fill="var(--stk-panel)" />
+  <rect x="366" y="50" width="156" height="150" rx="6" fill="var(--stk-mint)" fillOpacity="0.08" stroke="var(--stk-mint)" strokeWidth="1.5" />
+  <text x="380" y="74" fontSize="9.4" fill="var(--stk-mint)" fontFamily="ui-monospace, Menlo, monospace" fontWeight="600" letterSpacing="1">3 · THE TICKET</text>
+  <text x="380" y="98" fontSize="13" fill="var(--stk-ink)" fontFamily="Avenir Next, Futura, system-ui, sans-serif" fontWeight="600">OPS-1</text>
+  <text x="380" y="122" fontSize="10" fill="var(--stk-muted)" fontFamily="ui-monospace, Menlo, monospace">Signal from</text>
+  <text x="380" y="138" fontSize="10" fill="var(--stk-muted)" fontFamily="ui-monospace, Menlo, monospace">alertmanager</text>
+  <text x="380" y="162" fontSize="10" fill="var(--stk-mint)" fontFamily="ui-monospace, Menlo, monospace">signal:firing</text>
+  <text x="380" y="178" fontSize="10" fill="var(--stk-muted)" fontFamily="ui-monospace, Menlo, monospace">+ graph link</text>
+
+  <rect x="544" y="50" width="156" height="150" rx="6" fill="var(--stk-panel)" />
+  <rect x="544" y="50" width="156" height="150" rx="6" fill="var(--stk-amber)" fillOpacity="0.08" stroke="var(--stk-amber)" strokeWidth="1.5" />
+  <text x="558" y="74" fontSize="9.4" fill="var(--stk-amber)" fontFamily="ui-monospace, Menlo, monospace" fontWeight="600" letterSpacing="1">4 · AGENT SESSION</text>
+  <text x="558" y="98" fontSize="13" fill="var(--stk-ink)" fontFamily="Avenir Next, Futura, system-ui, sans-serif" fontWeight="600">claims, investigates</text>
+  <text x="558" y="122" fontSize="10" fill="var(--stk-muted)" fontFamily="ui-monospace, Menlo, monospace">claim_next_issue</text>
+  <text x="558" y="138" fontSize="10" fill="var(--stk-muted)" fontFamily="ui-monospace, Menlo, monospace">record = signal:firing</text>
+  <text x="558" y="162" fontSize="10" fill="var(--stk-muted)" fontFamily="ui-monospace, Menlo, monospace">evidence as comments</text>
+  <text x="558" y="178" fontSize="10" fill="var(--stk-muted)" fontFamily="ui-monospace, Menlo, monospace">handoff when it stops</text>
+
+  <rect x="722" y="50" width="168" height="150" rx="6" fill="var(--stk-panel)" />
+  <rect x="722" y="50" width="168" height="150" rx="6" fill="var(--stk-blue)" fillOpacity="0.08" stroke="var(--stk-blue)" strokeWidth="1.5" />
+  <text x="736" y="74" fontSize="9.4" fill="var(--stk-blue)" fontFamily="ui-monospace, Menlo, monospace" fontWeight="600" letterSpacing="1">5 · A PERSON</text>
+  <text x="736" y="98" fontSize="13" fill="var(--stk-ink)" fontFamily="Avenir Next, Futura, system-ui, sans-serif" fontWeight="600">makes the call</text>
+  <text x="736" y="122" fontSize="10" fill="var(--stk-muted)" fontFamily="ui-monospace, Menlo, monospace">"Roll back now?"</text>
+  <text x="736" y="138" fontSize="10" fill="var(--stk-blue)" fontFamily="ui-monospace, Menlo, monospace">yes · OPS-1/q_1</text>
+  <text x="736" y="162" fontSize="10" fill="var(--stk-muted)" fontFamily="ui-monospace, Menlo, monospace">sees the session,</text>
+  <text x="736" y="178" fontSize="10" fill="var(--stk-muted)" fontFamily="ui-monospace, Menlo, monospace">can pause it</text>
+
+  <text x="10" y="244" fontSize="9.4" fill="var(--stk-muted)" fontFamily="ui-monospace, Menlo, monospace" fontWeight="600" letterSpacing="1">WHAT THE SAME ALERT DOES NEXT</text>
+  <rect x="10" y="256" width="282" height="110" rx="6" fill="var(--stk-panel)" stroke="var(--stk-steel)" strokeWidth="1.2" />
+  <text x="24" y="280" fontSize="9.4" fill="var(--stk-steel)" fontFamily="ui-monospace, Menlo, monospace" fontWeight="600" letterSpacing="1">IT REPEATS</text>
+  <text x="24" y="304" fontSize="13" fill="var(--stk-ink)" fontFamily="Avenir Next, Futura, system-ui, sans-serif" fontWeight="600">no second ticket</text>
+  <text x="24" y="328" fontSize="10" fill="var(--stk-muted)" fontFamily="ui-monospace, Menlo, monospace">the record is updated</text>
+  <text x="24" y="344" fontSize="10" fill="var(--stk-muted)" fontFamily="ui-monospace, Menlo, monospace">opened: []</text>
+  <rect x="308" y="256" width="282" height="110" rx="6" fill="var(--stk-panel)" stroke="var(--stk-mint)" strokeWidth="1.2" />
+  <text x="322" y="280" fontSize="9.4" fill="var(--stk-mint)" fontFamily="ui-monospace, Menlo, monospace" fontWeight="600" letterSpacing="1">IT RESOLVES</text>
+  <text x="322" y="304" fontSize="13" fill="var(--stk-ink)" fontFamily="Avenir Next, Futura, system-ui, sans-serif" fontWeight="600">the signal is cleared</text>
+  <text x="322" y="328" fontSize="10" fill="var(--stk-muted)" fontFamily="ui-monospace, Menlo, monospace">the ticket is untouched:</text>
+  <text x="322" y="344" fontSize="10" fill="var(--stk-muted)" fontFamily="ui-monospace, Menlo, monospace">closing it is a decision</text>
+  <rect x="606" y="256" width="284" height="110" rx="6" fill="var(--stk-panel)" stroke="var(--stk-violet)" strokeWidth="1.2" />
+  <text x="620" y="280" fontSize="9.4" fill="var(--stk-violet)" fontFamily="ui-monospace, Menlo, monospace" fontWeight="600" letterSpacing="1">IT FIRES AGAIN AFTER DONE</text>
+  <text x="620" y="304" fontSize="13" fill="var(--stk-ink)" fontFamily="Avenir Next, Futura, system-ui, sans-serif" fontWeight="600">OPS-2, linked to OPS-1</text>
+  <text x="620" y="328" fontSize="10" fill="var(--stk-muted)" fontFamily="ui-monospace, Menlo, monospace">"Fired again after</text>
+  <text x="620" y="344" fontSize="10" fill="var(--stk-muted)" fontFamily="ui-monospace, Menlo, monospace">OPS-1 was done."</text>
+</svg>
+</Figure>
+
+<Thesis seal="朱">
+Your alerting says <b>what is wrong</b>. The space decides <b>what becomes a ticket</b>. The agent
+does <b>the investigation</b>. A person makes <b>the calls</b>. Kanso keeps all of it on one
+record.
+</Thesis>
+
+## Connect your alerting
+
+Kanso takes problems in as **signals**: things a monitored system reports as wrong right now,
+each with the source's own fingerprint. Two connectors for this come in the catalog:
+
+| Catalog entry | For | Configure |
+|---|---|---|
+| `alertmanager` | Prometheus Alertmanager | A receiver pointed at the instance's URL, with `send_resolved: true` |
+| `signals` | Any monitor, log pipeline or script | POST `{"source": …, "signals": [{fingerprint, title, status?, severity?, url?, data?}]}` |
+
+Kanso does not receive OpenTelemetry (OTLP) itself. If your telemetry, OpenTelemetry
+included, drives alerts in Alertmanager or in any system that can send a webhook, those
+alerts become signals. A script can send the `signals` shape directly.
+
+<Steps>
+  <Step title="Install the connector">
+    In **Connectors**, install **Prometheus Alertmanager** from the catalog.
+  </Step>
+  <Step title="Bind it to a space">
+    Binding creates an instance in the space and returns its ingest URL and its secret, for
+    example `/api/v1/ingest/cbind_1`.
+  </Step>
+  <Step title="Point Alertmanager at it">
+    Add a receiver that sends to that URL with the secret:
+
+```yaml
+receivers:
+  - name: kanso
+    webhook_configs:
+      - url: https://kanso.example.com/api/v1/ingest/cbind_1
+        send_resolved: true
+        http_config:
+          authorization:
+            credentials: <the instance secret>
+```
+  </Step>
+  <Step title="Let the space open tickets">
+    Tickets are **off by default**. On the instance, choose **signals** and turn tickets on.
+    That needs `manage_connectors` and `create_issue` in the space. You can also pick the
+    issue type, the link type for recurrences, and the storm cap.
+  </Step>
+</Steps>
+
+The same settings over the API:
+
+```bash
+curl -X PUT "$KANSO_URL/api/v1/connector-bindings/cbind_1/signal-settings" \
+  -b cookies.txt -H 'If-Match: 1' -H 'Content-Type: application/json' \
+  -d '{"tickets": true, "issueType": null, "linkType": "lt_4",
+       "storm": {"tickets": 20, "windowMinutes": 10}}'
+```
+
+## One problem, one ticket
+
+Each delivery reports what it did:
+
+```json
+{ "delivery": "del_1",
+  "signals": { "seen": 1, "opened": ["OPS-1"], "cleared": 0, "stormed": 0 } }
+```
+
+| When | What Kanso does |
+|---|---|
+| A new problem fires | Opens one ticket, attributed to the connector, titled from the alert: *CheckoutErrorRate on checkout-7f9c*. It carries a `signal` record with status `firing`. |
+| The same problem fires again | Updates the record. No second ticket opens (`opened: []`). |
+| The problem resolves | Marks the record `cleared`. **The ticket is not changed.** Nothing closes, comments on or moves it. Closing it is a decision. |
+| It fires again after the ticket is done | Opens a **new** ticket, linked to the old one, that says *Fired again after OPS-1 was done.* |
+| Too many problems at once | Above the storm cap (20 new tickets per 10 minutes by default), the rest go onto one storm ticket. |
+
+The ticket starts with where the problem came from:
+
+```
+> **Signal** from connector `alertmanager` · fingerprint `9c1e4f7a2b`
+
+Source: http://prometheus.example/graph?g0.expr=job%3Acheckout_5xx
+```
+
+The alert's labels, annotations and start time stay on the signal. Find every open problem
+with JQL:
+
+```
+record = "signal:firing"
+```
+
+## An agent takes the case
+
+<Steps>
+  <Step title="Claim the problem">
+    The agent claims from the open problems, highest priority first. It sends its own run id
+    in the `Kanso-Session` header, so its work is grouped as one session.
+
+```
+claim_next_issue  jql: record = "signal:firing" ORDER BY priority DESC
+```
+  </Step>
+  <Step title="Investigate on the ticket">
+    It reads the ticket and the source link, and posts what it finds as comments: *5xx
+    started 20:09, right after deploy checkout v2.14. Rollback candidate: v2.13.*
+  </Step>
+  <Step title="Ask for the call that needs a person">
+    It asks a typed question on the ticket, *Roll checkout back to v2.13?*, and waits. The
+    lead answers yes. The answer comes back as data, with a citation: `OPS-1/q_1`.
+  </Step>
+  <Step title="Hand off, or finish">
+    When it stops, it releases the ticket and leaves a **handoff** in the same call: where
+    the work stands, what to do next, what blocks it, and where the work is. The next
+    session, agent or person, starts from there.
+  </Step>
+</Steps>
+
+```json
+"handoff": {
+  "state": "Same 5xx pattern as OPS-1; the rollback did not hold.",
+  "next":  "Check the payment-provider timeout added in v2.14.",
+  "where": "checkout service, payment client"
+}
+```
+
+<Status>
+  <Chip kind="designed">in development</Chip>
+  <span>Routing by <b>ops policy</b>: a space policy that decides what a signal is worth, how
+  urgent it is, and which queue takes it, as a <code>queue:&lt;name&gt;</code> label. Agents then
+  claim with <code>labels = "queue:…"</code>. Built on its own branch and not yet reviewed.</span>
+</Status>
+
+## People stay in control
+
+Every agent run is a **session** you can see. The **Agent sessions** page shows each one:
+whose it is, which token it uses, what it holds, which person it is waiting on, and how long
+it has been quiet.
+
+```json
+{ "id": "as_1", "externalId": "inc-2026-10-22-checkout", "state": "active",
+  "credential": { "kind": "token", "id": "kat_1", "name": "oncall agent" },
+  "leases":     [{ "issue": "OPS-1", "expiresAt": "2026-10-22T20:36:59Z" }],
+  "waitingOn":  [{ "question": "OPS-1/q_1", "assignee": { "name": "Lee Lead" } }] }
+```
+
+You can stop an agent without killing anything:
+
+| Action | Who | Effect |
+|---|---|---|
+| **Pause** a session | The token's owner, a site admin, or anyone with `pause_agent_sessions` in a space where the session is working | Its next work write is refused |
+| **Pause all agents** | A site admin | Every agent's work writes are refused. People and apps are not affected. |
+| **Resume** | The owner or a site admin, signed in. Never a token. | Work continues |
+
+A pause stops the **work** but keeps the **conversation** open. The agent is told exactly
+that:
+
+```
+session_paused: this agent session (as_1) is paused: it may still read, search, comment,
+ask, answer and release its leases, but this operation is refused — its owner or a site
+admin can resume it on the Agent sessions page
+```
+
+A paused agent can still leave a handoff and report its usage, so nothing it already did is
+lost. A pause sticks: if the agent comes back with the same run id, it is still paused.
+
+## The honest limits
+
+- **Kanso does not run agents.** It never starts, steers or kills an agent process. It is the
+  record and the doorbell: it opens the ticket, records the work, asks the person and refuses
+  a paused session's next write. Your agents pull the work.
+- **No live attach.** You see a session's state and its writes, not its screen. To pick up
+  where an agent left off, read its handoff and its comments.
+- **One delivery holds up to 500 problems**, and an instance tracks up to 1,000 firing ones.
+  Beyond that a delivery is refused with `too_many_signals`. A delivery is all or nothing.
+- **Kanso does not close tickets when a problem clears.** To make *Done* wait until the
+  signal has cleared, put a requirement on the workflow for a `signal` record with status
+  `cleared`.

@@ -95,7 +95,9 @@ const config = {
           routeBasePath: 'docs',
         },
         blog: false,
-        theme: { customCss: require.resolve('./src/css/custom.css') },
+        theme: {
+          customCss: [require.resolve('./src/css/custom.css'), require.resolve('./src/css/kanso.css')],
+        },
       },
     ],
   ],

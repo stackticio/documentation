@@ -1,0 +1,261 @@
+---
+id: architecture-secured-stack
+slug: /architecture/secured-stack
+title: "Example: a secured marketplace"
+sidebar_label: "Example: secured marketplace"
+sidebar_position: 3
+description: A real 29-component production stack walked through link by link — two applications behind rate limits and a WAF, with admission policy, intrusion detection, vaulted secrets, build gates, DAST, autoscaling and load tests.
+---
+
+<Hero eyebrow="Worked stack" title="Two production applications and every security layer turned on">
+This is a marketplace stack the Stacktic team runs as its security reference: a catalog API, a shop
+front end, an AI assistant, and around them every security component the catalog offers. Every
+control below is a component, a sub-component, a link or an attribute on its diagram.
+</Hero>
+
+<Figure caption="The design of the secured marketplace. Solid lines are links, dashed lines the WAF profile protecting both applications. The bottom band is the security generated around the same components.">
+<svg viewBox="0 0 900 476" role="img" aria-label="The secured marketplace. Two routes, api and shop, reach catalog-svc and portal-frontend through rate limits and a CrowdSec WAF profile. catalog-svc uses a database, a bucket, a cache, OpenSearch, two Kafka topics and an AI gateway route to a vLLM model. Around it, admission policy, network policies, intrusion detection, secrets from OpenBao, build gates, SAST, DAST and evidence are all generated from the graph.">
+  <defs>
+    <marker id="secBBlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-blue)" /></marker>
+    <marker id="secBMint" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-mint)" /></marker>
+    <marker id="secBViolet" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-violet)" /></marker>
+  </defs>
+  <rect x="24" y="36" width="210" height="288" rx="16" fill="var(--stk-violet)" fillOpacity="0.035" stroke="var(--stk-violet)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <rect x="258" y="36" width="196" height="288" rx="16" fill="var(--stk-blue)" fillOpacity="0.035" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <rect x="478" y="36" width="210" height="288" rx="16" fill="var(--stk-mint)" fillOpacity="0.035" stroke="var(--stk-mint)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <rect x="712" y="36" width="164" height="288" rx="16" fill="var(--stk-amber)" fillOpacity="0.035" stroke="var(--stk-amber)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <rect x="24" y="344" width="852" height="116" rx="16" fill="var(--stk-red)" fillOpacity="0.035" stroke="var(--stk-red)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <path d="M160 84 C248 84 248 116 336 116" fill="none" stroke="var(--stk-violet)" strokeWidth="1.2" markerEnd="url(#secBViolet)" />
+  <path d="M160 146 C248 146 248 240 336 240" fill="none" stroke="var(--stk-violet)" strokeWidth="1.2" markerEnd="url(#secBViolet)" />
+  <path d="M176 208 C256 208 256 124 336 124" fill="none" stroke="var(--stk-violet)" strokeWidth="1.1" strokeDasharray="4 4" markerEnd="url(#secBViolet)" />
+  <path d="M176 208 C256 208 256 234 336 234" fill="none" stroke="var(--stk-violet)" strokeWidth="1.1" strokeDasharray="4 4" markerEnd="url(#secBViolet)" />
+  <path d="M374 116 C435 116 435 72 496 72" fill="none" stroke="var(--stk-blue)" strokeWidth="1.1" markerEnd="url(#secBBlue)" />
+  <path d="M374 116 C435 116 435 118 496 118" fill="none" stroke="var(--stk-blue)" strokeWidth="1.1" markerEnd="url(#secBBlue)" />
+  <path d="M374 116 C435 116 435 164 496 164" fill="none" stroke="var(--stk-blue)" strokeWidth="1.1" markerEnd="url(#secBBlue)" />
+  <path d="M374 116 C435 116 435 210 496 210" fill="none" stroke="var(--stk-blue)" strokeWidth="1.1" markerEnd="url(#secBBlue)" />
+  <path d="M374 116 C435 116 435 256 496 256" fill="none" stroke="var(--stk-blue)" strokeWidth="1.1" markerEnd="url(#secBBlue)" />
+  <path d="M374 116 C435 116 435 302 496 302" fill="none" stroke="var(--stk-blue)" strokeWidth="1.1" markerEnd="url(#secBBlue)" />
+  <path d="M610 302 C665 302 665 170 720 170" fill="none" stroke="var(--stk-mint)" strokeWidth="1.1" markerEnd="url(#secBMint)" />
+  <rect x="44" y="370" width="192" height="78" rx="12" fill="var(--stk-panel)" />
+  <rect x="44" y="370" width="192" height="78" rx="12" fill="var(--stk-red)" fillOpacity="0.045" stroke="var(--stk-red)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="252" y="370" width="192" height="78" rx="12" fill="var(--stk-panel)" />
+  <rect x="252" y="370" width="192" height="78" rx="12" fill="var(--stk-red)" fillOpacity="0.045" stroke="var(--stk-red)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="460" y="370" width="192" height="78" rx="12" fill="var(--stk-panel)" />
+  <rect x="460" y="370" width="192" height="78" rx="12" fill="var(--stk-red)" fillOpacity="0.045" stroke="var(--stk-red)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="668" y="370" width="192" height="78" rx="12" fill="var(--stk-panel)" />
+  <rect x="668" y="370" width="192" height="78" rx="12" fill="var(--stk-red)" fillOpacity="0.045" stroke="var(--stk-red)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <circle cx="48" cy="84" r="6" fill="var(--stk-violet)" />
+  <circle cx="48" cy="146" r="6" fill="var(--stk-violet)" />
+  <circle cx="48" cy="208" r="6" fill="var(--stk-violet)" />
+  <circle cx="48" cy="270" r="6" fill="var(--stk-violet)" />
+  <circle cx="356" cy="116" r="16" fill="var(--stk-blue)" fillOpacity="0.16" />
+  <circle cx="356" cy="116" r="10" fill="var(--stk-blue)" />
+  <circle cx="356" cy="240" r="16" fill="var(--stk-blue)" fillOpacity="0.16" />
+  <circle cx="356" cy="240" r="10" fill="var(--stk-blue)" />
+  <circle cx="504" cy="72" r="6" fill="var(--stk-mint)" />
+  <circle cx="504" cy="118" r="6" fill="var(--stk-mint)" />
+  <circle cx="504" cy="164" r="6" fill="var(--stk-mint)" />
+  <circle cx="504" cy="210" r="6" fill="var(--stk-mint)" />
+  <circle cx="504" cy="256" r="6" fill="var(--stk-mint)" />
+  <circle cx="504" cy="302" r="6" fill="var(--stk-mint)" />
+  <circle cx="740" cy="170" r="16" fill="var(--stk-amber)" fillOpacity="0.16" />
+  <circle cx="740" cy="170" r="10" fill="var(--stk-amber)" />
+  <text x="40" y="57" fontSize="10.2" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">WHO REACHES IT</text>
+  <text x="60" y="88" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">route api</text>
+  <text x="60" y="101" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">rate limit 10000/min</text>
+  <text x="60" y="150" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">route shop</text>
+  <text x="60" y="163" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">rate limit 100/min</text>
+  <text x="60" y="212" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">WAF profile waf</text>
+  <text x="60" y="225" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">CrowdSec AppSec</text>
+  <text x="60" y="274" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">Keycloak</text>
+  <text x="60" y="287" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">login for the MCP server</text>
+  <text x="274" y="57" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">APPLICATIONS</text>
+  <text x="356" y="149" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">catalog-svc</text>
+  <text x="356" y="162" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">Django · 2 replicas</text>
+  <text x="356" y="273" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">portal-frontend</text>
+  <text x="356" y="286" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">Node.js · 2 replicas</text>
+  <text x="494" y="57" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">WHAT CATALOG-SVC USES</text>
+  <text x="516" y="76" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">catalog-db</text>
+  <text x="516" y="89" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">CloudNativePG</text>
+  <text x="516" y="122" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">catalog-images</text>
+  <text x="516" y="135" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">SeaweedFS bucket</text>
+  <text x="516" y="168" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">valkey</text>
+  <text x="516" y="181" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">cache</text>
+  <text x="516" y="214" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">opensearch</text>
+  <text x="516" y="227" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">search</text>
+  <text x="516" y="260" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">bids · orders</text>
+  <text x="516" y="273" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">Kafka topics</text>
+  <text x="516" y="306" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">ai-gateway</text>
+  <text x="516" y="319" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">route to a model</text>
+  <text x="728" y="57" fontSize="10.2" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">MODEL · vLLM</text>
+  <text x="762" y="174" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">chat model</text>
+  <text x="762" y="187" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">marketplace-chat</text>
+  <text x="40" y="365" fontSize="10.2" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">SECURITY AROUND IT</text>
+  <text x="58" y="390" fontSize="9.7" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">ADMISSION</text>
+  <text x="58" y="407" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">OPA · 8 policies</text>
+  <text x="58" y="424" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">4 deny · 2 warn · 2 dryrun</text>
+  <text x="266" y="390" fontSize="9.7" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">NETWORK</text>
+  <text x="266" y="407" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">policies per link</text>
+  <text x="266" y="424" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">Suricata → OpenSearch</text>
+  <text x="474" y="390" fontSize="9.7" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">SECRETS</text>
+  <text x="474" y="407" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">OpenBao</text>
+  <text x="474" y="424" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">External Secrets sync</text>
+  <text x="682" y="390" fontSize="9.7" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">SUPPLY CHAIN</text>
+  <text x="682" y="407" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">gates · SAST · DAST</text>
+  <text x="682" y="424" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">Trivy · SonarQube · Nuclei</text>
+</svg>
+</Figure>
+
+## The design
+
+29 components. Names are the ones on the diagram.
+
+| Layer | Cells |
+|---|---|
+| **Applications** | `catalog-svc` (external source code, Django, port 8000) · `portal-frontend` (external source code, Node.js, port 8080) — both `env: production`, 2 replicas |
+| **Who reaches them** | `apisix` with 8 routes and an AI gateway sub-component · `crowdsec` with the WAF profile `waf` · `keycloak-operator` · `cert-manager` |
+| **Data and events** | `cnpg` with `catalog-db` and `sonarqube` · `kafka` with the topics `bids` and `orders`, a bridge and two node pools · `opensearch` · `valkey` · `seaweedfs` with six buckets |
+| **Model** | `vllm` with the model `marketplace-chat` |
+| **Data jobs** | `airflow` with the ETL sub-component `catalog-export` |
+| **Scale and load** | `keda` with the triggers `api-load` and `shop-load` · `k6` with the suite `shop-journey-r2` |
+| **Security** | `opa` with 8 policies · `falco` · `suricata` · `crowdsec` · `openbao` · `external-secrets` · `trivy` · `sonarqube` · `nuclei` |
+| **Observability** | `prometheus` (12 scrape links) · `grafana` |
+| **Delivery** | `argo-cd` (28 links) · `reloader` |
+| **Operations** | `stack-agent` · `fastmcp` |
+
+## The applications
+
+| | catalog-svc | portal-frontend |
+|---|---|---|
+| Route | `api.<domain>`, rate limit 10000 requests per minute per client address, CORS on, body up to 10 MiB | `shop.<domain>`, rate limit 100 requests per minute, CORS on, body up to 10 MiB |
+| WAF | Profile `waf`, `waf_failure_action: passthrough` | The same profile, `passthrough` |
+| Gateway login | Off: the application handles its own users | Off |
+| Workload hardening | `pod_security`, `container_security`, `read_only_fs`, `drop_capabilities`, `no_privilege_escalation`, `no_host_access`, `seccomp` | The same seven |
+| Build gates | `build_gate: enforce`, `sast_gate: enforce`, SonarQube scan through `sonarqube-external_source_code` | The same |
+| DAST | `nuclei-external_source_code` | `nuclei-external_source_code` |
+| Autoscaling | KEDA trigger `api-load` (`prometheus_query-external_source_code`) | KEDA trigger `shop-load` |
+
+catalog-svc's own links: `external_source_code-db` to `catalog-db`, `external_source_code-swbucket`
+to `catalog-images`, `external_source_code-valkey`, `external_source_code-opensearch`,
+`external_source_code-topic` to `bids` and to `orders`, and `external_source_code-ai_gateway` to
+`ai-gateway`, which links `ai_gateway-model` to `marketplace-chat`. Each one puts its variables into
+the application's environment, in the Django form for the database, the cache and the bucket — see
+[How a stack fits together](/docs/architecture/#the-layers-and-their-links).
+
+## Security, layer by layer
+
+### At the edge
+
+| Control | On the diagram | What it does here |
+|---|---|---|
+| Rate limits | `rate_limiting` and `rate_limit_count` on seven of the eight route links (not on Grafana) | APISIX `limit-count` per client address, counted on each gateway replica |
+| Web application firewall | CrowdSec `waf` sub-component, linked `waf-external_source_code` to both applications; `apisix-crowdsec` | CrowdSec's AppSec engine (Coraza with the OWASP Core Rule Set, virtual patches, generic rules) checks every request to both applications. The profile runs in `detect`: matches raise alerts, nothing is blocked yet. With `passthrough`, an unreachable WAF lets requests through |
+| IP bans | `crowdsec_firewall_bouncer` on, `crowdsec_simulation` off, remediation `ban` for 4 hours | Scenario overflows produce real decisions; the firewall bouncer drops traffic from a banned address on every node. Operator addresses are on `crowdsec_allowlist` so they are never banned |
+| Log sources for CrowdSec | `apisix-crowdsec`, `crowdsec-suricata`; collections `suricata`, `base-http-scenarios`, `http-cve` | The agent on every node reads the gateway access log and Suricata's events |
+
+### In the network and at admission
+
+| Control | On the diagram | What it does here |
+|---|---|---|
+| Network policies | Generated from every link, standard set | One policy per link; the OPA policy `network-policy-enforcement` refuses workloads in namespaces without one |
+| Admission policy | `opa` with 8 policy sub-components | `label-deny`, `pod-level-security`, `network-policy-enforcement` and `resource-policy` at `deny`; `image-policy` and `rbac-enforcement` at `warn`; `securitycontext` and `probes` at `dryrun`. Every policy is scoped to the stack label `stacktic.io/stack`. `opa_failure_policy: Ignore`: if Gatekeeper is down, admission does not fail |
+| Kafka clients | `mtls` on the Kafka component | Each application linked to a topic gets its own TLS client certificate and ACLs |
+
+### Watching
+
+| Control | On the diagram | What it does here |
+|---|---|---|
+| Network intrusion detection | `suricata`, linked `suricata-opensearch` | A passive sensor on every node, Emerging Threats Open rules refreshed every 24 hours, alerts and stats shipped to OpenSearch |
+| Runtime detection | `falco`, `modern_ebpf` driver, Falcosidekick on | Syscall rules on every node. The design has no `falco-opensearch` link, so Falco's events are not shipped to the SIEM |
+| CrowdSec alerts | `crowdsec-opensearch` | Every alert, WAF matches included, in the index `crowdsec-alerts`, with the SIEM dashboards and the new-decision monitor |
+| Vulnerability reports | `trivy-opensearch` | Trivy's reports in the SIEM |
+| Retention | OpenSearch `retention_hot_days: 7`, `retention_warm_days: 90`, `retention_total_days: 365` | The index lifecycle policy moves the SIEM indices (Falco, APISIX, OPA, audit, OpenTelemetry, Suricata, CrowdSec) to warm after 7 days and deletes them after 365 |
+| Metrics | `prometheus-suricata`, `prometheus-crowdsec`, `prometheus-opa` and nine more | Alert rules per component and the provisioned dashboards |
+
+### Secrets
+
+`external-secrets` links `external_secrets-openbao`: a seed Job writes the stack's secrets into
+OpenBao, and External Secrets syncs them into the namespaces that use them. `openbao-swbucket`
+takes Raft snapshots of OpenBao into a bucket on a schedule. See
+[Identity and secrets](/docs/day0/identity-secrets#two-ways-to-hold-a-secret).
+
+### Before anything runs
+
+| Gate | On the diagram | Effect |
+|---|---|---|
+| Source scan | `build_gate: enforce` on both applications | A finding stops the build |
+| Your own rules | `sast_gate: enforce` | Opengrep with the stack's rules stops the build on a match |
+| Quality gate | `sonarqube-external_source_code` to both applications, `scan_enabled` on, `enforce_quality_gate` off; `sonarqube-db` | SonarQube scans both applications on every build; a failed quality gate is reported, not blocking, until `enforce_quality_gate` is turned on |
+| DAST | `nuclei` linked to both applications, the gateway and the stack agent | One scan contract per link, its runs pushed to the stack agent |
+| Evidence | `stack_agent-swbucket` to `compliance-evidence`, `cve_decisions_enabled` on | Compliance evidence files in a bucket; a recorded decision per image vulnerability |
+
+See [Development security](/docs/dev-security/) for the three gates in detail.
+
+## Scale, load and data movement
+
+<Figure caption="Scaling, load testing and data movement are sub-components and links too, so they are versioned with the stack and visible in a diff.">
+<svg viewBox="0 0 900 250" role="img" aria-label="KEDA scales catalog-svc and portal-frontend on Prometheus queries, and has triggers on the database, the bids topic and the chat model. k6 replays a shop journey and reports to Prometheus. Airflow exports the catalog database to a bucket, and the bids topic is written into OpenSearch.">
+  <defs>
+    <marker id="secCViolet" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-violet)" /></marker>
+  </defs>
+  <rect x="24" y="36" width="420" height="196" rx="16" fill="var(--stk-blue)" fillOpacity="0.035" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <rect x="468" y="36" width="408" height="196" rx="16" fill="var(--stk-mint)" fillOpacity="0.035" stroke="var(--stk-mint)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <path d="M290 98 L290 140" fill="none" stroke="var(--stk-violet)" strokeWidth="1.1" markerEnd="url(#secCViolet)" />
+  <circle cx="52" cy="84" r="6" fill="var(--stk-blue)" />
+  <circle cx="52" cy="132" r="6" fill="var(--stk-blue)" />
+  <circle cx="52" cy="180" r="6" fill="var(--stk-blue)" />
+  <circle cx="290" cy="84" r="6" fill="var(--stk-violet)" />
+  <circle cx="290" cy="150" r="6" fill="var(--stk-violet)" />
+  <circle cx="496" cy="84" r="6" fill="var(--stk-mint)" />
+  <circle cx="496" cy="132" r="6" fill="var(--stk-mint)" />
+  <circle cx="496" cy="180" r="6" fill="var(--stk-mint)" />
+  <text x="40" y="57" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">SCALE AND LOAD</text>
+  <text x="64" y="88" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">api-load → catalog-svc</text>
+  <text x="64" y="101" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">prometheus_query trigger</text>
+  <text x="64" y="136" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">shop-load → portal-frontend</text>
+  <text x="64" y="149" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">prometheus_query trigger</text>
+  <text x="64" y="184" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">db · topic · model triggers</text>
+  <text x="64" y="197" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">catalog-db · bids · chat model</text>
+  <text x="302" y="88" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">k6 journey</text>
+  <text x="302" y="101" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">endpoints suite</text>
+  <text x="302" y="154" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">results</text>
+  <text x="302" y="167" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">Prometheus · Grafana</text>
+  <text x="484" y="57" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">DATA FLOWS</text>
+  <text x="508" y="88" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">catalog-db → catalog-export</text>
+  <text x="508" y="101" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">db-etl · Airflow ETL</text>
+  <text x="508" y="136" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">catalog-export → etl-exports</text>
+  <text x="508" y="149" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">etl-swbucket · bucket</text>
+  <text x="508" y="184" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">bids → opensearch</text>
+  <text x="508" y="197" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">topic-opensearch · Connect sink</text>
+</svg>
+</Figure>
+
+| Link or sub-component | What it generates |
+|---|---|
+| `keda-prometheus` + `prometheus_query` sub-components `api-load` and `shop-load`, each linked to its application | A KEDA ScaledObject per application, scaling on a Prometheus query. The applications run with `hpa: false`, as KEDA requires |
+| `keda-db` to `catalog-db` | A ScaledObject on the CloudNativePG cluster itself: its instance count follows a PostgreSQL query |
+| `keda-topic` to `bids` | Scales the consumers of the topic on their lag |
+| `keda-model` to `marketplace-chat` | Scales the model's vLLM runtime |
+| k6 `endpoints` sub-component `shop-journey-r2` | A load-test suite of virtual shoppers following a journey, results labelled per step in Prometheus (`prometheus-k6`) and shown in Grafana |
+| Airflow `catalog-export`: `db-etl` from `catalog-db`, `etl-swbucket` to `etl-exports` | An ETL job reading the catalog database and writing exports to a bucket |
+| `topic-opensearch` from `bids` | A Kafka Connect sink writing every bid into OpenSearch |
+
+## Delivery and operations
+
+| Concern | On the diagram | What it gives this stack |
+|---|---|---|
+| Delivery | `argo-cd` linked to 28 components · `reloader` | One Application per component, data never deleted by Argo CD, pods restarted when their Secret changes |
+| Backups | `cnpg-swbucket`, `opensearch-swbucket`, `openbao-swbucket` | Database backups, OpenSearch snapshots and OpenBao snapshots, each in its own bucket |
+| Stack agent | `deploy_access`, `backup_apply_access` and `cve_decisions_enabled` on | Deploys committed branches, runs guarded restore operations, records vulnerability decisions |
+| MCP server | `fastmcp` linked to `mcp-client`, `opa`, `stack-agent`, `valkey`, `kafka`; `ai_workflow: spec-kit` | Keycloak login, admission-policy tools, the agent's scans, persistent client storage, Kafka tools, and spec-driven development kits in the application folders |
+
+## What the design deliberately leaves out
+
+These are choices on this diagram, not gaps in the platform:
+
+- The application routes do not use gateway login; the applications authenticate their own users.
+- The WAF runs in `detect`. Switching the profile's `waf_mode` to `block` turns matches into
+  refusals once the alerts have been reviewed.
+- Falco has no OpenSearch link, so its events are not in the SIEM.
+
+→ [How a stack fits together](/docs/architecture/) · [Security, layer by layer](/docs/security/)

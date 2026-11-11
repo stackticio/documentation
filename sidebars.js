@@ -12,16 +12,28 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'The whole system',
+      collapsed: false,
+      items: [
+        { type: 'doc', id: 'architecture/architecture-index', label: 'How a stack fits together' },
+        { type: 'doc', id: 'architecture/architecture-ai-stack', label: 'Example: AI document desk' },
+        { type: 'doc', id: 'architecture/architecture-secured-stack', label: 'Example: secured marketplace' },
+      ],
+    },
+    {
+      type: 'category',
       label: 'The platform',
       collapsed: false,
       items: [
         { type: 'doc', id: 'platform/platform-index', label: 'Screen by screen' },
         { type: 'doc', id: 'platform/platform-systems', label: 'Systems and builds' },
+        { type: 'doc', id: 'platform/platform-repository', label: 'Repository and merge' },
         { type: 'doc', id: 'platform/platform-history', label: 'History and rollback' },
         { type: 'doc', id: 'platform/platform-liveview', label: 'LiveView' },
         { type: 'doc', id: 'platform/platform-sections', label: 'Catalog and sections' },
         { type: 'doc', id: 'platform/platform-custom-components', label: 'Your own components' },
         { type: 'doc', id: 'platform/platform-collaboration', label: 'Collaboration' },
+        { type: 'doc', id: 'platform/platform-external-stacks', label: 'External stacks' },
         { type: 'doc', id: 'platform/platform-knowledge', label: 'Knowledge' },
       ],
     },
@@ -66,11 +78,23 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'Security',
+      collapsed: true,
+      items: [
+        { type: 'doc', id: 'security/security-index', label: 'Security, layer by layer' },
+        { type: 'doc', id: 'security/security-edge', label: 'Gateway, login and VPN' },
+        { type: 'doc', id: 'security/security-network', label: 'Network policies' },
+        { type: 'doc', id: 'security/security-hardening', label: 'Hardening and admission' },
+        { type: 'doc', id: 'security/security-detection', label: 'Detection and response' },
+      ],
+    },
+    {
+      type: 'category',
       label: 'Compliance automation',
       collapsed: true,
       items: [
         { type: 'doc', id: 'compliance/compliance-index', label: 'Overview' },
-        { type: 'doc', id: 'compliance/compliance-frameworks', label: 'PCI DSS and ISO 27001' },
+        { type: 'doc', id: 'compliance/compliance-frameworks', label: 'PCI DSS, ISO, HIPAA, DORA' },
         { type: 'doc', id: 'compliance/compliance-policy', label: 'Admission policy' },
         { type: 'doc', id: 'compliance/compliance-controls-from-graph', label: 'Controls from the graph' },
         { type: 'doc', id: 'compliance/compliance-reviews', label: 'Reviews and approvals' },

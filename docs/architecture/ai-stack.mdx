@@ -1,0 +1,251 @@
+---
+id: architecture-ai-stack
+slug: /architecture/ai-stack
+title: "Example: an AI document desk"
+sidebar_label: "Example: AI document desk"
+sidebar_position: 2
+description: A real 22-component stack walked through link by link — two applications, two self-hosted models, an event stream, a nightly job, and everything generated around them.
+---
+
+<Hero eyebrow="Worked stack" title="Two applications, two models, one event stream">
+This is a stack the Stacktic team runs to test the platform and the MCP. A web application answers
+questions about the documents it stores, publishes an event for every document it ingests, and a
+nightly job writes a digest with the same self-hosted model. Every connection below is a link on
+its diagram; nothing was wired by hand.
+</Hero>
+
+<Figure caption="The design of the AI document desk, read from the gateway to the models. Solid lines are signal-desk's links, dashed lines signal-digest's. Everything in the bottom band is generated around the same components from their own links.">
+<svg viewBox="0 0 900 476" role="img" aria-label="The AI document desk. A route with login reaches signal-desk. signal-desk uses a PostgreSQL database, a Kafka topic, a Qdrant collection, a cache and two AI gateway routes, one to a chat model and one to an embedding model served by vLLM. Around it, Argo CD manages 21 components, Prometheus scrapes 12, logs go to Loki through Alloy, backups and logs land in SeaweedFS buckets, and the MCP server reaches the stack agent, Argo CD and Langflow.">
+  <defs>
+    <marker id="aiABlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-blue)" /></marker>
+    <marker id="aiAMint" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-mint)" /></marker>
+    <marker id="aiAViolet" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-violet)" /></marker>
+  </defs>
+  <rect x="24" y="36" width="196" height="288" rx="16" fill="var(--stk-violet)" fillOpacity="0.035" stroke="var(--stk-violet)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <rect x="244" y="36" width="196" height="288" rx="16" fill="var(--stk-blue)" fillOpacity="0.035" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <rect x="464" y="36" width="210" height="288" rx="16" fill="var(--stk-mint)" fillOpacity="0.035" stroke="var(--stk-mint)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <rect x="698" y="36" width="178" height="288" rx="16" fill="var(--stk-amber)" fillOpacity="0.035" stroke="var(--stk-amber)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <rect x="24" y="344" width="852" height="116" rx="16" fill="var(--stk-steel)" fillOpacity="0.035" stroke="var(--stk-steel)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <path d="M150 100 C236 100 236 110 322 110" fill="none" stroke="var(--stk-violet)" strokeWidth="1.2" markerEnd="url(#aiAViolet)" />
+  <path d="M328 122 C259 122 259 170 190 170" fill="none" stroke="var(--stk-blue)" strokeWidth="1.2" markerEnd="url(#aiABlue)" />
+  <path d="M360 110 C421 110 421 72 482 72" fill="none" stroke="var(--stk-blue)" strokeWidth="1.1" markerEnd="url(#aiABlue)" />
+  <path d="M360 110 C421 110 421 118 482 118" fill="none" stroke="var(--stk-blue)" strokeWidth="1.1" markerEnd="url(#aiABlue)" />
+  <path d="M360 110 C421 110 421 164 482 164" fill="none" stroke="var(--stk-blue)" strokeWidth="1.1" markerEnd="url(#aiABlue)" />
+  <path d="M360 110 C421 110 421 210 482 210" fill="none" stroke="var(--stk-blue)" strokeWidth="1.1" markerEnd="url(#aiABlue)" />
+  <path d="M360 110 C421 110 421 256 482 256" fill="none" stroke="var(--stk-blue)" strokeWidth="1.1" markerEnd="url(#aiABlue)" />
+  <path d="M360 110 C421 110 421 302 482 302" fill="none" stroke="var(--stk-blue)" strokeWidth="1.1" markerEnd="url(#aiABlue)" />
+  <path d="M360 236 C421 236 421 72 482 72" fill="none" stroke="var(--stk-blue)" strokeWidth="1.1" strokeDasharray="4 4" markerEnd="url(#aiABlue)" />
+  <path d="M360 236 C421 236 421 256 482 256" fill="none" stroke="var(--stk-blue)" strokeWidth="1.1" strokeDasharray="4 4" markerEnd="url(#aiABlue)" />
+  <path d="M600 256 C651 256 651 120 702 120" fill="none" stroke="var(--stk-mint)" strokeWidth="1.1" markerEnd="url(#aiAMint)" />
+  <path d="M600 302 C651 302 651 250 702 250" fill="none" stroke="var(--stk-mint)" strokeWidth="1.1" markerEnd="url(#aiAMint)" />
+  <rect x="44" y="370" width="192" height="78" rx="12" fill="var(--stk-panel)" />
+  <rect x="44" y="370" width="192" height="78" rx="12" fill="var(--stk-steel)" fillOpacity="0.045" stroke="var(--stk-steel)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="252" y="370" width="192" height="78" rx="12" fill="var(--stk-panel)" />
+  <rect x="252" y="370" width="192" height="78" rx="12" fill="var(--stk-steel)" fillOpacity="0.045" stroke="var(--stk-steel)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="460" y="370" width="192" height="78" rx="12" fill="var(--stk-panel)" />
+  <rect x="460" y="370" width="192" height="78" rx="12" fill="var(--stk-steel)" fillOpacity="0.045" stroke="var(--stk-steel)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="668" y="370" width="192" height="78" rx="12" fill="var(--stk-panel)" />
+  <rect x="668" y="370" width="192" height="78" rx="12" fill="var(--stk-steel)" fillOpacity="0.045" stroke="var(--stk-steel)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <circle cx="48" cy="100" r="6" fill="var(--stk-violet)" />
+  <circle cx="48" cy="170" r="6" fill="var(--stk-violet)" />
+  <circle cx="48" cy="240" r="6" fill="var(--stk-violet)" />
+  <circle cx="342" cy="110" r="16" fill="var(--stk-blue)" fillOpacity="0.16" />
+  <circle cx="342" cy="110" r="10" fill="var(--stk-blue)" />
+  <circle cx="342" cy="236" r="16" fill="var(--stk-blue)" fillOpacity="0.16" />
+  <circle cx="342" cy="236" r="10" fill="var(--stk-blue)" />
+  <circle cx="490" cy="72" r="6" fill="var(--stk-mint)" />
+  <circle cx="490" cy="118" r="6" fill="var(--stk-mint)" />
+  <circle cx="490" cy="164" r="6" fill="var(--stk-mint)" />
+  <circle cx="490" cy="210" r="6" fill="var(--stk-mint)" />
+  <circle cx="490" cy="256" r="6" fill="var(--stk-mint)" />
+  <circle cx="490" cy="302" r="6" fill="var(--stk-mint)" />
+  <circle cx="722" cy="120" r="16" fill="var(--stk-amber)" fillOpacity="0.16" />
+  <circle cx="722" cy="120" r="10" fill="var(--stk-amber)" />
+  <circle cx="722" cy="250" r="16" fill="var(--stk-amber)" fillOpacity="0.16" />
+  <circle cx="722" cy="250" r="10" fill="var(--stk-amber)" />
+  <text x="40" y="57" fontSize="10.2" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">WHO REACHES IT</text>
+  <text x="60" y="104" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">route desk</text>
+  <text x="60" y="117" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">login at the gateway</text>
+  <text x="60" y="174" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">signal-desk-client</text>
+  <text x="60" y="187" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">Keycloak client</text>
+  <text x="60" y="244" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">7 more routes</text>
+  <text x="60" y="257" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">MCP · agent · Grafana · UIs</text>
+  <text x="260" y="57" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">APPLICATIONS</text>
+  <text x="342" y="143" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">signal-desk</text>
+  <text x="342" y="156" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">FastAPI · port 8080</text>
+  <text x="342" y="269" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">signal-digest</text>
+  <text x="342" y="282" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">Python · nightly job</text>
+  <text x="480" y="57" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">DATA · EVENTS · AI ROUTES</text>
+  <text x="502" y="76" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">signal-db</text>
+  <text x="502" y="89" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">CloudNativePG</text>
+  <text x="502" y="122" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">doc-ingested</text>
+  <text x="502" y="135" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">Kafka topic</text>
+  <text x="502" y="168" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">docs</text>
+  <text x="502" y="181" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">Qdrant collection</text>
+  <text x="502" y="214" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">valkey</text>
+  <text x="502" y="227" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">cache</text>
+  <text x="502" y="260" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">ai-chat</text>
+  <text x="502" y="273" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">AI gateway route</text>
+  <text x="502" y="306" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">ai-embed</text>
+  <text x="502" y="319" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">AI gateway route</text>
+  <text x="714" y="57" fontSize="10.2" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">MODELS · vLLM</text>
+  <text x="744" y="124" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">qwen3-8b</text>
+  <text x="744" y="137" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">chat</text>
+  <text x="744" y="254" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">bge-m3</text>
+  <text x="744" y="267" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">embeddings</text>
+  <text x="722" y="300" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">Open WebUI, Langflow</text>
+  <text x="722" y="313" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">use qwen3-8b too</text>
+  <text x="40" y="365" fontSize="10.2" fill="var(--stk-steel)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">AROUND IT</text>
+  <text x="58" y="390" fontSize="9.7" fill="var(--stk-steel)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">DELIVERY</text>
+  <text x="58" y="407" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">Argo CD</text>
+  <text x="58" y="424" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">21 Applications</text>
+  <text x="58" y="437.5" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">Reloader</text>
+  <text x="266" y="390" fontSize="9.7" fill="var(--stk-steel)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">OBSERVABILITY</text>
+  <text x="266" y="407" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">Prometheus</text>
+  <text x="266" y="424" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">12 scrape links</text>
+  <text x="266" y="437.5" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">Grafana · Loki ← Alloy</text>
+  <text x="474" y="390" fontSize="9.7" fill="var(--stk-steel)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">STORAGE</text>
+  <text x="474" y="407" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">SeaweedFS</text>
+  <text x="474" y="424" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">cnpg-backups</text>
+  <text x="474" y="437.5" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">loki-logs</text>
+  <text x="682" y="390" fontSize="9.7" fill="var(--stk-steel)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">OPERATIONS</text>
+  <text x="682" y="407" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">MCP server</text>
+  <text x="682" y="424" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">stack agent · Argo CD</text>
+  <text x="682" y="437.5" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">Langflow · Valkey</text>
+</svg>
+</Figure>
+
+## The design
+
+22 components. Names are the ones on the diagram.
+
+| Layer | Cells |
+|---|---|
+| **Applications** | `signal-desk` (external source code, FastAPI, port 8080) · `signal-digest` (external source code, Python, port 8080) |
+| **Who reaches them** | `apisix` with 8 routes · `keycloak-operator` with 3 clients: `signal-desk-client`, `openwebui-client`, and `client` for the MCP server |
+| **Data and events** | `cnpg` with the databases `signal-db` and `dagster-db` · `kafka` with the topic `doc-ingested` · `qdrant` with the collection `docs` · `valkey` |
+| **Models** | `vllm` with two model sub-components, `qwen3-8b` and `bge-m3` · two AI gateway sub-components on `apisix`, `ai-chat` and `ai-embed` · `open-webui` · `langflow` |
+| **Jobs** | `dagster` with the sensor `doc-ingested-sensor` and the job `nightly-digest` |
+| **Storage** | `seaweedfs` with the buckets `cnpg-backups` and `loki-logs` |
+| **Observability** | `prometheus` (12 scrape links) · `grafana` · `loki` · `alloy` |
+| **Delivery** | `argo-cd` (21 links) · `reloader` · `cert-manager` |
+| **Operations** | `stack-agent` · `fastmcp` |
+
+## What signal-desk's links generate
+
+The application's code reads its configuration from environment variables. Every one of them comes
+from a link; none is typed by hand.
+
+| Link on the diagram | In signal-desk's environment | Elsewhere in the stack |
+|---|---|---|
+| `apisix-external_source_code`, subdomain `desk`, `apisix_oidc_enable` on | — | The route `desk.<domain>` with TLS. Because login is on and the application links a Keycloak client, the route gets an `openid-connect` plugin built from that client: nobody reaches the application without signing in |
+| `external_source_code-client` to `signal-desk-client` | `OIDC_ISSUER_URL`, `OIDC_DISCOVERY_URL`, `OIDC_REALM`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_REDIRECT_URIS` | The client in Keycloak, created and kept in line by the Keycloak sync Job |
+| `external_source_code-db` to `signal-db` | `DATABASE_URL` (the FastAPI form) | The database and its user in the CloudNativePG cluster |
+| `external_source_code-topic` to `doc-ingested` | `KAFKA_BOOTSTRAP_SERVERS`, `KAFKA_TOPICS`, `KAFKA_SECURITY_PROTOCOL` and the TLS file locations | With the Kafka component's `mtls` on, a TLS user with ACLs per client and its certificate in the application's namespace. This stack runs with `mtls` off |
+| `external_source_code-collection` to `docs` | `QDRANT_HOST`, `QDRANT_PORT`, `QDRANT_URL`, `QDRANT_COLLECTION`, `QDRANT_VECTOR_SIZE` | The collection, created and reconciled by Qdrant's init Job from the sub-component |
+| `external_source_code-valkey` | `REDIS_URL` | — (the application uses it for its own rate limit and an answer cache) |
+| `external_source_code-ai_gateway` to `ai-chat` and to `ai-embed` | `AI_GATEWAY_URL`, `AI_GATEWAY_MODEL`, `AI_GATEWAY_API_KEY`, `AI_GATEWAY_API_KEY_HEADER` from the first link, and one complete set per gateway: `AI_CHAT_AI_GATEWAY_*` and `AI_EMBED_AI_GATEWAY_*` | — |
+| `argo_cd-external_source_code` | — | An Argo CD Application for the component |
+
+The per-gateway names are the gateway sub-component's name in upper case with dashes as
+underscores. An application with a single gateway link gets only the plain `AI_GATEWAY_*` set.
+
+## The models
+
+Each AI gateway sub-component is one route on the gateway to one served model:
+
+| Gateway route | Link | Model | Also used by |
+|---|---|---|---|
+| `ai-chat` | `ai_gateway-model` | `qwen3-8b` | `signal-digest`, Open WebUI (`open_webui-model`), Langflow (`langflow-model`) |
+| `ai-embed` | `ai_gateway-model` | `bge-m3` | — |
+
+The application only ever talks to the gateway, so the key stays server-side and the gateway
+applies its key auth, prompt guard and token budget — see
+[Private AI](/docs/blueprints/private-ai#an-assistant-inside-your-app).
+
+## The event chain
+
+The second application is started by events, not by a person.
+
+<Figure caption="Four links make the pipeline: no consumer code, no connector configuration and no scheduler wiring is written by hand.">
+<svg viewBox="0 0 900 230" role="img" aria-label="The event chain. signal-desk publishes to the topic doc-ingested. A Kafka Connect sink writes the topic into signal-db. A Dagster sensor watches the same topic and starts the job nightly-digest, which runs the signal-digest image as a Kubernetes job.">
+  <defs>
+    <marker id="aiBMint" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-mint)" /></marker>
+    <marker id="aiBSteel" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-steel)" /></marker>
+  </defs>
+  <path d="M72 90 L206 90" fill="none" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#aiBSteel)" />
+  <path d="M250 90 L384 90" fill="none" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#aiBSteel)" />
+  <path d="M428 90 L562 90" fill="none" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#aiBSteel)" />
+  <path d="M606 90 L740 90" fill="none" stroke="var(--stk-steel)" strokeWidth="1.2" markerEnd="url(#aiBSteel)" />
+  <path d="M228 136 C228 158 228 158 228 180" fill="none" stroke="var(--stk-mint)" strokeWidth="1.1" markerEnd="url(#aiBMint)" />
+  <circle cx="50" cy="90" r="16" fill="var(--stk-blue)" fillOpacity="0.16" />
+  <circle cx="50" cy="90" r="10" fill="var(--stk-blue)" />
+  <circle cx="228" cy="90" r="16" fill="var(--stk-mint)" fillOpacity="0.16" />
+  <circle cx="228" cy="90" r="10" fill="var(--stk-mint)" />
+  <circle cx="406" cy="90" r="16" fill="var(--stk-violet)" fillOpacity="0.16" />
+  <circle cx="406" cy="90" r="10" fill="var(--stk-violet)" />
+  <circle cx="584" cy="90" r="16" fill="var(--stk-violet)" fillOpacity="0.16" />
+  <circle cx="584" cy="90" r="10" fill="var(--stk-violet)" />
+  <circle cx="762" cy="90" r="16" fill="var(--stk-blue)" fillOpacity="0.16" />
+  <circle cx="762" cy="90" r="10" fill="var(--stk-blue)" />
+  <circle cx="228" cy="190" r="6" fill="var(--stk-mint)" />
+  <text x="50" y="123" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">signal-desk</text>
+  <text x="50" y="136" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">publishes</text>
+  <text x="228" y="123" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">doc-ingested</text>
+  <text x="228" y="136" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">Kafka topic</text>
+  <text x="406" y="123" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">sensor</text>
+  <text x="406" y="136" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">Dagster · topic-sensor</text>
+  <text x="584" y="123" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">nightly-digest</text>
+  <text x="584" y="136" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">Dagster job</text>
+  <text x="762" y="123" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="middle" fontWeight="600">signal-digest</text>
+  <text x="762" y="136" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">runs as a k8s job</text>
+  <text x="139" y="76" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">external_source_code-topic</text>
+  <text x="317" y="76" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">topic-sensor</text>
+  <text x="495" y="76" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">sensor-job</text>
+  <text x="673" y="76" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">job-external_source_code</text>
+  <text x="240" y="194" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">signal-db</text>
+  <text x="240" y="207" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">topic-db · Kafka Connect sink</text>
+</svg>
+</Figure>
+
+| Link | What it generates |
+|---|---|
+| `external_source_code-topic` | signal-desk's Kafka configuration, above; the application publishes an ingest event per document |
+| `topic-db` (topic `doc-ingested` to database `signal-db`) | A Kafka Connect cluster and a sink connector that writes every event into the database, with the statement in the link's `sink_query` attribute (here an audit table) |
+| `topic-sensor` (topic to Dagster sensor) | A Dagster sensor on that topic, generated with `default_status=RUNNING`, so it evaluates from the first daemon tick |
+| `sensor-job` (sensor to job) | The sensor starts `nightly-digest` |
+| `job-external_source_code` (job to `signal-digest`) | The job runs the `signal-digest` image as a Kubernetes job, in that component's namespace |
+| `dagster-db` | Dagster's own storage, in the database `dagster-db` |
+
+signal-digest then reads `signal-db` and calls `ai-chat` through its own two links. No consumer
+loop, connector definition or scheduler entry was written by hand.
+
+## Around it
+
+| Concern | On the diagram | What it gives this stack |
+|---|---|---|
+| **Delivery** | `argo-cd` linked to 21 components · `reloader` | One Application per component; a changed Secret or ConfigMap restarts the pods that read it. The applications have `push_and_deploy` on: the build Job rolls the Deployment onto the image it just pushed |
+| **Images** | Stack configuration: BuildKit, `cache_build` on | In-cluster builds with a layer cache, so a code-only change reuses the dependency layers |
+| **Metrics** | `prometheus` linked to 12 components · `grafana-prometheus` | Scrape configuration, alert rules and dashboards for each linked component |
+| **Logs** | `alloy-loki` · `grafana-loki` · `loki-swbucket` to `loki-logs` | Logs from every pod, stored in a bucket, queried in Grafana |
+| **Backups** | `cnpg-swbucket` to `cnpg-backups` | The database's backups in a bucket |
+| **Operations** | `fastmcp` linked to `client`, `argo-cd`, `stack-agent`, `valkey`, `langflow` | An MCP server behind Keycloak login, with Argo CD runtime tools, the stack agent's scans, persistent OAuth client storage and Langflow flow tools |
+| **Validation** | `stack-agent`, `deploy_access` on | Link tests for every link above; a deploy arm that applies committed branches |
+
+## Security in this stack
+
+| Layer | Setting |
+|---|---|
+| Login | The application route requires a Keycloak login, built from the client link |
+| Workload | Both applications carry `pod_security`, `drop_capabilities`, `no_privilege_escalation`, `read_only_fs` and `seccomp` |
+| Build | `build_gate` set to `enforce`: a source scan finding blocks the build; `sast_gate` off |
+| Network | The standard generated network policies (the stack's `microsegmentation_level` is not set, which means the standard set) |
+
+## How it was built
+
+The application code lives on the stack repository's build branch under `apps/signal-desk` and
+`apps/signal-digest`. It was written and committed there by the MCP server, each commit signed
+"Stacktic MCP". The generated files come from the platform's branch and are merged in on every
+build — see [The stack repository](/docs/platform/repository).
+
+→ [How a stack fits together](/docs/architecture/) · [A secured marketplace](/docs/architecture/secured-stack)

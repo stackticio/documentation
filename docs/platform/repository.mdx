@@ -1,0 +1,180 @@
+---
+id: platform-repository
+slug: /platform/repository
+title: The stack repository and the merge
+sidebar_label: Repository and merge
+sidebar_position: 3
+description: The branches of a stack repository, what a build writes to each, the per-file merge between the generated output and your branch, and which actions merge.
+---
+
+<Hero eyebrow="Repository" title="One branch the platform owns, one branch you own">
+The platform writes its output to a branch nobody else writes to, then merges that branch into the
+branch your team and your deployments use. Your edits and your application code live on the second
+branch and survive every build.
+</Hero>
+
+<Figure caption="The generated branch is rewritten by every build and merged into the build branch, where your application code and edits live. The stack agent keeps evidence on its own branch. Everything that deploys reads the build branch.">
+<svg viewBox="0 0 900 340" role="img" aria-label="Three branches in the stack repository. The platform writes the generated branch on every build and merges it into the build branch. People and the MCP commit application code to the build branch. The stack agent writes evidence to its own branch. Argo CD, image builds and the deploy arm read the build branch.">
+  <defs>
+    <marker id="repoABlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-blue)" /></marker>
+    <marker id="repoAMint" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-mint)" /></marker>
+  </defs>
+  <rect x="724" y="36" width="152" height="286" rx="16" fill="var(--stk-mint)" fillOpacity="0.035" stroke="var(--stk-mint)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <path d="M160 80 L700 80" fill="none" stroke="var(--stk-blue)" strokeWidth="1.6" />
+  <path d="M160 190 L700 190" fill="none" stroke="var(--stk-mint)" strokeWidth="1.6" />
+  <path d="M160 288 L700 288" fill="none" stroke="var(--stk-amber)" strokeWidth="1.6" />
+  <path d="M190 86 C220 86 220 182 250 182" fill="none" stroke="var(--stk-blue)" strokeWidth="1.2" markerEnd="url(#repoABlue)" />
+  <path d="M330 86 C360 86 360 182 390 182" fill="none" stroke="var(--stk-blue)" strokeWidth="1.2" markerEnd="url(#repoABlue)" />
+  <path d="M610 86 C640 86 640 182 670 182" fill="none" stroke="var(--stk-blue)" strokeWidth="1.2" markerEnd="url(#repoABlue)" />
+  <path d="M700 190 L734 190" fill="none" stroke="var(--stk-mint)" strokeWidth="1.2" markerEnd="url(#repoAMint)" />
+  <circle cx="190" cy="80" r="6" fill="var(--stk-blue)" />
+  <circle cx="330" cy="80" r="6" fill="var(--stk-blue)" />
+  <circle cx="470" cy="80" r="6" fill="var(--stk-blue)" />
+  <circle cx="610" cy="80" r="6" fill="var(--stk-blue)" />
+  <circle cx="250" cy="190" r="13" fill="none" stroke="var(--stk-mint)" strokeWidth="1.3" strokeDasharray="3 3" />
+  <circle cx="250" cy="190" r="7" fill="var(--stk-mint)" />
+  <circle cx="390" cy="190" r="13" fill="none" stroke="var(--stk-mint)" strokeWidth="1.3" strokeDasharray="3 3" />
+  <circle cx="390" cy="190" r="7" fill="var(--stk-mint)" />
+  <circle cx="670" cy="190" r="13" fill="none" stroke="var(--stk-mint)" strokeWidth="1.3" strokeDasharray="3 3" />
+  <circle cx="670" cy="190" r="7" fill="var(--stk-mint)" />
+  <circle cx="530" cy="190" r="6" fill="var(--stk-git)" />
+  <circle cx="300" cy="288" r="6" fill="var(--stk-amber)" />
+  <circle cx="520" cy="288" r="6" fill="var(--stk-amber)" />
+  <circle cx="748" cy="84" r="6" fill="var(--stk-mint)" />
+  <circle cx="748" cy="136" r="6" fill="var(--stk-mint)" />
+  <circle cx="748" cy="188" r="6" fill="var(--stk-mint)" />
+  <circle cx="748" cy="240" r="6" fill="var(--stk-mint)" />
+  <text x="24" y="84" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">stacktic</text>
+  <text x="24" y="100" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">generated · git_branch</text>
+  <text x="24" y="194" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">main</text>
+  <text x="24" y="210" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">build · build_branch</text>
+  <text x="24" y="292" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">evidence</text>
+  <text x="24" y="308" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">stack agent only</text>
+  <text x="190" y="62" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">build</text>
+  <text x="330" y="62" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">save &amp; push</text>
+  <text x="470" y="62" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">API build</text>
+  <text x="610" y="62" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">build</text>
+  <text x="530" y="214" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">apps/&lt;name&gt; commit</text>
+  <text x="470" y="106" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">not merged</text>
+  <text x="410" y="308" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">one commit per scan run</text>
+  <text x="740" y="57" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">READS MAIN</text>
+  <text x="760" y="88" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">Argo CD</text>
+  <text x="760" y="140" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">image builds</text>
+  <text x="760" y="192" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">deploy arm</text>
+  <text x="760" y="244" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">your team</text>
+  <rect x="239.56" y="222.9" width="160.88" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="239.56" y="222.9" width="160.88" height="18.2" rx="9.1" fill="var(--stk-blue)" fillOpacity="0.14" stroke="var(--stk-blue)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="320" y="235.67" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">Merge stacktic into main</text>
+</svg>
+</Figure>
+
+## The branches
+
+Both branch names are set on the system's [configuration page](/docs/platform/systems#the-configuration-page);
+by convention the generated branch is called `stacktic` and the build branch `main`.
+
+| Branch | Configuration key | Written by | What it holds |
+|---|---|---|---|
+| **Generated branch** | `git_branch` | The platform only | Exactly what the last build rendered: every manifest, policy, Job, script and document. It is overwritten on every build |
+| **Build branch** | `build_branch` | The platform, by merging; your team; the MCP server | The generated output merged in, plus everything people add: application code under `apps/<name>`, edits to generated files, notes |
+| **Evidence branch** | fixed name `evidence` | The stack agent, when its `evidence_push` attribute is on | A copy of every saved scan run, so the audit trail has a record the agent cannot rewrite in place |
+
+The generated branch answers "what does the design render". The build branch answers "what does
+the stack run".
+
+## What a build writes
+
+The build log shows these steps in this order.
+
+<Steps>
+  <Step title="Defining ignore and overwrite files">
+    The per-file choices from the divergence list on the build page: <em>ignore</em> is stored on the
+    system and kept for later builds; <em>overwrite</em> applies once.
+  </Step>
+  <Step title="Generate every component">
+    Each component is rendered from its template, then the stack-wide steps run (metadata, network
+    policies, checksums, air-gap rewrite).
+  </Step>
+  <Step title="Push to the generated branch">
+    The generated branch is fetched and reset to the remote, every generated file is copied in, and
+    <strong>every file the generator did not produce is deleted</strong>, empty folders too. Then it
+    is committed and pushed.
+  </Step>
+  <Step title="Merge into the build branch (when merge is on)">
+    The build branch is fetched and reset to the remote, so commits pushed by people or by the MCP
+    since the last build are part of the merge. Then the per-file merge below runs.
+  </Step>
+</Steps>
+
+:::danger Never commit to the generated branch
+A file that the generator did not produce is deleted from the generated branch at the next build.
+Application code pushed there is gone the next time anyone builds. Commit to the build branch.
+:::
+
+## The merge, file by file
+
+The merge compares three versions of every file: the generated commit that was last merged into the
+build branch (the base), the newest generated commit, and the newest commit on the build branch.
+On the very first merge there is no base, and a plain `git merge` runs.
+
+| What happened to the file since the last merge | Result on the build branch | Log section |
+|---|---|---|
+| It is on the stored **ignore** list | Never touched, whatever changed | IGNORED |
+| It is on the **overwrite** list | Replaced by the generated version, even if someone edited it | OVERWRITTEN |
+| Changed only by the generator | The change is applied: added, changed or removed | ADDED · CHANGED · REMOVED |
+| Changed only on the build branch, by a person or the MCP | Kept as they left it | — |
+| **Deleted** on the build branch but still generated | Brought back from the generated branch | RESTORED |
+| Changed on both sides, no overlap | Merged line by line | MERGED |
+| Changed on both sides, overlapping | **Build**: committed with conflict markers and listed for review. **Save & Push**: refused, see below | ATTENTION |
+| Exists only on the build branch, never generated (`apps/…`, notes) | Untouched | — |
+
+After the merge, `kustomize build` runs for every kustomization folder that contains a changed file,
+and the result is logged under KUSTOMIZATION. A failure there is reported, not fatal.
+
+The merge commit has two parents, the build branch and the generated branch, and the message
+`Merge <generated branch> into <build branch>`. Its author is the person who started the build; its
+committer is the stack's git user. If the remote refuses the push, the build fails and says so.
+
+## Which actions merge
+
+| Action | Writes the generated branch | Merges into the build branch |
+|---|---|---|
+| **Build**, **Fast Build** or **Full push** from the build page | Yes | When *Merge* is ticked; conflicts are committed with markers and listed under ATTENTION |
+| **Save & Push**, from the design page or the API | Yes, only the files the changed attributes affect | Always. A conflict blocks the push: the build branch is left untouched and the log says "Run a Build or Fast Build to resolve them" |
+| **A build started through the API** (the MCP's `stacktic_system(action='build')`) | Yes, with the commit message "API build" | No. Merge it later with a Save & Push, or a build from the page with *Merge* ticked |
+
+Anything that deploys from the build branch — Argo CD, the stack agent's deploy arm, a CI job of
+yours — sees an API build only after the next merge.
+
+## Keeping a change of yours
+
+| You want | Do this |
+|---|---|
+| Edit a generated file and keep the edit | Edit it on the build branch. It survives every build until the generator changes the same lines; then the file is merged, or flagged ATTENTION |
+| Keep a file exactly as you left it, forever | Mark it *ignore* in the divergence list. From then on the platform never touches it |
+| Throw your edit away and take the generated version | Mark it *overwrite* for one build |
+| Remove a generated file | Remove what generates it from the design. Deleting it on the build branch does not stick: the next merge restores it. Or mark it *ignore* |
+| Resolve ATTENTION files | Do not deploy that state. Fix the files on the build branch, or choose *merge*, *overwrite* or *ignore* for them in the divergence list and build again |
+
+## Where your application code lives
+
+An application component whose code is in the stack repository keeps it on the build branch, one
+folder per application under `apps/<name>`. The component's `branch` attribute names the build
+branch; its build Job clones that branch.
+
+The MCP server follows the same rule. It writes only under `apps/`, only on the build branch, and
+signs its commits "Stacktic MCP". When a stack has no separate build branch, it refuses to write and
+asks for the application to get a repository of its own. A repository per application is equally
+supported; then the stack repository holds only generated files.
+
+## Who reads which branch
+
+| Reader | Branch |
+|---|---|
+| Argo CD Applications | The branch or tag in the Argo CD component's `argocd_target_revision` — normally the build branch |
+| Image builds | The application component's `branch` (for code in the stack repository, the build branch) |
+| The stack agent's deploy arm | The repository and branch named in the deploy request; nothing uncommitted is ever applied |
+| The stack agent's metadata | `stack-metadata.yaml` from the generated branch |
+| The MCP server's reads (`stack_repo`, `stack_graph`) | The generated branch: what the design renders, not what people edited. It writes application code to the build branch |
+
+→ [Systems and builds](/docs/platform/systems) · [Build and deploy](/docs/day0/build-deploy) · [From graph to repository](/docs/day0/graph-to-code)

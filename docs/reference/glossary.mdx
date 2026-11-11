@@ -25,6 +25,23 @@ meaning here.
 | **Push** | Regenerate only the files the changed attributes can affect |
 | **Full push** | Commit the whole system from the background pre-render of your last save — a build without the rendering wait |
 | **Impact map** | Per-component mapping from an attribute to the generated files it can affect. What makes a push small |
+| **Generated branch** | The branch of the stack repository only the platform writes (`git_branch`, by convention `stacktic`). Rewritten by every build |
+| **Build branch** | The branch the generated output is merged into (`build_branch`, usually `main`). Your edits and application code live here; deployments read it |
+| **Merge** | The per-file three-way merge of the generated branch into the build branch, after a build with *Merge* ticked or a Save & Push |
+| **Divergence list** | The files on your branch that differ from what the platform would write, with a choice per file: merge, overwrite or ignore |
+| **API build** | A build started through the platform API, the MCP's included. It writes the generated branch and does not merge |
+| **External component** | A copy of another system's component (`is_external`): it lives in another cluster, and nothing is rendered in its name |
+| **Referenced component** | A placeholder for another system's component (`is_referenced`), rendered as local |
+| **Cross-stack egress** | The network policy rule that opens a pod's connection to another stack's address, read from the link's address attribute |
+| **Login from a link** | A gateway login built from the application's identity-client link, switched on by `apisix_oidc_enable` on its route |
+| **Realm** | A separate user space in the identity provider: its own users, groups, sessions and rules. Extra realms are sub-components |
+| **Identity provider** | An external OpenID Connect sign-in that Keycloak brokers, such as Microsoft Entra ID. A sub-component |
+| **Hand-over** | What happens to a declared user who signs in through a provider: the local password is removed and the provider becomes the only way in |
+| **WAF profile** | One CrowdSec AppSec configuration (`waf` sub-component) that a gateway route sends requests to before the application |
+| **Firewall bouncer** | The CrowdSec DaemonSet that drops traffic from banned addresses on every node |
+| **SIEM source** | A component whose `<source>-opensearch` link ships its events to OpenSearch, with an index template, dashboards and monitors |
+| **Evidence tier** | For ISO 27001, the *Standard* floor of evidence and the *Strong* set on top of it; a passing control is graded with one of them |
+| **Client profile** | The tool list the MCP server serves to a client: `full`, or `compact` for clients that cap their tools |
 | **Overlay** | An environment's differences from the shared base |
 | **Declared state** | Anything in the graph — components, links, attributes, system users, routes, policies |
 | **Runtime data** | Anything an application wrote — a ticket, a file, a row. Not in the graph, and should not be |

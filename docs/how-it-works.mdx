@@ -172,9 +172,10 @@ GitOps repository.
     metadata is written alongside it.
   </Step>
   <Step title="Commit">
-    The result is committed to your stack repository. Your own edits to marked files are
-    merged rather than overwritten; a conflict stops the push instead of committing
-    markers.
+    The result is committed to the platform's own branch of your stack repository, then
+    merged file by file into your branch: your edits survive, files you mark <em>ignore</em>
+    are never touched, and a conflict stops a push instead of committing markers — see
+    [The stack repository and the merge](/docs/platform/repository).
   </Step>
 </Steps>
 
@@ -182,8 +183,8 @@ GitOps repository.
 
 A full build regenerates everything. A **push** does not: it diffs the graph against the
 last pushed state, resolves which files each changed attribute can possibly affect through
-a per-template impact map, and re-renders only those files. The build log ends with the
-exact `kubectl apply` lines for what changed.
+a per-template impact map, and re-renders only those files. The push log ends with one
+`kubectl apply --server-side` per changed manifest, build manifests first.
 
 <Figure caption="Draw one edge and nine things are generated: three on your app, three on the database, a credential per instance on the edge itself, and monitoring and backup around it.">
 <svg viewBox="0 0 900 392" role="img" aria-label="One link between your app and a database generates nine things: three on the app side, three on the database side, a per-instance credential on the edge, and monitoring and backup around it.">

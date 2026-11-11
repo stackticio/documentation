@@ -75,11 +75,13 @@ proposes it; you approve it; the platform performs it as an ordinary graph chang
 
 ## Database migrations
 
-Schema migration is expressed as a **sub-component** of the database, so it is part of the
-declared system and moves with it. Migrations run as an init container against the
-component's own image, the workload surges by zero so two versions never run against one
-schema, and a failed migration fails closed rather than starting an application against a
-half-migrated database.
+Schema migration is an attribute of your application component, `migration_command`, so it is
+part of the declared system and moves with it. It runs as an init container named `migrate`,
+with the application's own image, environment and security context, before the application
+container of every new pod. The rollout replaces one pod at a time and never runs more pods
+than declared (`maxSurge: 0`), so the migration runs before the first new pod serves, and a
+failing migration stops the rollout with the old pods still serving — it fails closed rather
+than starting an application against a half-migrated database.
 
 Backups stay with whatever already owns them — a migration step does not invent its own
 backup mechanism next to the one that is already proven.
@@ -100,6 +102,37 @@ Because the autoscaler is a component and its triggers are sub-components, scali
 behaviour is versioned with the stack and visible in a diff — not a cluster-side object
 someone edited once.
 
+What each KEDA link scales:
+
+| On the graph | What is generated |
+|---|---|
+| `keda-prometheus`, plus a `prometheus_query` sub-component linked `prometheus_query-<app>` | A ScaledObject on the application, driven by the sub-component's query. The application runs with its own `hpa` off |
+| `keda-topic`, `keda-queue` | Scales the consumers of a Kafka topic on their lag, or of a RabbitMQ queue on its length or message rate (the link's `keda_queue_mode`). A topic that sinks through Kafka Connect also scales the Connect workers |
+| `keda-db`, `keda-mongo_db` | A scaler on the database itself, driven by a query: for CloudNativePG the cluster's instance count, for MongoDB its workload |
+| `keda-model` | Scales a served model's vLLM runtime |
+| With a `prometheus-keda` link | Alert rules on KEDA itself |
+
+When Argo CD manages a scaled component, its replica count is left to KEDA and not reverted from
+git — see `argocd_replicas_mode` in [Build and deploy](/docs/day0/build-deploy#argo-cd). Under Argo CD,
+replacing a scaler takes two builds: remove the old one in the first, add the new one in the second,
+because KEDA refuses a scaler for a workload another scaler still manages.
+
+## Load tests
+
+The `k6` component runs load tests as declared state. Each `endpoints` sub-component is one suite:
+either a list of targets hit at random, or a journey — one declared account per virtual user, a login,
+then the steps in order — with k6's own stages and thresholds.
+
+| What | How |
+|---|---|
+| Run a suite | `kubectl create -f day2/tests/<suite>.yaml`. Each create is a new run; nothing runs with the deploy |
+| Schedule a suite | Give it a `schedule` (a cron expression): a CronJob creates the same run on time |
+| Test a data service | Link k6 to a database or another data service; a test script per linked service is generated |
+| Read the results | With `prometheus-k6`, every run writes its metrics while it runs, each series labelled with the suite (`testid`) and the journey step (`step`). A Grafana linked to that Prometheus shows the k6 dashboards, the KEDA scalers during the test, and what the scaled workloads cost at the prices you type into the dashboard |
+
+Remember the gateway: a route's rate limit counts per client address, and every virtual user of a
+run comes from the same runner pod.
+
 ## Restart on change
 
 A generated secret or configuration value that changes must actually reach the running
@@ -112,8 +145,9 @@ pod. Two complementary mechanisms exist, and both are part of the graph:
     changed, so the workload rolls. Nothing else does.
   </Card>
   <Card kicker="Runtime" title="A reload controller">
-    A controller watches labelled secrets and configuration and restarts the workloads that
-    consume them. Scoped by label, so it acts on what you opted in.
+    The Reloader component watches labelled secrets and configuration and restarts the
+    workloads that consume them. It needs no link, and its restarts are invisible to Argo CD's
+    diff, so the two never fight.
   </Card>
 </Cards>
 

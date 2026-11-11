@@ -1,0 +1,144 @@
+---
+id: security-network
+slug: /security/network
+title: Network policies
+sidebar_label: Network policies
+sidebar_position: 3
+description: How network policies are generated from the links after every component renders, the standard and strict sets, ports and exceptions, unresolved links, cross-stack egress, delivery through kubectl or Argo CD, and the scans that prove them.
+---
+
+<Hero eyebrow="Network" title="A link opens its path. Nothing else does.">
+No component template ships a network policy. Policies are generated once the whole graph is known,
+from the links between components, so adding a link opens exactly the path it needs and removing it
+closes that path at the next build.
+</Hero>
+
+<Figure caption="Network policies are generated from the links once the whole graph is known. A link opens its path; removing it closes the path at the next build.">
+<svg viewBox="0 0 900 300" role="img" aria-label="A link between two components becomes network policies after every component has rendered. The generator reads the ports from the link table, the component port attribute and the exception tables, writes the policies, a manifest and a network diagram, and lists every unresolved link.">
+  <defs>
+    <marker id="npABlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-blue)" /></marker>
+    <marker id="npAViolet" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-violet)" /></marker>
+  </defs>
+  <rect x="24" y="36" width="240" height="228" rx="16" fill="var(--stk-blue)" fillOpacity="0.035" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <path d="M60 128 L60 182" fill="none" stroke="var(--stk-blue)" strokeWidth="1.3" markerEnd="url(#npABlue)" />
+  <path d="M266 150 L294 150" fill="none" stroke="var(--stk-blue)" strokeWidth="1.3" markerEnd="url(#npABlue)" />
+  <path d="M582 150 C597 150 597 75 612 75" fill="none" stroke="var(--stk-violet)" strokeWidth="1.1" markerEnd="url(#npAViolet)" />
+  <path d="M582 150 C597 150 597 149 612 149" fill="none" stroke="var(--stk-violet)" strokeWidth="1.1" markerEnd="url(#npAViolet)" />
+  <path d="M582 150 C597 150 597 223 612 223" fill="none" stroke="var(--stk-violet)" strokeWidth="1.1" markerEnd="url(#npAViolet)" />
+  <rect x="300" y="60" width="280" height="180" rx="12" fill="var(--stk-panel)" />
+  <rect x="300" y="60" width="280" height="180" rx="12" fill="var(--stk-violet)" fillOpacity="0.045" stroke="var(--stk-violet)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="616" y="44" width="260" height="62" rx="12" fill="var(--stk-panel)" />
+  <rect x="616" y="44" width="260" height="62" rx="12" fill="var(--stk-mint)" fillOpacity="0.045" stroke="var(--stk-mint)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="616" y="118" width="260" height="62" rx="12" fill="var(--stk-panel)" />
+  <rect x="616" y="118" width="260" height="62" rx="12" fill="var(--stk-mint)" fillOpacity="0.045" stroke="var(--stk-mint)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="616" y="192" width="260" height="62" rx="12" fill="var(--stk-panel)" />
+  <rect x="616" y="192" width="260" height="62" rx="12" fill="var(--stk-mint)" fillOpacity="0.045" stroke="var(--stk-mint)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <circle cx="60" cy="110" r="16" fill="var(--stk-blue)" fillOpacity="0.16" />
+  <circle cx="60" cy="110" r="10" fill="var(--stk-blue)" />
+  <circle cx="60" cy="200" r="16" fill="var(--stk-mint)" fillOpacity="0.16" />
+  <circle cx="60" cy="200" r="10" fill="var(--stk-mint)" />
+  <text x="40" y="57" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">ON THE GRAPH</text>
+  <text x="82" y="114" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">your app</text>
+  <text x="82" y="204" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">database</text>
+  <text x="80" y="160" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">&lt;app&gt;-db</text>
+  <text x="314" y="80" fontSize="9.7" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">AFTER EVERY COMPONENT RENDERS</text>
+  <text x="314" y="97" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">network policy generator</text>
+  <text x="314" y="114" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">ports: link table, then the</text>
+  <text x="314" y="127.5" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">component port attribute</text>
+  <text x="314" y="141" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">exceptions: webhooks, scrape,</text>
+  <text x="314" y="154.5" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">host network, observers,</text>
+  <text x="314" y="168" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">internet, cross-stack egress</text>
+  <text x="630" y="64" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">networkpolicy/</text>
+  <text x="630" y="81" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">one policy per link</text>
+  <text x="630" y="138" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">networkpolicy-manifest.json</text>
+  <text x="630" y="155" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">unresolved · fallbacks</text>
+  <text x="630" y="212" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">network-diagram.md</text>
+  <text x="630" y="229" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">what is open, why</text>
+  <rect x="317.54" y="262.9" width="264.92" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="317.54" y="262.9" width="264.92" height="18.2" rx="9.1" fill="var(--stk-violet)" fillOpacity="0.14" stroke="var(--stk-violet)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="450" y="275.67" fontSize="10.2" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">standard set or pci_dss_strict, per stack</text>
+</svg>
+</Figure>
+
+## What is generated
+
+After every component has rendered, the generator reads `stack-metadata.yaml` and writes:
+
+| Output | What it holds |
+|---|---|
+| `networkpolicy/` | One policy file per rule, for each link in both directions — component to component, sub-component to component, component to sub-component and sub-component to sub-component |
+| `networkpolicy-manifest.json` | Every policy, plus the lists you check after a build: `unresolved_links`, `fallback_to_any`, `cross_stack`, `cross_stack_outbound`, `cross_stack_unaddressed` |
+| `network-diagram.md` | A diagram of every path, the components with internet access, and the links that could not be resolved |
+
+Policies work at namespace level: a policy admits traffic from the source component's namespace to
+the target's namespace on the ports the link uses. Link types that carry no pod-to-pod traffic are
+registered as such and produce no policy.
+
+## Where the ports come from
+
+| Order | Source |
+|---|---|
+| 1 | The port table for the link type (`link-ports`): the ports the link actually uses on its target |
+| 2 | The target component's own port attributes — `port`, `service_port`, `http_port` or `native_port`, and the multi-line `ports` of image-based components, one `name:port` per line |
+| 3 | The well-known port of the target's type |
+
+A link the generator cannot resolve to a port is allowed on **all** ports between its two namespaces,
+listed under `unresolved_links` and in the diagram, so it works and can be tightened, rather than
+being silently blocked.
+
+## What a link cannot express
+
+Some traffic is not a link: an admission webhook the API server calls, a metrics port a scraper reads,
+a component on the host network, an observer that reads every namespace, a component that needs the
+internet. These are registered per component type in two exception tables — one for each set below —
+and the generator applies them to the types present in the stack. A link whose traffic runs against
+its arrow is registered as a reverse flow.
+
+## Two sets
+
+`microsegmentation_level` on the system's [sections](/docs/platform/sections) chooses one.
+
+| Value | What is generated |
+|---|---|
+| empty or any value except the two below | The standard set: one policy per link, the exceptions, and internet egress on ports 80 and 443 for every namespace |
+| `pci_dss_strict` | The strict set: a default-deny baseline in every namespace, no blanket allow rules, no blanket internet egress, internet ingress only through the gateway |
+| `none` | No network policies |
+
+The strict set has three destinations that no namespace rule can match: the cluster DNS (node-local
+cache), the API server, and the nodes themselves (kubelet, node-exporter). Each is allowed by address
+range from a stack configuration key: `cluster_dns_cidr`, `control_plane_cidr`, `node_cidr`. Until a
+key is set, that rule allows its ports to any destination, the build log says so, and the manifest lists
+it under `fallback_to_any` — so an assessor sees exactly what is open. Every declared link still works.
+
+## Across stacks
+
+A link to a component of another stack is handled in both directions: a pod that connects out to
+another stack's address gets egress on that address's port, to the IP itself when the address is an IP;
+a link from another stack into this one through the gateway opens the gateway to the target. The full
+rules and the list of link types are in [External stacks](/docs/platform/external-stacks#network-policies-across-stacks).
+
+## Applying them
+
+| Delivery | How |
+|---|---|
+| kubectl | `kubectl apply -f networkpolicy/` after the build. Applying never deletes a policy the generator stopped writing: delete it by hand |
+| Argo CD | Turn on `automate_networkpolicies` on the Argo CD component (with `gitops` on, on an Argo CD that manages only its own cluster). A `networkpolicy` Application then syncs the folder, prunes what the design dropped, adopts policies already applied with kubectl, and retries without limit while a namespace another Application creates does not exist yet |
+
+A component added to a running stack races its own policies: its namespace may appear after the
+policy sync starts, and with the OPA policy `network-policy-enforcement` at `deny` its workloads are
+refused until the policies exist. The retries resolve it; raise the component's Argo CD
+`argocd_sync_retry_limit` for a new component.
+
+## Proving them
+
+| Check | What it does |
+|---|---|
+| Network policy scan, light | Do the policies the links imply exist, in both directions? Missing and extra policies are named |
+| Network policy scan, full | Real connection probes across every declared link, plus negative tests that a path which should be closed is closed |
+| OPA `network-policy-enforcement` | Refuses workloads in a namespace without a policy, and wide-open policies |
+| `network-diagram.md` | What is open and why, for a reviewer who does not run the scan |
+
+A missing policy is never fixed by hand-writing one. It means a missing link, or a port the generator
+does not know: add the link, or register the port.
+
+→ [Security, layer by layer](/docs/security/) · [Controls from the graph](/docs/compliance/controls-from-graph#segmentation)

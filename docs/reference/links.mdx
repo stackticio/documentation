@@ -7,7 +7,7 @@ sidebar_position: 2
 description: How a typed edge is named, what each family of links generates, and how sub-component links work.
 ---
 
-<Hero eyebrow="Reference" title="441 typed edges, one naming rule">
+<Hero eyebrow="Reference" title="418 typed edges, one naming rule">
 A link type is always <code>sourceType-targetType</code>. That string selects the
 generation logic on both sides — which is why the behaviour of a new link is predictable
 before you draw it.
@@ -86,6 +86,14 @@ a bucket to a backup target, an experiment to a registered model.
 | **Autoscaler → workload** | — | — | The scaling rule and its signal |
 | **Mesh → anything** | — | Sidecar injection | Mesh policy |
 | **Application → application** | Service address and credentials | Ingress policy | The declared dependency, used by blast radius and ordering |
+| **Event pipelines** — topic → database or search, topic → sensor, sensor → job, job → application | — | — | A Kafka Connect sink connector; a Dagster sensor started on the events; a job that runs the application's image |
+| **Security sensor → SIEM** — `<source>-opensearch` | Shipping of the source's events | The index template, dashboards and monitors for that source | Retention by the index lifecycle policy |
+| **WAF profile → application** — `waf-<app>` | — | — | The web application firewall plugin on the application's route |
+| **GitOps → anything** — `argo_cd-<type>` | — | — | One Argo CD Application, tuned by the link's attributes; the component's Jobs become sync hooks |
+| **Across stacks** | The other stack's address, from an attribute | — | Egress to that address — see [External stacks](/docs/platform/external-stacks) |
+
+The link types an application uses most, layer by layer, with the variables each one puts into the
+application's environment, are in [How a stack fits together](/docs/architecture/#the-layers-and-their-links).
 
 ## Link attributes
 

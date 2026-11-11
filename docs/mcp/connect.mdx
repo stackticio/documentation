@@ -117,6 +117,52 @@ client secret.
 </svg>
 </Figure>
 
+### Who may use the server
+
+Logging in is the identity provider's business; who may then call tools is the MCP
+component's. The `allowed_groups` attribute on the MCP server component lists the identity
+groups whose members may use it, one group per line. Leave it empty and every user of the
+realm who can log in gets every tool, which is the default and the behaviour of every stack
+built before this attribute existed.
+
+The groups themselves are declared on the identity component's `groups` attribute, one
+line per group in the form `name:address:members`. That declaration creates the group,
+adds the members and attaches the claim that carries group names inside the tokens, so set
+both attributes together, then build and deploy. Two things to know:
+
+- A client that was connected before you enabled groups still holds a token without them.
+  Reconnect it once.
+- The value is the bare group name. A line such as `allowed_groups = admins` is read
+  literally as a group called `allowed_groups = admins`, and nobody is a member of that.
+
+A refused call returns the message "not a member of a group allowed to use this MCP
+server" together with the name of the caller.
+
+### The consent page
+
+The `oauth_consent` attribute decides whether the server shows its own "Allow Access" page
+before sending the browser to the identity provider. `off`, the default, keeps the flow
+that AI connectors complete without a visible page. `remember` shows the page once per
+client and browser, then approves silently. `always` shows it every time. The page is the
+defence against a malicious MCP server that bounces your browser into this proxy to obtain
+a token in your name, so turn it on once you have confirmed that your clients complete it.
+
+### Which clients may register
+
+AI clients register themselves with the server before the login and tell it where to send
+the authorization code. The server only accepts callback addresses listed in the identity
+client's `redirect` attribute, plus loopback addresses on any port for clients that run on
+your own machine. The generated configuration already lists the server's own host and the
+callbacks of the common connectors; add a new connector's callback there before anyone
+connects it. An unknown address is accepted at registration but refused at authorization,
+so a stranger's client never receives a code.
+
+### Picking the user you log in as
+
+The browser that runs the login keeps a session with the identity provider. Reconnecting a
+client reuses it, so you cannot choose a different user from the client. Sign out of the
+identity provider first, or run the login in a private window.
+
 ## Who the model is, and who you are
 
 There are two identities in play. Confusing them is the most common support question.
@@ -139,6 +185,23 @@ comes back in tool descriptions and tool results — `workflow`, `server_info` a
 `knowledge` — which every client passes to the model. If a client behaves differently from
 another, ask it to call `workflow` first.
 
+### Clients that cap their tools
+
+Some clients pass only a limited number of tools to the model: Cursor sends 40, Visual Studio Code
+128 across every server. A capped client silently drops the rest, and the model then improvises.
+The server recognises the client when it connects and serves it a profile:
+
+| Profile | Served to | What the model sees |
+|---|---|---|
+| `full` | Claude Code, claude.ai, Claude Desktop, ChatGPT, OpenAI Codex, and any client the server does not recognise | Every tool the stack mounts, exactly as registered |
+| `compact` | Cursor, Visual Studio Code with GitHub Copilot, GitHub Copilot in JetBrains, Xcode and the CLI | At most 40 tools: every tool the guided journey names, the design write tools, and the gateway tool `more_tools` |
+
+`more_tools` lists, describes and calls any mounted tool with the same arguments and the same result,
+so nothing is out of reach; its description names the tool families that are not in the list, so the
+model knows they exist. A request header `X-Stacktic-Profile` overrides the choice, and `server_info`
+reports the client and the profile it got. A profile fits the client's limit; it is never an
+authorization — `allowed_groups` still decides who may call what, through the gateway too.
+
 ## Troubleshooting
 
 | Symptom | Most likely cause | What to do |
@@ -148,6 +211,8 @@ another, ask it to call `workflow` first.
 | Tools list is missing a technology you have | The corresponding link is not drawn | Add the link, build, deploy — the tools register on the next start |
 | A write tool returns 401, reads work | Platform account, not the connector | Set the MCP component's `stacktic_api_user` and `stacktic_api_key` to a real platform account — not the catalog placeholders, and not a user of your stack's identity provider — then build, apply and restart the pod. For this conversation only, `stacktic_login` signs in as that account without a redeploy |
 | A configuration change had no effect | The pod is still running the previous configuration | Roll the workload so it picks up the new values |
+| Every tool call is refused as "not a member of a group" | `allowed_groups` holds something other than a bare group name, the group does not exist yet, or the client's token predates the groups | Fix the value, wait for the identity sync to finish, reconnect the client once |
+| The client connects as the wrong user | The browser still holds the identity provider's session | Sign out there, or use a private window, then reconnect |
 
 ## Health
 
@@ -157,6 +222,11 @@ The server exposes two endpoints, and they answer different questions on purpose
 |---|---|
 | `/health` | Whether the process is up. Kubernetes probes use it, and it never fails for an external reason — a bad credential must not put the pod in a restart loop |
 | `/readyz` | Whether the server can actually work: platform credentials set and not the catalog placeholders, an OIDC base URL clients can discover, persistent client storage, a stack agent, and the knowledge repository. It always answers HTTP 200 — read `status` (`ok` or `degraded`) and the `degraded` list, not the status code |
+
+`/readyz` answers without a login, so it reports booleans and modes only — whether
+authentication is on, whether a callback allow-list is in force, the consent mode, and
+whether calls are restricted to groups — never a hostname, user or URL. The authenticated
+`self_check` tool returns the values behind each of them.
 
 ```bash
 curl https://<mcp-host>/readyz

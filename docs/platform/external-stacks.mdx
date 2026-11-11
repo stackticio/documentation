@@ -1,0 +1,165 @@
+---
+id: platform-external-stacks
+slug: /platform/external-stacks
+title: External stacks
+sidebar_label: External stacks
+sidebar_position: 7
+description: How several stacks reference each other — publishing a cell, what a build does with copies, which links work across stacks, where the other stack's address comes from, and the network policies that follow.
+---
+
+<Hero eyebrow="Multi-stack" title="Several stacks, each with its own graph, wired where they meet">
+A shared platform stack, several product stacks and a central observability stack are separate
+systems. Each keeps its own graph, lifecycle, history and validation. A cell published by one can be
+drawn in another, and the links to it generate the cross-stack configuration.
+</Hero>
+
+<Figure caption="Cross-stack links read the other stack's address from an attribute: a host on the link for most consumers, on the component for Prometheus and Alloy. The network policy generator opens exactly that port, to the IP when the address is an IP.">
+<svg viewBox="0 0 900 380" role="img" aria-label="A central stack and an application stack. The application stack sends metrics by remote write, logs to the central Loki, security events to the central OpenSearch, and is managed by the central Argo CD. Each connection reads its address from an attribute, and the network policy opens exactly that port.">
+  <defs>
+    <marker id="extABlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-blue)" /></marker>
+    <marker id="extAViolet" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-violet)" /></marker>
+  </defs>
+  <rect x="24" y="36" width="300" height="300" rx="16" fill="var(--stk-violet)" fillOpacity="0.035" stroke="var(--stk-violet)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <rect x="576" y="36" width="300" height="300" rx="16" fill="var(--stk-blue)" fillOpacity="0.035" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <path d="M592 84 L310 84" fill="none" stroke="var(--stk-blue)" strokeWidth="1.3" markerEnd="url(#extABlue)" />
+  <path d="M592 140 L310 140" fill="none" stroke="var(--stk-blue)" strokeWidth="1.3" markerEnd="url(#extABlue)" />
+  <path d="M592 196 L310 196" fill="none" stroke="var(--stk-blue)" strokeWidth="1.3" markerEnd="url(#extABlue)" />
+  <path d="M310 252 L592 252" fill="none" stroke="var(--stk-violet)" strokeWidth="1.3" markerEnd="url(#extAViolet)" />
+  <circle cx="300" cy="84" r="6" fill="var(--stk-violet)" />
+  <circle cx="300" cy="140" r="6" fill="var(--stk-violet)" />
+  <circle cx="300" cy="196" r="6" fill="var(--stk-violet)" />
+  <circle cx="300" cy="252" r="6" fill="var(--stk-violet)" />
+  <circle cx="300" cy="308" r="6" fill="var(--stk-violet)" />
+  <circle cx="600" cy="84" r="6" fill="var(--stk-blue)" />
+  <circle cx="600" cy="140" r="6" fill="var(--stk-blue)" />
+  <circle cx="600" cy="196" r="6" fill="var(--stk-blue)" />
+  <circle cx="600" cy="252" r="6" fill="var(--stk-blue)" />
+  <text x="40" y="57" fontSize="10.2" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">CENTRAL STACK</text>
+  <text x="592" y="57" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">APPLICATION STACK</text>
+  <text x="288" y="88" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="end" fontWeight="600">Prometheus</text>
+  <text x="288" y="101" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="end">prometheus_master</text>
+  <text x="288" y="144" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="end" fontWeight="600">Loki</text>
+  <text x="288" y="157" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="end">tenant = stack name</text>
+  <text x="288" y="200" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="end" fontWeight="600">OpenSearch</text>
+  <text x="288" y="213" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="end">one SIEM for all stacks</text>
+  <text x="288" y="256" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="end" fontWeight="600">Argo CD</text>
+  <text x="288" y="269" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="end">manages other clusters</text>
+  <text x="288" y="312" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" textAnchor="end" fontWeight="600">Grafana</text>
+  <text x="288" y="325" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="end">a folder per stack</text>
+  <text x="612" y="88" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">Prometheus</text>
+  <text x="612" y="101" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">remote_host</text>
+  <text x="612" y="144" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">Alloy</text>
+  <text x="612" y="157" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">remote_host + api_key</text>
+  <text x="612" y="200" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">Falco · CrowdSec · Trivy</text>
+  <text x="612" y="213" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">link remote_host</text>
+  <text x="612" y="256" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">Argo CD</text>
+  <text x="612" y="269" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">link cluster_api_server</text>
+  <rect x="375.68" y="74.9" width="148.64" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="375.68" y="74.9" width="148.64" height="18.2" rx="9.1" fill="var(--stk-blue)" fillOpacity="0.14" stroke="var(--stk-blue)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="450" y="87.67" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">metrics · remote write</text>
+  <rect x="397.1" y="130.9" width="105.8" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="397.1" y="130.9" width="105.8" height="18.2" rx="9.1" fill="var(--stk-blue)" fillOpacity="0.14" stroke="var(--stk-blue)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="450" y="143.67" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">logs · push API</text>
+  <rect x="390.98" y="186.9" width="118.04" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="390.98" y="186.9" width="118.04" height="18.2" rx="9.1" fill="var(--stk-blue)" fillOpacity="0.14" stroke="var(--stk-blue)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="450" y="199.67" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">events · bulk API</text>
+  <rect x="378.74" y="242.9" width="142.52" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="378.74" y="242.9" width="142.52" height="18.2" rx="9.1" fill="var(--stk-violet)" fillOpacity="0.14" stroke="var(--stk-violet)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="450" y="255.67" fontSize="10.2" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">deploys · cluster API</text>
+  <rect x="290" y="346.9" width="320" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="290" y="346.9" width="320" height="18.2" rx="9.1" fill="var(--stk-mint)" fillOpacity="0.14" stroke="var(--stk-mint)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="450" y="359.67" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">egress opened per link, from its address attribute</text>
+</svg>
+</Figure>
+
+## Publishing and copying a cell
+
+A system is published with the eye icon on its card. Its components are then offered under
+**External systems** on the design page of everyone who has a role on it. A published system with a
+pending catalog change is not offered until it is synchronized.
+
+Once copies exist:
+
+| Direction | Behaviour |
+|---|---|
+| **A copy is added elsewhere** | The origin records that another system holds a copy |
+| **The origin changes** | Name, type, group, attributes, added sub-components and links are propagated into every copy |
+| **The origin loses something** | The copies lose it too, along with the links that depended on it |
+| **A copy is removed** | The origin stops listing that system |
+
+:::caution Name a system before you publish it
+Cross-system references are resolved by the system's title. Renaming a system that other designs
+reference breaks those references without a warning.
+:::
+
+## What a build does with copies
+
+When a system that shares cells is built, the build page first opens **External & Referenced
+Components Build Settings**:
+
+| List | What it holds | What ticking does |
+|---|---|---|
+| **External components** | The copies on your canvas, taken from other systems | Ticking the component also renders it, creating its folder in your repository. Ticking **Links** imports the links it has in its own system: the components at its other ends are added, named `<origin title>_<name>` |
+| **Referenced components** | For each of your cells that other systems copied, the components those systems linked to it | Ticking one renders it, creating its folder in your repository |
+
+Ticked or not, all of them are written to `stack-metadata.yaml`, so your components' templates see
+them at the other end of their links.
+
+## Two marks: external and referenced
+
+| Mark in `stack-metadata.yaml` | Meaning | How templates treat it |
+|---|---|---|
+| `is_external: true` | The component lives in another cluster | Nothing is rendered in its name. A template with cross-stack handling connects to the address in an attribute instead of an in-cluster name |
+| `is_referenced: true` | A placeholder for another system's component | Rendered as a local component, as every other template would render it |
+
+A template that has no cross-stack handling for a link treats the copy as local: it uses the
+copy's namespace and in-cluster service name. That only resolves when both stacks run in the same
+cluster.
+
+## Links that work across stacks
+
+These are the links whose templates connect to another stack's address, and the attribute that
+carries it. It is the same list the network policy generator uses (below).
+
+| Link | Where the other stack's address is | Typical use |
+|---|---|---|
+| `prometheus-prometheus` | The remote Prometheus component's `remote_host`; the master's `remote_alerts` | Central metrics: every stack sends its metrics by remote write, labelled with its stack name |
+| `alloy-loki` | The Alloy component's `remote_host` (the full push URL) and the Loki `api_key` | Central logs: the tenant is the sending stack's name |
+| `falco-opensearch`, `crowdsec-opensearch`, `trivy-opensearch`, `opa-opensearch`, `otel-opensearch`, `fastmcp-opensearch`, `external_source_code-opensearch` | The link's `remote_host` | Central SIEM and search. `suricata-opensearch` reads `remote_host` too, but the network policy generator does not open its egress yet |
+| `otel-clickhouse_db`, `grafana-clickhouse` | The link's `public_host` | Central traces and analytics |
+| Airflow ETL links to and from `clickhouse_db` | The link's `public_host` | Data jobs against a central warehouse |
+| `kanso-prometheus`, `kanso-loki`, `kanso-opensearch` | The link's `remote_host`, when set | A work tracker that watches another stack |
+| `external_secrets-openbao` | The External Secrets component's `secret_store_host` | One secret store for several stacks |
+| `argo_cd-argo_cd` | The link's `cluster_api_server` | Central delivery: one Argo CD deploys other clusters |
+| `prometheus-opensearch` | The Prometheus component's `remote_alerts` | The central OpenSearch reads another stack's alerts |
+
+Anything not in this list — a database, a bucket, an identity provider, a queue in another stack —
+renders as a local in-cluster address.
+
+## The common shapes
+
+| Shape | On the graph | What it generates |
+|---|---|---|
+| **Central metrics** | Each application stack's Prometheus links `prometheus-prometheus` to the central one, marked `prometheus_master` | Remote write from every stack, each series labelled with the stack it came from; the central Prometheus accepts samples up to an hour late |
+| **Central dashboards** | The central Grafana links to its Prometheus | One dashboard folder per stack whose metrics arrive |
+| **Central logs** | Each stack's Alloy links `alloy-loki` to the central Loki | Logs pushed with the stack name as tenant; dashboards live on the central stack |
+| **Central SIEM** | Each stack's Falco, CrowdSec, Trivy and OPA link to the central OpenSearch | One SIEM with every stack's security events |
+| **Central delivery** | Each stack's Argo CD links `argo_cd-argo_cd` to the central one | The central Argo CD generates Applications per managed cluster, cluster by cluster |
+| **Shared services** | A cell of another stack is drawn in your design | Generated through the template's cross-stack handling where it has one; otherwise as an in-cluster address that works only when both stacks share a cluster |
+
+## Network policies across stacks
+
+The network policy generator handles the two directions of a cross-stack link differently.
+
+| Direction | What is generated |
+|---|---|
+| **Into this stack, through its gateway** | A link from another stack's component into a local one, with `remote_host` pointing at this stack's gateway, opens gateway → target on the port the gateway route to that component type uses. The build log and `networkpolicy-manifest.json` (`cross_stack`) list every such rule |
+| **Out of this stack** | A local pod that connects to another stack's address gets egress on that address's port, read from the attribute in the table above. When the address is an IP, only that IP is opened. When it is a host name, the port is opened to any destination, because a network policy cannot match names. The policy annotation `stacktic.io/cross-stack-hosts`, the build log and the manifest (`cross_stack_outbound`) name every opened host |
+| **A cross-stack link with no address** | Warned in the build log and listed under `cross_stack_unaddressed` in the manifest |
+
+A stack without cross-stack links renders exactly what it rendered before. In the strict regulated
+set (`microsegmentation_level: pci_dss_strict`), these explicit rules are what keeps cross-stack
+connections working without a blanket internet egress — see
+[Network policies](/docs/security/network).
+
+→ [Collaboration](/docs/platform/collaboration) · [How a stack fits together](/docs/architecture/)

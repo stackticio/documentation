@@ -89,9 +89,14 @@ your-stack-repository/
 │  └─ deploy/
 │     ├─ base/<component>/        workloads, services, policies, secrets, routes
 │     └─ overlays/<environment>/  per-environment values
+├─ <component>/helm/              chart values and the script that renders the chart
+├─ <application>/dev_tools/       Tiltfile, AGENTS.md, spec-kit for your AI coding agent
+├─ apps/<name>/                   your application code — on the build branch only
 ├─ doc/                           generated documentation, per component and for the system
 ├─ scripts/                       decrypt, validate, operate
 ├─ networkpolicy/                 the network policies the links imply
+├─ networkpolicy-manifest.json    every policy, and the links that could not be resolved
+├─ network-diagram.md             every open path, and why
 ├─ rbac/                          cluster roles for the people the graph grants access to
 ├─ audit/                         a security audit of the design, regenerated every build
 ├─ versioning/                    image inventory and migration script (air-gapped stacks)
@@ -102,7 +107,9 @@ your-stack-repository/
 ```
 
 Every component contributes its own subtree; the aggregation step merges them and
-preserves every environment any component defines.
+preserves every environment any component defines. The whole tree lands on the generated
+branch and is merged into your build branch — see
+[The stack repository and the merge](/docs/platform/repository).
 
 ## How a link becomes configuration
 
@@ -144,7 +151,16 @@ step always runs; the others are switched by the system's [section values](/docs
     With <code>microsegmentation_level</code> set to <code>pci_dss_strict</code>, a stricter set
     replaces the standard one for the whole stack: a default-deny baseline in every
     namespace, no blanket allow rules, no blanket internet egress, and internet ingress only
-    through the gateway. Every declared link still works.
+    through the gateway. Three destinations are outside the pod network and cannot be matched
+    by a namespace rule: the cluster DNS (node-local cache), the API server and the nodes
+    themselves (kubelet, node-exporter). Each is allowed by CIDR from the stack configuration
+    keys <code>cluster_dns_cidr</code>, <code>control_plane_cidr</code> and <code>node_cidr</code>.
+    Until a key is set, that rule allows its ports to any destination, the build log says so,
+    and the manifest lists it under <code>fallback_to_any</code>, so an assessor sees exactly
+    what is open. Every declared link still works: a link whose port is not known to the
+    generator is allowed on all ports between its two namespaces and listed in the generated
+    network diagram, so it can be tightened rather than silently blocked. The full rules,
+    including cross-stack links, are in [Network policies](/docs/security/network).
   </Step>
   <Step title="Configuration checksums (optional)">
     Adds content checksums to the workload pod template, so that changing a secret or a
@@ -177,10 +193,22 @@ generated files each of those attributes can affect. Only those files are re-ren
 The result is that changing one attribute produces a small, reviewable diff and a short
 list of things to apply, instead of a repository-wide churn you have to read.
 
-The build log ends with the exact apply commands for what changed.
+The push log ends with one `kubectl apply --server-side` per changed manifest, build
+manifests first.
+
+## Where Helm charts come from
+
+Components deployed from a Helm chart are rendered with `helm template` at build time, so the
+repository holds plain YAML. The chart archive is resolved in a fixed order: the build machine's
+local cache, then the platform's chart bucket shared by every stack when the platform has one, then
+the upstream repository with three attempts. Whatever the source, the archive is the chart's published one, so the output
+is the same. When every source fails, the render stops with an error instead of writing an empty
+manifest.
 
 ## Your edits are not steamrolled
 
-Files you have marked are merged rather than replaced, and a merge conflict stops the push
-instead of committing conflict markers into your repository. The generated tree stays
-yours to extend.
+Every file is merged three ways between what the platform generated last time, what it generates
+now and what is on your branch, so your edits survive builds. Files you mark *ignore* are never
+touched again, and a conflict on a push stops the push instead of committing conflict markers.
+The rules, file by file, are in [The stack repository and the merge](/docs/platform/repository#the-merge-file-by-file).
+The generated tree stays yours to extend.

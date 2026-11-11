@@ -1,0 +1,153 @@
+---
+id: security-detection
+slug: /security/detection
+title: Detection and response
+sidebar_label: Detection and response
+sidebar_position: 5
+description: Suricata, Falco and CrowdSec as components — what each sees, how they feed one another and the SIEM, how bans and WAF blocks are enforced, and the alerts and dashboards generated with them.
+---
+
+<Hero eyebrow="Watch" title="Three sensors, one decision point, one SIEM">
+Network intrusion detection, runtime detection and log-based intrusion prevention are components of
+the stack. The links between them, and from them to OpenSearch and Prometheus, decide where their
+events go and what acts on them.
+</Hero>
+
+<Figure caption="Detection is three sensors, one decision point and two enforcement points, with one SIEM for the events. Each arrow is a link on the graph; without it the sensor keeps its events on the node.">
+<svg viewBox="0 0 900 350" role="img" aria-label="Suricata sniffs node traffic, Falco watches system calls, and the gateway writes its access log. The CrowdSec agent on every node reads the gateway log and the Suricata events and raises alerts to the CrowdSec Local API, which issues decisions that the firewall bouncer enforces on every node and the WAF enforces at the gateway. Events go to the OpenSearch SIEM; metrics and alert rules go to Prometheus and Grafana.">
+  <defs>
+    <marker id="detARed" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-red)" /></marker>
+    <marker id="detAViolet" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-violet)" /></marker>
+  </defs>
+  <rect x="24" y="36" width="214" height="262" rx="16" fill="var(--stk-red)" fillOpacity="0.035" stroke="var(--stk-red)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <path d="M196 88 C229 88 229 92 262 92" fill="none" stroke="var(--stk-red)" strokeWidth="1.2" markerEnd="url(#detARed)" />
+  <path d="M196 168 C229 168 229 106 262 106" fill="none" stroke="var(--stk-red)" strokeWidth="1.2" markerEnd="url(#detARed)" />
+  <path d="M456 98 L478 98" fill="none" stroke="var(--stk-violet)" strokeWidth="1.3" markerEnd="url(#detAViolet)" />
+  <path d="M672 98 L694 98" fill="none" stroke="var(--stk-violet)" strokeWidth="1.3" markerEnd="url(#detAViolet)" />
+  <path d="M577 142 C577 166 470 166 470 190" fill="none" stroke="var(--stk-violet)" strokeWidth="1.1" strokeDasharray="4 4" markerEnd="url(#detAViolet)" />
+  <path d="M214 100 C214 145 300 145 300 190" fill="none" stroke="var(--stk-red)" strokeWidth="1.1" strokeDasharray="4 4" markerEnd="url(#detARed)" />
+  <path d="M130 248 C196 248 196 250 262 250" fill="none" stroke="var(--stk-red)" strokeWidth="1.1" strokeDasharray="4 4" markerEnd="url(#detARed)" />
+  <rect x="268" y="56" width="186" height="84" rx="12" fill="var(--stk-panel)" />
+  <rect x="268" y="56" width="186" height="84" rx="12" fill="var(--stk-red)" fillOpacity="0.045" stroke="var(--stk-red)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="484" y="56" width="186" height="84" rx="12" fill="var(--stk-panel)" />
+  <rect x="484" y="56" width="186" height="84" rx="12" fill="var(--stk-violet)" fillOpacity="0.045" stroke="var(--stk-violet)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="700" y="56" width="176" height="84" rx="12" fill="var(--stk-panel)" />
+  <rect x="700" y="56" width="176" height="84" rx="12" fill="var(--stk-violet)" fillOpacity="0.045" stroke="var(--stk-violet)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="268" y="196" width="300" height="92" rx="12" fill="var(--stk-panel)" />
+  <rect x="268" y="196" width="300" height="92" rx="12" fill="var(--stk-amber)" fillOpacity="0.045" stroke="var(--stk-amber)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="598" y="196" width="278" height="92" rx="12" fill="var(--stk-panel)" />
+  <rect x="598" y="196" width="278" height="92" rx="12" fill="var(--stk-mint)" fillOpacity="0.045" stroke="var(--stk-mint)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <circle cx="52" cy="88" r="6" fill="var(--stk-red)" />
+  <circle cx="52" cy="168" r="6" fill="var(--stk-red)" />
+  <circle cx="52" cy="248" r="6" fill="var(--stk-red)" />
+  <text x="40" y="57" fontSize="10.2" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">SENSORS · EVERY NODE</text>
+  <text x="64" y="92" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">Suricata</text>
+  <text x="64" y="105" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">node NIC · EVE events</text>
+  <text x="64" y="172" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">gateway log</text>
+  <text x="64" y="185" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">APISIX access log</text>
+  <text x="64" y="252" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">Falco</text>
+  <text x="64" y="265" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">eBPF · syscall rules</text>
+  <text x="282" y="76" fontSize="9.7" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">CROWDSEC AGENT</text>
+  <text x="282" y="93" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">scenarios</text>
+  <text x="282" y="110" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">parsers per source</text>
+  <text x="498" y="76" fontSize="9.7" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">LOCAL API</text>
+  <text x="498" y="93" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">decisions</text>
+  <text x="498" y="110" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">ban or captcha · IP</text>
+  <text x="714" y="76" fontSize="9.7" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">ENFORCED</text>
+  <text x="714" y="93" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">bouncer · WAF</text>
+  <text x="714" y="110" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">nftables · AppSec</text>
+  <text x="282" y="216" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">SIEM</text>
+  <text x="282" y="233" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">OpenSearch</text>
+  <text x="282" y="250" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">index per source</text>
+  <text x="282" y="263.5" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">monitors · dashboards · retention</text>
+  <text x="612" y="216" fontSize="9.7" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">METRICS</text>
+  <text x="612" y="233" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">Prometheus · Grafana</text>
+  <text x="612" y="250" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">alert rules per component</text>
+  <text x="612" y="263.5" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">provisioned dashboards</text>
+  <rect x="210.44" y="316.9" width="479.12" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="210.44" y="316.9" width="479.12" height="18.2" rx="9.1" fill="var(--stk-red)" fillOpacity="0.14" stroke="var(--stk-red)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="450" y="329.67" fontSize="10.2" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">each feed is a link: crowdsec-suricata, apisix-crowdsec, &lt;source&gt;-opensearch</text>
+</svg>
+</Figure>
+
+## The three sensors
+
+| Component | Runs as | Sees | Acts |
+|---|---|---|---|
+| **Suricata** | A DaemonSet: one passive sensor per node | Traffic on the node's network interface. Pod-to-pod traffic on the same node never crosses the interface; inbound HTTPS shows TLS metadata (SNI, certificates, JA3/JA4) only | Never blocks. Writes EVE JSON events |
+| **Falco** | A DaemonSet with an eBPF driver | System calls, file access and network activity of containers and hosts | Raises events at or above `falco_priority` |
+| **CrowdSec** | A Local API (one replica) and an agent on every node | The container logs of linked sources: the gateway's access log, Suricata's events | Raises alerts; the Local API turns them into decisions that are enforced |
+
+They run side by side without conflict: no shared port, kernel hook or file. Suricata captures with
+AF_PACKET, Falco hooks system calls with eBPF, and the CrowdSec agent reads logs through a read-only
+host path.
+
+## CrowdSec: from a log line to a ban
+
+| On the graph | What it does |
+|---|---|
+| `apisix-crowdsec` | The agent tails the gateway's access log; a parser turns it into the fields the HTTP scenarios need. The same link registers the gateway as the WAF's bouncer |
+| `crowdsec-suricata` | The agent tails Suricata's event stream and runs the Suricata scenarios |
+| `crowdsec_collections` | The hub collections the agent installs: parsers and scenarios |
+| `crowdsec_simulation` | On: scenarios run and alerts are raised, flagged simulated, but no decision is issued. Tune here, then switch it off to enforce |
+| `crowdsec_remediation`, `crowdsec_ban_duration` | `ban` or `captcha`, and for how long; per address only |
+| `crowdsec_firewall_bouncer` | A DaemonSet on the host network that pulls the ban decisions every 10 seconds into an nftables set, so a banned address is dropped before it reaches the node's own ports or a pod. Built in the cluster from a pinned upstream release whose checksum is an attribute: a mismatch fails the build |
+| `crowdsec_allowlist` | Addresses that never reach a scenario — put the operators' addresses here. Private addresses never produce a decision |
+| `crowdsec_capi_sharing` | On: the Local API enrols with CrowdSec's Central API, shares attacker addresses and pulls the community blocklist. Off: nothing leaves the cluster |
+| `waf` sub-components | The web application firewall at the gateway — see [Gateway, login and private access](/docs/security/edge#web-application-firewall) |
+
+Request-level blocks are the WAF's job; address-level bans are the firewall bouncer's.
+
+## Suricata: what to set
+
+| Attribute | Meaning |
+|---|---|
+| `suricata_home_net` | The address ranges Suricata treats as yours |
+| `suricata_rule_sources`, `suricata_update_interval` | Rule sources for `suricata-update` (Emerging Threats Open by default) and how often they refresh, in hours |
+| `suricata_disable_rules`, `suricata_thresholds` | Noise suppression: rules turned off, and thresholds |
+| `suricata_eve_types` | The event types written, for example `alert` and `stats` |
+| `suricata_interface` | The interface to sniff; `auto` takes the default-route interface |
+
+## Where the events go
+
+| Link | Destination |
+|---|---|
+| `suricata-opensearch` | A shipper sidecar sends the events to OpenSearch, index `suricata-events` |
+| `falco-opensearch` | Falcosidekick sends Falco's events to OpenSearch |
+| `crowdsec-opensearch` | The Local API posts every alert, WAF matches included, to the index `crowdsec-alerts` |
+| `trivy-opensearch`, `opa-opensearch`, `apisix-opensearch` | Vulnerability reports, admission violations and gateway logs in the same SIEM |
+| `prometheus-crowdsec`, `prometheus-suricata`, `prometheus-falco` | Metrics and alert rules in Prometheus |
+
+Without its link, a sensor keeps its events on the node or in its own pods.
+
+## The SIEM
+
+The OpenSearch component turns each inbound link into a SIEM source. For every linked source it
+creates the index template, the dashboards, and the alerting monitors where the source has them —
+Falco, Suricata and CrowdSec — plus a security overview dashboard across all of them, all from a
+bootstrap Job.
+
+| Attribute | Meaning |
+|---|---|
+| `retention_hot_days`, `retention_warm_days`, `retention_total_days` | The index lifecycle policy for the SIEM indices: warm after the hot period, deleted after the total |
+
+A central SIEM for several stacks is the same links drawn to another stack's OpenSearch, with the
+link's `remote_host` — see [External stacks](/docs/platform/external-stacks).
+
+## Alerts and dashboards
+
+| Component | Prometheus alert rules | Grafana |
+|---|---|---|
+| CrowdSec | The Local API is down; an agent is missing on a node; no log source has matched for 30 minutes | The four official CrowdSec dashboards |
+| Suricata | A sensor is missing or not scheduled on a node | The *Suricata sensor fleet* dashboard; Suricata itself exposes no metrics endpoint, so its signatures and flows are read in OpenSearch |
+| Falco | Falco's ServiceMonitor and alert rules, with `prometheus-falco` | The Falco and Falcosidekick dashboards |
+
+Dashboards are provisioned by the stack's Grafana when its Prometheus has the matching
+`prometheus-<type>` link.
+
+## From an AI client
+
+With a `fastmcp-opensearch` link, the MCP server's SIEM tools query the Falco, Trivy, OPA, APISIX and
+OpenTelemetry indices. CrowdSec and Suricata events are read in OpenSearch's own dashboards.
+
+→ [Security, layer by layer](/docs/security/) · [A secured marketplace](/docs/architecture/secured-stack)

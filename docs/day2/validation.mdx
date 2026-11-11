@@ -142,3 +142,32 @@ central test suite to maintain and nothing to keep in sync.
 There are also cross-cutting tests that only make sense at the system level: data flow
 across components, network reachability, secret propagation, cross-stack connectivity and
 Kubernetes-level compliance.
+
+## Your own tests in Python
+
+When a command is not enough, a test can be Python source attached to a cell of the diagram. The
+platform sends it to the stack agent, which runs it and returns the result through the same channel
+as the command tests.
+
+| Part | What it is |
+|---|---|
+| **What the code sees** | `component` (the first resolved component, as a flat view), `components` (all of them), `config` (the stack configuration), `domain`, and `sh(cmd, timeout)` to run a command |
+| **What runs** | Every top-level function whose name starts with `test_`, called without arguments |
+| **What it returns** | One result or a list of them: a name, a severity, `passed` or `failed`, the steps with their output, and a recommendation. `passed` and `output` alone are accepted as a short form |
+| **Bounds** | A timeout for the whole run, 60 seconds unless the request sets one |
+
+```python
+def test_deployment_ready():
+    """All replicas of the deployment are available."""
+    ns, name = component.get("namespace", "default"), component.get("name", "app")
+    r = sh(f"kubectl get deploy {name} -n {ns} -o jsonpath='{{.status.replicas}} {{.status.availableReplicas}}'")
+    wanted, available = (r["stdout"].split() + ["0", "0"])[:2]
+    ok = r["ok"] and wanted == available and wanted != "0"
+    return {"name": f"{name}_deployment_ready", "severity": "critical",
+            "status": "passed" if ok else "failed",
+            "steps": [{"name": "command", "status": "passed" if ok else "failed",
+                       "output": f"replicas={wanted} available={available}"}],
+            "recommendation": f"kubectl get pods -n {ns}"}
+```
+
+The agent's `GET /custom-tests/contract` returns the input and output schemas and this example.

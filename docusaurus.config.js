@@ -34,7 +34,9 @@ const config = {
       items: [
         { to: '/docs/', label: 'Docs', position: 'left' },
         { to: '/docs/mcp/quickstart', label: 'Start with MCP', position: 'left' },
+        { to: '/docs/architecture/', label: 'Architecture', position: 'left' },
         { to: '/docs/platform/', label: 'Platform', position: 'left' },
+        { to: '/docs/security/', label: 'Security', position: 'left' },
         { to: '/docs/compliance/', label: 'Compliance', position: 'left' },
         { to: '/docs/blueprints/', label: 'Blueprints', position: 'left' },
         { to: '/docs/reference/components', label: 'Catalog', position: 'right' },
@@ -49,6 +51,7 @@ const config = {
           items: [
             { label: 'What Stacktic is', to: '/docs/' },
             { label: 'How it works', to: '/docs/how-it-works' },
+            { label: 'How a stack fits together', to: '/docs/architecture/' },
             { label: 'Start with MCP', to: '/docs/mcp/quickstart' },
           ],
         },
@@ -58,6 +61,7 @@ const config = {
             { label: 'The platform', to: '/docs/platform/' },
             { label: 'Day 0–1 — design & generate', to: '/docs/day0/' },
             { label: 'Day 2 — operate', to: '/docs/day2/' },
+            { label: 'Security', to: '/docs/security/' },
             { label: 'Compliance', to: '/docs/compliance/' },
           ],
         },

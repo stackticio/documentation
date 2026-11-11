@@ -91,6 +91,13 @@ kubectl apply -k k8s/build/overlays/<environment>/ --server-side=true --force-co
 The loop for an application change is therefore: edit the code in your application
 repository → build → deploy. The stack itself only changes when the graph changes.
 
+Two settings shorten that loop:
+
+| Setting | Where | Effect |
+|---|---|---|
+| `cache_build` | The system configuration | Every application build pushes its layers to a sibling repository `<component>-cache` in your registry and reads them back on the next build, so a code-only change reuses the dependency layers. A cache miss or a failed cache push never fails a build |
+| `push_and_deploy` | The application component (and the MCP server) | The build Job records the digest of the image it pushed and rolls the Deployment onto exactly that image. A failed push leaves the running version alone |
+
 ### Develop against the cluster
 
 Each application component's folder in the stack repository carries a `dev_tools/` kit:
@@ -121,6 +128,9 @@ kubectl apply -f networkpolicy/
 kubectl apply -f rbac/rbac.yaml
 ```
 
+With Argo CD and its `automate_networkpolicies` attribute on, the network policies are synced by
+their own Application instead — see [Network policies](/docs/security/network#applying-them).
+
 :::tip The apply contract
 `kubectl apply -k` must always succeed, and must always be safe to repeat. That is a design
 rule for everything the platform generates, not an aspiration — it is what makes moving a
@@ -150,14 +160,40 @@ Which components Argo CD manages is decided on the graph:
 | On the graph | What Argo CD manages |
 |---|---|
 | `gitops` off | Nothing — Argo CD is installed and idle |
-| `gitops` on, no links from Argo CD | Every component in the stack |
-| `gitops` on, links to some components | Only the linked ones — the recommended way |
+| `gitops` on, no links from Argo CD | Every component in the stack except cert-manager |
+| `gitops` on, links to some components | Only the linked ones — the recommended way. With no links, drawing the first one later shrinks the managed set, and the Applications of the other components stay until someone deletes them |
 | Another stack's Argo CD links a component | That stack's Argo CD manages it |
-| A link between two Argo CD components | Multi-cluster: one Argo CD manages the stacks of other clusters |
+| A link between two Argo CD components | Multi-cluster: one Argo CD manages the stacks of other clusters — see [External stacks](/docs/platform/external-stacks) |
 
 `argocd_mode` decides when it syncs: **Automatic** applies every new commit, **Manual** waits
-for someone to press Sync. Self-healing — reverting a drifted resource on its own — is set
-per link, works in automatic mode only, and is off by default for databases.
+for someone to press Sync. Every Application tracks the branch or tag in
+`argocd_target_revision` — normally the build branch, see
+[The stack repository](/docs/platform/repository#who-reads-which-branch).
+
+Each `argo_cd-<type>` link tunes its one Application:
+
+| Link attribute | Effect |
+|---|---|
+| `argocd_self_heal_enabled` | Automatic mode only: re-sync a drifted resource at once, then with backoff. Off by default for CloudNativePG and MongoDB; turn it off for an application changed by a development loop |
+| `argocd_prune_enabled` | Off by default: a resource that leaves git stays in the cluster. On: it is deleted at the next sync — the data guard below still refuses volumes, definitions and data resources |
+| `argocd_replicas_mode` | `auto`: replicas are ignored only where the diagram owns the count (the component's autoscaler attribute or a KEDA scaler); `ignore` or `enforce` to decide yourself |
+| `argocd_sync_retry_limit`, `argocd_sync_retry_max_duration` | Retries of a failed sync; raise them for a component whose first sync races its CRDs or its network policies |
+| `argocd_ignore_rbac_drift` | Off: roles and bindings are enforced from git. On: only for an operator that rewrites its own roles |
+| `argocd_custom_ignore_differences`, `argocd_skip_schema_validation` | Extra ignore rules for this Application; schema validation off for a CRD that rejects a valid manifest |
+| `imageupdater_update_strategy`, `imageupdater_allow_tags` | For applications with the image updater on: `latest`, `semver`, `digest` or `name`, and which tags qualify |
+| `argocd_app_project` | The Argo CD project of this Application |
+| `build_hook` | On a link to Dagster, the MCP server or the stack agent: their image builds run as an Argo CD sync hook of a `<name>-build` Application, triggered when the generated build source changes |
+
+What else the Argo CD component generates:
+
+| Generated | When |
+|---|---|
+| Jobs as sync hooks | A component's setup Jobs (database grants, seeding, the single sign-on sync) become Argo CD hooks when Argo CD manages that component. Each sync deletes the old Job and creates it again, so an immutable finished Job never blocks an apply |
+| The `networkpolicy` Application | `automate_networkpolicies` on: syncs the generated policies, prunes the dropped ones, retries while namespaces appear |
+| Runtime tools for the MCP server | A `fastmcp-argo_cd` link: `argocd_flow_check` (sync, health, failed hooks, workloads not ready beneath custom resources, out-of-memory kills, the data guard), `argocd_why_out_of_sync`, `argocd_refresh_application`, and with `write_access` on the link, sync and terminate |
+
+The Applications themselves are applied with the Argo CD component's own folder: after changing an
+Argo CD setting or link, build and apply that folder once.
 
 :::note Argo CD never deletes data
 Pruning and cascade deletion are off on every Application, and the Argo CD component

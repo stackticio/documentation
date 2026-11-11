@@ -1,0 +1,137 @@
+---
+id: security-hardening
+slug: /security/hardening
+title: Workload hardening and admission
+sidebar_label: Hardening and admission
+sidebar_position: 4
+description: The security context an application gets from its security_features attribute, the admission policy families, how each is scoped, and the safe way from dryrun to deny.
+---
+
+<Hero eyebrow="Workloads" title="Harden the workload with one attribute, then make the cluster insist on it">
+An application's security context comes from one multi-select attribute. Admission policy then makes
+the cluster refuse workloads that fall short. The two are designed to meet: each option names the
+policy it satisfies.
+</Hero>
+
+## Workload hardening
+
+`security_features` is a multi-select attribute on the application components (external source
+code, image base, FastAPI) and on the MCP server. Each option renders part of the pod's security
+context.
+
+| Option | Renders | Satisfies | Breaks when |
+|---|---|---|---|
+| `pod_security` | `runAsNonRoot`, `runAsUser`, `runAsGroup`, `fsGroup` from `user_id` and `group_id`; the namespace's Pod Security labels at `restricted` for warn and audit | `securitycontext` (non-root) | The image only works as root |
+| `container_security` | Shorthand for `no_privilege_escalation` and `drop_capabilities` | `securitycontext`, `disallow` | As its two parts |
+| `no_privilege_escalation` | `allowPrivilegeEscalation: false`, `privileged: false` | `securitycontext`, `disallow` | The application uses setuid binaries such as `sudo` |
+| `drop_capabilities` | `capabilities.drop: [ALL]`; entries of the `capabilities` attribute are still added | Hardening checks | Ports below 1024 without `NET_BIND_SERVICE`; binaries with file capabilities |
+| `read_only_fs` | `readOnlyRootFilesystem` with a writable `/tmp` | `securitycontext` (read-only root) | The application writes outside `/tmp` without a declared writable directory |
+| `seccomp` | `seccompProfile: RuntimeDefault` | `securitycontext` with seccomp enforced | Rare system calls (mount, ptrace, bpf) |
+| `apparmor` | `appArmorProfile: RuntimeDefault` | `securitycontext` with AppArmor enforced | Clusters before Kubernetes 1.30, nodes without AppArmor |
+| `no_host_access` | `hostNetwork`, `hostPID`, `hostIPC` off (the default) | `pod_level_security` | Never |
+| `no_automount` | No Kubernetes API token in the pod | — | Application code that calls the Kubernetes API |
+| `privilege_escalation` | `allowPrivilegeEscalation: true` only | Fails `securitycontext` and `disallow` | Review why it is needed |
+| `privileged` | Full device and kernel access | Fails `securitycontext` and `disallow` | Only for applications that truly need it |
+
+The value is the complete list. An application whose image runs as root (`user_id` 0) should get
+these on a non-production environment first.
+
+## Admission policy
+
+The OPA component runs Gatekeeper. Each policy family is a sub-component, which renders a
+constraint template and its constraint.
+
+| Sub-component | What it refuses |
+|---|---|
+| `securitycontext` | A container without `allowPrivilegeEscalation: false`, a privileged container, a writable root filesystem, a container that may run as root; seccomp and AppArmor profiles when the sub-component's `enforce_seccomp_profile` and `enforce_apparmor` are on |
+| `disallow` | Privileged containers, a missing `allowPrivilegeEscalation: false`, images tagged `:latest` |
+| `pod_level_security` | Host network, host PID, host IPC and `hostPath` volumes |
+| `resource_policy` | A pod whose main container declares no CPU and memory requests and limits. Only a create or a change of the pod spec is judged: removing a finalizer or patching a label is never refused |
+| `probes` | A main container without a liveness and a readiness probe |
+| `image_policy` | Images outside the registry allow-list, tag rules, optional digest pinning — for regular, init and ephemeral containers |
+| `image_signing` | Images without a valid signature |
+| `label_deny` | Workloads that do not carry a required label and value |
+| `network_policy_enforcement` | A namespace with workloads and no network policy, and network policies that are wide open |
+| `rbac_enforcement` | Workloads on the default service account, wildcard roles; an opt-in identity guard |
+| `custom` | Your own constraint |
+
+Each control maps to PCI DSS and ISO 27001 requirements, which the compliance scans use — see
+[Compliance automation](/docs/compliance/).
+
+The OPA component also renders one mutation when the stack configuration sets `ttl`: every Job in the
+cluster that sets no `ttlSecondsAfterFinished` of its own — rendered by a chart, created by an operator
+or launched by an application — gets that value, so finished Jobs do not pile up. Namespaces listed in
+the configuration's `namespaces_exclude` are left alone.
+
+### Scope
+
+A policy's `labels` attribute becomes a selector. Every object and namespace the stack renders
+carries `stacktic.io/stack: "<system name>"`, and application pods also carry `env:` with the
+component's environment. A selector that matches neither protects nothing, and the admission scan
+says so (`NO_SCOPE`).
+
+On every policy, the `namespaces` attribute limits it to the namespaces listed, one per line, and
+`excluded_namespaces` exempts namespaces. A component that cannot satisfy a policy by design is
+exempted by the template itself — the VPN's namespace from `securitycontext`, because the WireGuard
+server must run as root with `NET_ADMIN`. The carve-outs a stack needs for its operators are planned
+from the knowledge layer — see [Admission policy from your topology](/docs/compliance/policy).
+
+### Mode
+
+`opa_action` on each policy sub-component is its enforcement: `dryrun` records violations, `warn`
+admits and warns, `deny` refuses. The OPA component's `opa_failure_policy` decides what happens when
+Gatekeeper itself does not answer: `Ignore` admits, `Fail` refuses.
+
+<Figure caption="The safe order for every policy: widen its scope at dryrun or warn, run the admission scan, fix the carve-outs, then deny.">
+<svg viewBox="0 0 900 220" role="img" aria-label="An admission policy moves from dryrun to warn to deny. Between each step the admission scan runs and the carve-outs are fixed, so a deny never blocks a workload the stack needs.">
+  <defs>
+    <marker id="rampAViolet" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-violet)" /></marker>
+  </defs>
+  <path d="M264 102 L344 102" fill="none" stroke="var(--stk-violet)" strokeWidth="1.3" markerEnd="url(#rampAViolet)" />
+  <path d="M554 102 L634 102" fill="none" stroke="var(--stk-violet)" strokeWidth="1.3" markerEnd="url(#rampAViolet)" />
+  <rect x="60" y="60" width="200" height="84" rx="12" fill="var(--stk-panel)" />
+  <rect x="60" y="60" width="200" height="84" rx="12" fill="var(--stk-steel)" fillOpacity="0.045" stroke="var(--stk-steel)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="350" y="60" width="200" height="84" rx="12" fill="var(--stk-panel)" />
+  <rect x="350" y="60" width="200" height="84" rx="12" fill="var(--stk-amber)" fillOpacity="0.045" stroke="var(--stk-amber)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="640" y="60" width="200" height="84" rx="12" fill="var(--stk-panel)" />
+  <rect x="640" y="60" width="200" height="84" rx="12" fill="var(--stk-red)" fillOpacity="0.045" stroke="var(--stk-red)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <text x="74" y="80" fontSize="9.7" fill="var(--stk-steel)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">DRYRUN</text>
+  <text x="74" y="97" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">record only</text>
+  <text x="74" y="114" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">violations listed</text>
+  <text x="364" y="80" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">WARN</text>
+  <text x="364" y="97" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">admit and warn</text>
+  <text x="364" y="114" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">kubectl shows it</text>
+  <text x="654" y="80" fontSize="9.7" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">DENY</text>
+  <text x="654" y="97" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">refuse</text>
+  <text x="654" y="114" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">the pod is rejected</text>
+  <text x="60" y="40" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">opa_action on each policy sub-component</text>
+  <rect x="241.92" y="162.9" width="124.16" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="241.92" y="162.9" width="124.16" height="18.2" rx="9.1" fill="var(--stk-violet)" fillOpacity="0.14" stroke="var(--stk-violet)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="304" y="175.67" fontSize="10.2" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">scan · fix · scope</text>
+  <rect x="531.92" y="162.9" width="124.16" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="531.92" y="162.9" width="124.16" height="18.2" rx="9.1" fill="var(--stk-violet)" fillOpacity="0.14" stroke="var(--stk-violet)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="594" y="175.67" fontSize="10.2" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">scan · fix · scope</text>
+</svg>
+</Figure>
+
+Widening a `deny` policy from nothing to the whole stack blocks every non-compliant pod at once.
+The safe order is the same for every policy: scope it at `warn`, run the admission scan
+(`scan(scanner='opa', mode='full')` through the MCP), fix or carve out what it finds, then `deny`.
+The full scan dry-runs each constraint with a resource that should pass and one that should not,
+and classifies it as enforcing, not enforcing, over-enforcing or broken.
+
+### The identity guard
+
+`rbac_enforcement` carries an opt-in identity guard (`identity_guard_action`: `off` by default, then
+`warn`, `dryrun` or `deny`). The requesters it trusts are derived from the stack — Reloader, the stack
+agent's deploy arm — and requesters holding every permission are never judged. Turn it on at `warn`
+first, and only on a stack whose OPA component was rebuilt once with the template that renders its
+constraint template.
+
+## When a policy blocks an apply
+
+Tune the policy to the stack — its scope, an exclusion, its mode — and rebuild. Never remove it, and
+never patch the cluster around it: the next build would bring it back, and the evidence would show a
+control that was not in force.
+
+→ [Security, layer by layer](/docs/security/) · [Admission policy from your topology](/docs/compliance/policy)

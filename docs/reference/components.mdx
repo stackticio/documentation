@@ -14,15 +14,17 @@ never something to improvise around.
 </Hero>
 
 <Stats>
-  <Stat value="79" label="component templates available" />
-  <Stat value="441" label="typed link types" />
-  <Stat value="63" label="sub-component types" />
+  <Stat value="69" label="components you can draw" />
+  <Stat value="418" label="link types their templates generate configuration for" />
+  <Stat value="60+" label="sub-component types" />
 </Stats>
 
 :::note Where these numbers come from
-All three numbers come from the platform's own generated inventory of its component
-templates. Five of the 79 are legacy entries kept so that older stacks still generate;
-they are never offered for a new design. The numbers move as the catalog grows.
+The 69 are the catalog's drawable components (November 2026). The link types are the ones the
+templates of those components read, from the platform's generated inventory of its templates. The
+sub-component types are counted from the same templates; the count is a floor, not an exact figure.
+Templates kept only so that older stacks still generate are not counted. The numbers move as the
+catalog grows.
 :::
 
 :::note The authoritative list is the catalog itself
@@ -35,7 +37,7 @@ treating any document as the source of truth — including this one.
 
 | Component | What it is for |
 |---|---|
-| **External source code** | Your own code, built in-cluster from your repository. The centre of most stacks |
+| **External source code** | Your own code, built in-cluster from your repository. The centre of most stacks; its `migration_command` runs schema migrations before each new pod starts |
 | **Image base** | A pre-built container image you already have |
 | **FastAPI** | A scaffolded Python API, when you want the platform to write the starting point |
 
@@ -43,14 +45,12 @@ treating any document as the source of truth — including this one.
 
 | Component | What it is for |
 |---|---|
-| **vLLM** · **Llama** | Self-hosted model inference; each served model is a sub-component |
+| **vLLM** | Self-hosted model inference; each served model is a sub-component |
 | **KServe** | Model serving as inference services |
 | **MLflow** | Experiment tracking and the model registry |
 | **Open WebUI** | A chat interface for served models |
 | **Langflow** · **Flowise** | Visual retrieval and agent workflow builders |
 | **Qdrant** | Vector store; collections are sub-components |
-| **Langfuse** | LLM observability |
-| **OpenAI** | An external model provider, expressed as a component so links behave the same |
 | **JupyterHub** | Notebooks |
 | **Dagster** · **Airflow** · **Argo Workflows** | Orchestration for training, apply and data jobs |
 | **Spark** | Distributed processing |
@@ -59,17 +59,17 @@ treating any document as the source of truth — including this one.
 
 | Component | What it is for |
 |---|---|
-| **CloudNativePG** | PostgreSQL; databases, migrations and point-in-time-recovery clusters are sub-components |
-| **MongoDB** · **MariaDB** · **Cassandra** · **Neo4j** | Document, relational, wide-column and graph databases |
+| **CloudNativePG** | PostgreSQL; databases and point-in-time-recovery clusters are sub-components |
+| **MongoDB** · **MariaDB** · **Neo4j** | Document, relational and graph databases; databases are sub-components |
 | **ClickHouse** | Analytics |
-| **OpenSearch** · **Elasticsearch** | Search, analytics and SIEM |
+| **OpenSearch** | Search, analytics and the SIEM — see [Detection and response](/docs/security/detection) |
 | **Valkey** | Cache |
 | **RabbitMQ** | Messaging; exchanges, queues and bindings are sub-components |
 | **Kafka** | Event streaming; topics and bridges are sub-components |
 | **Apicurio Schema Registry** | Schema governance for streaming |
 | **SeaweedFS** | S3-compatible object storage; buckets are sub-components |
 | **immudb** | Immutable, verifiable storage |
-| **RDS · DocumentDB · DynamoDB · S3 · IAM** | Cloud-managed resources, provisioned through Crossplane |
+| **RDS · DocumentDB · DynamoDB · IAM** | Cloud-managed resources, provisioned through Crossplane |
 
 ## Gateway, identity and networking
 
@@ -77,22 +77,24 @@ treating any document as the source of truth — including this one.
 |---|---|
 | **APISIX** | The gateway: routes, TLS, rate limiting, authentication, and an AI gateway sub-component |
 | **Istio** | Service mesh |
-| **Keycloak Operator** | Identity; OIDC clients, groups and LDAP federation are sub-components |
-| **LDAP** | Directory services |
+| **Keycloak Operator** | Identity; clients, extra realms and external identity providers are sub-components — see [Identity and secrets](/docs/day0/identity-secrets) |
 | **cert-manager** | Certificate issuance and renewal |
-| **External DNS** | DNS records from cluster state |
+| **VPN** | WireGuard access to the stack (wg-portal, SSO login, any WireGuard client); linked to APISIX, every HTTP route becomes VPN-only — see [Private access](/docs/security/edge#private-access-with-the-vpn) |
 
 ## Security and policy
 
 | Component | What it is for |
 |---|---|
-| **OPA / Gatekeeper** | Admission policy; each policy family is a sub-component |
+| **OPA / Gatekeeper** | Admission policy; each policy family is a sub-component — see [Hardening and admission](/docs/security/hardening) |
 | **OpenBao** | Secret storage |
 | **External Secrets** | Sourcing secrets from a store at runtime |
 | **Falco** | Runtime threat detection |
+| **Suricata** | Network intrusion detection (passive sensor on every node) |
+| **CrowdSec** | Behaviour-based intrusion prevention: bans enforced on every node, and the web application firewall at the gateway as `waf` sub-components |
 | **Trivy** | Vulnerability scanning |
 | **Sigstore** | Image signature verification |
-| **SonarQube** | Code quality and security analysis |
+| **SonarQube** | Code quality and security analysis; the quality gate of the build |
+| **Nuclei** | DAST: one scan contract per linked application or gateway, runs pushed to the stack agent — see [DAST](/docs/dev-security/dast) |
 | **Vaultwarden** | Credential management for people |
 
 ## Observability
@@ -103,7 +105,6 @@ treating any document as the source of truth — including this one.
 | **Grafana** | Dashboards |
 | **Loki** | Logs |
 | **OpenTelemetry** · **Alloy** | Tracing and telemetry collection |
-| **Kubecost** | Cost visibility |
 
 ## Platform and operations
 
@@ -112,13 +113,13 @@ treating any document as the source of truth — including this one.
 | **Stack agent** | Validation, scanning, evidence, backup control — see [Day 2](/docs/day2/) |
 | **MCP server** | The AI interface — see [MCP](/docs/mcp/) |
 | **Velero** | Cluster backup and restore |
-| **KEDA** | Event-driven autoscaling |
+| **KEDA** | Event-driven autoscaling on metrics queries, databases, topics, queues and models |
 | **Kueue** | Workload queueing and priority |
 | **Reloader** | Restart workloads when their configuration changes |
 | **Argo CD** | GitOps delivery |
 | **Crossplane** | Cloud resource provisioning |
 | **Backstage** | Developer portal |
-| **k6** | Load testing |
+| **k6** | Load testing; each test suite is a sub-component, results in Prometheus |
 | **Kanso** | Work and issue tracking |
 
 ## Business applications

@@ -114,6 +114,23 @@ The gateway component has an AI-specific sub-component type. That is where model
 request shaping and the controls you want in front of an inference endpoint live — as part
 of the graph, so they are versioned and validated like everything else.
 
+## An assistant inside your app
+
+The `external_source_code-ai_gateway` link is how your own code reaches the model. It puts four
+variables into the app's environment: the gateway's OpenAI-compatible base URL for one model, the
+model name, the gateway key and the name of the header that carries it. The app calls
+`POST $AI_GATEWAY_URL/chat/completions` with a streamed request and sends the deltas on to the
+browser; the browser only ever talks to the app, so the key stays server-side.
+
+The split of work is fixed by where things live. The gateway, from the link's attributes, applies
+key auth, the prompt guard, the system prompt it prepends, the token budget for the whole route and
+an optional external fallback. The app does what only it can: it grounds every answer in its own
+data (what this user may see: search results, their own orders), keeps the conversation inside the
+model's context length, throttles per user because the gateway's budget is shared, and turns the
+gateway's status codes into plain words. Without the link the variables are absent and the feature
+hides itself. The component's generated README carries this blueprint step by step, so an agent
+working in the application repository can build the assistant from the stack alone.
+
 ## Tool calling
 
 Chat models that support tool calling need the right parser for their family. The platform

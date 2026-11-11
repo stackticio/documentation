@@ -1,0 +1,206 @@
+---
+id: architecture-index
+slug: /architecture/
+title: How a stack fits together
+sidebar_label: Overview
+sidebar_position: 1
+description: The whole system on one page — the layers of a stack, the link types that join them, and what each link generates on both sides.
+---
+
+<Hero eyebrow="The whole system" title="One application, everything around it, and the links in between">
+A stack is your application plus every service it needs. Each connection between two parts is
+a typed link, and each link generates configuration on both sides of it. This page is the map:
+the layers, the links that join them, and what each one produces.
+</Hero>
+
+<Figure caption="One graph, read from the middle: the application, who reaches it, what it needs, and the delivery, observability, security and operations generated around all of it from the same links.">
+<svg viewBox="0 0 900 430" role="img" aria-label="The application sits in the middle. On the left, the gateway, login, web application firewall and VPN decide who reaches it. On the right, the data stores, event streams, vector store, cache, object storage and models it uses. Underneath, delivery, observability, security and operations are generated around every component from the same links.">
+  <defs>
+    <marker id="mapAAmber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-amber)" /></marker>
+    <marker id="mapAMint" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-mint)" /></marker>
+    <marker id="mapAViolet" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-violet)" /></marker>
+  </defs>
+  <rect x="24" y="36" width="262" height="236" rx="16" fill="var(--stk-violet)" fillOpacity="0.035" stroke="var(--stk-violet)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <rect x="614" y="36" width="262" height="236" rx="16" fill="var(--stk-mint)" fillOpacity="0.035" stroke="var(--stk-mint)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <rect x="314" y="96" width="272" height="116" rx="16" fill="var(--stk-blue)" fillOpacity="0.035" stroke="var(--stk-blue)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <rect x="24" y="300" width="852" height="110" rx="16" fill="var(--stk-amber)" fillOpacity="0.035" stroke="var(--stk-amber)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <path d="M170 78 C301 78 301 172 432 172" fill="none" stroke="var(--stk-violet)" strokeWidth="1.2" markerEnd="url(#mapAViolet)" />
+  <path d="M170 126 C301 126 301 172 432 172" fill="none" stroke="var(--stk-violet)" strokeWidth="1.2" markerEnd="url(#mapAViolet)" />
+  <path d="M170 174 C301 174 301 172 432 172" fill="none" stroke="var(--stk-violet)" strokeWidth="1.2" markerEnd="url(#mapAViolet)" />
+  <path d="M170 222 C301 222 301 172 432 172" fill="none" stroke="var(--stk-violet)" strokeWidth="1.2" markerEnd="url(#mapAViolet)" />
+  <path d="M468 172 C551 172 551 74 634 74" fill="none" stroke="var(--stk-mint)" strokeWidth="1.2" markerEnd="url(#mapAMint)" />
+  <path d="M468 172 C551 172 551 113 634 113" fill="none" stroke="var(--stk-mint)" strokeWidth="1.2" markerEnd="url(#mapAMint)" />
+  <path d="M468 172 C551 172 551 152 634 152" fill="none" stroke="var(--stk-mint)" strokeWidth="1.2" markerEnd="url(#mapAMint)" />
+  <path d="M468 172 C551 172 551 191 634 191" fill="none" stroke="var(--stk-mint)" strokeWidth="1.2" markerEnd="url(#mapAMint)" />
+  <path d="M468 172 C551 172 551 230 634 230" fill="none" stroke="var(--stk-mint)" strokeWidth="1.2" markerEnd="url(#mapAMint)" />
+  <path d="M450 300 C450 245 450 245 450 190" fill="none" stroke="var(--stk-amber)" strokeWidth="1.2" strokeDasharray="4 4" markerEnd="url(#mapAAmber)" />
+  <rect x="44" y="330" width="192" height="66" rx="12" fill="var(--stk-panel)" />
+  <rect x="44" y="330" width="192" height="66" rx="12" fill="var(--stk-amber)" fillOpacity="0.045" stroke="var(--stk-amber)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="252" y="330" width="192" height="66" rx="12" fill="var(--stk-panel)" />
+  <rect x="252" y="330" width="192" height="66" rx="12" fill="var(--stk-amber)" fillOpacity="0.045" stroke="var(--stk-amber)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="460" y="330" width="192" height="66" rx="12" fill="var(--stk-panel)" />
+  <rect x="460" y="330" width="192" height="66" rx="12" fill="var(--stk-amber)" fillOpacity="0.045" stroke="var(--stk-amber)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="668" y="330" width="192" height="66" rx="12" fill="var(--stk-panel)" />
+  <rect x="668" y="330" width="192" height="66" rx="12" fill="var(--stk-amber)" fillOpacity="0.045" stroke="var(--stk-amber)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <circle cx="52" cy="78" r="6" fill="var(--stk-violet)" />
+  <circle cx="52" cy="126" r="6" fill="var(--stk-violet)" />
+  <circle cx="52" cy="174" r="6" fill="var(--stk-violet)" />
+  <circle cx="52" cy="222" r="6" fill="var(--stk-violet)" />
+  <circle cx="642" cy="74" r="6" fill="var(--stk-mint)" />
+  <circle cx="642" cy="113" r="6" fill="var(--stk-mint)" />
+  <circle cx="642" cy="152" r="6" fill="var(--stk-mint)" />
+  <circle cx="642" cy="191" r="6" fill="var(--stk-mint)" />
+  <circle cx="642" cy="230" r="6" fill="var(--stk-mint)" />
+  <circle cx="450" cy="172" r="16" fill="var(--stk-blue)" fillOpacity="0.16" />
+  <circle cx="450" cy="172" r="10" fill="var(--stk-blue)" />
+  <text x="40" y="57" fontSize="10.2" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">WHO REACHES IT</text>
+  <text x="64" y="82" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">gateway route</text>
+  <text x="64" y="95" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">apisix-&lt;app&gt;</text>
+  <text x="64" y="130" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">login</text>
+  <text x="64" y="143" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">&lt;app&gt;-client</text>
+  <text x="64" y="178" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">web firewall</text>
+  <text x="64" y="191" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">waf-&lt;app&gt;</text>
+  <text x="64" y="226" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">private access</text>
+  <text x="64" y="239" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">vpn-apisix</text>
+  <text x="630" y="57" fontSize="10.2" fill="var(--stk-mint)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">WHAT IT NEEDS</text>
+  <text x="654" y="78" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">database</text>
+  <text x="654" y="91" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">&lt;app&gt;-db</text>
+  <text x="654" y="117" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">events</text>
+  <text x="654" y="130" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">&lt;app&gt;-topic · -queue</text>
+  <text x="654" y="156" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">vectors · search</text>
+  <text x="654" y="169" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">-collection · -opensearch</text>
+  <text x="654" y="195" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">cache · objects</text>
+  <text x="654" y="208" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">-valkey · -swbucket</text>
+  <text x="654" y="234" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">a model</text>
+  <text x="654" y="247" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">&lt;app&gt;-ai_gateway</text>
+  <text x="330" y="117" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">YOUR APPLICATION</text>
+  <text x="450" y="140" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">your code, built in-cluster</text>
+  <text x="40" y="321" fontSize="10.2" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">AROUND EVERYTHING, FROM THE SAME LINKS</text>
+  <text x="58" y="350" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">DELIVERY</text>
+  <text x="58" y="367" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">build · deploy</text>
+  <text x="58" y="384" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">Argo CD · Reloader</text>
+  <text x="266" y="350" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">OBSERVABILITY</text>
+  <text x="266" y="367" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">metrics · logs</text>
+  <text x="266" y="384" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">traces · dashboards</text>
+  <text x="474" y="350" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">SECURITY</text>
+  <text x="474" y="367" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">policy · detection</text>
+  <text x="474" y="384" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">network · admission</text>
+  <text x="682" y="350" fontSize="9.7" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">OPERATIONS</text>
+  <text x="682" y="367" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">agent · MCP</text>
+  <text x="682" y="384" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">tests · scans · evidence</text>
+  <rect x="363.44" y="226.9" width="173.12" height="18.2" rx="9.1" fill="var(--stk-panel-2)" />
+  <rect x="363.44" y="226.9" width="173.12" height="18.2" rx="9.1" fill="var(--stk-blue)" fillOpacity="0.14" stroke="var(--stk-blue)" strokeOpacity="0.6" strokeWidth="1" />
+  <text x="450" y="239.67" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle" fontWeight="600">every edge is a typed link</text>
+</svg>
+</Figure>
+
+## Read a stack from the middle
+
+Every stack has the same shape, whatever it does:
+
+1. **The application** sits in the middle. It is your own code, built inside the cluster, or an
+   image you already have.
+2. **Who reaches it** is on one side: the gateway route, the login, the web application firewall,
+   private access through a VPN.
+3. **What it needs** is on the other side: databases, event streams, vector stores, caches,
+   object storage, search, models.
+4. **Around everything** sit delivery, observability, security and operations. You do not
+   configure them per application. They are generated from the same links.
+
+Nothing in this picture is configured twice. A link from your application to a database gives
+the application its connection variables, gives the database its user, opens the network path
+between the two namespaces, and registers the relationship with the stack agent, which then
+tests it.
+
+## The layers and their links
+
+The link type is always `sourceType-targetType`, and it is the contract: it decides which files
+appear and which values travel. The table lists the link types an application uses most, by
+layer. The full vocabulary is in [Link types](/docs/reference/links).
+
+| Layer | Components | Links into this layer | What the link generates |
+|---|---|---|---|
+| **Your application** | External source code (your repository, built in the cluster) · Image base (an image you already have) · FastAPI (a scaffold) | — | The workload, its env Secret, the in-cluster build, the `dev_tools/` kit — see [Build and deploy](/docs/day0/build-deploy) |
+| **Relational and document data** | CloudNativePG · MongoDB · MariaDB · Neo4j · ClickHouse | `<app>-db`, `<app>-mongo_db`, `<app>-maria_db`, `<app>-neo4j_db` (each to a database sub-component) | Connection variables in the shape your framework expects, the database and its user, the network path |
+| **Events** | Kafka (topics, bridges, node pools) · RabbitMQ (exchanges, queues) · Apicurio | `<app>-topic`, `<app>-exchange`, `<app>-apicurio_schema_registry` | `KAFKA_BOOTSTRAP_SERVERS`, `KAFKA_TOPICS`, the security protocol and the TLS file locations; the AMQP connection and `RABBITMQ_QUEUES`; `SCHEMA_REGISTRY_URL` |
+| **Search, vectors, cache, objects** | OpenSearch · Qdrant (collections) · Valkey · SeaweedFS (buckets) | `<app>-opensearch`, `<app>-collection`, `<app>-valkey`, `<app>-swbucket` | `OPENSEARCH_URL` and its credentials, `QDRANT_URL` and `QDRANT_COLLECTION`, the cache connection (`REDIS_URL` for most frameworks), the S3 endpoint, bucket and access key |
+| **Models** | vLLM (one sub-component per model) · KServe · MLflow · Open WebUI · Langflow · Flowise | `<app>-ai_gateway` to an AI gateway route, which links `ai_gateway-model` to a served model | `AI_GATEWAY_URL`, `AI_GATEWAY_MODEL`, `AI_GATEWAY_API_KEY` and its header name; the gateway applies the key, the prompt guard and the token budget |
+| **Identity** | Keycloak (clients, realms, external identity providers) | `<app>-client` or `client-<app>` | `OIDC_ISSUER_URL`, `OIDC_DISCOVERY_URL`, `OIDC_REALM`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_REDIRECT_URIS`; the client itself; the login at the gateway when the route asks for it — see [Identity and secrets](/docs/day0/identity-secrets) |
+| **Gateway and access** | APISIX (routes, AI gateway) · cert-manager · VPN · CrowdSec WAF profiles | `apisix-<app>`, `vpn-apisix`, `waf-<app>`, `apisix-crowdsec` | A route on `<subdomain>.<domain>` with TLS, rate limit, CORS, IP allow-list and login; VPN-only access; a WAF in front — see [Gateway, login and private access](/docs/security/edge) |
+| **Delivery** | In-cluster builds · Argo CD · Reloader | `argo_cd-<type>` | One Argo CD Application per linked component, Jobs as sync hooks, restart on a changed Secret — see [Build and deploy](/docs/day0/build-deploy#argo-cd) |
+| **Observability** | Prometheus · Grafana · Loki · Alloy · OpenTelemetry | `prometheus-<type>`, `grafana-prometheus`, `grafana-loki`, `alloy-loki`, `<app>-otel` | Scrape configuration, alert rules and dashboards for the linked component; log shipping; trace export |
+| **Scale** | KEDA · Kueue · k6 | `keda-prometheus`, `prometheus_query-<app>`, `keda-db`, `keda-topic`, `keda-queue`, `keda-model` | Autoscalers bound to real signals; load-test suites whose results land in Prometheus — see [Lifecycle and scale](/docs/day2/lifecycle) |
+| **Security** | Generated network policies · OPA · Falco · Suricata · CrowdSec · OpenBao · External Secrets · Trivy · SonarQube · Nuclei · Sigstore | `<source>-opensearch`, `crowdsec-suricata`, `sonarqube-<app>`, `nuclei-<app>`, `external_secrets-openbao` | Policies per link, admission constraints, detection feeds, build gates, scans — see [Security, layer by layer](/docs/security/) |
+| **Operations** | Stack agent · MCP server · Velero | `fastmcp-stack_agent`, `fastmcp-<type>`, `stack_agent-swbucket` | Link tests, scans, evidence, backups; the AI tools for each linked technology — see [Day 2](/docs/day2/) and [MCP](/docs/mcp/) |
+
+`<app>` stands for the application's component type: `external_source_code`, `image_base` or
+`fastapi`. The variable names above are the ones an `external_source_code` component receives.
+For a database, a cache, a bucket, a message broker and MongoDB the names follow the component's
+`framework_type`: a Python application gets `DATABASE_URL`, `REDIS_URL`, `S3_ENDPOINT_URL`,
+`AMQP_URL` and `MONGODB_URI`; a Spring application gets the `SPRING_*` properties; Node.js, Rails,
+Laravel and the generic set each get their own conventional names.
+
+## One link, every side of it
+
+Take the most common link, an application to a PostgreSQL database
+(`external_source_code-db`, drawn to a database sub-component of a CloudNativePG cluster).
+
+| Where | What appears |
+|---|---|
+| **The application** | Connection variables in its env Secret, named for its framework |
+| **The database** | The database and its owner, from the sub-component's attributes |
+| **The network** | A policy that lets the application's namespace reach the database namespace on the database port |
+| **Delivery** | When Argo CD manages the database, the grant Job runs as a sync hook |
+| **Monitoring** | With a `prometheus-cnpg` link, the cluster's metrics, alert rules and dashboards |
+| **Backups** | With a `cnpg-swbucket` link, the object store and the backup schedule, as link attributes |
+| **The stack agent** | The link appears in link validation: is it rendered, did the credential arrive, is the port reachable, does the database answer with that credential |
+
+Removing the link removes all of it from the repository at the next build. Objects already in the
+cluster stay until someone deletes them, because an apply never removes what a file no longer
+lists — see [Build and deploy](/docs/day0/build-deploy).
+
+## Two real stacks, end to end
+
+The two pages that follow walk through stacks the Stacktic team runs, cell by cell. Names are
+the ones on their diagrams; hosts and credentials are left out.
+
+<Cards cols={2}>
+  <Card to="/docs/architecture/ai-stack" kicker="Example" title="An AI document desk">
+    Two applications, two self-hosted models, an event stream that feeds a database and a
+    nightly job — 22 components, all wired by links.
+  </Card>
+  <Card to="/docs/architecture/secured-stack" kicker="Example" title="A secured marketplace">
+    Two production applications behind rate limits and a web application firewall, with
+    admission policy, intrusion detection, secrets from a vault and every build gate on.
+  </Card>
+</Cards>
+
+## Read any stack yourself
+
+Every stack repository describes itself. These files are generated on every build:
+
+| File | What it tells you |
+|---|---|
+| `stack-metadata.yaml` | The graph as data: every component, sub-component, link and attribute. The stack agent and the MCP read this file |
+| `README.md` | The architecture, rendered as a diagram |
+| `network-diagram.md` | Every network path the links opened, and why |
+| `networkpolicy-manifest.json` | The generated policies, and any link the generator could not resolve |
+| `doc/` | One page per component, with what its links generated |
+| `audit/` | A security audit of the design |
+
+An AI client connected to the stack's MCP server reads the same graph with `stack_graph`, and can
+explain any link with `knowledge(action='link', link_type=<type>)`.
+
+## Where to go next
+
+<Cards>
+  <Card to="/docs/platform/repository" kicker="Repository" title="Branches and the merge">
+    Where the generated files go, where your code goes, and how the two meet on every build.
+  </Card>
+  <Card to="/docs/platform/external-stacks" kicker="Multi-stack" title="External stacks">
+    Central metrics, logs, SIEM and delivery for several stacks, and what crosses a stack boundary.
+  </Card>
+  <Card to="/docs/security/" kicker="Security" title="Security, layer by layer">
+    Every control, the declaration it comes from, and the scan that proves it.
+  </Card>
+</Cards>

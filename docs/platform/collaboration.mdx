@@ -96,65 +96,13 @@ an observability stack are separate systems that nonetheless need to reference e
 </svg>
 </Figure>
 
-A system is published with the eye icon on its card. Its components are then offered
-under **External systems** on the design page of everyone who has a role on it. A
-published system with a pending catalog change is not offered until it is synchronized.
-Once copies exist:
+A system is published with the eye icon on its card, and its cells can then be drawn in the
+systems of everyone who has a role on it. Changes at the origin propagate into every copy, deletions
+too, and a build can render the copies and import the components linked to them.
 
-| Direction | Behaviour |
-|---|---|
-| **A copy is added elsewhere** | The origin records that another system holds a copy |
-| **The origin changes** | Name, type, group, attributes, added sub-components and links are propagated into every copy |
-| **The origin loses something** | The copies lose it too, along with the links that depended on it |
-| **A copy is removed** | The origin stops listing that system |
-
-### What a copy generates
-
-When a system involved in sharing is built, the build page first opens **External &
-Referenced Components Build Settings**:
-
-| List | What it holds | What ticking does |
-|---|---|---|
-| **External components** | The copies on your canvas, taken from other systems | Ticking the component also renders it, creating its folder in your repository. Ticking **Links** imports the links it has in its own system: the components at its other ends are added, named `<origin title>_<name>` |
-| **Referenced components** | For each of your cells that other systems copied, the components those systems linked to it | Ticking one renders it, creating its folder in your repository |
-
-Whether ticked or not, all of these are in `stack-metadata.yaml`, and your components'
-templates see them at the other end of their links, marked *external* or *referenced*.
-
-What the external mark changes depends on the template. Only some templates handle it:
-
-| Link | With an external component at the other end |
-|---|---|
-| OpenTelemetry collector to ClickHouse or OpenSearch | Sends to `https://<remote_host>:443`, where `remote_host` is an attribute of the link |
-| Grafana to ClickHouse | Uses the link's `public_host` as the data source address |
-| Prometheus to Prometheus | Sends its metrics to the central Prometheus by remote write, labelled with this stack's name |
-| Argo CD to Argo CD | Switches to the multi-cluster modes; see [Argo CD](/docs/day0/build-deploy#argo-cd) |
-
-A template that does not handle the mark treats the copy as local. It uses the copy's
-namespace and in-cluster service name, which only resolve when both stacks run in the same
-cluster.
-
-No network policy rule is generated for a link to an external component. Its traffic
-leaves through the egress on ports 80 and 443 that every namespace gets by default.
-
-:::caution Renaming a system that others reference
-Cross-system references are resolved by the system's title. Renaming a system that other
-designs reference breaks those references silently. Decide the name before you publish it.
-:::
-
-## Multi-stack in practice
-
-The result is a federation: separate systems, each with its own graph, lifecycle, history
-and validation surface, that can still express dependencies on each other and generate the
-configuration those dependencies require.
-
-The common shapes are all links to a cell published by another stack:
-
-| Shape | On the graph | What it generates |
-|---|---|---|
-| **Central metrics** | Each application stack's metrics server links to the metrics server of a central stack; the central one is marked as the master | Every stack sends its metrics to the central one, each series labelled with the name of the stack it came from; the central server accepts samples up to an hour late |
-| **Central dashboards** | The central stack's dashboards link to its metrics server | One dashboard folder per stack whose metrics arrive |
-| **Central delivery** | Each stack's GitOps controller links to the central one | The central controller deploys every linked stack, cluster by cluster — see [Argo CD](/docs/day0/build-deploy#argo-cd) |
-| **Shared services** | A cell of another stack — a database, a gateway, an identity provider — is pulled into your design | The link generates as described in [What a copy generates](#what-a-copy-generates): through the template's external handling where it has one, otherwise as an in-cluster address that only works when both stacks share a cluster |
+Everything else about it is on one page, [External stacks](/docs/platform/external-stacks): the
+build settings for external and referenced components, the links that work across stacks and
+where each reads the other stack's address, the common shapes (central metrics, logs, SIEM and
+delivery), and the network policies generated for cross-stack links.
 
 → [Core concepts](/docs/concepts)

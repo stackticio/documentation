@@ -1,0 +1,173 @@
+---
+id: security-index
+slug: /security/
+title: Security, layer by layer
+sidebar_label: Overview
+sidebar_position: 1
+description: Every security control a stack can carry — what is generated, which declaration on the graph produces it, and which scan proves it — from the gateway to the build gates.
+---
+
+<Hero eyebrow="Security" title="Every control comes from the graph, and every control is measured">
+Security in Stacktic is not a separate product bolted onto the stack. Each control is a component, a
+sub-component, a link or an attribute. It is generated with the topology, regenerated when the
+topology changes, and measured by the stack agent against what the graph declares.
+</Hero>
+
+<Figure caption="Security in three lanes: what is checked before a workload runs, what every request passes through, and what watches the running system and responds. Every element is a component, a sub-component, a link or an attribute on the graph.">
+<svg viewBox="0 0 900 420" role="img" aria-label="Three lanes. Before it runs: build gates, then admission policy. Every request: the VPN guard, the firewall bouncer and web application firewall, the gateway with TLS, rate limits and login, then the network policy, then the hardened pod. Watching: Suricata, Falco and CrowdSec feed the SIEM and the alerts, and CrowdSec decisions feed back into the bouncer and the firewall. The stack agent proves each layer.">
+  <defs>
+    <marker id="secAAmber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-amber)" /></marker>
+    <marker id="secARed" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-red)" /></marker>
+    <marker id="secAViolet" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stk-violet)" /></marker>
+  </defs>
+  <rect x="24" y="36" width="852" height="96" rx="16" fill="var(--stk-amber)" fillOpacity="0.035" stroke="var(--stk-amber)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <rect x="24" y="152" width="852" height="110" rx="16" fill="var(--stk-violet)" fillOpacity="0.035" stroke="var(--stk-violet)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <rect x="24" y="282" width="852" height="120" rx="16" fill="var(--stk-red)" fillOpacity="0.035" stroke="var(--stk-red)" strokeOpacity="0.55" strokeWidth="1.1" strokeDasharray="5 5" />
+  <path d="M160 84 L220 84" fill="none" stroke="var(--stk-amber)" strokeWidth="1.2" markerEnd="url(#secAAmber)" />
+  <path d="M330 84 L390 84" fill="none" stroke="var(--stk-amber)" strokeWidth="1.2" markerEnd="url(#secAAmber)" />
+  <path d="M500 84 L560 84" fill="none" stroke="var(--stk-amber)" strokeWidth="1.2" markerEnd="url(#secAAmber)" />
+  <path d="M670 84 L730 84" fill="none" stroke="var(--stk-amber)" strokeWidth="1.2" markerEnd="url(#secAAmber)" />
+  <path d="M166 204 L194 204" fill="none" stroke="var(--stk-violet)" strokeWidth="1.2" markerEnd="url(#secAViolet)" />
+  <path d="M308 204 L336 204" fill="none" stroke="var(--stk-violet)" strokeWidth="1.2" markerEnd="url(#secAViolet)" />
+  <path d="M450 204 L478 204" fill="none" stroke="var(--stk-violet)" strokeWidth="1.2" markerEnd="url(#secAViolet)" />
+  <path d="M592 204 L620 204" fill="none" stroke="var(--stk-violet)" strokeWidth="1.2" markerEnd="url(#secAViolet)" />
+  <path d="M734 204 L762 204" fill="none" stroke="var(--stk-violet)" strokeWidth="1.2" markerEnd="url(#secAViolet)" />
+  <path d="M250 344 L322 344" fill="none" stroke="var(--stk-red)" strokeWidth="1.2" markerEnd="url(#secARed)" />
+  <path d="M556 344 L612 344" fill="none" stroke="var(--stk-red)" strokeWidth="1.2" markerEnd="url(#secARed)" />
+  <path d="M700 302 C700 258 345 258 345 214" fill="none" stroke="var(--stk-red)" strokeWidth="1.1" strokeDasharray="4 4" markerEnd="url(#secARed)" />
+  <rect x="330" y="302" width="220" height="84" rx="12" fill="var(--stk-panel)" />
+  <rect x="330" y="302" width="220" height="84" rx="12" fill="var(--stk-red)" fillOpacity="0.045" stroke="var(--stk-red)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <rect x="620" y="302" width="236" height="84" rx="12" fill="var(--stk-panel)" />
+  <rect x="620" y="302" width="236" height="84" rx="12" fill="var(--stk-red)" fillOpacity="0.045" stroke="var(--stk-red)" strokeOpacity="0.5" strokeWidth="1.1" />
+  <circle cx="60" cy="84" r="6" fill="var(--stk-amber)" />
+  <circle cx="230" cy="84" r="6" fill="var(--stk-amber)" />
+  <circle cx="400" cy="84" r="6" fill="var(--stk-amber)" />
+  <circle cx="570" cy="84" r="6" fill="var(--stk-amber)" />
+  <circle cx="740" cy="84" r="6" fill="var(--stk-amber)" />
+  <circle cx="60" cy="204" r="6" fill="var(--stk-violet)" />
+  <circle cx="202" cy="204" r="6" fill="var(--stk-violet)" />
+  <circle cx="344" cy="204" r="6" fill="var(--stk-violet)" />
+  <circle cx="486" cy="204" r="6" fill="var(--stk-violet)" />
+  <circle cx="628" cy="204" r="6" fill="var(--stk-violet)" />
+  <circle cx="770" cy="204" r="6" fill="var(--stk-violet)" />
+  <circle cx="60" cy="322" r="6" fill="var(--stk-red)" />
+  <circle cx="60" cy="352" r="6" fill="var(--stk-red)" />
+  <circle cx="60" cy="382" r="6" fill="var(--stk-red)" />
+  <text x="40" y="57" fontSize="10.2" fill="var(--stk-amber)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">BEFORE IT RUNS</text>
+  <text x="72" y="88" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">source scan</text>
+  <text x="72" y="101" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">build_gate</text>
+  <text x="242" y="88" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">your rules</text>
+  <text x="242" y="101" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">sast_gate</text>
+  <text x="412" y="88" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">quality gate</text>
+  <text x="412" y="101" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">sonarqube-&lt;app&gt;</text>
+  <text x="582" y="88" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">admission</text>
+  <text x="582" y="101" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">OPA policies</text>
+  <text x="752" y="88" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">hardened pod</text>
+  <text x="752" y="101" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">security_features</text>
+  <text x="40" y="173" fontSize="10.2" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">EVERY REQUEST</text>
+  <text x="72" y="208" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">internet</text>
+  <text x="72" y="221" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">client</text>
+  <text x="214" y="208" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">VPN guard</text>
+  <text x="214" y="221" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">vpn-apisix</text>
+  <text x="356" y="208" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">bouncer · WAF</text>
+  <text x="356" y="221" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">crowdsec</text>
+  <text x="498" y="208" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">gateway</text>
+  <text x="498" y="221" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">TLS · limits · login</text>
+  <text x="640" y="208" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">network policy</text>
+  <text x="640" y="221" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">per link</text>
+  <text x="782" y="208" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">your app</text>
+  <text x="782" y="221" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">pod</text>
+  <text x="40" y="303" fontSize="10.2" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">WATCHING</text>
+  <text x="72" y="326" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">Suricata</text>
+  <text x="150" y="326" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">node traffic</text>
+  <text x="72" y="356" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">Falco</text>
+  <text x="150" y="356" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">system calls</text>
+  <text x="72" y="386" fontSize="11" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">CrowdSec</text>
+  <text x="150" y="386" fontSize="9.6" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">logs · scenarios</text>
+  <text x="344" y="322" fontSize="9.7" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">SIEM · ALERTS</text>
+  <text x="344" y="339" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">OpenSearch · Prometheus</text>
+  <text x="344" y="356" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">index · monitors · dashboards</text>
+  <text x="634" y="322" fontSize="9.7" fill="var(--stk-red)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">RESPONSE</text>
+  <text x="634" y="339" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">decisions</text>
+  <text x="634" y="356" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">ban at the node · block at WAF</text>
+</svg>
+</Figure>
+
+## The layers
+
+| Layer | What is generated | Declared by | Proven by | Read |
+|---|---|---|---|---|
+| **Gateway routes** | TLS, rate limit, CORS, IP allow-list, body size, header removal, per route | Attributes of the `apisix-<type>` link | Penetration test, DAST coverage | [Gateway, login and private access](/docs/security/edge) |
+| **Login** | `openid-connect` at the gateway, built from the application's client; OIDC settings in the application | `<app>-client` link, `apisix_oidc_enable` on the route | Link validation (token issuance), the identity checks of the penetration test | [Login from a link](/docs/security/edge#login-from-a-link) |
+| **Private access** | Every HTTP route reachable only through a WireGuard tunnel, except the hosts you keep public | `vpn` component, `vpn-apisix` link | A request from outside the tunnel answers 403 | [Private access](/docs/security/edge#private-access-with-the-vpn) |
+| **Web application firewall** | A CrowdSec AppSec profile (Coraza, OWASP Core Rule Set) in front of each linked application | `waf` sub-component, `waf-<app>` link, `apisix-crowdsec` | WAF alerts in the SIEM, per-rule hit counters | [Web application firewall](/docs/security/edge#web-application-firewall) |
+| **Identity** | Realms, clients, users, groups, external identity providers, who may use the MCP server | Keycloak sub-components and attributes; the MCP's `allowed_groups` | Realm tests of the compliance scans, the penetration test's identity checks | [Identity and secrets](/docs/day0/identity-secrets) |
+| **Network** | One network policy per link; a strict regulated set; explicit egress for cross-stack links | The links themselves; `microsegmentation_level` | Network policy scan, with real connection probes and negative tests | [Network policies](/docs/security/network) |
+| **Admission** | A Gatekeeper constraint per policy family, in `dryrun`, `warn` or `deny` | OPA policy sub-components | Admission scan: enforcing, not enforcing, over-enforcing, broken | [Workload hardening and admission](/docs/security/hardening) |
+| **Workloads** | The pod and container security context | The application's `security_features` | Admission scan, Kubernetes hardening scan | [Workload hardening](/docs/security/hardening#workload-hardening) |
+| **Secrets** | Encrypted secret files in the repository; secrets sourced from OpenBao at runtime | `sops_enabled` on the system; `external_secrets-openbao` | Secrets scan | [Identity and secrets](/docs/day0/identity-secrets#two-ways-to-hold-a-secret) |
+| **Detection** | Network intrusion detection, runtime detection, log-based bans, one SIEM | Suricata, Falco and CrowdSec components; `<source>-opensearch` links | SIEM monitors and dashboards, Prometheus alert rules | [Detection and response](/docs/security/detection) |
+| **Supply chain** | A source scan, your own SAST rules and the quality gate in every build; image vulnerability triage; DAST scan contracts; image signature checks | `build_gate`, `sast_gate`, `sonarqube-<app>`, `nuclei-<app>`, Sigstore | Builds and gates scan, image vulnerability scan, DAST coverage | [Development security](/docs/dev-security/) |
+| **Cluster access for people** | Roles and bindings per namespace | A user group access component, links with a role | RBAC scan | [Who can reach the cluster](/docs/day0/identity-secrets#who-can-reach-the-cluster-is-declared-too) |
+| **Delivery** | Argo CD that never deletes data | The Argo CD component | — | [Argo CD](/docs/day0/build-deploy#argo-cd) |
+| **Proof** | Scans, PCI DSS, ISO 27001, HIPAA and DORA positions, a hash-chained evidence trail | The stack agent | — | [Compliance automation](/docs/compliance/) · [Evidence](/docs/day2/evidence) |
+
+## Why this shape matters
+
+**A control follows the topology.** Add a link and its network path, its route policy and its
+monitoring appear together. Remove it and they go at the next build. There is no window in which the
+security rules describe last month's system.
+
+**A control is versioned with the stack.** It is in the diagram's history, in a diff between two
+versions, in a duplicated environment, and in a rollback.
+
+**A control is measured, not assumed.** The stack agent runs the scan that matches each layer and
+records the result with the metadata commit it judged. "We enforce that" becomes a run anyone can
+repeat.
+
+## Tune, never remove
+
+Hardening starts with the components' own attributes: an application's `security_features`, the
+OPA policy sub-components and their modes, the options on each gateway route. When a policy blocks
+something the stack needs, the policy is tuned to the stack — a scope, an exclusion, a mode — not
+removed.
+
+An AI client connected to the stack's MCP server can produce the plan with
+`security_tuning(action='plan')`. It reads the stack and returns, for every item, the attribute, its
+current and recommended value, why, what it can break, and the exact call that changes it. It never
+writes. Each item has a class:
+
+| Class | Meaning |
+|---|---|
+| `critical_review` | Dangerous today; a person confirms before anything changes |
+| `apply_now` | Near-zero risk, with the residual condition stated |
+| `staged` | Depends on how the application behaves at runtime: change it on a non-production environment first |
+| `needs_input` | The value is not in the design (office or VPN address ranges, an identity client) and has to come from you |
+
+Apply what you approve, build, deploy, and confirm with the admission scan.
+
+## See it on a real stack
+
+[A secured marketplace](/docs/architecture/secured-stack) walks through a stack with every layer
+above turned on, and the choices its design leaves open.
+
+<Cards>
+  <Card to="/docs/security/edge" kicker="Edge" title="Gateway, login and private access">
+    Route options, login from a link, the WAF and VPN-only routes, in the order a request meets them.
+  </Card>
+  <Card to="/docs/security/network" kicker="Network" title="Network policies">
+    One policy per link, the strict regulated set, cross-stack egress, and how to read what is open.
+  </Card>
+  <Card to="/docs/security/hardening" kicker="Workloads" title="Hardening and admission">
+    Security contexts from one attribute, and admission policy that moves from dryrun to deny safely.
+  </Card>
+  <Card to="/docs/security/detection" kicker="Watch" title="Detection and response">
+    Suricata, Falco and CrowdSec, the SIEM they feed, and the bans and blocks that follow.
+  </Card>
+  <Card to="/docs/dev-security/" kicker="Build" title="Development security">
+    The three build gates, DAST as a design fact, and how they map to compliance.
+  </Card>
+  <Card to="/docs/compliance/" kicker="Prove" title="Compliance automation">
+    PCI DSS, ISO 27001, HIPAA and DORA, measured from the cluster and signed off by a person.
+  </Card>
+</Cards>

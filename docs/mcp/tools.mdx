@@ -96,8 +96,8 @@ appears.
 | Tool | What it answers |
 |---|---|
 | `workflow` | The guided journey: measures where the stack is — design, build, install, automate, secure, prove, operate — and returns **one** next step with the exact call to make, the questions to ask you first, and the docs page that explains it. The server tells the model to call it first in a conversation and after every milestone |
-| `server_info` | What this server can do right now: knowledge repository access, platform account, stack agent, cluster access, Argo CD, and the tool modules that loaded |
-| `self_check` | Tests every credential and connection the server runs on, live, and names the attribute that fixes what is broken |
+| `server_info` | What this server can do right now: knowledge repository access, platform account, stack agent, cluster access, Argo CD, who may call tools (`capabilities.authorization`), and the tool modules that loaded |
+| `self_check` | Tests every credential and connection the server runs on, live, and names the attribute that fixes what is broken; `scope='oauth'` also reports the callback allow-list, the consent mode and the allowed groups |
 | `ping` | Whether the server answers at all |
 
 ## Knowledge — what the platform can express
@@ -131,7 +131,7 @@ target, how badly, and what the recommended order of operations is.
 | Tool | What it does |
 |---|---|
 | `stack_test` | Runs real end-to-end validation against the live topology: connections, credentials, certificates, routes |
-| `scan` | Scored scans through the stack agent: penetration test, link validation, admission policy, network policy, Kubernetes hardening, RBAC, secrets, configuration posture, vulnerability sweep, PCI DSS and ISO 27001 |
+| `scan` | Scored scans through the stack agent: penetration test, link validation, admission policy, network policy, Kubernetes hardening, RBAC, secrets, configuration posture, vulnerability sweep, PCI DSS, ISO 27001, the HIPAA Security Rule and DORA |
 | `evidence` | The attestation trail: versioned runs, hash chains, deltas, finding memory |
 | `backup` | What is protected, what can be proven, restore points, and guarded day-2 operations |
 | `cve` | Vulnerability findings from two sources that are never added together — weaknesses in your own code, and known vulnerabilities in images — with the decision recorded for each |

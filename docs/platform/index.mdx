@@ -194,7 +194,7 @@ value and message), then offers four actions.
 
 | Action | What it does |
 |---|---|
-| **Build** | Renders every component from its template, runs the stack-wide generation steps and commits the result. If the system shares cells with other systems, you first choose which shared components are rendered into your repository (see [What a copy generates](/docs/platform/collaboration#what-a-copy-generates)). Then you choose the *Stacktic version* (the version of the stack-wide steps) and whether to merge into your branch |
+| **Build** | Renders every component from its template, runs the stack-wide generation steps and commits the result. If the system shares cells with other systems, you first choose which shared components are rendered into your repository (see [External stacks](/docs/platform/external-stacks#what-a-build-does-with-copies)). Then you choose the *Stacktic version* (the version of the stack-wide steps) and whether to merge into your branch |
 | **Fast Build** | Renders only the components you tick, with their sub-components, then runs the stack-wide steps and commits. Components you did not tick keep the output of the last build, even when they read something you changed. The page warns about this |
 | **Push** | Commits the whole system from what the last Save & Render already rendered, plus the stack-wide steps. It is a full build without waiting for rendering. It is refused until that background render has finished |
 | **Cancel Build** | Stops a running build between steps and between components |
@@ -209,7 +209,8 @@ what Stacktic would write. For each file you choose:
 
 Ignore choices are remembered for later builds and pushes. A build that still conflicts
 commits the conflict markers and lists the files in its log. A push that conflicts commits
-nothing.
+nothing. The branches, the per-file rules and which actions merge are in
+[The stack repository and the merge](/docs/platform/repository).
 
 The build log streams while the build runs and stays on the build's row in History.
 

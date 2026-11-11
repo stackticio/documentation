@@ -1,7 +1,7 @@
 ---
 id: compliance-frameworks
 slug: /compliance/frameworks
-title: PCI DSS and ISO 27001
+title: PCI DSS, ISO 27001, HIPAA and DORA
 sidebar_label: Frameworks
 sidebar_position: 2
 description: How the compliance position is computed from the topology and the cluster, and what the generated audit report contains.
@@ -39,9 +39,9 @@ are even applicable, then go and measure them.
   <text x="124" y="164" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">backup           ✓</text>
   <text x="124" y="180" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">SIEM             ✗</text>
   <text x="392" y="106" fontSize="9.7" fill="var(--stk-violet)" fontFamily="Fira Code, ui-monospace, monospace" fontWeight="600" letterSpacing="1.1">APPLICABLE CONTROLS</text>
-  <text x="392" y="123" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">PCI DSS · ISO 27001</text>
+  <text x="392" y="123" fontSize="13.5" fill="var(--stk-ink)" fontFamily="Instrument Sans, ui-sans-serif, system-ui, sans-serif" fontWeight="600">PCI DSS · ISO 27001 · HIPAA</text>
   <text x="392" y="140" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">PCI DSS v4.0 · 250</text>
-  <text x="392" y="155" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">ISO 27001:2022 · 93</text>
+  <text x="392" y="155" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">ISO 27001:2022 · 93 · HIPAA · 48</text>
   <text x="392" y="170" fontSize="10.5" fill="var(--stk-muted)" fontFamily="Fira Code, ui-monospace, monospace">no SIEM = a named gap</text>
   <rect x="321.58" y="118.9" width="56.84" height="18.2" rx="4" fill="var(--stk-panel-2)" />
   <text x="350" y="131.672" fontSize="10.2" fill="var(--stk-blue)" fontFamily="Fira Code, ui-monospace, monospace" textAnchor="middle">decides</text>
@@ -114,6 +114,77 @@ sequence:
 Because the remediation is a graph change, "we fixed it" is verifiable by re-running the
 same scan and comparing the two runs — and the comparison is classified as an improvement
 explained by a declared change, not as unexplained movement.
+
+## Two tiers of evidence for ISO 27001
+
+ISO/IEC 27001 names outcomes, never products: "networks shall be segregated", "changes shall follow a
+change management procedure". A stack can prove such an outcome with a minimum set of facts, or with
+more machinery on top. So 42 of the ISO controls carry two tiers:
+
+| Tier | What it is |
+|---|---|
+| **Standard** | The floor: the facts that prove the outcome. A stack that has them passes the control |
+| **Strong** | The fullest evidence the platform can present — network policies, a GitOps controller, admission policy, intrusion detection, where they apply |
+
+A passing control is graded *Strong* or *Standard*. A stack without the strong set does not read as
+failing a control the standard does not ask it for, and a stack that declares the strong set but does
+not run it does not read as having it: the auditor-facing note says, per tier, whether the evidence
+was presented, declared but not confirmed by this scan, partly in the stack, or not in it. PCI DSS,
+which does prescribe segmentation and intrusion detection, keeps one level.
+
+## The HIPAA Security Rule
+
+The third framework is the HIPAA Security Rule, 45 CFR Part 164, Subpart C, as in force. The
+scanner judges the 48 standards and implementation specifications of §§ 164.308–164.316: 19
+required and 22 addressable implementation specifications, plus the seven standards that carry
+none. Every row quotes the regulation's own words, and the report groups them by section —
+administrative, physical, technical, organizational, documentation.
+
+What the platform tests from the cluster: backups and disaster recovery, certified restores, audit
+controls (the log store and the runtime detector), malware protection, log-in monitoring, password
+policy, automatic logoff, unique user IDs, authentication on every gateway route, transmission
+security, access authorization, and the periodic evaluation itself. Where the rule fixes no number —
+an idle timeout, a password policy — the scan reports the declared value and does not invent a
+threshold.
+
+What stays yours: the risk analysis, the policies, the business associate agreements, the workforce
+procedures, emergency access, the encryption and integrity of the health records inside your
+applications, and the documentation rules. Those rows read *Not Covered* with the reason and the
+platform facts that support them, and a named person accepts each one with the document. The
+physical safeguards are your hosting provider's and read *N/A* with the provider's attestation
+named as the evidence.
+
+An addressable specification is not optional: the rule asks you to implement it, or to document why
+it is not reasonable and appropriate and implement an equivalent measure. The scan never drops one.
+And there is no HIPAA certificate: the deliverable is the evidence pack and the signed positions.
+
+## DORA
+
+The fourth framework is DORA, Regulation (EU) 2022/2554 on digital operational resilience for the
+financial sector, applicable since 17 January 2025. The scanner judges 110 rows: the obligations of
+Chapters II to VI addressed to financial entities, one row per paragraph — or per point, where the
+points are obligations the platform tests differently — keyed by the citation, such as
+`Art.9(4)(b)`. Every row quotes the regulation line for line. Provisions addressed to the supervisory
+authorities, options ("may") and the scoping articles are not rows.
+
+What the platform tests: the technical obligations of the ICT risk management framework — updated and
+redundant systems, the asset map, monitoring and detection, segmentation, authentication, change and
+patch management, backups, restores and logging — the technical half of incident management
+(recording, early warning, response mechanisms), and the tests the stack agent performs itself. It
+reuses the evidence collectors of the other frameworks, and adds one of its own: the replicas of
+every workload and data store.
+
+What stays yours: the governance, the policies, the business continuity plans, incident
+classification and reporting, threat-led penetration testing, the third-party contracts and the
+register of information. Those rows read *Not Covered* with the reason and the platform facts that
+support them, and a person accepts them with the document. Paragraphs addressed to one type of entity
+only — central securities depositories, central counterparties, data reporting service providers,
+microenterprises — read *N/A* with the entity type named; an entity of that type rejects the N/A and
+decides the row. There is no DORA certification: compliance is assessed by the competent authority,
+and the deliverable is the evidence pack.
+
+The scan runs in the same [three modes](#the-three-modes) as the others: fast (cluster evidence, under a
+minute), deep (adds the hardening scans, a few minutes) and report (deep, plus the rendered document).
 
 ## Continuous, not annual
 

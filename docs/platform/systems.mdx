@@ -175,11 +175,18 @@ Only *ignore* is remembered — an overwrite makes the file match, and a merge i
 default anyway, so neither needs to be stored. On a push, a conflict stops the operation
 instead of committing conflict markers.
 
+A build started through the API — the MCP's build included — commits the generated branch only
+and does not merge. The next Save & Push, or a build with *Merge* ticked, brings it into the build
+branch. The full rules, file by file, are in
+[The stack repository and the merge](/docs/platform/repository).
+
 ## Build logs
 
 Logs stream while the build runs, and each step reports its own timing, so a slow build can
-be attributed from the log alone. The build log ends with the exact apply commands for what
-changed.
+be attributed from the log alone. After a Save & Push, the log ends with one
+`kubectl apply -f <file> --server-side --force-conflicts` per changed manifest, build
+manifests before deploy manifests. A full build lists no apply commands: apply the components,
+or the whole environment, as in [Build and deploy](/docs/day0/build-deploy).
 
 ## Folders and visibility
 
